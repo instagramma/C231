@@ -8,6 +8,9 @@
   ============================================================
   CHEM 231 — OCHEM BOOTCAMP  ·  v2.1  ·  built 2026-08-09
   v2.1: due dates + overdue flags on days/molecules; Aug 17 final diagnostic day (mixed 1-per-topic round)
+  v2.2: cross-device cloud sync via the B250 Supabase project (`progress` table, profile "gabe-c231") —
+        pull+merge on load (arrays union, per-question stats keep the higher-attempt copy), debounced push on change.
+        localStorage stays as offline cache; header dot shows sync state.
   For Gabe. Single file, no server, no dependencies.
 
   ARCHITECTURE (for future updates when course material lands):
@@ -218,7 +221,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp</h1>
-  <span style="display:flex;gap:8px;align-items:baseline"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -237,6 +240,52 @@ const safeStore = (() => {
     persistent: ok
   };
 })();
+
+/* ============ CLOUD SYNC (same Supabase project as B250) ============
+   One row in the `progress` table, profile "gabe-c231".
+   Pull + merge on load, debounced push on every change →
+   iPad / iPhone / Mac / any browser all see the same progress.  */
+const SB_URL = "https://tzdreklmkntpopqncada.supabase.co";
+const SB_KEY = "sb_publishable_PWdbyaBoBg8hM2kptSrwBA_I4lFrnQr";
+const SB_PROFILE = "gabe-c231";
+let cloudState = "init";
+let _pushT = null;
+function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Content-Type":"application/json"}; }
+function mergeRemote(remote){
+  if (!remote) return;
+  ["doneDays","molDone","visits"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...S[k]])]; });
+  const seenM = new Set(S.missed);
+  (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
+  Object.entries(remote.qstats||{}).forEach(([id,st])=>{
+    const loc = S.qstats[id];
+    if (!loc || (st.r+st.w) > (loc.r+loc.w)) S.qstats[id] = st;   // keep the copy with more attempts
+  });
+}
+async function cloudPull(){
+  try {
+    const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq."+SB_PROFILE+"&select=data", {headers:sbHeaders()});
+    if (!r.ok) throw 0;
+    const rows = await r.json();
+    mergeRemote(rows[0] && rows[0].data);
+    cloudState = "synced"; save(); render(); cloudPush(true);
+  } catch(e){ cloudState = "offline"; renderSyncDot(); }
+}
+async function cloudPush(now){
+  if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
+  try {
+    const body = JSON.stringify({ profile: SB_PROFILE,
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits},
+      updated_at: new Date().toISOString() });
+    const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
+    cloudState = r.ok ? "synced" : "offline";
+  } catch(e){ cloudState = "offline"; }
+  renderSyncDot();
+}
+function renderSyncDot(){
+  const d = document.getElementById("syncdot"); if(!d) return;
+  d.textContent = cloudState==="synced" ? "● cloud" : cloudState==="offline" ? "○ local only" : "◌ syncing…";
+  d.style.color = cloudState==="synced" ? "#8FE3A1" : "#F2B705";
+}
 
 /* ================= TRACK (swap for syllabus later) ================= */
 const CLASS_START = "2026-08-17";
@@ -373,7 +422,7 @@ const S = {
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); cloudPush(false); }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -854,8 +903,7 @@ VIEWS.report = (v) => {
 
 /* ================= BOOT ================= */
 render();
-</script>
-<script>
+cloudPull();
 /* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
 (function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
 </script>
