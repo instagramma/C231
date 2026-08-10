@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PHYS 210 · Physics Bootcamp</title>
+<!--
+  ============================================================
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v1.0  ·  built 2026-08-10
+  For Gabe. Single file, no server, no dependencies.
+  Sibling of chem231-bootcamp.html v2.1 — same architecture and
+  due-date system, blue "graph paper" colorway.
+
+  ARCHITECTURE (for future updates when course material lands):
+  · THEME        — CSS custom properties, swap freely
+  · TRACK        — the day plan WITH DUE DATES; replace with
+                   syllabus weeks once Janatpour posts it
+  · QUESTIONS    — flat array, schema: id/topic/type/prompt/
+                   answer/choices?/tolerance?/why
+  · PROBLEMS     — Problem Lab: blank-page problems, step-gated
+                   (setup → equation → algebra → number), each
+                   step tagged so misses are tracked BY STEP TYPE
+  · Storage      — safeStore wrapper, keys prefixed p210_
+  ============================================================
+-->
+<style>
+  :root{
+    --paper:#F3F6FA;
+    --paper2:#E7EDF5;
+    --ink:#1B2233;
+    --teal:#2E5EAA;      /* primary (blue) — variable names kept from chem template */
+    --teal-dk:#1E3F78;
+    --coral:#D64045;     /* action (red) */
+    --gold:#F5A623;      /* highlight (amber) */
+    --violet:#A23B72;    /* tags (magenta) */
+    --ok:#2E7D32;
+    --line:#1B2233;
+    --shadow:4px 4px 0 var(--ink);
+    --shadow-sm:2px 2px 0 var(--ink);
+    --serif:"Iowan Old Style","Palatino","Georgia",serif;
+    --mono:"SF Mono","Menlo","Consolas",monospace;
+    --sans:-apple-system,"Segoe UI","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{font-size:16px}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(rgba(46,94,170,.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(46,94,170,.07) 1px, transparent 1px);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  header{
+    background:var(--teal);
+    color:var(--paper);
+    border-bottom:3px solid var(--ink);
+    padding:14px 18px 12px;
+    display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px;
+  }
+  header h1{font-family:var(--serif);font-size:1.45rem;letter-spacing:.5px}
+  header h1 .flask{display:inline-block;transform:rotate(-8deg);margin-right:6px}
+  header .countdown{font-family:var(--mono);font-size:.8rem;background:var(--ink);color:var(--gold);padding:3px 10px;border-radius:99px}
+  .menubtn{font-family:var(--mono);font-size:.8rem;background:var(--paper);color:var(--ink);border:2px solid var(--ink);padding:3px 12px;border-radius:99px;font-weight:800;text-decoration:none;box-shadow:var(--shadow-sm)}
+  .menubtn:active{transform:translate(1px,1px);box-shadow:none}
+  nav{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    display:flex;background:var(--paper);border-top:3px solid var(--ink);
+  }
+  nav button{
+    flex:1;padding:10px 2px 12px;background:none;border:none;border-right:1px solid rgba(27,34,51,.15);
+    font-family:var(--sans);font-size:.68rem;font-weight:700;color:var(--ink);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+  }
+  nav button:last-child{border-right:none}
+  nav button .ico{font-size:1.25rem;line-height:1}
+  nav button.active{background:var(--gold)}
+  main{max-width:860px;margin:0 auto;padding:18px 14px 30px}
+  .card{
+    background:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .card.cream{background:var(--paper2)}
+  .card.teal{background:var(--teal);color:var(--paper)}
+  .card h2{font-family:var(--serif);font-size:1.25rem;margin-bottom:8px}
+  .card h3{font-family:var(--serif);font-size:1.05rem;margin-bottom:6px}
+  .tag{
+    display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);padding:3px 9px;border-radius:99px;margin-bottom:8px;
+  }
+  .tag.gold{background:var(--gold);color:var(--ink)}
+  .tag.coral{background:var(--coral);color:#fff}
+  .tag.violet{background:var(--violet);color:#fff}
+  .bigbtn{
+    display:block;width:100%;text-align:center;
+    background:var(--coral);color:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);padding:16px;font-size:1.1rem;font-weight:800;font-family:var(--serif);
+    cursor:pointer;transition:transform .06s;
+  }
+  .bigbtn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+  .btn{
+    display:inline-block;background:var(--teal);color:#fff;border:2px solid var(--ink);border-radius:8px;
+    box-shadow:var(--shadow-sm);padding:8px 14px;font-size:.85rem;font-weight:700;cursor:pointer;
+    transition:transform .06s;font-family:var(--sans);
+  }
+  .btn:active{transform:translate(2px,2px);box-shadow:none}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.coral{background:var(--coral)}
+  .btn.gold{background:var(--gold);color:var(--ink)}
+  .btn.violet{background:var(--violet)}
+  .btn.small{padding:5px 10px;font-size:.75rem}
+  .btn:disabled{opacity:.4;pointer-events:none}
+  .statrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .stat{
+    flex:1;min-width:90px;background:#fff;border:2px solid var(--ink);border-radius:8px;
+    box-shadow:var(--shadow-sm);padding:8px 10px;text-align:center;
+  }
+  .stat .n{font-family:var(--serif);font-size:1.5rem;font-weight:800}
+  .stat .l{font-size:.62rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.75}
+  .progressbar{height:14px;background:#fff;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:6px 0}
+  .progressbar>div{height:100%;background:var(--teal);border-right:2px solid var(--ink);transition:width .4s}
+  .daygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .daycard{
+    background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:var(--shadow-sm);
+    padding:10px;cursor:pointer;position:relative;
+  }
+  .daycard.today{background:var(--gold)}
+  .daycard.overdue{border-color:var(--coral);box-shadow:2px 2px 0 var(--coral)}
+  .daycard.done{background:#DDEEDD}
+  .daycard.done::after{content:"✓";position:absolute;top:6px;right:9px;font-weight:900;color:var(--ok);font-size:1.1rem}
+  .daycard .d{font-family:var(--mono);font-size:.65rem;font-weight:700;opacity:.7}
+  .duetag{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:#fff;border:1.5px solid var(--ink);border-radius:99px;padding:2px 8px;margin-top:6px}
+  .duetag.today-due{background:var(--gold)}
+  .duetag.overdue{background:var(--coral);color:#fff}
+  .daycard .t{font-family:var(--serif);font-weight:700;font-size:.9rem;margin-top:2px}
+  .qprompt{font-size:1.05rem;line-height:1.5;margin:10px 0 14px}
+  .qprompt .formula{font-family:var(--mono);font-weight:700}
+  .choices{display:flex;flex-direction:column;gap:8px}
+  .choice{
+    text-align:left;background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:var(--shadow-sm);
+    padding:10px 12px;font-size:.95rem;cursor:pointer;font-family:var(--sans);
+  }
+  .choice.picked-right{background:#CDEBCB;border-color:var(--ok)}
+  .choice.picked-wrong{background:#F6CFC2;border-color:var(--coral)}
+  .choice.reveal-right{background:#CDEBCB}
+  .choice:disabled{cursor:default}
+  input.answerbox{
+    font-family:var(--mono);font-size:1.2rem;padding:10px 12px;border:2.5px solid var(--ink);
+    border-radius:8px;width:130px;background:#fff;box-shadow:inset 2px 2px 0 rgba(27,34,51,.12);
+  }
+  input.answerbox.wide{width:100%}
+  .why{
+    border-left:5px solid var(--gold);background:var(--paper2);border-radius:0 8px 8px 0;
+    padding:10px 12px;margin-top:12px;font-size:.9rem;line-height:1.5;
+  }
+  .why b{color:var(--teal-dk)}
+  .feedback-right{color:var(--ok);font-weight:800;font-family:var(--serif);font-size:1.1rem}
+  .feedback-wrong{color:var(--coral);font-weight:800;font-family:var(--serif);font-size:1.1rem}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  .pill{
+    background:#fff;border:2px solid var(--ink);border-radius:99px;padding:6px 13px;font-size:.8rem;
+    font-weight:700;cursor:pointer;box-shadow:var(--shadow-sm);
+  }
+  .pill.on{background:var(--teal);color:#fff}
+  .pill.done{background:#DDEEDD}
+  /* ---------- Problem Lab ---------- */
+  .labwrap{display:flex;flex-direction:column;gap:12px}
+  .stepper{display:flex;gap:6px;flex-wrap:wrap}
+  .step{
+    flex:1;min-width:64px;text-align:center;font-size:.62rem;font-weight:800;letter-spacing:.3px;
+    border:2px solid var(--ink);border-radius:8px;padding:5px 3px;background:#fff;opacity:.45;
+  }
+  .step.on{background:var(--gold);opacity:1}
+  .step.ok{background:#CDEBCB;opacity:1}
+  .stepask{font-size:.98rem;line-height:1.5;margin:6px 0}
+  .givenbox{
+    font-family:var(--mono);font-size:.9rem;background:var(--ink);color:var(--paper);
+    border-radius:8px;padding:10px 12px;line-height:1.6;
+  }
+  .givenbox .hl{color:var(--gold)}
+  table.cheat{width:100%;border-collapse:collapse;font-size:.85rem;margin:8px 0}
+  table.cheat th,table.cheat td{border:1.5px solid var(--ink);padding:6px 8px;text-align:left}
+  table.cheat th{background:var(--teal);color:#fff;font-family:var(--serif)}
+  table.cheat tr:nth-child(even){background:var(--paper2)}
+  .mono{font-family:var(--mono)}
+  .center{text-align:center}
+  .muted{opacity:.7;font-size:.85rem}
+  textarea.report{
+    width:100%;height:220px;font-family:var(--mono);font-size:.75rem;border:2px solid var(--ink);
+    border-radius:8px;padding:10px;background:#fff;
+  }
+  .confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99}
+  .confetti span{position:absolute;font-size:1.4rem;animation:fall 1.4s ease-in forwards}
+  @keyframes fall{from{transform:translateY(-40px) rotate(0)}to{transform:translateY(105vh) rotate(340deg);opacity:.2}}
+  .shake{animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @media(max-width:520px){
+    header h1{font-size:1.15rem}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="flask">🚀</span>PHYS 210 · Physics Bootcamp</h1>
+  <span style="display:flex;gap:8px;align-items:baseline"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span class="countdown" id="countdown"></span></span>
+</header>
+<main id="view"></main>
+<nav id="nav"></nav>
+<div class="confetti" id="confetti"></div>
+<script>
+"use strict";
+
+/* ================= STORAGE (safe wrapper, p210_ keys) ================= */
+const safeStore = (() => {
+  let mem = {};
+  let ok = false;
+  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true; } catch(e){ ok = false; }
+  return {
+    get(k, fallback){ k="p210_"+k; try { const v = ok ? localStorage.getItem(k) : mem[k]; return v == null ? fallback : JSON.parse(v); } catch(e){ return fallback; } },
+    set(k, v){ k="p210_"+k; try { const s = JSON.stringify(v); if (ok) localStorage.setItem(k, s); else mem[k] = s; } catch(e){} },
+    persistent: ok
+  };
+})();
+
+/* ================= TRACK — the 9-day runway, WITH DUE DATES =================
+   day = the due date. Miss one → it becomes tomorrow's catch-up mission
+   (slide, never double up). Swap for syllabus weeks when the course starts. */
+const CLASS_START = "2026-08-17";
+const TRACK = [
+  { day:"2026-08-08", topic:"lab",     title:"Warm-up: the 37° hiker (Lab)" },
+  { day:"2026-08-09", topic:"algebra", title:"Algebra: rearrange + units" },
+  { day:"2026-08-10", topic:"trig",    title:"Trig: right triangles" },
+  { day:"2026-08-11", topic:"vectors", title:"Vector components ★" },
+  { day:"2026-08-12", topic:"vecadd",  title:"Vector addition" },
+  { day:"2026-08-13", topic:"kin1",    title:"1D kinematics: concepts" },
+  { day:"2026-08-14", topic:"kin2",    title:"Kinematics: equations" },
+  { day:"2026-08-15", topic:"newton",  title:"Newton's laws" },
+  { day:"2026-08-16", topic:"diag",    title:"Mini-diagnostic (before class!)" },
+];
+const TOPICS = {
+  units:   { name:"Units + conversions", ico:"📏" },
+  algebra: { name:"Algebra fluency",     ico:"🧮" },
+  trig:    { name:"Trig / triangles",    ico:"📐" },
+  vectors: { name:"Vector components",   ico:"🧭" },
+  vecadd:  { name:"Vector addition",     ico:"➕" },
+  kin1:    { name:"1D kinematics",       ico:"🏃" },
+  kin2:    { name:"Kinematic equations", ico:"📈" },
+  newton:  { name:"Newton's laws",       ico:"🍎" },
+  diag:    { name:"Mixed diagnostic",    ico:"🧪" },
+};
+
+/* ================= QUESTION BANK =================
+   schema: {id, topic, type:"num"|"mc"|"text", prompt, answer, choices?, tolerance?, why}
+   All generation-style where possible: you produce the number, no options to lean on. */
+const QUESTIONS = [
+/* --- units + conversions (feeds everything) --- */
+{id:"u1",topic:"units",type:"num",prompt:"Convert 72 km/h to m/s.",answer:20,why:"km/h → m/s: <b>divide by 3.6</b> (×1000 m/km ÷ 3600 s/h). 72 ÷ 3.6 = <b>20 m/s</b>. Physics answers live in m/s — this conversion is daily."},
+{id:"u2",topic:"units",type:"num",prompt:"How many seconds in 5.0 minutes?",answer:300,why:"5 × 60 = <b>300 s</b>. Always convert to seconds BEFORE plugging into equations."},
+{id:"u3",topic:"units",type:"num",prompt:"Convert 250 cm to meters.",answer:2.5,why:"÷100 → <b>2.5 m</b>. SI base units (m, s, kg) in, SI out."},
+{id:"u4",topic:"units",type:"mc",prompt:"The SI unit of acceleration is:",choices:["m/s²","m/s","N","m²/s"],answer:0,why:"Acceleration = change in velocity (m/s) per second → <b>m/s²</b>. Reading units aloud ('meters per second, per second') is the fastest concept check there is."},
+{id:"u5",topic:"units",type:"num",prompt:"Convert 90 km/h to m/s.",answer:25,why:"90 ÷ 3.6 = <b>25 m/s</b>. (Highway speed ≈ 25–30 m/s — good sanity-check anchor.)"},
+{id:"u6",topic:"units",type:"mc",prompt:"Which of these is a VECTOR quantity?",choices:["Velocity","Speed","Distance","Mass"],answer:0,why:"<b>Velocity has direction</b> (30 m/s *east*); speed is just the magnitude. Vector vs scalar decides whether components and signs matter."},
+{id:"u7",topic:"units",type:"num",prompt:"How many seconds in 2.0 hours?",answer:7200,why:"2 × 3600 = <b>7200 s</b>."},
+{id:"u8",topic:"units",type:"mc",prompt:"Which formula is dimensionally IMPOSSIBLE?",choices:["x = v · t² (m from m/s × s²?)","x = v · t","v = a · t","x = ½at²"],answer:0,why:"v·t² gives (m/s)(s²) = <b>m·s — not meters</b>. Unit-checking every formula you write catches algebra mistakes before the arithmetic even starts. Quantify, don't eyeball."},
+{id:"u9",topic:"units",type:"mc",prompt:"1 newton (N) is the same as:",choices:["1 kg·m/s²","1 kg·m/s","1 kg/s²","1 m/s²"],answer:0,why:"F = ma → N = kg × m/s² = <b>kg·m/s²</b>. Knowing what a unit unpacks into lets you rebuild formulas you forget."},
+/* --- algebra fluency --- */
+{id:"al1",topic:"algebra",type:"num",prompt:"x = ½at². If a = 4 m/s² and t = 3 s, x = ? (meters)",answer:18,why:"½ × 4 × 9 = <b>18 m</b>. Square the time FIRST, then multiply — order-of-operations slips are the #1 easy-point leak."},
+{id:"al2",topic:"algebra",type:"mc",prompt:"Solve v = v₀ + at for t:",choices:["t = (v − v₀)/a","t = v/a − v₀","t = a(v − v₀)","t = (v₀ − v)/a"],answer:0,why:"Subtract v₀, divide by a: <b>t = (v − v₀)/a</b>. Rearrange with SYMBOLS first, plug numbers last — fewer errors, and you can reuse the rearranged form."},
+{id:"al3",topic:"algebra",type:"num",prompt:"v² = v₀² + 2aΔx. If v = 20 m/s, v₀ = 0, Δx = 50 m, then a = ? (m/s²)",answer:4,why:"400 = 0 + 2a(50) → a = 400/100 = <b>4 m/s²</b>. Note v² = 400, not 40 — squaring first is the whole game."},
+{id:"al4",topic:"algebra",type:"mc",prompt:"Solve x = ½at² for t:",choices:["t = √(2x/a)","t = 2x/a","t = √(x/2a)","t = (2x/a)²"],answer:0,why:"Multiply by 2, divide by a, THEN square-root: <b>t = √(2x/a)</b>. Undo operations in reverse order, square root last."},
+{id:"al5",topic:"algebra",type:"num",prompt:"F = ma. If F = 24 N and m = 6 kg, a = ? (m/s²)",answer:4,why:"a = F/m = 24/6 = <b>4 m/s²</b>."},
+{id:"al6",topic:"algebra",type:"num",prompt:"v = v₀ + at. If v₀ = 5 m/s, a = 2 m/s², v = 17 m/s, then t = ? (s)",answer:6,why:"t = (17 − 5)/2 = <b>6 s</b>. Same rearrangement you just did symbolically — that's why symbols-first pays."},
+{id:"al7",topic:"algebra",type:"mc",prompt:"Solve v² = v₀² + 2aΔx for Δx:",choices:["Δx = (v² − v₀²)/(2a)","Δx = (v − v₀)²/2a","Δx = 2a(v² − v₀²)","Δx = (v² + v₀²)/(2a)"],answer:0,why:"Subtract v₀², divide by 2a: <b>Δx = (v² − v₀²)/(2a)</b>. Watch the minus — (v−v₀)² is NOT v²−v₀²."},
+{id:"al8",topic:"algebra",type:"num",prompt:"Δx = v·t. A runner covers 140 m in 20 s at constant speed. v = ? (m/s)",answer:7,why:"v = 140/20 = <b>7 m/s</b>."},
+{id:"al9",topic:"algebra",type:"mc",prompt:"a = (v − v₀)/t with v, v₀ in m/s and t in s. The units of a come out as:",choices:["m/s²","m/s","m·s","s/m"],answer:0,why:"(m/s)/s = <b>m/s²</b> ✓. Carrying units through EVERY line is your anti-eyeballing rule wearing its physics uniform."},
+/* --- trig --- */
+{id:"t1",topic:"trig",type:"num",prompt:"Right triangle: hypotenuse 10, angle 30°. The side OPPOSITE the 30° = ? (sin 30° = 0.5)",answer:5,why:"opp = hyp × sin θ = 10 × 0.5 = <b>5</b>. SOH: <b>S</b>in = <b>O</b>pp/<b>H</b>yp."},
+{id:"t2",topic:"trig",type:"num",prompt:"Same triangle (hyp 10, 30°): the side ADJACENT to 30° = ? (cos 30° ≈ 0.87)",answer:8.7,tolerance:0.2,why:"adj = hyp × cos θ = 10 × 0.87 ≈ <b>8.7</b>. CAH: <b>C</b>os = <b>A</b>dj/<b>H</b>yp."},
+{id:"t3",topic:"trig",type:"mc",prompt:"SOH-CAH-TOA: sin θ equals…",choices:["opposite / hypotenuse","adjacent / hypotenuse","opposite / adjacent","hypotenuse / opposite"],answer:0,why:"<b>S</b>OH: sin = opp/hyp. This one mnemonic runs 80% of the early physics math."},
+{id:"t4",topic:"trig",type:"num",prompt:"Legs 3 and 4. Hypotenuse = ?",answer:5,why:"√(9+16) = √25 = <b>5</b>. The 3-4-5 triangle shows up constantly (as does 6-8-10). Recognize it and skip the arithmetic."},
+{id:"t5",topic:"trig",type:"num",prompt:"Opposite = 3, adjacent = 4. tan θ = ? (decimal)",answer:0.75,why:"TOA: tan = opp/adj = 3/4 = <b>0.75</b>."},
+{id:"t6",topic:"trig",type:"num",prompt:"If tan θ = 3/4, then θ ≈ ? (degrees)",answer:37,tolerance:1,why:"tan⁻¹(0.75) ≈ <b>37°</b>. The 3-4-5 triangle's angles are ~37° and ~53° — physics problems reuse these numbers on purpose."},
+{id:"t7",topic:"trig",type:"num",prompt:"Hypotenuse 20, angle 53°. Opposite side ≈ ? (sin 53° ≈ 0.8)",answer:16,tolerance:0.5,why:"20 × 0.8 = <b>16</b>."},
+{id:"t8",topic:"trig",type:"mc",prompt:"The hypotenuse is always…",choices:["Opposite the right angle (the longest side)","The horizontal side","The vertical side","Whichever side is unknown"],answer:0,why:"<b>Opposite the 90°</b>, always the longest. In vector problems the vector itself is the hypotenuse; its components are the legs."},
+{id:"t9",topic:"trig",type:"num",prompt:"Adjacent = 12, angle 60°, cos 60° = 0.5. Hypotenuse = ?",answer:24,why:"adj = hyp·cos θ → hyp = adj/cos θ = 12/0.5 = <b>24</b>. Dividing (not multiplying) here is the classic flip — write the equation first, then rearrange."},
+/* --- vector components (THE priority topic) --- */
+{id:"vc1",topic:"vectors",type:"num",prompt:"A 50 m displacement at 37° above the +x axis (cos 37° ≈ 0.8, sin 37° ≈ 0.6). x-component = ?",answer:40,why:"Ax = A cos θ = 50 × 0.8 = <b>40 m</b>. θ measured from the x-axis → x gets cos."},
+{id:"vc2",topic:"vectors",type:"num",prompt:"Same vector (50 m at 37°): y-component = ?",answer:30,why:"Ay = A sin θ = 50 × 0.6 = <b>30 m</b>. Audit: √(40² + 30²) = 50 ✓ — components must rebuild the original."},
+{id:"vc3",topic:"vectors",type:"mc",prompt:"With θ measured from the +x axis, the x-component is:",choices:["A cos θ","A sin θ","A tan θ","A/cos θ"],answer:0,why:"<b>x ↔ cos, y ↔ sin — WHEN θ is from the x-axis.</b> If the problem gives the angle from vertical, they swap. Don't memorize 'x = cos'; memorize 'adjacent gets cos'."},
+{id:"vc4",topic:"vectors",type:"num",prompt:"100 m at 60° above +x (cos 60° = 0.5). x-component = ?",answer:50,why:"100 × 0.5 = <b>50 m</b>. Steeper angle → smaller x-share. Sanity-check direction: at 60° the vector leans more vertical than horizontal."},
+{id:"vc5",topic:"vectors",type:"num",prompt:"100 m at 60° (sin 60° ≈ 0.87): y-component ≈ ?",answer:87,tolerance:1,why:"100 × 0.87 ≈ <b>87 m</b>. And 50² + 87² ≈ 100² ✓."},
+{id:"vc6",topic:"vectors",type:"mc",prompt:"A vector points up-and-left (135° from +x). Signs of (x, y):",choices:["(−, +)","(+, +)","(−, −)","(+, −)"],answer:0,why:"Left = negative x, up = positive y → <b>(−, +)</b>. Signs come from the DIRECTION, and sign errors are the #1 vector mistake — write the sign before the number."},
+{id:"vc7",topic:"vectors",type:"num",prompt:"20 m at exactly 90° (straight up). x-component = ?",answer:0,why:"cos 90° = 0 → <b>0</b>. All 20 m is vertical. Extreme angles (0°, 90°) are free sanity checks."},
+{id:"vc8",topic:"vectors",type:"num",prompt:"That same 20 m at 90°: y-component = ?",answer:20,why:"sin 90° = 1 → <b>20 m</b>."},
+{id:"vc9",topic:"vectors",type:"num",prompt:"A ball is kicked at 60 m/s, 30° above horizontal (sin 30° = 0.5). Vertical component = ?",answer:30,why:"60 × 0.5 = <b>30 m/s</b>. Projectile motion = this exact decomposition, done on day one of every problem."},
+{id:"vc10",topic:"vectors",type:"mc",prompt:"WHY decompose vectors into components at all?",choices:["x and y motion can then be solved independently","It makes the vector longer","Professors require it","It removes the need for trig"],answer:0,why:"<b>Independence of axes</b> — gravity only touches y; horizontal motion doesn't care. Split, solve each axis alone, recombine at the end. That's the entire method of projectile problems."},
+/* --- vector addition --- */
+{id:"va1",topic:"vecadd",type:"num",prompt:"A = (3, 4), B = (1, −2). Resultant x-component = ?",answer:4,why:"3 + 1 = <b>4</b>. Add x's with x's — components never mix axes."},
+{id:"va2",topic:"vecadd",type:"num",prompt:"Same A + B: resultant y-component = ?",answer:2,why:"4 + (−2) = <b>2</b>. The minus sign rides along — that's why you write signs first."},
+{id:"va3",topic:"vecadd",type:"num",prompt:"Walk 30 m east, then 40 m north. Magnitude of your displacement = ? (m)",answer:50,why:"Perpendicular legs → Pythagoras: √(30² + 40²) = <b>50 m</b> (the 3-4-5 again). Displacement ≠ distance walked (70 m)."},
+{id:"va4",topic:"vecadd",type:"num",prompt:"Same walk (30 E, 40 N): direction ≈ ? degrees north of east",answer:53,tolerance:1,why:"tan θ = 40/30 → θ = tan⁻¹(1.33) ≈ <b>53°</b> N of E. Always name the reference: '53°' alone is not a direction."},
+{id:"va5",topic:"vecadd",type:"num",prompt:"Magnitude of the vector (4, 2) ≈ ? (one decimal)",answer:4.5,tolerance:0.1,why:"√(16+4) = √20 ≈ <b>4.5</b>."},
+{id:"va6",topic:"vecadd",type:"mc",prompt:"To add two vectors that are NOT parallel, you:",choices:["Add their components axis-by-axis","Add their magnitudes","Multiply their magnitudes","Average their angles"],answer:0,why:"<b>Components, always.</b> Magnitudes only add when vectors point the same way. 30+40 = 70 walked, but the displacement was 50 — magnitudes lie."},
+{id:"va7",topic:"vecadd",type:"num",prompt:"5 m/s east + 5 m/s west. Resultant magnitude = ?",answer:0,why:"+5 + (−5) = <b>0</b>. Opposite directions cancel — vectors are signed, not just sized."},
+{id:"va8",topic:"vecadd",type:"num",prompt:"Magnitude of (6, 8) = ?",answer:10,why:"√(36+64) = <b>10</b> — the 3-4-5 scaled ×2. Spot the family, skip the work."},
+/* --- 1D kinematics concepts --- */
+{id:"k1",topic:"kin1",type:"mc",prompt:"Velocity differs from speed because velocity…",choices:["Includes direction (it can be negative)","Is always larger","Is measured in different units","Only applies to cars"],answer:0,why:"Velocity is a <b>vector</b>: −8 m/s means 8 m/s in the negative direction. The sign IS information — never drop it."},
+{id:"k2",topic:"kin1",type:"num",prompt:"A car goes 0 → 20 m/s in 4 s. Acceleration = ? (m/s²)",answer:5,why:"a = Δv/Δt = 20/4 = <b>5 m/s²</b> — it gains 5 m/s of speed every second."},
+{id:"k3",topic:"kin1",type:"num",prompt:"Constant velocity 15 m/s for 6 s. Displacement = ? (m)",answer:90,why:"Δx = vt = 15 × 6 = <b>90 m</b>. Constant v → no ½at² term, don't overcomplicate it."},
+{id:"k4",topic:"kin1",type:"mc",prompt:"On a position-time graph, the SLOPE is the:",choices:["Velocity","Acceleration","Displacement","Distance"],answer:0,why:"Slope = rise/run = Δx/Δt = <b>velocity</b>. (On a velocity-time graph, slope = acceleration.) Graph questions are free points once these two facts are cold."},
+{id:"k5",topic:"kin1",type:"mc",prompt:"A ball is thrown straight up. At the very top of its flight:",choices:["v = 0 but a = −9.8 m/s² still","v = 0 and a = 0","Both v and a point up","a = 0 but v is maximum"],answer:0,why:"Velocity passes through zero, but gravity never turns off: <b>a = −9.8 m/s² the whole flight</b>. 'v = 0 so a = 0' is the single most-tested misconception in kinematics."},
+{id:"k6",topic:"kin1",type:"num",prompt:"120 m covered in 60 s. Average velocity = ? (m/s)",answer:2,why:"v̄ = Δx/Δt = <b>2 m/s</b>."},
+{id:"k7",topic:"kin1",type:"mc",prompt:"On a velocity-time graph, the AREA under the curve is the:",choices:["Displacement","Acceleration","Average speed","Jerk"],answer:0,why:"Area = v × t summed = <b>displacement</b>. Slope-and-area on the two graphs: four facts that answer every graph question the course will throw."},
+{id:"k8",topic:"kin1",type:"num",prompt:"Moving at 10 m/s, braking at 2 m/s². Time to stop = ? (s)",answer:5,why:"t = Δv/a = 10/2 = <b>5 s</b>."},
+{id:"k9",topic:"kin1",type:"mc",prompt:"'Uniform acceleration' means:",choices:["Velocity changes by equal amounts in equal times","Velocity is constant","The object moves equal distances each second","Speed only increases"],answer:0,why:"Uniform a → <b>Δv is the same every second</b> (distances are NOT — they grow). This is exactly when the kinematic equations apply, and only then."},
+/* --- kinematic equations --- */
+{id:"q1",topic:"kin2",type:"mc",prompt:"Which kinematic equation contains NO Δx?",choices:["v = v₀ + at","v² = v₀² + 2aΔx","Δx = v₀t + ½at²","Δx = ½(v₀ + v)t"],answer:0,why:"<b>v = v₀ + at</b>. Pick the equation by the variable you DON'T have/need — that's the entire selection method, not vibes."},
+{id:"q2",topic:"kin2",type:"num",prompt:"Dropped from rest, g ≈ 9.8 m/s². Speed after 2 s ≈ ? (m/s)",answer:19.6,tolerance:0.3,why:"v = 0 + 9.8 × 2 = <b>19.6 m/s</b>. Free fall = kinematics with a = g, nothing more."},
+{id:"q3",topic:"kin2",type:"num",prompt:"That same 2 s drop: distance fallen ≈ ? (m)",answer:19.6,tolerance:0.3,why:"Δy = ½gt² = ½ × 9.8 × 4 = <b>19.6 m</b>. (Same number as v is a 2-second coincidence — don't generalize it.)"},
+{id:"q4",topic:"kin2",type:"num",prompt:"Thrown up at 20 m/s, g ≈ 10. Max height = ? (m)",answer:20,why:"At the top v = 0: 0 = 20² − 2(10)Δy → Δy = 400/20 = <b>20 m</b>. v² = v₀² + 2aΔx is THE no-time equation — reach for it whenever t isn't given."},
+{id:"q5",topic:"kin2",type:"num",prompt:"From rest, a = 3 m/s², until v = 30 m/s. Distance covered = ? (m)",answer:150,why:"v² = 2aΔx → Δx = 900/6 = <b>150 m</b>."},
+{id:"q6",topic:"kin2",type:"mc",prompt:"The FIRST move of every kinematics problem:",choices:["List knowns/unknowns and pick a positive direction","Plug numbers into the first equation you remember","Compute the average of the given numbers","Draw the answer"],answer:0,why:"<b>Setup first</b>: knowns, unknown, axis + sign convention. Most lost points are setup errors, not math errors — which is why the Problem Lab makes you do this step explicitly."},
+{id:"q7",topic:"kin2",type:"num",prompt:"v₀ = 0, a = 2 m/s², t = 5 s. Δx = ? (m)",answer:25,why:"Δx = 0 + ½ × 2 × 25 = <b>25 m</b>."},
+{id:"q8",topic:"kin2",type:"num",prompt:"Time to fall 45 m from rest (g ≈ 10) = ? (s)",answer:3,why:"45 = ½ × 10 × t² → t² = 9 → <b>3 s</b>. Rearrange symbolically first: t = √(2Δy/g)."},
+{id:"q9",topic:"kin2",type:"mc",prompt:"One ball is dropped; another is thrown HORIZONTALLY at the same instant from the same height. Which lands first?",choices:["They land together — vertical motion is independent of horizontal","The dropped one","The thrown one","Depends on the throw speed"],answer:0,why:"<b>Axes are independent</b> — both start with v_y = 0 and fall under the same g. The horizontal throw adds x-motion, not flight time. This is vc10's 'why components' as an exam classic."},
+/* --- Newton's laws --- */
+{id:"n1",topic:"newton",type:"num",prompt:"F = ma: net force 5 N on a 10 kg box. a = ? (m/s²)",answer:0.5,why:"a = F/m = 5/10 = <b>0.5 m/s²</b>. Big mass, small force → small a. Sanity-check magnitudes."},
+{id:"n2",topic:"newton",type:"num",prompt:"Weight of a 5.0 kg object (g ≈ 9.8) ≈ ? (N)",answer:49,tolerance:0.5,why:"W = mg = 5 × 9.8 = <b>49 N</b>. Weight is a FORCE (newtons); mass is kg. Mixing them is the classic week-4 error."},
+{id:"n3",topic:"newton",type:"mc",prompt:"A car moves at constant 25 m/s in a straight line. The net force on it is:",choices:["Zero","Forward, constant","Forward, growing","Equal to its weight"],answer:0,why:"Constant velocity = zero acceleration = <b>zero NET force</b> (N1). Engine force exists — it just cancels friction/drag. Net ≠ individual."},
+{id:"n4",topic:"newton",type:"num",prompt:"1200 kg car, a = 2.5 m/s². Net force = ? (N)",answer:3000,why:"F = ma = 1200 × 2.5 = <b>3000 N</b>."},
+{id:"n5",topic:"newton",type:"mc",prompt:"Newton's 3rd law pairs (equal & opposite forces) never cancel because they…",choices:["Act on DIFFERENT objects","Are different sizes","Act at different times","Only exist during collisions"],answer:0,why:"You push the wall, the wall pushes YOU — one force per object. Forces only cancel when they act <b>on the same object</b>. This resolves every '3rd-law paradox' question."},
+{id:"n6",topic:"newton",type:"num",prompt:"20 N right and 6 N left act on a box. Net force = ? (N)",answer:14,why:"20 − 6 = <b>14 N</b> (rightward). Net force is a signed SUM — this is vectors again, just wearing forces."},
+{id:"n7",topic:"newton",type:"mc",prompt:"Take a 10 kg dumbbell to the Moon. What changes?",choices:["Weight drops; mass stays 10 kg","Mass drops; weight stays","Both drop","Neither"],answer:0,why:"<b>Mass is intrinsic</b>; weight = mg depends on the local g (Moon ≈ 1.6 m/s²). The dumbbell is just as hard to shake side-to-side up there."},
+{id:"n8",topic:"newton",type:"num",prompt:"A 20 N book rests on a table. The normal force on it = ? (N)",answer:20,why:"At rest → net = 0 → N balances W: <b>20 N</b> up. (Normal = weight only when nothing else pushes vertically — on inclines this breaks.)"},
+{id:"n9",topic:"newton",type:"mc",prompt:"The net force on an object always points in the direction of its:",choices:["Acceleration","Velocity","Displacement","Motion history"],answer:0,why:"F_net ∥ <b>a</b>, NOT v. A braking car moves forward while its net force points backward. Divorcing force from velocity is half of understanding Newton."},
+{id:"n10",topic:"newton",type:"num",prompt:"4 kg box pushed with 26 N; friction resists with 6 N. a = ? (m/s²)",answer:5,why:"Net = 26 − 6 = 20 N → a = 20/4 = <b>5 m/s²</b>. NET force in F = ma — always subtract the opposition first."},
+];
+
+/* ================= PROBLEM LAB =================
+   Blank-page problems, step-gated. Each step is tagged with WHERE it can break:
+   setup / equation / algebra / number — misses are tracked per step type,
+   because "which step breaks" matters more than right/wrong (Pre-Flight §4).
+   Add problems freely: steps run in order, num answers support tolerance. */
+const PROBLEMS = [
+  { key:"hiker", due:"2026-08-08", formula:"The 37° hiker", blurb:"The owed Aug-8 warm-up. 50 m at 37° north of east — the components, done properly.",
+    given:"d = <span class='hl'>50 m</span> at <span class='hl'>37°</span> N of E · sin 37° ≈ 0.6 · cos 37° ≈ 0.8",
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> In the right triangle you should be sketching, what plays the HYPOTENUSE?", choices:["The 50 m displacement itself","The east component","The north component","The 37° angle"], answer:0, why:"The vector is always the hypotenuse; its components are the legs. If your sketch has this backwards, every number after is wrong — which is why setup is checked first."},
+      {cat:"equation", type:"mc", ask:"<b>Equation.</b> The EAST component (adjacent to the 37°) comes from:", choices:["50 × cos 37°","50 × sin 37°","50 × tan 37°","50 ÷ cos 37°"], answer:0, why:"Adjacent ↔ cos (CAH). East lies along the angle's adjacent side here. Don't memorize 'x = cos' — re-derive from which side is adjacent."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> East component = ? (m)", answer:40, why:"50 × 0.8 = <b>40 m</b>."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> North component = ? (m)", answer:30, why:"50 × 0.6 = <b>30 m</b>."},
+      {cat:"setup", type:"mc", ask:"<b>Audit.</b> How do you CHECK the answer before moving on?", choices:["√(40² + 30²) should rebuild 50","Add 40 + 30 and compare to 50","Check that 40 > 30","No check is possible"], answer:0, why:"Components must reassemble the original: √(1600+900) = √2500 = 50 ✓. Every vector decomposition ships with its own free audit — use it every time."},
+    ]},
+  { key:"solvet", due:"2026-08-09", formula:"Solve for t", blurb:"Pure algebra under a physics costume — symbols first, numbers last.",
+    given:"x = ½at² · x = <span class='hl'>20 m</span> · a = <span class='hl'>10 m/s²</span> · find t",
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> Knowns and unknown:", choices:["Know x and a; unknown is t","Know x and t; unknown is a","Know a and t; unknown is x","All three are known"], answer:0, why:"Listing knowns/unknown IS the first written line of every physics solution. It picks the equation for you."},
+      {cat:"algebra", type:"mc", ask:"<b>Algebra.</b> Rearranged for t (symbols only):", choices:["t = √(2x/a)","t = 2x/a","t = √(x/2a)","t = (2x/a)²"], answer:0, why:"×2, ÷a, then √ last: t = √(2x/a). Undo operations in reverse order."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> t = ? (s)", answer:2, why:"t = √(2×20/10) = √4 = <b>2 s</b>. Units check: √(m ÷ m/s²) = √(s²) = s ✓."},
+    ]},
+  { key:"caraccel", due:"2026-08-14", formula:"The accelerating car", blurb:"Two-part kinematics: find a, then use it — chained answers, like real problem sets.",
+    given:"car: <span class='hl'>0 → 24 m/s</span> in <span class='hl'>6 s</span> · find a, then Δx",
+    steps:[
+      {cat:"number", type:"num", ask:"<b>Number.</b> a = Δv/Δt = ? (m/s²)", answer:4, why:"24/6 = <b>4 m/s²</b>."},
+      {cat:"equation", type:"mc", ask:"<b>Equation.</b> Best route to Δx given v₀, v, and t:", choices:["Δx = ½(v₀ + v)t — average velocity × time","Δx = vt","v² = v₀² + 2aΔx","Δx = at"], answer:0, why:"With both velocities and time, <b>average velocity</b> is the cleanest: ½(0+24) = 12 m/s average. Δx = vt is WRONG here — v wasn't constant."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Δx = ? (m)", answer:72, why:"12 m/s × 6 s = <b>72 m</b>. (Cross-check: ½at² = ½×4×36 = 72 ✓ — two routes agreeing is the strongest audit there is.)"},
+    ]},
+  { key:"freefall", due:"2026-08-14", formula:"The 45 m drop", blurb:"Free fall = kinematics with a = g. Nothing new — if the setup is right.",
+    given:"dropped from rest · Δy = <span class='hl'>45 m</span> · g ≈ <span class='hl'>10 m/s²</span> · find t",
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> 'Dropped' tells you:", choices:["v₀ = 0, and a = g downward","v₀ = g","a = 0","Δy = 0"], answer:0, why:"'Dropped' = starts from rest. 'Thrown down' would mean v₀ ≠ 0. Translation of words → symbols is a setup skill, and it's where dropped points hide."},
+      {cat:"equation", type:"mc", ask:"<b>Equation.</b> With v₀ = 0, the distance-time relation is:", choices:["Δy = ½gt²","v = gt","v² = 2gΔy","Δy = gt"], answer:0, why:"Δy = v₀t + ½at² with v₀ = 0 → <b>Δy = ½gt²</b>. (v = gt is true but has no Δy — wrong tool for this unknown.)"},
+      {cat:"algebra", type:"mc", ask:"<b>Algebra.</b> Solved for t:", choices:["t = √(2Δy/g)","t = 2Δy/g","t = √(Δy/2g)","t = Δy/g"], answer:0, why:"Same rearrangement as 'Solve for t' — physics reuses about six algebra moves forever."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> t = ? (s)", answer:3, why:"√(2×45/10) = √9 = <b>3 s</b>."},
+    ]},
+  { key:"newtoncar", due:"2026-08-15", formula:"Newton's car", blurb:"F = ma feeding into kinematics — the week-4 pattern, previewed.",
+    given:"m = <span class='hl'>1200 kg</span> · F_net = <span class='hl'>3000 N</span> · from rest · find a, then v at t = 8 s",
+    steps:[
+      {cat:"number", type:"num", ask:"<b>Number.</b> a = F/m = ? (m/s²)", answer:2.5, why:"3000/1200 = <b>2.5 m/s²</b>. Newton hands the acceleration to kinematics — that handoff is half the course."},
+      {cat:"equation", type:"mc", ask:"<b>Equation.</b> To get v after 8 s from rest:", choices:["v = v₀ + at","v² = v₀² + 2aΔx","Δx = ½at²","F = ma again"], answer:0, why:"Have a and t, want v, don't care about Δx → the no-Δx equation. Selection by missing variable, every time."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> v = ? (m/s)", answer:20, why:"0 + 2.5 × 8 = <b>20 m/s</b> (≈ 45 mph — plausible for 8 s of hard acceleration ✓)."},
+    ]},
+  { key:"walk", due:"2026-08-12", formula:"The L-shaped walk", blurb:"30 m east, 40 m north — addition is components, never magnitudes.",
+    given:"legs: <span class='hl'>30 m E</span> then <span class='hl'>40 m N</span> · find the displacement (size + direction)",
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> To combine the two legs you:", choices:["Treat them as perpendicular components of one resultant","Add 30 + 40 = 70 m","Average them to 35 m","Subtract them"], answer:0, why:"East and north ARE the x- and y-components already. 70 m is the distance walked; displacement is the straight line — different quantities."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Displacement magnitude = ? (m)", answer:50, why:"√(30² + 40²) = <b>50 m</b> — the 3-4-5 triangle, scaled."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Direction ≈ ? degrees north of east (tan⁻¹ of 40/30)", answer:53, tolerance:1, why:"tan⁻¹(1.33) ≈ <b>53°</b> N of E. A magnitude without a named direction is half an answer."},
+    ]},
+];
+const STEPCATS = {setup:"Setup", equation:"Equation", algebra:"Algebra", number:"Number+units"};
+
+/* ================= STATE ================= */
+const S = {
+  doneDays: safeStore.get("doneDays", []),
+  qstats:   safeStore.get("qstats", {}),      // id -> {r,w}
+  missed:   safeStore.get("missed", []),      // ids, most recent last
+  probDone: safeStore.get("probDone", []),
+  stepMiss: safeStore.get("stepMiss", {setup:0,equation:0,algebra:0,number:0}),
+  visits:   safeStore.get("visits", []),
+  view: "home",
+  drill: null,
+  lab: null,
+};
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("probDone",S.probDone); safeStore.set("stepMiss",S.stepMiss); safeStore.set("visits",S.visits); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+(function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
+
+/* ================= HELPERS ================= */
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else e.setAttribute(k,v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function confetti(){ const c=$("#confetti"); const em=["🎉","🚀","✨","📐","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
+function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
+function accuracy(){ let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;}); const t=r+w; return {r,w,t,pct:t?Math.round(100*r/t):0}; }
+const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
+
+/* ================= ROUTER ================= */
+const NAV = [
+  {id:"home",  ico:"🏠", label:"Today"},
+  {id:"lab",   ico:"📝", label:"Problem Lab"},
+  {id:"drill", ico:"🎯", label:"Drill"},
+  {id:"track", ico:"🗓️", label:"Plan"},
+  {id:"cheat", ico:"📌", label:"Cheat Sheet"},
+  {id:"report",ico:"📤", label:"Report"},
+];
+function go(view){ S.view=view; render(); window.scrollTo(0,0); }
+function renderNav(){ const n=$("#nav"); n.innerHTML=""; NAV.forEach(t=>{ const b=el("button",{class:S.view===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
+function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass(); $("#countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); }
+
+/* ================= VIEWS ================= */
+const VIEWS = {};
+
+/* ---- HOME ---- */
+VIEWS.home = (v) => {
+  const t = todayStr();
+  // re-entry ritual: gap of 2+ days since previous visit
+  const prev = S.visits.filter(d=>d<t).sort().pop();
+  if (prev){ const gap = Math.round((new Date(t)-new Date(prev))/86400000);
+    if (gap>=2) v.appendChild(el("div",{class:"card cream"},
+      '<span class="tag coral">Re-entry ritual</span><h2>Welcome back ('+gap+' days away)</h2>'+
+      '<p>Break decay is steep for you — that\'s measured, not a guess. Before anything new: <b>redo the last Problem Lab problem you completed, cold.</b> Then continue with today\'s mission.</p>'));
+  }
+  const todayPlan = TRACK.find(x=>x.day===t);
+  const behind = TRACK.filter(x=>x.day<t && !S.doneDays.includes(x.day));
+  const mission = behind.length ? behind[0] : (todayPlan && !S.doneDays.includes(t) ? todayPlan : null);
+  const card = el("div",{class:"card teal"});
+  if (mission){
+    const isCatchup = behind.length && mission.day!==t;
+    card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ OVERDUE — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
+      '<h2 style="font-size:1.5rem">'+ (TOPICS[mission.topic]?TOPICS[mission.topic].ico:"🚀") +' '+mission.title+'</h2>'+
+      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. 20–30 min — physics is the light track; ochem keeps the bigger block.'+
+      (behind.length>1?' <b>('+(behind.length-1)+' more overdue behind this one — they queue up automatically.)</b>':'')+'</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lab"){ go("lab"); } else if(mission.topic==="diag"){ startDiagnostic(); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
+    card.appendChild(btn);
+  } else {
+    card.innerHTML = '<span class="tag gold">All caught up</span><h2>Nothing due today 🎉</h2><p style="margin:6px 0 14px">Optional: run <b>Review missed</b> in Drill — converting old misses is the highest-yield 15 minutes that exists.</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ startDrill("__missed"); }},"▶ &nbsp;Review my missed questions");
+    card.appendChild(btn);
+  }
+  v.appendChild(card);
+  const a = accuracy();
+  const stats = el("div",{class:"statrow"});
+  stats.innerHTML =
+    '<div class="stat"><div class="n">'+S.doneDays.length+'/'+TRACK.length+'</div><div class="l">days done</div></div>'+
+    '<div class="stat"><div class="n">'+a.t+'</div><div class="l">questions</div></div>'+
+    '<div class="stat"><div class="n">'+a.pct+'%</div><div class="l">accuracy</div></div>'+
+    '<div class="stat"><div class="n">'+S.probDone.length+'/'+PROBLEMS.length+'</div><div class="l">problems solved</div></div>';
+  v.appendChild(stats);
+  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Protect vector components (due Aug 11) and the two kinematics days (due Aug 13–14) above everything else — they are the spine of the first month.</p>');
+  v.appendChild(pb);
+  if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your PHYS 210 folder in Safari/Chrome for saved progress.</p>'));
+};
+
+/* ---- TRACK ---- */
+VIEWS.track = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag">The 9-day runway · due dates</span><h2>Aug 8 → 16 · class starts Mon Aug 17</h2><p class="muted">Each card shows its <b>due date</b>. Red = overdue → it auto-becomes your next mission on Today (slide, never double up). Tap ✓ to toggle done — honest self-report only: done = you actually did the 20–30 min.</p>'));
+  const g = el("div",{class:"daygrid"});
+  const t = todayStr();
+  TRACK.forEach(d=>{
+    const isDone=S.doneDays.includes(d.day);
+    const isOver=d.day<t && !isDone;
+    const c = el("div",{class:"daycard"+(d.day===t?" today":"")+(isDone?" done":"")+(isOver?" overdue":"")});
+    const due = isDone ? "" :
+      isOver ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(d.day)+'</span>' :
+      d.day===t ? '<span class="duetag today-due">due today</span>' :
+      '<span class="duetag">due '+fmtDay(d.day)+'</span>';
+    c.innerHTML = '<div class="d">'+d.day.slice(5)+'</div><div class="t">'+(TOPICS[d.topic]?TOPICS[d.topic].ico+" ":"")+d.title+'</div>'+due;
+    const row = el("div",{style:"margin-top:8px;display:flex;gap:6px"});
+    row.appendChild(el("button",{class:"btn small",onclick:(e)=>{e.stopPropagation(); d.topic==="lab"?go("lab"):d.topic==="diag"?startDiagnostic():startDrill(d.topic);}},"Open"));
+    row.appendChild(el("button",{class:"btn small ghost",onclick:(e)=>{e.stopPropagation(); const i=S.doneDays.indexOf(d.day); i>=0?S.doneDays.splice(i,1):S.doneDays.push(d.day); save(); render();}},"✓"));
+    c.appendChild(row);
+    g.appendChild(c);
+  });
+  v.appendChild(g);
+  v.appendChild(el("div",{class:"card cream",style:"margin-top:16px"},'<h3>Kept OUT of the runway (on purpose)</h3><p class="muted">Projectiles, forces on inclines, energy, momentum — the course teaches all of it, paced over 16 weeks. The runway\'s only job is the math under it (trig, components, algebra) plus first-contact with kinematics and Newton, so Week 1 is review instead of a firehose. After Aug 16: physics reps live on Mon/Wed, ochem on Tue/Thu, Friday stays protected.</p>'));
+};
+
+/* ---- DRILL ---- */
+function startDiagnostic(){
+  // 1 question per topic, unseen/missed first — the "walk in ahead of the curve" check
+  const pool=[];
+  Object.keys(TOPICS).filter(k=>k!=="diag").forEach(k=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k);
+    if(!qs.length)return;
+    const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+    pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]);
+  });
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__diag",answered:false};
+  go("drill");
+}
+function startDrill(topic){
+  let pool;
+  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
+  else pool = QUESTIONS.filter(q=>q.topic===topic);
+  // unseen first, then wrong-heavy first
+  const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+  pool = shuffle(pool).sort((a,b)=>seen(a.id)-seen(b.id));
+  S.drill = {queue:pool.slice(0,10), i:0, right:0, wrong:0, topic, answered:false};
+  go("drill");
+}
+VIEWS.drill = (v) => {
+  if (!S.drill){ // topic chooser
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Drill</span><h2>Pick a topic</h2><p class="muted">Or better: go back to Today and press the one button. (The chooser exists for review, not for deciding.)</p>'));
+    const pr = el("div",{class:"pill-row"});
+    Object.entries(TOPICS).filter(([k])=>k!=="diag").forEach(([k,t])=>{
+      const qs = QUESTIONS.filter(q=>q.topic===k);
+      const done = qs.filter(q=>S.qstats[q.id]?.r).length;
+      pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>"));
+    });
+    pr.appendChild(el("button",{class:"pill",style:"background:var(--gold)",onclick:()=>startDiagnostic()},"🧪 Mixed diagnostic"));
+    pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
+    v.appendChild(pr);
+    return;
+  }
+  const D = S.drill;
+  if (D.i>=D.queue.length){ // round over
+    const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    if (pct>=80) confetti();
+    const c = el("div",{class:"card"+(pct>=80?" teal":"")});
+    c.innerHTML='<span class="tag gold">Round complete</span><h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)</h2>'+
+      '<p style="margin:8px 0">'+(pct>=80?"That clears the bar. Mark the day and stop — consistency beats intensity.":"Below 80 — the misses just joined your Review queue. Read each 'why', then re-run them tomorrow (spacing, not re-cramming today).")+'</p>';
+    const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+    if (pct>=70){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ const t=todayStr(); if(!S.doneDays.includes(t)) S.doneDays.push(t); save(); S.drill=null; go("home"); }},"✓ Mark today done")); }
+    row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
+    c.appendChild(row); v.appendChild(c); return;
+  }
+  const q = D.queue[D.i];
+  const c = el("div",{class:"card"});
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+'</span>'+
+    '<div class="qprompt">'+q.prompt+'</div>';
+  const fb = el("div");
+  const finish = (ok, revealHtml) => {
+    D.answered=true;
+    const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
+    if(ok){st.r++;D.right++;}else{st.w++;D.wrong++;S.missed.push(q.id);}
+    save();
+    fb.innerHTML='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?"✓ Right":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p><div class="why">'+q.why+'</div>';
+    fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
+    if(!ok)c.classList.add("shake");
+  };
+  if (q.type==="mc"){
+    const ch=el("div",{class:"choices"});
+    const order=shuffle(q.choices.map((txt,i)=>({txt,i})));
+    order.forEach(o=>{
+      ch.appendChild(el("button",{class:"choice",onclick:(e)=>{
+        if(D.answered)return;
+        const ok=o.i===q.answer;
+        e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
+        if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
+        finish(ok,"");
+      }},o.txt));
+    });
+    c.appendChild(ch);
+  } else {
+    const inp=el("input",{class:"answerbox"+(q.type==="text"?" wide":""),type:"text",inputmode:q.type==="num"?"decimal":"text",placeholder:q.type==="num"?"#":"answer"});
+    const sub=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(D.answered)return;
+      let ok=false, val=inp.value.trim();
+      if(!val)return;
+      if(q.type==="num"){ const n=parseFloat(val.replace("−","-").replace(",",".")); const tol=q.tolerance||0; ok=Math.abs(n-q.answer)<=tol; }
+      else { const norm=s=>s.toLowerCase().replace(/[\s−]/g,"-").replace(/-+/g,"-").replace(/[^a-z0-9+\-]/g,""); const acc=(q.accept||[String(q.answer)]).map(norm); ok=acc.includes(norm(val)); }
+      finish(ok,"<b class='mono'>"+q.answer+"</b>");
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub.click();});
+    const row=el("div"); row.appendChild(inp); row.appendChild(sub); c.appendChild(row);
+    setTimeout(()=>inp.focus(),50);
+  }
+  c.appendChild(fb);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="S.drill=null;render()">quit round</button>'));
+};
+
+/* ---- PROBLEM LAB ---- */
+function startLab(probKey){
+  const prob = PROBLEMS.find(p=>p.key===probKey);
+  S.lab = {prob, step:0, tries:0, answered:false};
+  go("lab");
+}
+VIEWS.lab = (v) => {
+  if (!S.lab){ // problem chooser
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Problem Lab</span><h2>Blank-page problems, step by step</h2><p class="muted">The steps are enforced — setup before equation, equation before algebra, algebra before arithmetic. Misses are tracked <b>by step type</b>, because "which step breaks" is the real diagnostic. Work each on PAPER first; the app only checks.</p>'));
+    const t=todayStr();
+    PROBLEMS.forEach(p=>{
+      const done=S.probDone.includes(p.key);
+      const pdue = p.due||"2026-08-16";
+      const due = done ? "" :
+        pdue<t ? ' <span class="duetag overdue">⏰ overdue — was due '+fmtDay(pdue)+'</span>' :
+        pdue===t ? ' <span class="duetag today-due">due today</span>' :
+        ' <span class="duetag">due by '+fmtDay(pdue)+'</span>';
+      const c=el("div",{class:"card"+(done?" cream":"")});
+      c.innerHTML='<h3 style="font-size:1.15rem">'+p.formula+(done?' <span style="color:var(--ok)">✓ solved</span>':due)+'</h3><p class="muted">'+p.blurb+'</p>';
+      c.appendChild(el("button",{class:"btn"+(done?" ghost":" coral"),style:"margin-top:8px",onclick:()=>startLab(p.key)},done?"Re-solve cold":"Solve it"));
+      v.appendChild(c);
+    });
+    const m=S.stepMiss, tot=m.setup+m.equation+m.algebra+m.number;
+    if (tot) v.appendChild(el("div",{class:"card cream"},'<h3>Where your steps break so far</h3><p class="mono" style="line-height:1.8">setup: '+m.setup+' · equation: '+m.equation+' · algebra: '+m.algebra+' · number/units: '+m.number+'</p><p class="muted">The biggest count is your weak step type — say it out loud before starting the next problem.</p>'));
+    return;
+  }
+  const L=S.lab, p=L.prob;
+  const wrap=el("div",{class:"labwrap"});
+  // stepper
+  const st=el("div",{class:"stepper"});
+  p.steps.forEach((s,i)=>st.appendChild(el("div",{class:"step"+(i<L.step?" ok":i===L.step?" on":"")},(i+1)+" "+STEPCATS[s.cat])));
+  wrap.appendChild(st);
+  const card=el("div",{class:"card"});
+  card.innerHTML='<span class="tag">Problem Lab · '+p.formula+'</span>';
+  card.appendChild(el("div",{class:"givenbox"},p.given));
+  if (L.step>=p.steps.length){ // solved
+    confetti();
+    if (!S.probDone.includes(p.key)) S.probDone.push(p.key);
+    // lab-day auto-credit
+    const t=todayStr(); const plan=TRACK.find(x=>x.day===t);
+    if (plan && plan.topic==="lab" && !S.doneDays.includes(t)) S.doneDays.push(t);
+    save();
+    const c=el("div",{class:"card teal"},'<h2>✓ '+p.formula+' — every step checks out</h2><p>Setup ✓ · equation ✓ · algebra ✓ · numbers with units ✓. That is what "blank-page solved" means.</p>');
+    c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{S.lab=null;render();}},"Next problem →"));
+    wrap.appendChild(card); wrap.appendChild(c); v.appendChild(wrap); return;
+  }
+  const step=p.steps[L.step];
+  const ask=el("div",{class:"stepask"},step.ask);
+  card.appendChild(ask);
+  const fb=el("div");
+  const advance=()=>{ L.step++; L.tries=0; L.answered=false; render(); };
+  const miss=()=>{
+    L.tries++; S.stepMiss[step.cat]=(S.stepMiss[step.cat]||0)+1; save();
+    card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350);
+    if (L.tries>=2 && !fb.innerHTML) fb.innerHTML='<div class="why"><b>Hint:</b> '+step.why+'</div>';
+  };
+  if (step.type==="mc"){
+    const ch=el("div",{class:"choices"});
+    const order=shuffle(step.choices.map((txt,i)=>({txt,i})));
+    order.forEach(o=>{
+      ch.appendChild(el("button",{class:"choice",onclick:(e)=>{
+        if(L.answered)return;
+        if(o.i===step.answer){ L.answered=true; e.currentTarget.classList.add("picked-right");
+          fb.innerHTML='<div class="why">'+step.why+'</div>';
+          fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:advance},"Next step →"));
+        } else { e.currentTarget.classList.add("picked-wrong"); miss(); }
+      }},o.txt));
+    });
+    card.appendChild(ch);
+  } else {
+    const inp=el("input",{class:"answerbox",type:"text",inputmode:"decimal",placeholder:"#"});
+    const sub=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(L.answered)return;
+      const val=inp.value.trim(); if(!val)return;
+      const n=parseFloat(val.replace("−","-").replace(",","."));
+      const tol=step.tolerance||0;
+      if (Math.abs(n-step.answer)<=tol){ L.answered=true;
+        fb.innerHTML='<p class="feedback-right">✓ Right</p><div class="why">'+step.why+'</div>';
+        fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:advance},"Next step →"));
+      } else miss();
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub.click();});
+    const row=el("div"); row.appendChild(inp); row.appendChild(sub); card.appendChild(row);
+    setTimeout(()=>inp.focus(),50);
+  }
+  card.appendChild(fb);
+  wrap.appendChild(card);
+  wrap.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← problems"));
+  v.appendChild(wrap);
+};
+
+/* ---- CHEAT SHEET ---- */
+VIEWS.cheat = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole math bridge on one page</h2>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>The problem-solving ritual (every problem, no exceptions)</h3>'+
+    '<ol style="margin-left:18px;line-height:1.7"><li><b>Setup</b> — sketch, list knowns/unknown, pick +direction</li><li><b>Equation</b> — choose by the variable you DON\'T have</li><li><b>Algebra</b> — rearrange with symbols, numbers last</li><li><b>Number</b> — plug in WITH units, carry them through</li><li><b>Audit</b> — units correct? magnitude plausible? sign sensible?</li></ol>'+
+    '<p class="muted">Misses get tagged with the step that broke — the Report shows where your solutions actually fail. Quantify, don\'t eyeball.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Trig + vector components</h3>'+
+    '<p class="mono center" style="font-size:1.05rem;margin:8px 0">SOH · CAH · TOA</p>'+
+    '<p class="mono center" style="margin:6px 0">θ from x-axis: &nbsp;Ax = A cos θ · Ay = A sin θ</p>'+
+    '<p class="muted">Really: <b>adjacent gets cos</b> — if the angle is from the vertical, sin/cos swap. Signs come from direction (left = −x, down = −y). Check: Ax² + Ay² = A². Landmark triangles: 3-4-5 (37°/53°) and 30°-60°-90.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Kinematic equations (uniform a only)</h3>'+
+    '<table class="cheat"><tr><th>Equation</th><th>Missing variable</th></tr>'+
+    '<tr><td class="mono">v = v₀ + at</td><td>Δx</td></tr>'+
+    '<tr><td class="mono">Δx = v₀t + ½at²</td><td>v</td></tr>'+
+    '<tr><td class="mono">v² = v₀² + 2aΔx</td><td>t</td></tr>'+
+    '<tr><td class="mono">Δx = ½(v₀ + v)t</td><td>a</td></tr></table>'+
+    '<p class="muted">Pick the row whose missing variable is the one you neither have nor want. Free fall: same equations with a = g ≈ 9.8 m/s² (≈10 for mental math), down. At the top of a throw: v = 0, a ≠ 0.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Graphs — the four facts</h3>'+
+    '<table class="cheat"><tr><th>Graph</th><th>Slope =</th><th>Area =</th></tr>'+
+    '<tr><td>position–time</td><td>velocity</td><td>—</td></tr>'+
+    '<tr><td>velocity–time</td><td>acceleration</td><td>displacement</td></tr></table>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Newton\'s laws</h3>'+
+    '<p style="line-height:1.8"><b>N1:</b> no net force ↔ constant velocity (including zero). <b>N2:</b> F_net = ma — NET force, and a points along F_net, not along v. <b>N3:</b> equal/opposite pairs act on <i>different</i> objects, so they never cancel.</p>'+
+    '<p class="mono center" style="margin:6px 0">W = mg · N = kg·m/s² · g ≈ 9.8 m/s²</p>'+
+    '<p class="muted">Mass (kg) is intrinsic; weight (N) is a force. Constant v ⇒ net 0 — engine force just cancels friction.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Units you\'ll touch weekly</h3>'+
+    '<p style="line-height:1.8" class="mono">x: m · v: m/s · a: m/s² · F: N = kg·m/s² · km/h → m/s: ÷3.6</p>'+
+    '<p class="muted">Unit-check every rearranged formula before plugging numbers — it catches algebra errors for free.</p>'));
+  v.appendChild(el("div",{class:"card cream"},
+    '<h3>Free-body diagrams (week-1 preview)</h3>'+
+    '<p class="muted" style="line-height:1.7">Every force problem starts with a dot (the object) and arrows for each force ON it — weight down, normal ⊥ surface, friction along it, applied forces as given. Forces the object exerts on OTHER things don\'t go on its diagram (that\'s N3\'s whole point). Then F_net = ma per axis. Janatpour won\'t scaffold this — OpenStax ch. 4 + The Organic Chemistry Tutor\'s Newton\'s-laws playlist will.</p>'));
+};
+
+/* ---- REPORT ---- */
+VIEWS.report = (v) => {
+  const a=accuracy();
+  const perTopic = Object.entries(TOPICS).map(([k,t])=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k); let r=0,w=0;
+    qs.forEach(q=>{const s=S.qstats[q.id]; if(s){r+=s.r;w+=s.w;}});
+    return (r+w)?("  "+t.name+": "+r+"✓ "+w+"✗ ("+Math.round(100*r/(r+w))+"%)"):null;
+  }).filter(Boolean).join("\n");
+  const missedIds=[...new Set(S.missed)];
+  const missedTxt=missedIds.slice(-12).map(id=>{const q=QUESTIONS.find(x=>x.id===id);return "  ["+id+"] "+q.prompt.replace(/<[^>]+>/g,"").slice(0,70);}).join("\n");
+  const m=S.stepMiss;
+  const txt =
+"PHYS 210 BOOTCAMP REPORT — "+todayStr()+"\n"+
+"(paste this to Claude in the PHYS 210 session)\n\n"+
+"Track: "+S.doneDays.length+"/"+TRACK.length+" days marked done ("+S.doneDays.join(", ")+")\n"+
+"Visits: "+S.visits.join(", ")+"\n"+
+"Questions: "+a.r+" right / "+a.w+" wrong ("+a.pct+"% overall)\n"+
+(perTopic?("By topic:\n"+perTopic+"\n"):"")+
+"Problems solved: "+(S.probDone.join(", ")||"none")+"\n"+
+"Step-type misses (Problem Lab): setup "+m.setup+" · equation "+m.equation+" · algebra "+m.algebra+" · number/units "+m.number+"\n"+
+(missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
+"Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
+  const c=el("div",{class:"card"});
+  c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns by STEP TYPE, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
+  const ta=el("textarea",{class:"report",readonly:"readonly"}); ta.value=txt; c.appendChild(ta);
+  const b=el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{ ta.select(); try{ navigator.clipboard.writeText(txt); b.textContent="✓ Copied";}catch(e){ document.execCommand("copy"); b.textContent="✓ Copied"; } setTimeout(()=>b.textContent="Copy report",1600); }},"Copy report");
+  c.appendChild(b);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"card cream"},'<h3>When the syllabus lands</h3><p class="muted">Bring the course files to Claude — this app is built to grow: the TRACK swaps to real weeks with real due dates, per-chapter question banks append to the same schema, and the Problem Lab gains whatever problems your HW sets use. v1.0 → v2.0 in one session, same as the chem app.</p>'));
+};
+
+/* ================= BOOT ================= */
+render();
+</script>
+<script>
+/* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
+(function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
+</script>
+</body>
+</html>

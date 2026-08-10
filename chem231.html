@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CHEM 231 · Ochem Bootcamp</title>
+<!--
+  ============================================================
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.1  ·  built 2026-08-09
+  v2.1: due dates + overdue flags on days/molecules; Aug 17 final diagnostic day (mixed 1-per-topic round)
+  For Gabe. Single file, no server, no dependencies.
+
+  ARCHITECTURE (for future updates when course material lands):
+  · THEME        — CSS custom properties, swap freely
+  · TRACK        — the day plan; replace with syllabus weeks later
+  · QUESTIONS    — flat array, schema below; append per-chapter
+                   banks when the course starts (same shape as
+                   claudebank_*.json: id/topic/type/prompt/answer/why)
+  · MOLECULES    — Lewis Lab targets; add any molecule by listing
+                   atoms + expected valences, checker is generic
+  · Storage      — safeStore wrapper: persists in a real browser,
+                   degrades to in-memory inside sandboxed previews
+  ============================================================
+-->
+<style>
+  :root{
+    --paper:#FBF6EA;
+    --paper2:#F4EDDA;
+    --ink:#20241F;
+    --teal:#0E7C6B;
+    --teal-dk:#0A5C50;
+    --coral:#E4572E;
+    --gold:#F2B705;
+    --violet:#6A4C93;
+    --ok:#2E7D32;
+    --line:#20241F;
+    --shadow:4px 4px 0 var(--ink);
+    --shadow-sm:2px 2px 0 var(--ink);
+    --serif:"Iowan Old Style","Palatino","Georgia",serif;
+    --mono:"SF Mono","Menlo","Consolas",monospace;
+    --sans:-apple-system,"Segoe UI","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{font-size:16px}
+  body{
+    background:var(--paper);
+    background-image:radial-gradient(circle at 1px 1px, rgba(32,36,31,.07) 1px, transparent 0);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  header{
+    background:var(--teal);
+    color:var(--paper);
+    border-bottom:3px solid var(--ink);
+    padding:14px 18px 12px;
+    display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px;
+  }
+  header h1{font-family:var(--serif);font-size:1.45rem;letter-spacing:.5px}
+  header h1 .flask{display:inline-block;transform:rotate(-8deg);margin-right:6px}
+  header .countdown{font-family:var(--mono);font-size:.8rem;background:var(--ink);color:var(--gold);padding:3px 10px;border-radius:99px}
+  .menubtn{font-family:var(--mono);font-size:.8rem;background:var(--paper);color:var(--ink);border:2px solid var(--ink);padding:3px 12px;border-radius:99px;font-weight:800;text-decoration:none;box-shadow:var(--shadow-sm)}
+  .menubtn:active{transform:translate(1px,1px);box-shadow:none}
+  nav{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    display:flex;background:var(--paper);border-top:3px solid var(--ink);
+  }
+  nav button{
+    flex:1;padding:10px 2px 12px;background:none;border:none;border-right:1px solid rgba(32,36,31,.15);
+    font-family:var(--sans);font-size:.68rem;font-weight:700;color:var(--ink);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+  }
+  nav button:last-child{border-right:none}
+  nav button .ico{font-size:1.25rem;line-height:1}
+  nav button.active{background:var(--gold)}
+  main{max-width:860px;margin:0 auto;padding:18px 14px 30px}
+  .card{
+    background:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .card.cream{background:var(--paper2)}
+  .card.teal{background:var(--teal);color:var(--paper)}
+  .card h2{font-family:var(--serif);font-size:1.25rem;margin-bottom:8px}
+  .card h3{font-family:var(--serif);font-size:1.05rem;margin-bottom:6px}
+  .tag{
+    display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);padding:3px 9px;border-radius:99px;margin-bottom:8px;
+  }
+  .tag.gold{background:var(--gold);color:var(--ink)}
+  .tag.coral{background:var(--coral);color:#fff}
+  .tag.violet{background:var(--violet);color:#fff}
+  .bigbtn{
+    display:block;width:100%;text-align:center;
+    background:var(--coral);color:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);padding:16px;font-size:1.1rem;font-weight:800;font-family:var(--serif);
+    cursor:pointer;transition:transform .06s;
+  }
+  .bigbtn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+  .btn{
+    display:inline-block;background:var(--teal);color:#fff;border:2px solid var(--ink);border-radius:8px;
+    box-shadow:var(--shadow-sm);padding:8px 14px;font-size:.85rem;font-weight:700;cursor:pointer;
+    transition:transform .06s;font-family:var(--sans);
+  }
+  .btn:active{transform:translate(2px,2px);box-shadow:none}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.coral{background:var(--coral)}
+  .btn.gold{background:var(--gold);color:var(--ink)}
+  .btn.violet{background:var(--violet)}
+  .btn.small{padding:5px 10px;font-size:.75rem}
+  .btn:disabled{opacity:.4;pointer-events:none}
+  .statrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .stat{
+    flex:1;min-width:90px;background:#fff;border:2px solid var(--ink);border-radius:8px;
+    box-shadow:var(--shadow-sm);padding:8px 10px;text-align:center;
+  }
+  .stat .n{font-family:var(--serif);font-size:1.5rem;font-weight:800}
+  .stat .l{font-size:.62rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.75}
+  .progressbar{height:14px;background:#fff;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:6px 0}
+  .progressbar>div{height:100%;background:var(--teal);border-right:2px solid var(--ink);transition:width .4s}
+  .daygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .daycard{
+    background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:var(--shadow-sm);
+    padding:10px;cursor:pointer;position:relative;
+  }
+  .daycard.today{background:var(--gold)}
+  .daycard.overdue{border-color:var(--coral);box-shadow:2px 2px 0 var(--coral)}
+  .duetag{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:#fff;border:1.5px solid var(--ink);border-radius:99px;padding:2px 8px;margin-top:6px}
+  .duetag.today-due{background:var(--gold)}
+  .duetag.overdue{background:var(--coral);color:#fff}
+  .daycard.done{background:#DDEEDD}
+  .daycard.done::after{content:"✓";position:absolute;top:6px;right:9px;font-weight:900;color:var(--ok);font-size:1.1rem}
+  .daycard .d{font-family:var(--mono);font-size:.65rem;font-weight:700;opacity:.7}
+  .daycard .t{font-family:var(--serif);font-weight:700;font-size:.9rem;margin-top:2px}
+  .qprompt{font-size:1.05rem;line-height:1.5;margin:10px 0 14px}
+  .qprompt .formula{font-family:var(--mono);font-weight:700}
+  .choices{display:flex;flex-direction:column;gap:8px}
+  .choice{
+    text-align:left;background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:var(--shadow-sm);
+    padding:10px 12px;font-size:.95rem;cursor:pointer;font-family:var(--sans);
+  }
+  .choice.picked-right{background:#CDEBCB;border-color:var(--ok)}
+  .choice.picked-wrong{background:#F6CFC2;border-color:var(--coral)}
+  .choice.reveal-right{background:#CDEBCB}
+  .choice:disabled{cursor:default}
+  input.answerbox{
+    font-family:var(--mono);font-size:1.2rem;padding:10px 12px;border:2.5px solid var(--ink);
+    border-radius:8px;width:130px;background:#fff;box-shadow:inset 2px 2px 0 rgba(32,36,31,.12);
+  }
+  input.answerbox.wide{width:100%}
+  .why{
+    border-left:5px solid var(--gold);background:var(--paper2);border-radius:0 8px 8px 0;
+    padding:10px 12px;margin-top:12px;font-size:.9rem;line-height:1.5;
+  }
+  .why b{color:var(--teal-dk)}
+  .feedback-right{color:var(--ok);font-weight:800;font-family:var(--serif);font-size:1.1rem}
+  .feedback-wrong{color:var(--coral);font-weight:800;font-family:var(--serif);font-size:1.1rem}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  .pill{
+    background:#fff;border:2px solid var(--ink);border-radius:99px;padding:6px 13px;font-size:.8rem;
+    font-weight:700;cursor:pointer;box-shadow:var(--shadow-sm);
+  }
+  .pill.on{background:var(--teal);color:#fff}
+  .pill.done{background:#DDEEDD}
+  /* ---------- Lewis Lab ---------- */
+  .labwrap{display:flex;flex-direction:column;gap:12px}
+  .stepper{display:flex;gap:6px;flex-wrap:wrap}
+  .step{
+    flex:1;min-width:64px;text-align:center;font-size:.62rem;font-weight:800;letter-spacing:.3px;
+    border:2px solid var(--ink);border-radius:8px;padding:5px 3px;background:#fff;opacity:.45;
+  }
+  .step.on{background:var(--gold);opacity:1}
+  .step.ok{background:#CDEBCB;opacity:1}
+  .stepask{font-size:.98rem;line-height:1.5;margin:6px 0}
+  #lab-canvas{
+    width:100%;height:340px;background:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);touch-action:none;display:block;
+  }
+  .tooltray{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tool{
+    border:2px solid var(--ink);border-radius:8px;background:#fff;box-shadow:var(--shadow-sm);
+    padding:7px 12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:var(--mono);
+  }
+  .tool.on{background:var(--violet);color:#fff}
+  .ledger{
+    display:flex;gap:10px;font-family:var(--mono);font-size:.85rem;font-weight:700;
+    background:var(--ink);color:var(--paper);border-radius:8px;padding:8px 12px;flex-wrap:wrap;
+  }
+  .ledger .warn{color:var(--gold)}
+  .ledger .bad{color:#FF9A7B}
+  .ledger .good{color:#8FE3A1}
+  .audit li{margin:4px 0 4px 18px;font-size:.9rem}
+  .audit .pass{color:var(--ok);font-weight:700}
+  .audit .fail{color:var(--coral);font-weight:700}
+  table.cheat{width:100%;border-collapse:collapse;font-size:.85rem;margin:8px 0}
+  table.cheat th,table.cheat td{border:1.5px solid var(--ink);padding:6px 8px;text-align:left}
+  table.cheat th{background:var(--teal);color:#fff;font-family:var(--serif)}
+  table.cheat tr:nth-child(even){background:var(--paper2)}
+  .mono{font-family:var(--mono)}
+  .center{text-align:center}
+  .muted{opacity:.7;font-size:.85rem}
+  textarea.report{
+    width:100%;height:220px;font-family:var(--mono);font-size:.75rem;border:2px solid var(--ink);
+    border-radius:8px;padding:10px;background:#fff;
+  }
+  .confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99}
+  .confetti span{position:absolute;font-size:1.4rem;animation:fall 1.4s ease-in forwards}
+  @keyframes fall{from{transform:translateY(-40px) rotate(0)}to{transform:translateY(105vh) rotate(340deg);opacity:.2}}
+  .shake{animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @media(max-width:520px){
+    header h1{font-size:1.15rem}
+    #lab-canvas{height:300px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp</h1>
+  <span style="display:flex;gap:8px;align-items:baseline"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span class="countdown" id="countdown"></span></span>
+</header>
+<main id="view"></main>
+<nav id="nav"></nav>
+<div class="confetti" id="confetti"></div>
+<script>
+"use strict";
+
+/* ================= STORAGE (safe wrapper) ================= */
+const safeStore = (() => {
+  let mem = {};
+  let ok = false;
+  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true; } catch(e){ ok = false; }
+  return {
+    get(k, fallback){ try { const v = ok ? localStorage.getItem(k) : mem[k]; return v == null ? fallback : JSON.parse(v); } catch(e){ return fallback; } },
+    set(k, v){ try { const s = JSON.stringify(v); if (ok) localStorage.setItem(k, s); else mem[k] = s; } catch(e){} },
+    persistent: ok
+  };
+})();
+
+/* ================= TRACK (swap for syllabus later) ================= */
+const CLASS_START = "2026-08-17";
+const TRACK = [
+  { day:"2026-08-08", topic:"lewis",    title:"Lewis structures" },
+  { day:"2026-08-09", topic:"lewis",    title:"Lewis: H₂O + C₂H₄ (Lab)" },
+  { day:"2026-08-10", topic:"formal",   title:"Formal charge" },
+  { day:"2026-08-11", topic:"polarity", title:"EN · polarity · IMFs" },
+  { day:"2026-08-12", topic:"hybrid",   title:"Geometry + hybridization" },
+  { day:"2026-08-13", topic:"resonance",title:"Resonance" },
+  { day:"2026-08-14", topic:"acidbase1",title:"Acid-base I: pKa" },
+  { day:"2026-08-15", topic:"acidbase2",title:"Acid-base II: ARIO" },
+  { day:"2026-08-16", topic:"bondline", title:"Bond-line + func. groups" },
+  { day:"2026-08-17", topic:"diag",     title:"Final diagnostic (before class!)" },
+];
+const TOPICS = {
+  valence:  { name:"Valence electrons",  ico:"🔢" },
+  lewis:    { name:"Lewis structures",   ico:"🧩" },
+  formal:   { name:"Formal charge",      ico:"⚡" },
+  polarity: { name:"EN · polarity · IMF",ico:"🧲" },
+  hybrid:   { name:"Geometry + hybrid.", ico:"📐" },
+  resonance:{ name:"Resonance",          ico:"🔁" },
+  acidbase1:{ name:"Acid-base: pKa",     ico:"🍋" },
+  acidbase2:{ name:"Acid-base: ARIO",    ico:"⚖️" },
+  bondline: { name:"Bond-line + groups", ico:"⛓️" },
+  diag:     { name:"Final diagnostic",   ico:"🏁" },
+};
+const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
+
+/* ================= QUESTION BANK =================
+   schema: {id, topic, type:"num"|"mc"|"text", prompt, answer, choices?, why}
+   Add course-specific banks below this array when the syllabus lands. */
+const QUESTIONS = [
+/* --- valence electrons (feeds lewis) --- */
+{id:"v1",topic:"valence",type:"num",prompt:"How many valence electrons does carbon have?",answer:4,why:"Group 14 → <b>4 valence electrons</b>. This is why carbon makes 4 bonds — it's halfway to 8, so sharing 4 more is cheapest."},
+{id:"v2",topic:"valence",type:"num",prompt:"How many valence electrons does nitrogen have?",answer:5,why:"Group 15 → <b>5</b>. Nitrogen typically makes 3 bonds + 1 lone pair (3×2 shared + 2 = 8)."},
+{id:"v3",topic:"valence",type:"num",prompt:"How many valence electrons does oxygen have?",answer:6,why:"Group 16 → <b>6</b>. Oxygen typically makes 2 bonds + 2 lone pairs."},
+{id:"v4",topic:"valence",type:"num",prompt:"How many valence electrons does chlorine have?",answer:7,why:"Halogens (group 17) → <b>7</b>. One bond + 3 lone pairs completes the octet."},
+{id:"v5",topic:"valence",type:"num",prompt:"Total valence electrons in CO₂?",answer:16,why:"C(4) + 2×O(6) = <b>16</b>. Always compute the total first — it's the budget the whole structure must spend exactly."},
+{id:"v6",topic:"valence",type:"num",prompt:"Total valence electrons in NH₃?",answer:8,why:"N(5) + 3×H(1) = <b>8</b>."},
+{id:"v7",topic:"valence",type:"num",prompt:"Total valence electrons in HCN?",answer:10,why:"H(1) + C(4) + N(5) = <b>10</b>."},
+{id:"v8",topic:"valence",type:"num",prompt:"Total valence electrons in CH₃OH (methanol)?",answer:14,why:"C(4) + 4×H(4) + O(6) = <b>14</b>."},
+{id:"v9",topic:"valence",type:"num",prompt:"Total valence electrons in the hydroxide ion, OH⁻?",answer:8,why:"O(6) + H(1) <b>+ 1 for the negative charge</b> = 8. Charges change the budget: add e⁻ for −, subtract for +."},
+{id:"v10",topic:"valence",type:"num",prompt:"Total valence electrons in NH₄⁺?",answer:8,why:"N(5) + 4×H(4) <b>− 1 for the + charge</b> = 8."},
+/* --- lewis --- */
+{id:"l1",topic:"lewis",type:"mc",prompt:"In a Lewis structure, the central atom is usually…",choices:["The atom that wants the most bonds (never H)","The most electronegative atom","Whichever is written first","Always carbon"],answer:0,why:"Central = <b>most bonds wanted</b> (C > N > O). Hydrogen is never central — it only makes 1 bond, so it's always terminal."},
+{id:"l2",topic:"lewis",type:"num",prompt:"You draw 2 single bonds in H₂O (8 e⁻ total). How many electrons remain after step 3?",answer:4,why:"2 bonds × 2 e⁻ = 4 used. 8 − 4 = <b>4 remaining</b> → they become oxygen's 2 lone pairs. This is the step-3 arithmetic — always write it."},
+{id:"l3",topic:"lewis",type:"num",prompt:"A central carbon has 2 single bonds and no lone pairs. It needs 8. How many electrons SHORT is it?",answer:4,why:"2 bonds = 4 e⁻. 8 − 4 = <b>short by 4</b> — quantify, don't eyeball. Short÷2 = 2 lone pairs to pull in → a triple bond (or two doubles)."},
+{id:"l4",topic:"lewis",type:"mc",prompt:"A central atom is short by 2 electrons. The fix:",choices:["Convert a neighbor's lone pair into a double bond","Add lone pairs to the central atom from nowhere","Rearrange the neighbor's lone pairs","Remove a hydrogen"],answer:0,why:"Only <b>converting a lone pair into a shared bond</b> helps — sharing lets both atoms count the same 2 electrons. Rearranging lone pairs on a neighbor changes nothing (your documented trap!). And you can't invent electrons: the budget is fixed."},
+{id:"l5",topic:"lewis",type:"num",prompt:"How many lone pairs sit on the N in HCN (H–C≡N)?",answer:1,why:"N started with 3 lone pairs' worth, gave 2 pairs into the triple bond, keeps <b>1</b>. Audit: N has 3 bonds (6 e⁻) + 1 LP (2 e⁻) = 8 ✓."},
+{id:"l6",topic:"lewis",type:"num",prompt:"How many TOTAL lone pairs are in CO₂ (O=C=O)?",answer:4,why:"Each O: 2 bonds + <b>2 lone pairs</b>. Carbon: 4 bonds, 0 LP. Total = 4 LPs = 8 e⁻, plus 8 in bonds = 16 ✓."},
+{id:"l7",topic:"lewis",type:"mc",prompt:"Memorized bond counts — which row is WRONG?",choices:["C: 4 bonds, 0 lone pairs","N: 3 bonds, 1 lone pair","O: 2 bonds, 2 lone pairs","F: 2 bonds, 2 lone pairs"],answer:3,why:"Halogens make <b>1 bond + 3 lone pairs</b>. The table (H 1/0 · C 4/0 · N 3/1 · O 2/2 · X 1/3) double-checks every structure you draw."},
+/* --- formal charge --- */
+{id:"f1",topic:"formal",type:"num",prompt:"Formal charge on O in hydronium, H₃O⁺? (enter −1, 0, or 1)",answer:1,why:"FC = 6 − 2(LP e⁻) − ½(6 bonding) = 6 − 2 − 3 = <b>+1</b>. Shortcut: O with 3 bonds + 1 LP is always +1."},
+{id:"f2",topic:"formal",type:"num",prompt:"Formal charge on O in hydroxide, OH⁻?",answer:-1,why:"FC = 6 − 6 − 1 = <b>−1</b>. Shortcut: O with 1 bond + 3 LPs is always −1. You'll see this pattern constantly in mechanisms."},
+{id:"f3",topic:"formal",type:"num",prompt:"Formal charge on N in NH₄⁺?",answer:1,why:"N with <b>4 bonds, 0 LP</b>: FC = 5 − 0 − 4 = +1. Memorize the pattern — 4-bond nitrogen is positive."},
+{id:"f4",topic:"formal",type:"mc",prompt:"In CH₃O⁻ (methoxide), which atom carries the −1?",choices:["The oxygen","The carbon","A hydrogen","It's spread over all atoms equally"],answer:0,why:"<b>Oxygen</b>: 1 bond + 3 LPs → FC = −1. C has its normal 4 bonds (FC 0). Charge sits where the bond count deviates from the happy number."},
+{id:"f5",topic:"formal",type:"num",prompt:"FC formula: valence − lone-pair e⁻ − ½(bonding e⁻). For a C with 3 bonds and 1 lone pair, FC = ?",answer:-1,why:"3 bonds = 6 bonding e⁻ → ½ = 3. FC = 4 − 2 − 3 = <b>−1</b>. A 3-bond carbon with a lone pair is a carbanion — you'll meet these as nucleophiles."},
+/* --- polarity --- */
+{id:"p1",topic:"polarity",type:"mc",prompt:"Electronegativity order — which is correct?",choices:["F > O > N ≈ Cl > C ≈ H","O > F > N > C > H","F > N > O > C > H","C > N > O > F > H"],answer:0,why:"<b>F > O > N ≈ Cl</b>, and C ≈ H near the bottom of the common set. This ordering predicts every δ+/δ− you'll ever label."},
+{id:"p2",topic:"polarity",type:"mc",prompt:"In a C=O bond, the partial charges are:",choices:["δ+ on C, δ− on O","δ− on C, δ+ on O","No polarity — it's a double bond","Depends on temperature"],answer:0,why:"O is more electronegative → pulls density → <b>δ− O, δ+ C</b>. That δ+ carbon is where nucleophiles attack — arguably the single most important fact in carbonyl chemistry."},
+{id:"p3",topic:"polarity",type:"mc",prompt:"Which molecule can hydrogen-bond with itself?",choices:["CH₃OH","CH₄","CH₃OCH₃ (ether)","CO₂"],answer:0,why:"H-bonding needs an <b>H attached to O, N, or F</b>. Methanol has O–H ✓. The ether has O but no O–H — it can accept H-bonds, not donate."},
+{id:"p4",topic:"polarity",type:"mc",prompt:"Ethanol dissolves in water; hexane doesn't. Why?",choices:["Ethanol H-bonds with water; hexane only has London forces","Ethanol is smaller","Hexane is too dense","Water is ionic"],answer:0,why:"<b>Like dissolves like</b>: ethanol's O–H matches water's H-bond network. Hexane is nonpolar — mixing it into water breaks water-water H-bonds without paying them back."},
+{id:"p5",topic:"polarity",type:"mc",prompt:"Rank boiling points, highest first: butanol (C₄ alcohol), butane, diethyl ether",choices:["butanol > ether > butane","butane > ether > butanol","ether > butanol > butane","all equal"],answer:0,why:"H-bonding (butanol) > dipole-dipole (ether) > London only (butane). <b>Stronger IMFs = higher bp.</b>"},
+/* --- hybrid --- */
+{id:"h1",topic:"hybrid",type:"text",prompt:"Hybridization of carbon in CH₄? (type like: sp3)",answer:"sp3",why:"4 attached groups + 0 LP = 4 electron domains → <b>sp³</b>, tetrahedral, 109.5°. Count domains, that's the whole trick."},
+{id:"h2",topic:"hybrid",type:"text",prompt:"Hybridization of the carbon in H₂C=O?",answer:"sp2",why:"3 domains (2 H + 1 O, the double bond counts once) → <b>sp²</b>, trigonal planar, 120°."},
+{id:"h3",topic:"hybrid",type:"text",prompt:"Hybridization of each carbon in HC≡CH?",answer:"sp",why:"2 domains each → <b>sp</b>, linear, 180°."},
+{id:"h4",topic:"hybrid",type:"mc",prompt:"Water's oxygen is sp³ with 2 lone pairs. Its shape is:",choices:["Bent","Linear","Tetrahedral","Trigonal planar"],answer:0,why:"4 domains arrange tetrahedrally, but shape names only the atoms: 2 bonds + 2 LPs = <b>bent</b> (~104.5°)."},
+{id:"h5",topic:"hybrid",type:"mc",prompt:"A C=C double bond consists of:",choices:["1 sigma + 1 pi bond","2 sigma bonds","2 pi bonds","1 sigma + 2 pi"],answer:0,why:"<b>1σ + 1π</b>. The π bond is side-on p-orbital overlap — which is why double bonds can't rotate: rotating breaks the π overlap."},
+{id:"h6",topic:"hybrid",type:"text",prompt:"In CH₂=CH–C≡N, the hybridization of the carbon in C≡N?",answer:"sp",why:"Triple-bonded carbon: 2 domains → <b>sp</b>. Walking a molecule assigning sp/sp²/sp³ per atom should take seconds by day one of class."},
+/* --- resonance --- */
+{id:"r1",topic:"resonance",type:"mc",prompt:"Resonance structures are…",choices:["Imaginary snapshots; the real molecule is one blended hybrid","Structures the molecule flips between rapidly","Different molecules in equilibrium","Excited states"],answer:0,why:"The molecule is <b>always the hybrid</b> — it never 'flips.' Resonance is a limitation of drawing, not a motion of the molecule."},
+{id:"r2",topic:"resonance",type:"mc",prompt:"When drawing resonance structures, what is allowed to move?",choices:["Electrons only (lone pairs and π bonds)","Atoms only","Both atoms and electrons","Protons"],answer:0,why:"<b>Only electrons move</b> — lone pairs ↔ π bonds. If an atom moved, it's a different molecule (an isomer), not resonance."},
+{id:"r3",topic:"resonance",type:"num",prompt:"How many equivalent resonance structures does the nitrate ion NO₃⁻ have?",answer:3,why:"The double bond can sit on any of the 3 oxygens → <b>3 equivalent structures</b>; the real ion has three identical 1⅓ bonds."},
+{id:"r4",topic:"resonance",type:"mc",prompt:"The two C–O bonds in acetate (CH₃CO₂⁻) are the same length because…",choices:["The true structure is a hybrid — each bond is order 1.5","They alternate quickly","One is sigma, one is pi","Measurement error"],answer:0,why:"Two equivalent resonance forms average to <b>bond order 1.5 on both C–O bonds</b>, charge spread over both oxygens. Delocalized charge = stabilized charge — this becomes the #1 acidity argument."},
+{id:"r5",topic:"resonance",type:"mc",prompt:"Which resonance structure contributes MOST to the hybrid?",choices:["Full octets, least charge separation, − on the most electronegative atom","The one with the most charges","The one drawn first","They always contribute equally"],answer:0,why:"Ranking rules: <b>octets full > minimal charge > negative on the EN atom</b>. Equivalent structures (like acetate's) contribute equally."},
+/* --- acid-base I --- */
+{id:"a1",topic:"acidbase1",type:"mc",prompt:"Lower pKa means…",choices:["Stronger acid","Weaker acid","Stronger base","Higher pH always"],answer:0,why:"<b>pKa down = acid strength up</b> (it's a log scale: each unit = 10×). Burn this in — every ochem acid-base question routes through it."},
+{id:"a2",topic:"acidbase1",type:"num",prompt:"Approximate pKa of a carboxylic acid (like acetic acid)?",answer:5,why:"≈ <b>5</b> (4.76 for acetic). Landmarks to know cold: HCl −7 · H₃O⁺ −1.7 · RCOOH 5 · H₂O 15.7 · ROH 16 · alkyne 25 · alkane 50."},
+{id:"a3",topic:"acidbase1",type:"num",prompt:"Approximate pKa of water?",answer:16,why:"<b>15.7</b> (we accept 16). Water is a far weaker acid than a carboxylic acid — 10 pKa units ≈ 10 billion times weaker.",tolerance:1},
+{id:"a4",topic:"acidbase1",type:"mc",prompt:"An acid-base equilibrium favors the side with…",choices:["The weaker acid (higher pKa)","The stronger acid","More molecules","The heavier compounds"],answer:0,why:"Equilibrium runs <b>downhill to the weaker acid</b>. Compare the two pKa values; the side holding the higher-pKa acid wins."},
+{id:"a5",topic:"acidbase1",type:"mc",prompt:"Will acetate (CH₃CO₂⁻) deprotonate water?",choices:["No — that would form acetic acid (pKa 5) from water (pKa 15.7), uphill","Yes, completely","Yes, about half-way","Only when heated"],answer:0,why:"Going acetate + H₂O → acetic acid + OH⁻ converts a pKa-15.7 acid into a pKa-5 acid — <b>uphill by ~10¹¹</b>. Equilibrium says no."},
+{id:"a6",topic:"acidbase1",type:"text",prompt:"Conjugate base of H₂O? (type a formula, e.g. NH2-)",answer:"oh-",accept:["oh-","ho-","oh−","ho−"],why:"Remove H⁺ from H₂O → <b>OH⁻</b>. Conjugate pairs differ by exactly one proton."},
+/* --- acid-base II: ARIO --- */
+{id:"b1",topic:"acidbase2",type:"mc",prompt:"ARIO ranks what makes an acid strong. The letters stand for:",choices:["Atom, Resonance, Induction, Orbital","Acidity, Reactivity, Ionization, Orbital","Atom, Radius, Ion, Octet","Angle, Resonance, Induction, Overlap"],answer:0,why:"<b>A</b>tom → <b>R</b>esonance → <b>I</b>nduction → <b>O</b>rbital, checked in that order on the <b>conjugate base</b>: whatever stabilizes the conjugate base makes the acid stronger."},
+{id:"b2",topic:"acidbase2",type:"mc",prompt:"Why is acetic acid (pKa 5) a much stronger acid than ethanol (pKa 16)?",choices:["Resonance: acetate's charge spreads over 2 oxygens; ethoxide's sits on 1","Acetic acid has more hydrogens","Ethanol is bigger","Induction from the CH₃"],answer:0,why:"Same atom (O) holds the charge in both — the difference is <b>R: resonance delocalization</b> in acetate. Delocalized charge = stable conjugate base = stronger acid. This exact comparison is an Exam-1 classic."},
+{id:"b3",topic:"acidbase2",type:"mc",prompt:"Rank acidity: HF vs H₂O vs NH₃",choices:["HF > H₂O > NH₃","NH₃ > H₂O > HF","H₂O > HF > NH₃","All equal"],answer:0,why:"<b>A (atom)</b>: across a row, more electronegative atom stabilizes − better: F⁻ > OH⁻ > NH₂⁻. So HF (pKa 3.2) > H₂O (15.7) > NH₃ (38)."},
+{id:"b4",topic:"acidbase2",type:"mc",prompt:"Which effect explains why CF₃COOH (pKa 0.2) beats CH₃COOH (pKa 4.8)?",choices:["Induction — the F's pull electron density through the bonds","Resonance","A heavier molecule","Orbital size"],answer:0,why:"Both have identical resonance; the F's add <b>I: induction</b> — electron-withdrawal through σ bonds that further stabilizes the anion. Closer + more EN groups = bigger effect."},
+{id:"b5",topic:"acidbase2",type:"mc",prompt:"Terminal alkynes (pKa 25) are more acidic than alkanes (pKa 50) because…",choices:["The sp carbanion holds the lone pair closer to the nucleus","Triple bonds are weak","Resonance","Alkynes are polar molecules"],answer:0,why:"<b>O: orbital.</b> sp (50% s-character) holds electrons tighter than sp³ (25%) → more stable carbanion → more acidic. The O factor only matters when A/R/I tie."},
+{id:"b6",topic:"acidbase2",type:"mc",prompt:"HBr is a stronger acid than HF. But F is more electronegative! Why?",choices:["Size wins down a column — Br⁻ spreads charge over a bigger volume","It isn't stronger","Br has resonance","HF hydrogen-bonds"],answer:0,why:"<b>A has two sub-rules</b>: across a row → electronegativity; down a column → <b>size</b>. Big soft Br⁻ dilutes the charge → very stable → HBr pKa −9 vs HF +3.2."},
+/* --- bond-line + functional groups --- */
+{id:"c1",topic:"bondline",type:"num",prompt:"In bond-line notation, a plain zigzag of 4 line-ends/vertices (no letters) = butane. How many H's on each END carbon?",answer:3,why:"End carbons have 1 C–C bond → need <b>3 H's</b> to reach 4 bonds. Interior carbons with 2 C–C bonds carry 2 H's. Hydrogens are implied, never drawn."},
+{id:"c2",topic:"bondline",type:"num",prompt:"Total hydrogens in cyclohexane (the plain hexagon)?",answer:12,why:"6 carbons, each with 2 ring bonds → 2 H's each → <b>12</b>. Formula C₆H₁₂ ✓ (CₙH₂ₙ for one ring/double bond)."},
+{id:"c3",topic:"bondline",type:"num",prompt:"CH₃CH(OH)CH₂CH₃ — how many H's on the carbon bearing the OH?",answer:1,why:"That C has bonds to: CH₃, OH, CH₂CH₃ = 3 → needs <b>1 H</b>. Translating condensed ↔ bond-line and counting hidden H's is a day-one class skill."},
+{id:"c4",topic:"bondline",type:"mc",prompt:"A C=O with an H directly on the carbonyl carbon is a(n)…",choices:["Aldehyde","Ketone","Carboxylic acid","Ester"],answer:0,why:"<b>Aldehyde</b> = C=O at a chain END (has H). Ketone = C=O between two carbons. Acid = C=O with OH. Ester = C=O with OR."},
+{id:"c5",topic:"bondline",type:"mc",prompt:"CH₃–O–CH₃ contains which functional group?",choices:["Ether","Ester","Alcohol","Epoxide… wait that's an ether too"],answer:0,why:"C–O–C with no C=O = <b>ether</b>. (An epoxide is a 3-membered cyclic ether — so choice D was half right, but 'ether' is the group name.)"},
+{id:"c6",topic:"bondline",type:"mc",prompt:"Ibuprofen contains a benzene ring and which acidic group?",choices:["Carboxylic acid (–COOH)","Amide","Ester","Phenol"],answer:0,why:"Ibuprofen = aromatic ring + <b>carboxylic acid</b> (pKa ≈ 4.9). Spotting groups on real drugs is exactly how exams dress up easy questions."},
+{id:"c7",topic:"bondline",type:"mc",prompt:"An N between two carbons (R–NH–R), no C=O anywhere near it:",choices:["Amine","Amide","Nitrile","Imine"],answer:0,why:"<b>Amine</b> = N with C/H neighbors. <b>Amide</b> = N attached to a C=O — totally different behavior. This pair is the most-confused of all groups."},
+];
+/* fix f5 (answerOverride pattern demo): real answer is -1 */
+QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
+
+/* ================= MOLECULES (Lewis Lab) =================
+   atoms: element counts · ve: total valence e⁻ (the step-1 answer)
+   central: accepted central atom element(s)
+   afterSingles: e⁻ remaining after connecting the skeleton with single bonds (step-3 answer)
+   hint: shown only after 2 failed audits
+   Generic checker: formula match + budget spent + H rule + octets + connectivity. */
+const MOLECULES = [
+  {formula:"H₂O",  key:"H2O",  atoms:{O:1,H:2}, ve:8,  central:["O"], afterSingles:4, due:"2026-08-09", done:false, blurb:"The owed warm-up. Finish your steps 3–5 properly this time.", hint:"2 bonds use 4 e⁻; the remaining 4 = 2 lone pairs on O."},
+  {formula:"C₂H₄", key:"C2H4", atoms:{C:2,H:4}, ve:12, central:["C"], afterSingles:2, due:"2026-08-09", done:false, blurb:"Two central atoms! Connect C–C first, hang the H's, then audit.", hint:"5 single bonds spend 10 of 12. Put the last 2 on a carbon as a lone pair — then CONVERT that pair into a second C–C bond: C=C, and no lone pairs anywhere in the final structure."},
+  {formula:"NH₃",  key:"NH3",  atoms:{N:1,H:3}, ve:8,  central:["N"], afterSingles:2, done:false, blurb:"Straightforward — if your bond-number table is loaded.", hint:"N: 3 bonds + 1 lone pair."},
+  {formula:"CO₂",  key:"CO2",  atoms:{C:1,O:2}, ve:16, central:["C"], afterSingles:12, done:false, blurb:"Redo from tutoring. Carbon will come up short — quantify how short.", hint:"C is short by 4 after singles → pull one pair from EACH oxygen → two double bonds."},
+  {formula:"CH₂O", key:"CH2O", atoms:{C:1,O:1,H:2}, ve:12, central:["C"], afterSingles:6, done:false, blurb:"Formaldehyde — your first double-bond fix, revisited.", hint:"C short by 2 → one pair off O → C=O."},
+  {formula:"HCN",  key:"HCN",  atoms:{H:1,C:1,N:1}, ve:10, central:["C"], afterSingles:6, done:false, blurb:"The triple-bond one. Short by 4 → 2 pairs convert.", hint:"H–C≡N with one lone pair left on N."},
+  {formula:"CH₃OH",key:"CH3OH",atoms:{C:1,O:1,H:4}, ve:14, central:["C"], afterSingles:4, done:false, blurb:"Two heavy atoms again: C–O skeleton, H's around.", hint:"All singles; O keeps 2 lone pairs."},
+  {formula:"CH₃NH₂",key:"CH3NH2",atoms:{C:1,N:1,H:5}, ve:14, central:["C"], afterSingles:2, done:false, blurb:"Methylamine — N's lone pair is the business end of every amine.", hint:"All singles; 1 lone pair on N."},
+  {formula:"N₂",   key:"N2",   atoms:{N:2}, ve:10, central:["N"], afterSingles:8, done:false, blurb:"Deceptively simple. Both atoms short → big conversion.", hint:"N≡N with a lone pair on each end."},
+  {formula:"C₂H₆", key:"C2H6", atoms:{C:2,H:6}, ve:14, central:["C"], afterSingles:0, done:false, blurb:"Ethane — pure skeleton practice, zero leftovers.", hint:"7 single bonds spend all 14 exactly."},
+];
+const VALENCE = {H:1, C:4, N:5, O:6, F:7, Cl:7, Br:7, S:6, P:5};
+const ATOM_COLORS = {H:"#8aa4b8", C:"#20241F", N:"#2E5EAA", O:"#C0392B", F:"#2E7D32", Cl:"#2E7D32", Br:"#8B4513", S:"#B7950B", P:"#B7950B"};
+
+/* ================= STATE ================= */
+const S = {
+  doneDays: safeStore.get("doneDays", []),
+  qstats:   safeStore.get("qstats", {}),      // id -> {r,w}
+  missed:   safeStore.get("missed", []),      // ids, most recent last
+  molDone:  safeStore.get("molDone", []),
+  visits:   safeStore.get("visits", []),
+  view: "home",
+  drill: null,   // {queue:[], i, right, wrong, topic}
+  lab: null,     // lab session state
+};
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+(function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
+
+/* ================= HELPERS ================= */
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else e.setAttribute(k,v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function confetti(){ const c=$("#confetti"); const em=["🎉","⚗️","✨","🧪","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
+function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
+function accuracy(){ let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;}); const t=r+w; return {r,w,t,pct:t?Math.round(100*r/t):0}; }
+
+/* ================= ROUTER ================= */
+const NAV = [
+  {id:"home",  ico:"🏠", label:"Today"},
+  {id:"lab",   ico:"🧪", label:"Lewis Lab"},
+  {id:"drill", ico:"🎯", label:"Drill"},
+  {id:"track", ico:"🗓️", label:"Plan"},
+  {id:"cheat", ico:"📌", label:"Cheat Sheet"},
+  {id:"report",ico:"📤", label:"Report"},
+];
+function go(view){ S.view=view; render(); window.scrollTo(0,0); }
+function renderNav(){ const n=$("#nav"); n.innerHTML=""; NAV.forEach(t=>{ const b=el("button",{class:S.view===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
+function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass(); $("#countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); }
+
+/* ================= VIEWS ================= */
+const VIEWS = {};
+
+/* ---- HOME ---- */
+VIEWS.home = (v) => {
+  const t = todayStr();
+  // re-entry ritual: gap of 2+ days since previous visit
+  const prev = S.visits.filter(d=>d<t).sort().pop();
+  if (prev){ const gap = Math.round((new Date(t)-new Date(prev))/86400000);
+    if (gap>=2) v.appendChild(el("div",{class:"card cream"},
+      '<span class="tag coral">Re-entry ritual</span><h2>Welcome back ('+gap+' days away)</h2>'+
+      '<p>Break decay is steep for you — that\'s measured, not a guess. Before anything new: <b>one warm-up problem from the last topic you touched.</b> Open the Lewis Lab and rebuild the last molecule you completed, cold. Then continue.</p>'));
+  }
+  const todayPlan = TRACK.find(x=>x.day===t);
+  const behind = TRACK.filter(x=>x.day<t && !S.doneDays.includes(x.day));
+  const mission = behind.length ? behind[0] : (todayPlan && !S.doneDays.includes(t) ? todayPlan : null);
+  const card = el("div",{class:"card teal"});
+  if (mission){
+    const isCatchup = behind.length && mission.day!==t;
+    card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ OVERDUE — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
+      '<h2 style="font-size:1.5rem">'+ (TOPICS[mission.topic]?TOPICS[mission.topic].ico:"⚗️") +' '+mission.title+'</h2>'+
+      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. ~1 hour, timer optional but a finish line helps.'+
+      (behind.length>1?' <b>('+(behind.length-1)+' more overdue behind this one — they queue up automatically.)</b>':'')+'</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lewis"){ go("lab"); } else if(mission.topic==="diag"){ startDiagnostic(); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
+    card.appendChild(btn);
+  } else {
+    card.innerHTML = '<span class="tag gold">All caught up</span><h2>Nothing owed today 🎉</h2><p style="margin:6px 0 14px">Optional: run <b>Review missed</b> in Drill — converting old misses is the highest-yield hour that exists.</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ startDrill("__missed"); }},"▶ &nbsp;Review my missed questions");
+    card.appendChild(btn);
+  }
+  v.appendChild(card);
+  const a = accuracy();
+  const stats = el("div",{class:"statrow"});
+  stats.innerHTML =
+    '<div class="stat"><div class="n">'+S.doneDays.length+'/'+TRACK.length+'</div><div class="l">days done</div></div>'+
+    '<div class="stat"><div class="n">'+a.t+'</div><div class="l">questions</div></div>'+
+    '<div class="stat"><div class="n">'+a.pct+'%</div><div class="l">accuracy</div></div>'+
+    '<div class="stat"><div class="n">'+S.molDone.length+'/'+MOLECULES.length+'</div><div class="l">molecules built</div></div>';
+  v.appendChild(stats);
+  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Protect resonance (Aug 13) and both acid-base days (14–15) above everything else.</p>');
+  v.appendChild(pb);
+  if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
+};
+
+/* ---- TRACK ---- */
+VIEWS.track = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag">The 9-day runway</span><h2>Aug 8 → 16 · class starts Mon Aug 17</h2><p class="muted">Tap a day to open its work. Long-press logic is for suckers — tap the ✓ button to toggle done (honest self-report only: done = you actually did the hour).</p>'));
+  const g = el("div",{class:"daygrid"});
+  const t = todayStr();
+  TRACK.forEach(d=>{
+    const isDone=S.doneDays.includes(d.day), isOver=d.day<t&&!isDone;
+    const c = el("div",{class:"daycard"+(d.day===t?" today":"")+(isDone?" done":"")+(isOver?" overdue":"")});
+    const due = isDone ? "" :
+      isOver ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(d.day)+'</span>' :
+      d.day===t ? '<span class="duetag today-due">due today</span>' :
+      '<span class="duetag">due '+fmtDay(d.day)+'</span>';
+    c.innerHTML = '<div class="d">'+d.day.slice(5)+'</div><div class="t">'+(TOPICS[d.topic]?TOPICS[d.topic].ico+" ":"")+d.title+'</div>'+due;
+    const row = el("div",{style:"margin-top:8px;display:flex;gap:6px"});
+    row.appendChild(el("button",{class:"btn small",onclick:(e)=>{e.stopPropagation(); d.topic==="lewis"?go("lab"):d.topic==="diag"?startDiagnostic():startDrill(d.topic);}},"Open"));
+    row.appendChild(el("button",{class:"btn small ghost",onclick:(e)=>{e.stopPropagation(); const i=S.doneDays.indexOf(d.day); i>=0?S.doneDays.splice(i,1):S.doneDays.push(d.day); save(); render();}},"✓"));
+    c.appendChild(row);
+    g.appendChild(c);
+  });
+  v.appendChild(g);
+  v.appendChild(el("div",{class:"card cream",style:"margin-top:16px"},'<h3>Cut from the 14-day plan (on purpose)</h3><p class="muted">Thermo/kinetics diagrams and curved-arrow mechanisms — the course teaches both in week 1. If you finish a day early, preview curved arrows on the Cheat Sheet instead.</p>'));
+};
+
+/* ---- DRILL ---- */
+function startDiagnostic(){
+  // 1 question per topic, unseen/missed first — the "walk in ahead of the curve" check
+  const pool=[];
+  Object.keys(TOPICS).filter(k=>k!=="diag").forEach(k=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k);
+    if(!qs.length)return;
+    const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+    pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]);
+  });
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__diag",answered:false};
+  go("drill");
+}
+function startDrill(topic){
+  let pool;
+  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
+  else pool = QUESTIONS.filter(q=>q.topic===topic);
+  // unseen first, then wrong-heavy first
+  const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+  pool = shuffle(pool).sort((a,b)=>seen(a.id)-seen(b.id));
+  S.drill = {queue:pool.slice(0,10), i:0, right:0, wrong:0, topic, answered:false};
+  go("drill");
+}
+VIEWS.drill = (v) => {
+  if (!S.drill){ // topic chooser
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Drill</span><h2>Pick a topic</h2><p class="muted">Or better: go back to Today and press the one button. (The chooser exists for review, not for deciding.)</p>'));
+    const pr = el("div",{class:"pill-row"});
+    Object.entries(TOPICS).forEach(([k,t])=>{
+      const qs = QUESTIONS.filter(q=>q.topic===k);
+      const done = qs.filter(q=>S.qstats[q.id]?.r).length;
+      pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>"));
+    });
+    pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
+    v.appendChild(pr);
+    return;
+  }
+  const D = S.drill;
+  if (D.i>=D.queue.length){ // round over
+    const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    if (pct>=80) confetti();
+    const c = el("div",{class:"card"+(pct>=80?" teal":"")});
+    c.innerHTML='<span class="tag gold">Round complete</span><h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)</h2>'+
+      '<p style="margin:8px 0">'+(pct>=80?"That clears the bar. Mark the day and stop — consistency beats intensity.":"Below 80 — the misses just joined your Review queue. Read each 'why', then re-run them tomorrow (spacing, not re-cramming today).")+'</p>';
+    const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+    if (pct>=70){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ const t=todayStr(); if(!S.doneDays.includes(t)) S.doneDays.push(t); save(); S.drill=null; go("home"); }},"✓ Mark today done")); }
+    row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
+    c.appendChild(row); v.appendChild(c); return;
+  }
+  const q = D.queue[D.i];
+  const c = el("div",{class:"card"});
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+'</span>'+
+    '<div class="qprompt">'+q.prompt+'</div>';
+  const fb = el("div");
+  const finish = (ok, revealHtml) => {
+    D.answered=true;
+    const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
+    if(ok){st.r++;D.right++;}else{st.w++;D.wrong++;S.missed.push(q.id);}
+    save();
+    fb.innerHTML='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?"✓ Right":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p><div class="why">'+q.why+'</div>';
+    fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
+    if(!ok)c.classList.add("shake");
+  };
+  if (q.type==="mc"){
+    const ch=el("div",{class:"choices"});
+    const order=shuffle(q.choices.map((txt,i)=>({txt,i})));
+    order.forEach(o=>{
+      ch.appendChild(el("button",{class:"choice",onclick:(e)=>{
+        if(D.answered)return;
+        const ok=o.i===q.answer;
+        e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
+        if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
+        finish(ok,"");
+      }},o.txt));
+    });
+    c.appendChild(ch);
+  } else {
+    const inp=el("input",{class:"answerbox"+(q.type==="text"?" wide":""),type:q.type==="num"?"text":"text",inputmode:q.type==="num"?"numeric":"text",placeholder:q.type==="num"?"#":"answer"});
+    const sub=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(D.answered)return;
+      let ok=false, val=inp.value.trim();
+      if(!val)return;
+      if(q.type==="num"){ const n=parseFloat(val.replace("−","-")); const tol=q.tolerance||0; ok=Math.abs(n-q.answer)<=tol; }
+      else { const norm=s=>s.toLowerCase().replace(/[\s−]/g,"-").replace(/-+/g,"-").replace(/[^a-z0-9+\-]/g,""); const acc=(q.accept||[String(q.answer)]).map(norm); ok=acc.includes(norm(val)); }
+      finish(ok,"<b class='mono'>"+q.answer+"</b>");
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub.click();});
+    const row=el("div"); row.appendChild(inp); row.appendChild(sub); c.appendChild(row);
+    setTimeout(()=>inp.focus(),50);
+  }
+  c.appendChild(fb);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="S.drill=null;render()">quit round</button>'));
+};
+
+/* ---- LEWIS LAB ---- */
+function startLab(molKey){
+  const mol = MOLECULES.find(m=>m.key===molKey);
+  S.lab = {mol, step:1, tries:0, atoms:[], bonds:[], nextId:1, tool:"atom", selElement:Object.keys(mol.atoms)[0], selAtom:null, fails:0, msg:""};
+  go("lab");
+}
+VIEWS.lab = (v) => {
+  if (!S.lab){ // molecule chooser
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Lewis Lab</span><h2>Build structures, step by step</h2><p class="muted">The six steps are enforced — no skipping to the answer picture. Counts first, drawing second, audit last. (Yes, this is aimed directly at your H₂O attempt.)</p>'));
+    const t=todayStr();
+    MOLECULES.forEach(m=>{
+      const done=S.molDone.includes(m.key);
+      const mdue = m.due||"2026-08-16";
+      const dueTag = done ? "" :
+        mdue<t ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(mdue)+'</span>' :
+        mdue===t ? '<span class="duetag today-due">due today</span>' :
+        '<span class="duetag">due by '+fmtDay(mdue)+'</span>';
+      const c=el("div",{class:"card"+(done?" cream":"")});
+      c.innerHTML='<h3 class="mono" style="font-size:1.3rem">'+m.formula+(done?' <span style="color:var(--ok)">✓ built</span>':'')+'</h3><p class="muted">'+m.blurb+'</p>'+dueTag;
+      c.appendChild(el("button",{class:"btn"+(done?" ghost":" coral"),style:"margin-top:8px",onclick:()=>startLab(m.key)},done?"Rebuild cold":"Build it"));
+      v.appendChild(c);
+    });
+    return;
+  }
+  const L=S.lab, m=L.mol;
+  const wrap=el("div",{class:"labwrap"});
+  // stepper
+  const stepNames=["1 Count","2 Central","3 Predict","4-5 Build","6 Audit"];
+  const stepIdx = L.step<=3 ? L.step-1 : (L.step<=5?3:4);
+  const st=el("div",{class:"stepper"});
+  stepNames.forEach((s,i)=>st.appendChild(el("div",{class:"step"+(i<stepIdx?" ok":i===stepIdx?" on":"")},s)));
+  wrap.appendChild(st);
+  const card=el("div",{class:"card"});
+  card.innerHTML='<span class="tag">Lewis Lab · <span class="mono">'+m.formula+'</span></span>';
+  const ask=el("div",{class:"stepask"});
+  card.appendChild(ask);
+  if (L.step===1){
+    ask.innerHTML="<b>Step 1 — the budget.</b> Total valence electrons in <span class='mono'>"+m.formula+"</span>? Add every atom's valence count"+(m.charge?" and adjust for the charge":"")+".";
+    const inp=el("input",{class:"answerbox",inputmode:"numeric",placeholder:"#"});
+    const b=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(parseInt(inp.value,10)===m.ve){ L.step=2; L.tries=0; render(); }
+      else { L.tries++; card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350);
+        ask.innerHTML+= L.tries>=2?'<div class="why">Add per atom: '+Object.entries(m.atoms).map(([e,n])=>n+"×"+e+"("+VALENCE[e]+")").join(" + ")+'.</div>':""; }
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")b.click();});
+    card.appendChild(inp); card.appendChild(b);
+  }
+  else if (L.step===2){
+    ask.innerHTML="<b>Step 2 — central atom.</b> Which element sits in the middle (wants the most bonds — never H)?";
+    Object.keys(m.atoms).forEach(e=>{
+      card.appendChild(el("button",{class:"btn ghost",style:"margin-right:8px;font-family:var(--mono)",onclick:()=>{
+        if(m.central.includes(e)){ L.step=3; render(); } else { card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350); }
+      }},e));
+    });
+    if (Object.keys(m.atoms).filter(e=>e!=="H").length>1) ask.innerHTML+=' <span class="muted">(two heavy atoms? both are "central" — pick either, they bond to each other first)</span>';
+  }
+  else if (L.step===3){
+    ask.innerHTML="<b>Step 3 — predict before you draw.</b> After connecting ALL atoms with single bonds, how many electrons will remain from your "+m.ve+"? <span class='muted'>(bonds × 2, subtracted — do the arithmetic, don't eyeball)</span>";
+    const inp=el("input",{class:"answerbox",inputmode:"numeric",placeholder:"#"});
+    const b=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(parseInt(inp.value,10)===m.afterSingles){ L.step=4; render(); }
+      else { L.tries++; card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350);
+        if(L.tries>=2) ask.innerHTML+='<div class="why">A molecule with '+Object.values(m.atoms).reduce((a,b)=>a+b,0)+' atoms needs '+(Object.values(m.atoms).reduce((a,b)=>a+b,0)-1)+' single bonds to connect (if no rings). Each bond spends 2.</div>'; }
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")b.click();});
+    card.appendChild(inp); card.appendChild(b);
+  }
+  else {
+    ask.innerHTML="<b>Steps 4–5 — build it.</b> Place atoms, connect bonds (tap two atoms; tap the pair again to upgrade single→double→triple), give lone pairs to whoever needs them. The ledger does your bookkeeping — it must hit exactly 0 remaining. Then audit.";
+  }
+  wrap.appendChild(card);
+  if (L.step>=4){
+    // tool tray
+    const tray=el("div",{class:"tooltray"});
+    Object.entries(m.atoms).forEach(([e,total])=>{
+      const placed=L.atoms.filter(a=>a.el===e).length;
+      tray.appendChild(el("button",{class:"tool"+(L.tool==="atom"&&L.selElement===e?" on":""),onclick:()=>{L.tool="atom";L.selElement=e;render();}},e+" "+placed+"/"+total));
+    });
+    [["bond","⌁ Bond"],["lp","·· Lone pair"],["erase","⌫ Erase"]].forEach(([t,label])=>{
+      tray.appendChild(el("button",{class:"tool"+(L.tool===t?" on":""),onclick:()=>{L.tool=t;L.selAtom=null;render();}},label));
+    });
+    tray.appendChild(el("button",{class:"tool",style:"margin-left:auto",onclick:()=>{L.atoms=[];L.bonds=[];L.selAtom=null;render();}},"Clear"));
+    wrap.appendChild(tray);
+    // ledger
+    const used = 2*L.bonds.reduce((s,b)=>s+b.order,0) + 2*L.atoms.reduce((s,a)=>s+a.lp,0);
+    const rem = m.ve-used;
+    const led=el("div",{class:"ledger"});
+    led.innerHTML='<span>budget <b>'+m.ve+'</b></span><span>bonds <b>'+L.bonds.reduce((s,b)=>s+b.order,0)+'</b></span><span>lone pairs <b>'+L.atoms.reduce((s,a)=>s+a.lp,0)+'</b></span><span class="'+(rem===0?"good":rem<0?"bad":"warn")+'">remaining <b>'+rem+'</b></span>';
+    wrap.appendChild(led);
+    // canvas
+    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("id","lab-canvas");
+    svg.addEventListener("pointerdown",ev=>labPointer(ev,svg));
+    wrap.appendChild(svg);
+    // audit
+    const arow=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;align-items:center"});
+    arow.appendChild(el("button",{class:"btn coral",onclick:()=>runAudit(wrap)},"⚖️ Step 6 — Audit every octet"));
+    arow.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← molecules"));
+    wrap.appendChild(arow);
+    L.auditBox=el("div"); wrap.appendChild(L.auditBox);
+    v.appendChild(wrap);
+    drawLab(svg);
+    return;
+  }
+  wrap.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← molecules"));
+  v.appendChild(wrap);
+};
+function labPointer(ev,svg){
+  const L=S.lab; if(!L)return;
+  const r=svg.getBoundingClientRect();
+  const x=(ev.clientX-r.left)*(860/r.width>1?1:1), y=(ev.clientY-r.top);
+  const px=ev.clientX-r.left, py=ev.clientY-r.top;
+  const hit=L.atoms.find(a=>Math.hypot(a.x-px,a.y-py)<26);
+  if (L.tool==="atom"){
+    if (hit) return;
+    const total=L.mol.atoms[L.selElement]||0, placed=L.atoms.filter(a=>a.el===L.selElement).length;
+    if (placed>=total){ return; }
+    L.atoms.push({id:L.nextId++, el:L.selElement, x:px, y:py, lp:0});
+    // auto-advance selection to an element with remaining count
+    const remEl=Object.entries(L.mol.atoms).find(([e,n])=>L.atoms.filter(a=>a.el===e).length<n);
+    if (L.atoms.filter(a=>a.el===L.selElement).length>=total && remEl) L.selElement=remEl[0];
+    render();
+  } else if (L.tool==="bond"){
+    if (!hit){ L.selAtom=null; drawLab(svg); return; }
+    if (L.selAtom==null){ L.selAtom=hit.id; drawLab(svg); return; }
+    if (L.selAtom===hit.id){ L.selAtom=null; drawLab(svg); return; }
+    const a=Math.min(L.selAtom,hit.id), b=Math.max(L.selAtom,hit.id);
+    const ex=L.bonds.find(bd=>bd.a===a&&bd.b===b);
+    if (ex){ ex.order++; if(ex.order>3) L.bonds.splice(L.bonds.indexOf(ex),1); }
+    else L.bonds.push({a,b,order:1});
+    L.selAtom=null; render();
+  } else if (L.tool==="lp"){
+    if (!hit) return;
+    hit.lp=(hit.lp+1)%5;
+    render();
+  } else if (L.tool==="erase"){
+    if (!hit) return;
+    L.bonds=L.bonds.filter(b=>b.a!==hit.id&&b.b!==hit.id);
+    L.atoms.splice(L.atoms.indexOf(hit),1);
+    render();
+  }
+}
+function drawLab(svg){
+  const L=S.lab; if(!L)return;
+  svg.innerHTML="";
+  const NS="http://www.w3.org/2000/svg";
+  const mk=(t,at)=>{const e=document.createElementNS(NS,t);Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v));svg.appendChild(e);return e;};
+  if (!L.atoms.length){
+    mk("text",{x:"50%",y:"48%","text-anchor":"middle","font-size":"15","fill":"#999","font-family":"sans-serif"}).textContent="Tap to place your first "+L.selElement+" atom";
+    mk("text",{x:"50%",y:"58%","text-anchor":"middle","font-size":"12","fill":"#bbb","font-family":"sans-serif"}).textContent="(central atom in the middle is a good habit)";
+  }
+  // bonds
+  L.bonds.forEach(b=>{
+    const A=L.atoms.find(a=>a.id===b.a), B=L.atoms.find(a=>a.id===b.b); if(!A||!B)return;
+    const dx=B.x-A.x, dy=B.y-A.y, len=Math.hypot(dx,dy)||1;
+    const ox=-dy/len*4.5, oy=dx/len*4.5;
+    const offs = b.order===1?[0]:b.order===2?[-1,1]:[-1.6,0,1.6];
+    offs.forEach(o=>mk("line",{x1:A.x+ox*o,y1:A.y+oy*o,x2:B.x+ox*o,y2:B.y+oy*o,stroke:"#20241F","stroke-width":"3","stroke-linecap":"round"}));
+  });
+  // atoms
+  L.atoms.forEach(a=>{
+    const sel=L.selAtom===a.id;
+    mk("circle",{cx:a.x,cy:a.y,r:"21",fill:"#fff",stroke:sel?"#E4572E":"#20241F","stroke-width":sel?"4":"2.5"});
+    const t=mk("text",{x:a.x,y:a.y+6,"text-anchor":"middle","font-size":"19","font-weight":"800","font-family":"monospace",fill:ATOM_COLORS[a.el]||"#20241F"});
+    t.textContent=a.el;
+    // lone pairs at N,E,S,W
+    const slots=[[0,-31],[31,0],[0,31],[-31,0]];
+    for(let i=0;i<a.lp;i++){
+      const [sx,sy]=slots[i%4];
+      const horiz = sy===0;
+      mk("circle",{cx:a.x+sx+(horiz?0:-4),cy:a.y+sy+(horiz?-4:0),r:"3",fill:"#0E7C6B"});
+      mk("circle",{cx:a.x+sx+(horiz?0:4),cy:a.y+sy+(horiz?4:0),r:"3",fill:"#0E7C6B"});
+    }
+  });
+}
+function runAudit(wrap){
+  const L=S.lab, m=L.mol;
+  const fails=[];
+  // formula
+  Object.entries(m.atoms).forEach(([e,n])=>{
+    const placed=L.atoms.filter(a=>a.el===e).length;
+    if (placed!==n) fails.push("Formula: need "+n+"× "+e+", you placed "+placed+".");
+  });
+  // connectivity
+  if (L.atoms.length>1){
+    const adj={}; L.atoms.forEach(a=>adj[a.id]=[]);
+    L.bonds.forEach(b=>{ if(adj[b.a]&&adj[b.b]){adj[b.a].push(b.b);adj[b.b].push(b.a);} });
+    const seen=new Set([L.atoms[0].id]); const q=[L.atoms[0].id];
+    while(q.length){ const c=q.pop(); (adj[c]||[]).forEach(n=>{if(!seen.has(n)){seen.add(n);q.push(n);}}); }
+    if (seen.size!==L.atoms.length) fails.push("Not all atoms are connected into one molecule.");
+  } else if (L.atoms.length===0) fails.push("Canvas is empty.");
+  // per-atom rules
+  L.atoms.forEach(a=>{
+    const orders=L.bonds.filter(b=>b.a===a.id||b.b===a.id).reduce((s,b)=>s+b.order,0);
+    if (a.el==="H"){
+      if (orders!==1||a.lp!==0) fails.push("H needs exactly 1 bond and 0 lone pairs (has "+orders+" bond(s), "+a.lp+" LP). H stops at 2 — it's the exception.");
+    } else {
+      const count=2*orders+2*a.lp;
+      if (count!==8) fails.push(a.el+" audit: "+orders+" bond(s) ×2 + "+a.lp+" LP ×2 = "+count+" — "+(count<8?"short by "+(8-count)+". Quantify it: short÷2 = pairs to convert into bonds.":"OVER 8 by "+(count-8)+". Second-row atoms can't exceed the octet."));
+    }
+  });
+  // budget
+  const used=2*L.bonds.reduce((s,b)=>s+b.order,0)+2*L.atoms.reduce((s,a)=>s+a.lp,0);
+  if (used!==m.ve) fails.push("Budget: you spent "+used+" of "+m.ve+" electrons. Must land exactly.");
+  const box=L.auditBox; box.innerHTML="";
+  if (!fails.length){
+    confetti();
+    if (!S.molDone.includes(m.key)) S.molDone.push(m.key);
+    // lewis day auto-credit
+    const t=todayStr(); const plan=TRACK.find(x=>x.day===t);
+    if (plan && plan.topic==="lewis" && !S.doneDays.includes(t) && S.molDone.length>=2) S.doneDays.push(t);
+    save();
+    const c=el("div",{class:"card teal"},'<h2>✓ '+m.formula+' — every octet checks out</h2><p>Final audit passed: formula ✓ · connected ✓ · H rule ✓ · octets ✓ · budget spent exactly ✓</p>');
+    c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{S.lab=null;render();}},"Next molecule →"));
+    box.appendChild(c);
+  } else {
+    L.fails++;
+    const c=el("div",{class:"card cream"},'<h3>Audit found problems</h3><ul class="audit">'+fails.map(f=>'<li class="fail">'+f+'</li>').join("")+'</ul>'+(L.fails>=2?'<div class="why"><b>Hint:</b> '+m.hint+'</div>':""));
+    box.appendChild(c);
+  }
+}
+
+/* ---- CHEAT SHEET ---- */
+VIEWS.cheat = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole gen-chem bridge on one page</h2>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Bond numbers (the everyday table)</h3>'+
+    '<table class="cheat"><tr><th>Atom</th><th>Bonds</th><th>Lone pairs</th></tr>'+
+    '<tr><td class="mono">H</td><td>1</td><td>0</td></tr><tr><td class="mono">C</td><td>4</td><td>0</td></tr>'+
+    '<tr><td class="mono">N</td><td>3</td><td>1</td></tr><tr><td class="mono">O</td><td>2</td><td>2</td></tr>'+
+    '<tr><td class="mono">F Cl Br I</td><td>1</td><td>3</td></tr></table>'+
+    '<p class="muted">Charged versions shift by one: N⁺ 4 bonds · O⁺ 3 bonds/1 LP · O⁻ 1 bond/3 LP · C⁻ 3 bonds/1 LP.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Lewis: the six steps + the deficit rule</h3>'+
+    '<ol style="margin-left:18px;line-height:1.7"><li>Count total valence e⁻ (adjust for charge: + subtracts, − adds)</li><li>Central atom = wants most bonds, never H</li><li>Connect all with single bonds, −2 each</li><li>Fill OUTER atoms (H stops at 2)</li><li>Leftovers → central atom</li><li>Central short? <b>(short ÷ 2) = lone pairs to convert to bonds</b>: short by 2 → double, short by 4 → triple</li></ol>'+
+    '<p class="muted">Only converting a lone pair into a shared bond fixes a short atom — sharing lets both atoms count the same 2 e⁻. Rearranging never does.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Formal charge</h3><p class="mono center" style="font-size:1.05rem;margin:8px 0">FC = valence − lone-pair e⁻ − ½(bonding e⁻)</p>'+
+    '<p class="muted">Sight-read shortcuts: N with 4 bonds = +1 · O with 3 bonds = +1 · O with 1 bond = −1 · C with 3 bonds + LP = −1.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Electronegativity & geometry</h3>'+
+    '<p class="mono center" style="margin:6px 0">F &gt; O &gt; N ≈ Cl &gt; Br &gt; C ≈ H</p>'+
+    '<table class="cheat"><tr><th>Domains</th><th>Hybrid</th><th>Shape (no LP)</th><th>Angle</th></tr>'+
+    '<tr><td>4</td><td class="mono">sp³</td><td>tetrahedral</td><td>109.5°</td></tr>'+
+    '<tr><td>3</td><td class="mono">sp²</td><td>trigonal planar</td><td>120°</td></tr>'+
+    '<tr><td>2</td><td class="mono">sp</td><td>linear</td><td>180°</td></tr></table>'+
+    '<p class="muted">Lone pairs bend the name: sp³ + 1 LP = pyramidal, + 2 LP = bent. Double bond = 1σ + 1π (no rotation).</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>pKa ladder (memorize cold)</h3>'+
+    '<table class="cheat"><tr><th>Acid</th><th>pKa</th></tr>'+
+    '<tr><td>HCl</td><td class="mono">−7</td></tr><tr><td>H₃O⁺</td><td class="mono">−1.7</td></tr>'+
+    '<tr><td>RCOOH (carboxylic)</td><td class="mono">~5</td></tr><tr><td>H₂O</td><td class="mono">15.7</td></tr>'+
+    '<tr><td>ROH (alcohol)</td><td class="mono">~16</td></tr><tr><td>terminal alkyne</td><td class="mono">~25</td></tr>'+
+    '<tr><td>alkane</td><td class="mono">~50</td></tr></table>'+
+    '<p class="muted">Lower pKa = stronger acid. Equilibrium favors the weaker acid (higher pKa) side. <b>ARIO</b> ranks conjugate-base stability: <b>A</b>tom (row → EN, column → size) &gt; <b>R</b>esonance &gt; <b>I</b>nduction &gt; <b>O</b>rbital.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Functional groups (recognize on sight)</h3>'+
+    '<p style="line-height:1.8" class="mono">alkene C=C · alkyne C≡C · alcohol –OH · ether C–O–C · amine C–N · aldehyde –CHO · ketone C(=O)C · carboxylic acid –COOH · ester –CO₂R · amide –C(=O)N · halide –X · nitrile –C≡N</p>'+
+    '<p class="muted">Amine vs amide: amide\'s N touches a C=O. That single difference changes everything about reactivity.</p>'));
+  v.appendChild(el("div",{class:"card cream"},
+    '<h3>Curved arrows (week-1 preview)</h3>'+
+    '<p class="muted" style="line-height:1.7">Arrows show ELECTRON movement, never atoms. Start at an electron source (lone pair or π bond) → point to where they land. Nucleophile = electron-rich, attacks δ+. Electrophile = electron-poor, gets attacked. Every acid-base reaction you\'ve drilled is secretly a mechanism: base\'s lone pair → H, H\'s bond → back onto the acid.</p>'));
+};
+
+/* ---- REPORT ---- */
+VIEWS.report = (v) => {
+  const a=accuracy();
+  const perTopic = Object.entries(TOPICS).map(([k,t])=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k); let r=0,w=0;
+    qs.forEach(q=>{const s=S.qstats[q.id]; if(s){r+=s.r;w+=s.w;}});
+    return (r+w)?("  "+t.name+": "+r+"✓ "+w+"✗ ("+Math.round(100*r/(r+w))+"%)"):null;
+  }).filter(Boolean).join("\n");
+  const missedIds=[...new Set(S.missed)];
+  const missedTxt=missedIds.slice(-12).map(id=>{const q=QUESTIONS.find(x=>x.id===id);return "  ["+id+"] "+q.prompt.replace(/<[^>]+>/g,"").slice(0,70);}).join("\n");
+  const txt =
+"CHEM 231 BOOTCAMP REPORT — "+todayStr()+"\n"+
+"(paste this to Claude in the CHEM 231 session)\n\n"+
+"Track: "+S.doneDays.length+"/"+TRACK.length+" days marked done ("+S.doneDays.join(", ")+")\n"+
+"Visits: "+S.visits.join(", ")+"\n"+
+"Questions: "+a.r+" right / "+a.w+" wrong ("+a.pct+"% overall)\n"+
+(perTopic?("By topic:\n"+perTopic+"\n"):"")+
+"Molecules built: "+(S.molDone.join(", ")||"none")+"\n"+
+(missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
+"Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
+  const c=el("div",{class:"card"});
+  c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
+  const ta=el("textarea",{class:"report",readonly:"readonly"}); ta.value=txt; c.appendChild(ta);
+  const b=el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{ ta.select(); try{ navigator.clipboard.writeText(txt); b.textContent="✓ Copied";}catch(e){ document.execCommand("copy"); b.textContent="✓ Copied"; } setTimeout(()=>b.textContent="Copy report",1600); }},"Copy report");
+  c.appendChild(b);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"card cream"},'<h3>When the syllabus lands</h3><p class="muted">Bring the course files to Claude — this app is built to grow: the TRACK swaps to real weeks, per-chapter question banks append to the same schema, and the Lab gains whatever molecules your problem sets use. v2.0 → v3.0 in one session.</p>'));
+};
+
+/* ================= BOOT ================= */
+render();
+</script>
+<script>
+/* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
+(function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
+</script>
+</body>
+</html>
