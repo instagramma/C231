@@ -6,7 +6,8 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.0  ·  built 2026-08-09
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.1  ·  built 2026-08-09
+  v2.1: due dates + overdue flags on days/molecules; Aug 17 final diagnostic day (mixed 1-per-topic round)
   For Gabe. Single file, no server, no dependencies.
 
   ARCHITECTURE (for future updates when course material lands):
@@ -122,6 +123,10 @@
     padding:10px;cursor:pointer;position:relative;
   }
   .daycard.today{background:var(--gold)}
+  .daycard.overdue{border-color:var(--coral);box-shadow:2px 2px 0 var(--coral)}
+  .duetag{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:#fff;border:1.5px solid var(--ink);border-radius:99px;padding:2px 8px;margin-top:6px}
+  .duetag.today-due{background:var(--gold)}
+  .duetag.overdue{background:var(--coral);color:#fff}
   .daycard.done{background:#DDEEDD}
   .daycard.done::after{content:"✓";position:absolute;top:6px;right:9px;font-weight:900;color:var(--ok);font-size:1.1rem}
   .daycard .d{font-family:var(--mono);font-size:.65rem;font-weight:700;opacity:.7}
@@ -243,6 +248,7 @@ const TRACK = [
   { day:"2026-08-14", topic:"acidbase1",title:"Acid-base I: pKa" },
   { day:"2026-08-15", topic:"acidbase2",title:"Acid-base II: ARIO" },
   { day:"2026-08-16", topic:"bondline", title:"Bond-line + func. groups" },
+  { day:"2026-08-17", topic:"diag",     title:"Final diagnostic (before class!)" },
 ];
 const TOPICS = {
   valence:  { name:"Valence electrons",  ico:"🔢" },
@@ -254,7 +260,10 @@ const TOPICS = {
   acidbase1:{ name:"Acid-base: pKa",     ico:"🍋" },
   acidbase2:{ name:"Acid-base: ARIO",    ico:"⚖️" },
   bondline: { name:"Bond-line + groups", ico:"⛓️" },
+  diag:     { name:"Final diagnostic",   ico:"🏁" },
 };
+const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
 
 /* ================= QUESTION BANK =================
    schema: {id, topic, type:"num"|"mc"|"text", prompt, answer, choices?, why}
@@ -337,8 +346,8 @@ QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answer
    hint: shown only after 2 failed audits
    Generic checker: formula match + budget spent + H rule + octets + connectivity. */
 const MOLECULES = [
-  {formula:"H₂O",  key:"H2O",  atoms:{O:1,H:2}, ve:8,  central:["O"], afterSingles:4, done:false, blurb:"The owed warm-up. Finish your steps 3–5 properly this time.", hint:"2 bonds use 4 e⁻; the remaining 4 = 2 lone pairs on O."},
-  {formula:"C₂H₄", key:"C2H4", atoms:{C:2,H:4}, ve:12, central:["C"], afterSingles:2, done:false, blurb:"Two central atoms! Connect C–C first, hang the H's, then audit.", hint:"5 single bonds spend 10 of 12. Put the last 2 on a carbon as a lone pair — then CONVERT that pair into a second C–C bond: C=C, and no lone pairs anywhere in the final structure."},
+  {formula:"H₂O",  key:"H2O",  atoms:{O:1,H:2}, ve:8,  central:["O"], afterSingles:4, due:"2026-08-09", done:false, blurb:"The owed warm-up. Finish your steps 3–5 properly this time.", hint:"2 bonds use 4 e⁻; the remaining 4 = 2 lone pairs on O."},
+  {formula:"C₂H₄", key:"C2H4", atoms:{C:2,H:4}, ve:12, central:["C"], afterSingles:2, due:"2026-08-09", done:false, blurb:"Two central atoms! Connect C–C first, hang the H's, then audit.", hint:"5 single bonds spend 10 of 12. Put the last 2 on a carbon as a lone pair — then CONVERT that pair into a second C–C bond: C=C, and no lone pairs anywhere in the final structure."},
   {formula:"NH₃",  key:"NH3",  atoms:{N:1,H:3}, ve:8,  central:["N"], afterSingles:2, done:false, blurb:"Straightforward — if your bond-number table is loaded.", hint:"N: 3 bonds + 1 lone pair."},
   {formula:"CO₂",  key:"CO2",  atoms:{C:1,O:2}, ve:16, central:["C"], afterSingles:12, done:false, blurb:"Redo from tutoring. Carbon will come up short — quantify how short.", hint:"C is short by 4 after singles → pull one pair from EACH oxygen → two double bonds."},
   {formula:"CH₂O", key:"CH2O", atoms:{C:1,O:1,H:2}, ve:12, central:["C"], afterSingles:6, done:false, blurb:"Formaldehyde — your first double-bond fix, revisited.", hint:"C short by 2 → one pair off O → C=O."},
@@ -406,10 +415,11 @@ VIEWS.home = (v) => {
   const card = el("div",{class:"card teal"});
   if (mission){
     const isCatchup = behind.length && mission.day!==t;
-    card.innerHTML = '<span class="tag gold">'+(isCatchup?"Catch-up · originally "+mission.day.slice(5):"Today · "+t.slice(5))+'</span>'+
+    card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ OVERDUE — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
       '<h2 style="font-size:1.5rem">'+ (TOPICS[mission.topic]?TOPICS[mission.topic].ico:"⚗️") +' '+mission.title+'</h2>'+
-      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. ~1 hour, timer optional but a finish line helps.</p>';
-    const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lewis"){ go("lab"); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
+      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. ~1 hour, timer optional but a finish line helps.'+
+      (behind.length>1?' <b>('+(behind.length-1)+' more overdue behind this one — they queue up automatically.)</b>':'')+'</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lewis"){ go("lab"); } else if(mission.topic==="diag"){ startDiagnostic(); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
     card.appendChild(btn);
   } else {
     card.innerHTML = '<span class="tag gold">All caught up</span><h2>Nothing owed today 🎉</h2><p style="margin:6px 0 14px">Optional: run <b>Review missed</b> in Drill — converting old misses is the highest-yield hour that exists.</p>';
@@ -436,10 +446,15 @@ VIEWS.track = (v) => {
   const g = el("div",{class:"daygrid"});
   const t = todayStr();
   TRACK.forEach(d=>{
-    const c = el("div",{class:"daycard"+(d.day===t?" today":"")+(S.doneDays.includes(d.day)?" done":"")});
-    c.innerHTML = '<div class="d">'+d.day.slice(5)+'</div><div class="t">'+(TOPICS[d.topic]?TOPICS[d.topic].ico+" ":"")+d.title+'</div>';
+    const isDone=S.doneDays.includes(d.day), isOver=d.day<t&&!isDone;
+    const c = el("div",{class:"daycard"+(d.day===t?" today":"")+(isDone?" done":"")+(isOver?" overdue":"")});
+    const due = isDone ? "" :
+      isOver ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(d.day)+'</span>' :
+      d.day===t ? '<span class="duetag today-due">due today</span>' :
+      '<span class="duetag">due '+fmtDay(d.day)+'</span>';
+    c.innerHTML = '<div class="d">'+d.day.slice(5)+'</div><div class="t">'+(TOPICS[d.topic]?TOPICS[d.topic].ico+" ":"")+d.title+'</div>'+due;
     const row = el("div",{style:"margin-top:8px;display:flex;gap:6px"});
-    row.appendChild(el("button",{class:"btn small",onclick:(e)=>{e.stopPropagation(); d.topic==="lewis"?go("lab"):startDrill(d.topic);}},"Open"));
+    row.appendChild(el("button",{class:"btn small",onclick:(e)=>{e.stopPropagation(); d.topic==="lewis"?go("lab"):d.topic==="diag"?startDiagnostic():startDrill(d.topic);}},"Open"));
     row.appendChild(el("button",{class:"btn small ghost",onclick:(e)=>{e.stopPropagation(); const i=S.doneDays.indexOf(d.day); i>=0?S.doneDays.splice(i,1):S.doneDays.push(d.day); save(); render();}},"✓"));
     c.appendChild(row);
     g.appendChild(c);
@@ -449,6 +464,18 @@ VIEWS.track = (v) => {
 };
 
 /* ---- DRILL ---- */
+function startDiagnostic(){
+  // 1 question per topic, unseen/missed first — the "walk in ahead of the curve" check
+  const pool=[];
+  Object.keys(TOPICS).filter(k=>k!=="diag").forEach(k=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k);
+    if(!qs.length)return;
+    const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+    pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]);
+  });
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__diag",answered:false};
+  go("drill");
+}
 function startDrill(topic){
   let pool;
   if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
@@ -539,10 +566,16 @@ function startLab(molKey){
 VIEWS.lab = (v) => {
   if (!S.lab){ // molecule chooser
     v.appendChild(el("div",{class:"card"},'<span class="tag violet">Lewis Lab</span><h2>Build structures, step by step</h2><p class="muted">The six steps are enforced — no skipping to the answer picture. Counts first, drawing second, audit last. (Yes, this is aimed directly at your H₂O attempt.)</p>'));
+    const t=todayStr();
     MOLECULES.forEach(m=>{
       const done=S.molDone.includes(m.key);
+      const mdue = m.due||"2026-08-16";
+      const dueTag = done ? "" :
+        mdue<t ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(mdue)+'</span>' :
+        mdue===t ? '<span class="duetag today-due">due today</span>' :
+        '<span class="duetag">due by '+fmtDay(mdue)+'</span>';
       const c=el("div",{class:"card"+(done?" cream":"")});
-      c.innerHTML='<h3 class="mono" style="font-size:1.3rem">'+m.formula+(done?' <span style="color:var(--ok)">✓ built</span>':'')+'</h3><p class="muted">'+m.blurb+'</p>';
+      c.innerHTML='<h3 class="mono" style="font-size:1.3rem">'+m.formula+(done?' <span style="color:var(--ok)">✓ built</span>':'')+'</h3><p class="muted">'+m.blurb+'</p>'+dueTag;
       c.appendChild(el("button",{class:"btn"+(done?" ghost":" coral"),style:"margin-top:8px",onclick:()=>startLab(m.key)},done?"Rebuild cold":"Build it"));
       v.appendChild(c);
     });
