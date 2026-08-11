@@ -6,11 +6,17 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.1  ·  built 2026-08-09
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.4  ·  built 2026-08-09, audited 2026-08-11
   v2.1: due dates + overdue flags on days/molecules; Aug 17 final diagnostic day (mixed 1-per-topic round)
   v2.2: cross-device cloud sync via the B250 Supabase project (`progress` table, profile "gabe-c231") —
         pull+merge on load (arrays union, per-question stats keep the higher-attempt copy), debounced push on change.
         localStorage stays as offline cache; header dot shows sync state.
+  v2.3: audit fixes — labeled FC explanations, LP scaffold questions (f0/f0b), pKa tolerance, notation.
+  v2.4: external-audit response — Lewis Lab formal-charge audit (rejects legal-octet-but-wrong
+        structures like H–N≡C and charge-separated CO₂); carbon sign-rule corrected on cheat sheet
+        (C⁺ 3 bonds/0 LP vs C⁻ 3 bonds/1 LP) + new f6 carbocation question; formal drill runs
+        f0→f0b→f1→f2 in order on first pass; auto-complete now needs ≥80% AND topic must match an
+        open mission day; recovery mode replaces FIFO backlog (today first + ONE repair, no pile).
   For Gabe. Single file, no server, no dependencies.
 
   ARCHITECTURE (for future updates when course material lands):
@@ -347,6 +353,7 @@ const QUESTIONS = [
 {id:"f3",topic:"formal",type:"num",prompt:"Formal charge on N in NH₄⁺? (enter −1, 0, or 1)",answer:1,why:"N with <b>4 bonds, 0 LP</b>: FC = 5 − 0 − 4 = +1. Memorize the pattern — 4-bond nitrogen is positive."},
 {id:"f4",topic:"formal",type:"mc",prompt:"In CH₃O⁻ (methoxide), which atom carries the −1?",choices:["The oxygen","The carbon","A hydrogen","It's spread over all atoms equally"],answer:0,why:"<b>Oxygen</b>: 1 bond + 3 LPs → FC = −1. C has its normal 4 bonds (FC 0). Charge sits where the bond count deviates from the happy number."},
 {id:"f5",topic:"formal",type:"num",prompt:"FC formula: valence − lone-pair e⁻ − ½(bonding e⁻). For a C with 3 bonds and 1 lone pair, FC = ?",answer:-1,why:"3 bonds = 6 bonding e⁻ → ½ = 3. FC = 4 − 2 − 3 = <b>−1</b>. A 3-bond carbon with a lone pair is a carbanion — you'll meet these as nucleophiles."},
+{id:"f6",topic:"formal",type:"num",prompt:"A carbon has 3 bonds and NO lone pair (a carbocation, R₃C⁺). FC = ? (enter −1, 0, or 1)",answer:1,why:"FC = 4 − 0 − 3 = <b>+1</b>. Compare the last question: 3 bonds + 1 LP = −1, but 3 bonds + 0 LP = +1. <b>Same bond count, opposite charges — bond count alone never decides carbon's sign; the lone pair does.</b> When in doubt, run the full formula. (Carbocations are ochem's most important electrophiles.)"},
 /* --- polarity --- */
 {id:"p1",topic:"polarity",type:"mc",prompt:"Electronegativity order — which is correct?",choices:["F > O > N ≈ Cl > C ≈ H","O > F > N > C > H","F > N > O > C > H","C > N > O > F > H"],answer:0,why:"<b>F > O > N ≈ Cl</b>, and C ≈ H near the bottom of the common set. This ordering predicts every δ+/δ− you'll ever label."},
 {id:"p2",topic:"polarity",type:"mc",prompt:"In a C=O bond, the partial charges are:",choices:["δ+ on C, δ− on O","δ− on C, δ+ on O","No polarity — it's a double bond","Depends on temperature"],answer:0,why:"O is more electronegative → pulls density → <b>δ− O, δ+ C</b>. That δ+ carbon is where nucleophiles attack — arguably the single most important fact in carbonyl chemistry."},
@@ -464,22 +471,33 @@ VIEWS.home = (v) => {
   }
   const todayPlan = TRACK.find(x=>x.day===t);
   const behind = TRACK.filter(x=>x.day<t && !S.doneDays.includes(x.day));
-  const mission = behind.length ? behind[0] : (todayPlan && !S.doneDays.includes(t) ? todayPlan : null);
+  // v2.4 recovery mode: today's topic is ALWAYS the mission (highest yield now).
+  // A missed day becomes ONE short repair — the backlog never stacks into a pile.
+  const mission = (todayPlan && !S.doneDays.includes(t)) ? todayPlan : (behind.length ? behind[0] : null);
+  const repair = (mission===todayPlan && behind.length) ? behind[0] : null;
   const card = el("div",{class:"card teal"});
   if (mission){
-    const isCatchup = behind.length && mission.day!==t;
-    card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ OVERDUE — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
+    const isCatchup = mission.day!==t;
+    card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ Catch-up — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
       '<h2 style="font-size:1.5rem">'+ (TOPICS[mission.topic]?TOPICS[mission.topic].ico:"⚗️") +' '+mission.title+'</h2>'+
-      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. ~1 hour, timer optional but a finish line helps.'+
-      (behind.length>1?' <b>('+(behind.length-1)+' more overdue behind this one — they queue up automatically.)</b>':'')+'</p>';
+      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. ~1 hour, timer optional but a finish line helps.</p>';
     const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lewis"){ go("lab"); } else if(mission.topic==="diag"){ startDiagnostic(); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
     card.appendChild(btn);
+    if (repair){
+      const rc = el("div",{class:"card cream"});
+      rc.innerHTML = '<span class="tag coral">🩹 Recovery — 10 min, before or after</span>'+
+        '<p style="margin:6px 0 10px">One missed day gets repaired: a short <b>'+(TOPICS[repair.topic]?.name||repair.topic)+'</b> round (was due '+fmtDay(repair.day)+'). '+
+        (behind.length>1?'Anything older than this is <b>not queued</b> — the Aug 17 diagnostic will surface whatever still matters. No pile.':'That\'s the whole backlog. No pile.')+'</p>';
+      rc.appendChild(el("button",{class:"btn coral",onclick:()=>{ if(repair.topic==="lewis"){ go("lab"); } else { startDrill(repair.topic); } }},"Run the repair round"));
+      card._repairCard = rc;
+    }
   } else {
     card.innerHTML = '<span class="tag gold">All caught up</span><h2>Nothing owed today 🎉</h2><p style="margin:6px 0 14px">Optional: run <b>Review missed</b> in Drill — converting old misses is the highest-yield hour that exists.</p>';
     const btn = el("button",{class:"bigbtn",onclick:()=>{ startDrill("__missed"); }},"▶ &nbsp;Review my missed questions");
     card.appendChild(btn);
   }
   v.appendChild(card);
+  if (card._repairCard) v.appendChild(card._repairCard);
   const a = accuracy();
   const stats = el("div",{class:"statrow"});
   stats.innerHTML =
@@ -536,6 +554,15 @@ function startDrill(topic){
   // unseen first, then wrong-heavy first
   const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   pool = shuffle(pool).sort((a,b)=>seen(a.id)-seen(b.id));
+  // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
+  // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
+  if (topic==="formal"){
+    const ORD=["f0","f0b","f1","f2"];
+    if (ORD.every(id=>seen(id)===0)){
+      pool = ORD.map(id=>pool.find(q=>q.id===id)).filter(Boolean)
+             .concat(pool.filter(q=>!ORD.includes(q.id)));
+    }
+  }
   S.drill = {queue:pool.slice(0,10), i:0, right:0, wrong:0, topic, answered:false};
   go("drill");
 }
@@ -560,7 +587,11 @@ VIEWS.drill = (v) => {
     c.innerHTML='<span class="tag gold">Round complete</span><h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)</h2>'+
       '<p style="margin:8px 0">'+(pct>=80?"That clears the bar. Mark the day and stop — consistency beats intensity.":"Below 80 — the misses just joined your Review queue. Read each 'why', then re-run them tomorrow (spacing, not re-cramming today).")+'</p>';
     const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
-    if (pct>=70){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ const t=todayStr(); if(!S.doneDays.includes(t)) S.doneDays.push(t); save(); S.drill=null; go("home"); }},"✓ Mark today done")); }
+    // v2.4: auto-complete needs ≥80% (matching the text) AND the round's topic must match
+    // an unfinished TRACK day — no more marking today's mission done by drilling anything.
+    const claim = TRACK.filter(x=>x.day<=todayStr() && !S.doneDays.includes(x.day) && x.topic===D.topic).sort((a,b)=>a.day<b.day?-1:1)[0];
+    if (pct>=80 && claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day)) S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark “"+claim.title+"” ("+fmtDay(claim.day)+") done")); }
+    else if (pct>=80){ c.appendChild(el("p",{class:"muted",style:"margin:4px 0 8px"},"Good round — but it doesn't match an open mission day, so nothing auto-completes. (Honest manual ✓ lives in the Plan tab.)")); }
     row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
     c.appendChild(row); v.appendChild(c); return;
   }
@@ -785,6 +816,21 @@ function drawLab(svg){
     }
   });
 }
+// v2.4: per-atom formal-charge audit. FC = valence − lone-pair e⁻ − bond orders.
+// For these neutral molecules every atom's FC must be 0 (a mol may declare an fc map later
+// for ions). A structure can pass every octet and still be the WRONG molecule — this catches it.
+function fcAuditFails(m,L){
+  const fails=[]; const expected = m.fc || {};
+  L.atoms.forEach(a=>{
+    const orders=L.bonds.filter(b=>b.a===a.id||b.b===a.id).reduce((s,b)=>s+b.order,0);
+    const fc=(VALENCE[a.el]||0) - 2*a.lp - orders;
+    const want = expected[a.el]!==undefined ? expected[a.el] : 0;
+    if (fc!==want) fails.push("Formal-charge audit: your "+a.el+" carries FC "+(fc>0?"+":"")+fc+
+      " (FC = "+VALENCE[a.el]+" − "+(2*a.lp)+" LP e⁻ − "+orders+" bonds). Every atom in neutral "+
+      m.formula+" must be 0 — the octets check out, but this is a different structure (charge-separated or rearranged). Recount which atom took too many or too few bonds.");
+  });
+  return fails;
+}
 function runAudit(wrap){
   const L=S.lab, m=L.mol;
   const fails=[];
@@ -814,6 +860,8 @@ function runAudit(wrap){
   // budget
   const used=2*L.bonds.reduce((s,b)=>s+b.order,0)+2*L.atoms.reduce((s,a)=>s+a.lp,0);
   if (used!==m.ve) fails.push("Budget: you spent "+used+" of "+m.ve+" electrons. Must land exactly.");
+  // v2.4 formal-charge audit: catches legal-octet-but-WRONG structures (H–N≡C, charge-separated CO₂, misplaced H's)
+  fails.push(...fcAuditFails(m,L));
   const box=L.auditBox; box.innerHTML="";
   if (!fails.length){
     confetti();
@@ -822,7 +870,7 @@ function runAudit(wrap){
     const t=todayStr(); const plan=TRACK.find(x=>x.day===t);
     if (plan && plan.topic==="lewis" && !S.doneDays.includes(t) && S.molDone.length>=2) S.doneDays.push(t);
     save();
-    const c=el("div",{class:"card teal"},'<h2>✓ '+m.formula+' — every octet checks out</h2><p>Final audit passed: formula ✓ · connected ✓ · H rule ✓ · octets ✓ · budget spent exactly ✓</p>');
+    const c=el("div",{class:"card teal"},'<h2>✓ '+m.formula+' — every octet checks out</h2><p>Final audit passed: formula ✓ · connected ✓ · H rule ✓ · octets ✓ · budget spent exactly ✓ · formal charges all correct ✓</p>');
     c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{S.lab=null;render();}},"Next molecule →"));
     box.appendChild(c);
   } else {
@@ -841,15 +889,15 @@ VIEWS.cheat = (v) => {
     '<tr><td class="mono">H</td><td>1</td><td>0</td></tr><tr><td class="mono">C</td><td>4</td><td>0</td></tr>'+
     '<tr><td class="mono">N</td><td>3</td><td>1</td></tr><tr><td class="mono">O</td><td>2</td><td>2</td></tr>'+
     '<tr><td class="mono">F Cl Br I</td><td>1</td><td>3</td></tr></table>'+
-    '<p class="muted">Charged versions shift by one: N⁺ 4 bonds · O⁺ 3 bonds/1 LP · O⁻ 1 bond/3 LP · C⁻ 3 bonds/1 LP.</p>'));
+    '<p class="muted">Charged versions shift by one: N⁺ 4 bonds · O⁺ 3 bonds/1 LP · O⁻ 1 bond/3 LP · C⁻ 3 bonds/1 LP · C⁺ 3 bonds/0 LP (C⁺ vs C⁻: same bonds — the lone pair decides).</p>'));
   v.appendChild(el("div",{class:"card"},
     '<h3>Lewis: the six steps + the deficit rule</h3>'+
     '<ol style="margin-left:18px;line-height:1.7"><li>Count total valence e⁻ (adjust for charge: + subtracts, − adds)</li><li>Central atom = wants most bonds, never H</li><li>Connect all with single bonds, −2 each</li><li>Fill OUTER atoms (H stops at 2)</li><li>Leftovers → central atom</li><li>Central short? <b>(short ÷ 2) = lone pairs to convert to bonds</b>: short by 2 → double, short by 4 → triple</li></ol>'+
     '<p class="muted">Only converting a lone pair into a shared bond fixes a short atom — sharing lets both atoms count the same 2 e⁻. Rearranging never does.</p>'));
   v.appendChild(el("div",{class:"card"},
     '<h3>Formal charge</h3><p class="mono center" style="font-size:1.05rem;margin:8px 0">FC = valence − lone-pair e⁻ − ½(bonding e⁻)</p>'+
-    '<p class="muted"><b>"Valence" = the atom\'s own group number, always</b> (O is 6 in every molecule — an ion\'s charge changes the total e⁻ budget in step 1, never this number). Count lone pairs fresh from the octet each time: fewer bonds → more LPs. <b>More bonds than the neutral pattern → +, fewer → −.</b></p>'+
-    '<p class="muted">Sight-read shortcuts: N with 4 bonds = +1 · O with 3 bonds = +1 · O with 1 bond = −1 · C with 3 bonds + LP = −1.</p>'));
+    '<p class="muted"><b>"Valence" = the atom\'s own group number, always</b> (O is 6 in every molecule — an ion\'s charge changes the total e⁻ budget in step 1, never this number). Count lone pairs fresh from the octet each time: fewer bonds → more LPs. For octet-keeping atoms like O and N: more bonds than the neutral pattern → +, fewer → −. <b>Carbon breaks that shortcut:</b> C⁺ (3 bonds, 0 LP) and C⁻ (3 bonds, 1 LP) have the SAME bond count — the lone pair decides the sign. When lone pairs are uncertain, run the full formula.</p>'+
+    '<p class="muted">Sight-read shortcuts: N with 4 bonds = +1 · O with 3 bonds = +1 · O with 1 bond = −1 · C with 3 bonds + 1 LP = −1 · C with 3 bonds + 0 LP = +1.</p>'));
   v.appendChild(el("div",{class:"card"},
     '<h3>Electronegativity & geometry</h3>'+
     '<p class="mono center" style="margin:6px 0">F &gt; O &gt; N ≈ Cl &gt; Br &gt; C ≈ H</p>'+
