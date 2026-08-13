@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.4  ·  built 2026-08-09, audited 2026-08-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.5  ·  built 2026-08-09, audited 2026-08-11
+  v2.5: FC mastery check — the audit's transfer gate as an in-app mode: 6 species (OH⁻, H₃O⁺,
+        NH₄⁺, CH₃O⁻, R₃C⁺, R₃C⁻), inputs labeled (bonds → LPs → FC), clean 6/6 runs on
+        2 distinct days = mastered; synced via fcMastery array.
   v2.1: due dates + overdue flags on days/molecules; Aug 17 final diagnostic day (mixed 1-per-topic round)
   v2.2: cross-device cloud sync via the B250 Supabase project (`progress` table, profile "gabe-c231") —
         pull+merge on load (arrays union, per-question stats keep the higher-attempt copy), debounced push on change.
@@ -259,7 +262,7 @@ let _pushT = null;
 function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Content-Type":"application/json"}; }
 function mergeRemote(remote){
   if (!remote) return;
-  ["doneDays","molDone","visits"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...S[k]])]; });
+  ["doneDays","molDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
   const seenM = new Set(S.missed);
   (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
   Object.entries(remote.qstats||{}).forEach(([id,st])=>{
@@ -280,7 +283,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -427,11 +430,12 @@ const S = {
   missed:   safeStore.get("missed", []),      // ids, most recent last
   molDone:  safeStore.get("molDone", []),
   visits:   safeStore.get("visits", []),
+  fcMastery: safeStore.get("fcMastery", []),  // dates of CLEAN 6/6 mastery-check runs; 2 distinct days = mastered
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); cloudPush(false); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); cloudPush(false); }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -458,6 +462,64 @@ function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view
 
 /* ================= VIEWS ================= */
 const VIEWS = {};
+
+/* ---- v2.5: FORMAL-CHARGE MASTERY CHECK (the external audit's transfer gate) ----
+   Six species, cold, inputs labeled: bonds → lone pairs → FC for the key atom.
+   A run is CLEAN only if all 18 inputs are right first try. Two clean runs on
+   two different days = mastered. Draw each one on paper BEFORE answering. */
+const MASTERY_FC = [
+  {name:"OH⁻ (hydroxide)",      atom:"O", bonds:1, lp:3, fc:-1},
+  {name:"H₃O⁺ (hydronium)",     atom:"O", bonds:3, lp:1, fc:1},
+  {name:"NH₄⁺ (ammonium)",      atom:"N", bonds:4, lp:0, fc:1},
+  {name:"CH₃O⁻ (methoxide)",    atom:"O", bonds:1, lp:3, fc:-1},
+  {name:"R₃C⁺ (a carbocation)", atom:"C", bonds:3, lp:0, fc:1},
+  {name:"R₃C⁻ (a carbanion)",   atom:"C", bonds:3, lp:1, fc:-1},
+];
+function startMastery(){
+  S.mastery = {queue: shuffle(MASTERY_FC), i:0, clean:true};
+  go("mastery");
+}
+VIEWS.mastery = (v) => {
+  const M = S.mastery;
+  if (!M){ go("home"); return; }
+  const mastered = new Set(S.fcMastery).size>=2;
+  if (M.i>=M.queue.length){ // run over
+    const c = el("div",{class:"card"+(M.clean?" teal":"")});
+    if (M.clean){
+      confetti();
+      const t=todayStr(); if(!S.fcMastery.includes(t)) S.fcMastery.push(t); save();
+      const days=new Set(S.fcMastery).size;
+      c.innerHTML='<span class="tag gold">CLEAN RUN — 6/6, all inputs</span><h2>'+(days>=2?"🏅 MASTERED. Two clean days on record ("+[...new Set(S.fcMastery)].join(", ")+").":"Clean day 1 banked ("+t+"). One more clean run on a DIFFERENT day and formal charge is officially mastered.")+'</h2><p class="muted">Per the audit rule: drill percentages never count as mastery — only this does.</p>';
+    } else {
+      c.innerHTML='<span class="tag coral">Not clean</span><h2>Run finished with misses</h2><p>No shame, real data: the missed inputs are the exact gap. Reread the charge model (a − is one extra paired-up electron; a + is one missing), then retry — a clean run requires every input right on the first try.</p>';
+    }
+    const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+    row.appendChild(el("button",{class:"btn gold",onclick:()=>startMastery()},"Run again"));
+    row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.mastery=null; go("home");}},"Home"));
+    c.appendChild(row); v.appendChild(c); return;
+  }
+  const sp = M.queue[M.i];
+  const c = el("div",{class:"card"});
+  c.innerHTML='<span class="tag violet">Mastery check · '+(M.i+1)+'/6'+(mastered?' · 🏅':'')+'</span>'+
+    '<h2>'+sp.name+' — the '+sp.atom+'</h2>'+
+    '<p class="muted">Draw it on paper first. Then label the inputs — no formula until the last box.</p>';
+  const mkRow=(label,id)=>'<div style="display:flex;align-items:center;gap:10px;margin:8px 0"><span style="min-width:210px;font-weight:700">'+label+'</span><input id="'+id+'" type="number" inputmode="numeric" style="width:90px;padding:8px;border:2px solid var(--ink);border-radius:8px;font-family:var(--mono);font-size:1rem"></div>';
+  c.innerHTML += mkRow("Bonds on the "+sp.atom+":","m_b") + mkRow("Lone PAIRS on the "+sp.atom+":","m_l") + mkRow("Formal charge:","m_f");
+  const fb=el("div");
+  const btn=el("button",{class:"btn teal",onclick:()=>{
+    const b=parseInt($("#m_b").value,10), l=parseInt($("#m_l").value,10), f=parseInt($("#m_f").value,10);
+    if ([b,l,f].some(x=>Number.isNaN(x))){ fb.innerHTML='<p class="muted">Fill all three boxes.</p>'; return; }
+    const ok = b===sp.bonds && l===sp.lp && f===sp.fc;
+    if (!ok) M.clean=false;
+    fb.innerHTML = ok
+      ? '<p style="color:var(--ok);font-weight:700">✓ All three inputs right.</p>'
+      : '<p style="color:var(--coral);font-weight:700">✗ Correct: '+sp.bonds+' bond(s), '+sp.lp+' LP, FC '+(sp.fc>0?"+":"")+sp.fc+'.</p><p class="muted">FC = '+VALENCE[sp.atom]+' − '+(2*sp.lp)+' (LP e⁻) − '+sp.bonds+' (bonds) = '+(sp.fc>0?"+":"")+sp.fc+'</p>';
+    btn.replaceWith(el("button",{class:"btn gold",onclick:()=>{M.i++; render();}},"Next →"));
+  }},"Check all three");
+  c.appendChild(btn); c.appendChild(fb);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"card cream"},'<p class="muted">Status: '+new Set(S.fcMastery).size+'/2 clean days'+(S.fcMastery.length?' ('+[...new Set(S.fcMastery)].join(", ")+')':'')+'. A single miss anywhere makes the run not-clean — that\'s the point.</p>'));
+};
 
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
@@ -576,6 +638,7 @@ VIEWS.drill = (v) => {
       pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>"));
     });
     pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
+    pr.appendChild(el("button",{class:"pill",style:"background:var(--gold);font-weight:800",onclick:()=>startMastery()},(new Set(S.fcMastery).size>=2?"🏅":"⚖️")+" FC mastery check ("+new Set(S.fcMastery).size+"/2 days)"));
     v.appendChild(pr);
     return;
   }
@@ -593,6 +656,7 @@ VIEWS.drill = (v) => {
     if (pct>=80 && claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day)) S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark “"+claim.title+"” ("+fmtDay(claim.day)+") done")); }
     else if (pct>=80){ c.appendChild(el("p",{class:"muted",style:"margin:4px 0 8px"},"Good round — but it doesn't match an open mission day, so nothing auto-completes. (Honest manual ✓ lives in the Plan tab.)")); }
     row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
+    if (D.topic==="formal") row.appendChild(el("button",{class:"btn teal",onclick:()=>startMastery()},"⚖️ Mastery check (the real bar)"));
     c.appendChild(row); v.appendChild(c); return;
   }
   const q = D.queue[D.i];
