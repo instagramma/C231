@@ -6,7 +6,12 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.5  ·  built 2026-08-09, audited 2026-08-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.6  ·  built 2026-08-09, audited 2026-08-11
+  v2.6 (2026-08-15): re-anchored to Prof. Ciesla's welcome email. Runway now tracks HER review
+        list (polarity/dipoles → hybridization+VSEPR → IMFs → diagnostic before Tue lecture);
+        resonance/acid-base/bond-line dropped from runway (course teaches them; still drillable).
+        NEW imf topic (6 Qs) + VSEPR shapes (h7–h10) + molecular-dipole pair (p7/p8).
+        First-week logistics card on Home through 8/19 (labs MONDAY 8/17; lecture Tue 8/18).
   v2.5: FC mastery check — the audit's transfer gate as an in-app mode: 6 species (OH⁻, H₃O⁺,
         NH₄⁺, CH₃O⁻, R₃C⁺, R₃C⁻), inputs labeled (bonds → LPs → FC), clean 6/6 runs on
         2 distinct days = mastered; synced via fcMastery array.
@@ -302,20 +307,22 @@ const TRACK = [
   { day:"2026-08-08", topic:"lewis",    title:"Lewis structures" },
   { day:"2026-08-09", topic:"lewis",    title:"Lewis: H₂O + C₂H₄ (Lab)" },
   { day:"2026-08-10", topic:"formal",   title:"Formal charge" },
-  { day:"2026-08-11", topic:"polarity", title:"EN · polarity · IMFs" },
-  { day:"2026-08-12", topic:"hybrid",   title:"Geometry + hybridization" },
-  { day:"2026-08-13", topic:"resonance",title:"Resonance" },
-  { day:"2026-08-14", topic:"acidbase1",title:"Acid-base I: pKa" },
-  { day:"2026-08-15", topic:"acidbase2",title:"Acid-base II: ARIO" },
-  { day:"2026-08-16", topic:"bondline", title:"Bond-line + func. groups" },
-  { day:"2026-08-17", topic:"diag",     title:"Final diagnostic (before class!)" },
+  // v2.6 — re-anchored to Prof. Ciesla's welcome email (8/15). Her review list:
+  // Lewis ✓, formal charges ✓, hybridization (sp/sp²/sp³ only), VSEPR, polar bonds,
+  // molecular dipoles, IMFs. Resonance/acid-base/bond-line dropped from the runway
+  // (the course teaches them; topics stay drillable). First LAB: Mon 8/17. Lecture: Tue 8/18.
+  { day:"2026-08-15", topic:"polarity", title:"Polarity + molecular dipoles" },
+  { day:"2026-08-16", topic:"hybrid",   title:"Hybridization + VSEPR" },
+  { day:"2026-08-17", topic:"imf",      title:"IMFs (lab day — keep it light)" },
+  { day:"2026-08-18", topic:"diag",     title:"Final diagnostic (before lecture!)" },
 ];
 const TOPICS = {
   valence:  { name:"Valence electrons",  ico:"🔢" },
   lewis:    { name:"Lewis structures",   ico:"🧩" },
   formal:   { name:"Formal charge",      ico:"⚡" },
-  polarity: { name:"EN · polarity · IMF",ico:"🧲" },
-  hybrid:   { name:"Geometry + hybrid.", ico:"📐" },
+  polarity: { name:"Polarity + dipoles", ico:"🧭" },
+  hybrid:   { name:"Hybridization+VSEPR",ico:"📐" },
+  imf:      { name:"Intermolec. forces", ico:"🧲" },
   resonance:{ name:"Resonance",          ico:"🔁" },
   acidbase1:{ name:"Acid-base: pKa",     ico:"🍋" },
   acidbase2:{ name:"Acid-base: ARIO",    ico:"⚖️" },
@@ -363,13 +370,26 @@ const QUESTIONS = [
 {id:"p3",topic:"polarity",type:"mc",prompt:"Which molecule can hydrogen-bond with itself?",choices:["CH₃OH","CH₄","CH₃OCH₃ (ether)","CO₂"],answer:0,why:"H-bonding needs an <b>H attached to O, N, or F</b>. Methanol has O–H ✓. The ether has O but no O–H — it can accept H-bonds, not donate."},
 {id:"p4",topic:"polarity",type:"mc",prompt:"Ethanol dissolves in water; hexane doesn't. Why?",choices:["Ethanol H-bonds with water; hexane only has London forces","Ethanol is smaller","Hexane is too dense","Water is ionic"],answer:0,why:"<b>Like dissolves like</b>: ethanol's O–H matches water's H-bond network. Hexane is nonpolar — mixing it into water breaks water-water H-bonds without paying them back."},
 {id:"p5",topic:"polarity",type:"mc",prompt:"Rank boiling points, highest first: butanol (C₄ alcohol), butane, diethyl ether",choices:["butanol > ether > butane","butane > ether > butanol","ether > butanol > butane","all equal"],answer:0,why:"H-bonding (butanol) > dipole-dipole (ether) > London only (butane). <b>Stronger IMFs = higher bp.</b>"},
+{id:"p7",topic:"polarity",type:"mc",prompt:"CO₂ has two very polar C=O bonds. Is the MOLECULE polar?",choices:["No — the bond dipoles point opposite ways and cancel","Yes — polar bonds always mean a polar molecule","Only when it's hot","Yes, because oxygen is electronegative"],answer:0,why:"Linear + symmetric → the two dipole arrows cancel exactly → <b>net dipole = 0, nonpolar molecule</b>. Bond polarity and MOLECULAR polarity are different questions — geometry decides the second one. (Predicted trap: answering bond-level when the question says 'molecule'.)"},
+{id:"p8",topic:"polarity",type:"mc",prompt:"H₂O also has two polar bonds. Is the molecule polar?",choices:["Yes — it's bent, so the dipoles add instead of canceling","No — two dipoles always cancel","No — it's symmetric","Only in ice"],answer:0,why:"Bent (~104.5°) → both O–H dipoles have a component pointing the same way → they <b>add</b> → strongly polar. CO₂ vs H₂O is the classic geometry-decides-polarity pair."},
 /* --- hybrid --- */
 {id:"h1",topic:"hybrid",type:"text",prompt:"Hybridization of carbon in CH₄? (type like: sp3)",answer:"sp3",why:"4 attached groups + 0 LP = 4 electron domains → <b>sp³</b>, tetrahedral, 109.5°. Count domains, that's the whole trick."},
 {id:"h2",topic:"hybrid",type:"text",prompt:"Hybridization of the carbon in H₂C=O?",answer:"sp2",why:"3 domains (2 H + 1 O, the double bond counts once) → <b>sp²</b>, trigonal planar, 120°."},
 {id:"h3",topic:"hybrid",type:"text",prompt:"Hybridization of each carbon in HC≡CH?",answer:"sp",why:"2 domains each → <b>sp</b>, linear, 180°."},
 {id:"h4",topic:"hybrid",type:"mc",prompt:"Water's oxygen is sp³ with 2 lone pairs. Its shape is:",choices:["Bent","Linear","Tetrahedral","Trigonal planar"],answer:0,why:"4 domains arrange tetrahedrally, but shape names only the atoms: 2 bonds + 2 LPs = <b>bent</b> (~104.5°)."},
 {id:"h5",topic:"hybrid",type:"mc",prompt:"A C=C double bond consists of:",choices:["1 sigma + 1 pi bond","2 sigma bonds","2 pi bonds","1 sigma + 2 pi"],answer:0,why:"<b>1σ + 1π</b>. The π bond is side-on p-orbital overlap — which is why double bonds can't rotate: rotating breaks the π overlap."},
+{id:"h7",topic:"hybrid",type:"mc",prompt:"NH₃'s shape (VSEPR)?",choices:["Trigonal pyramidal","Trigonal planar","Tetrahedral","Bent"],answer:0,why:"Count ALL 4 domains: 3 bonds + <b>1 lone pair</b> → sp³, but the SHAPE names only the atoms: <b>trigonal pyramidal</b> (~107°). Forgetting the lone pair (calling it trigonal planar) is your documented trap — the LP counts as a domain."},
+{id:"h8",topic:"hybrid",type:"num",prompt:"Bond angle in CH₄ (tetrahedral), in degrees? (one decimal)",answer:109.5,why:"4 equal domains → <b>109.5°</b>. The set to memorize: sp 180° · sp² 120° · sp³ 109.5° (squeezed slightly by lone pairs: NH₃ ~107°, H₂O ~104.5°)."},
+{id:"h9",topic:"hybrid",type:"mc",prompt:"CO₂'s shape and angle?",choices:["Linear, 180°","Bent, ~120°","Trigonal planar, 120°","Bent, ~104.5°"],answer:0,why:"C has 2 domains (each double bond counts ONCE) → sp, <b>linear, 180°</b>. Domain counting, not bond counting."},
+{id:"h10",topic:"hybrid",type:"mc",prompt:"CH₂O (formaldehyde) — shape around the C?",choices:["Trigonal planar, ~120°","Tetrahedral, 109.5°","Bent","Linear"],answer:0,why:"3 domains (2 H + the C=O counted once) → sp², <b>trigonal planar, 120°</b>."},
 {id:"h6",topic:"hybrid",type:"text",prompt:"In CH₂=CH–C≡N, the hybridization of the carbon in C≡N?",answer:"sp",why:"Triple-bonded carbon: 2 domains → <b>sp</b>. Walking a molecule assigning sp/sp²/sp³ per atom should take seconds by day one of class."},
+/* --- imf (v2.6 — on Prof. Ciesla's review list) --- */
+{id:"i1",topic:"imf",type:"mc",prompt:"Strongest intermolecular force in pure water?",choices:["Hydrogen bonding","London dispersion","Dipole-dipole only","Covalent bonds between molecules"],answer:0,why:"O–H bonds + lone pairs on O → water both donates and accepts <b>H-bonds</b>. (H-bonding IS a strong dipole-dipole special case — name the strongest force present.)"},
+{id:"i2",topic:"imf",type:"mc",prompt:"A hydrogen bond requires:",choices:["H bonded to N, O, or F + a lone pair on another N, O, or F","Any H near any O","A charged molecule","A metal atom"],answer:0,why:"Both halves matter: a polarized <b>H on N/O/F</b> (the donor) and a <b>lone pair on N/O/F</b> (the acceptor). C–H hydrogens don't count — carbon isn't electronegative enough."},
+{id:"i3",topic:"imf",type:"mc",prompt:"CH₄'s only intermolecular force?",choices:["London dispersion","Hydrogen bonding","Dipole-dipole","Ion-dipole"],answer:0,why:"No polar bonds worth counting, no net dipole → only <b>London dispersion</b> (present in EVERYTHING, and the only thing nonpolar molecules get). Hence bp −162 °C."},
+{id:"i4",topic:"imf",type:"mc",prompt:"Higher boiling point: ethanol (CH₃CH₂OH) or dimethyl ether (CH₃OCH₃)? Same formula!",choices:["Ethanol — it can H-bond with itself (O–H); the ether can't","The ether — oxygen in the middle","Identical, same atoms","Depends on pressure"],answer:0,why:"Same C₂H₆O, wildly different bp (+78° vs −24°). Ethanol has an <b>O–H</b> → H-bond donor. The ether's H's are all on carbon → acceptor only, no donation between its own molecules. Connectivity beats formula."},
+{id:"i5",topic:"imf",type:"mc",prompt:"Why does octane (C₈) boil higher than butane (C₄)?",choices:["More surface area → stronger London dispersion","Octane has hydrogen bonds","Octane is polar","It doesn't"],answer:0,why:"Dispersion scales with <b>contact surface area</b> — more electrons, more molecule to stick. This is why 'weakest force' ≠ 'small effect': in big molecules dispersion dominates."},
+{id:"i6",topic:"imf",type:"mc",prompt:"Acetone (CH₃)₂C=O has a polar C=O but no O–H. Strongest IMF between acetone molecules?",choices:["Dipole-dipole","Hydrogen bonding","London only","Ionic"],answer:0,why:"Net dipole (that C=O) → <b>dipole-dipole</b>. No O–H/N–H means it can't H-bond donate to itself. (It CAN accept H-bonds from water — why acetone mixes with water — but between acetone molecules, dipole-dipole is the ceiling.)"},
 /* --- resonance --- */
 {id:"r1",topic:"resonance",type:"mc",prompt:"Resonance structures are…",choices:["Imaginary snapshots; the real molecule is one blended hybrid","Structures the molecule flips between rapidly","Different molecules in equilibrium","Excited states"],answer:0,why:"The molecule is <b>always the hybrid</b> — it never 'flips.' Resonance is a limitation of drawing, not a motion of the molecule."},
 {id:"r2",topic:"resonance",type:"mc",prompt:"When drawing resonance structures, what is allowed to move?",choices:["Electrons only (lone pairs and π bonds)","Atoms only","Both atoms and electrons","Protons"],answer:0,why:"<b>Only electrons move</b> — lone pairs ↔ π bonds. If an atom moved, it's a different molecule (an isomer), not resonance."},
@@ -524,6 +544,13 @@ VIEWS.mastery = (v) => {
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
   const t = todayStr();
+  // v2.6: first-week logistics from Prof. Ciesla's welcome email (shown through Wed 8/19)
+  if (t<="2026-08-19"){
+    v.appendChild(el("div",{class:"card cream"},
+      '<span class="tag coral">FIRST WEEK — from the welcome email</span>'+
+      '<p style="margin:8px 0 4px"><b>⚠️ Labs meet MONDAY 8/17</b> (Bldg 36, Lab 300): A2 11:10 AM · A1 2:10 PM. Lecture (all sections): <b>Tue 8/18, 11:10 AM</b>, Bldg 36 Rm 319. <b>You MUST attend your first lab AND lecture to keep your seat</b> — check which section you\'re registered in TODAY.</p>'+
+      '<p class="muted" style="margin:6px 0 0">Bring/get: hardback <b>composition</b> lab notebook (NOT spiral) · ANSI Z-87.1 safety glasses (loaners exist) · Klein 5e is Inclusive Access via Canvas · Wiley Plus HW via Canvas · model set later. Prof: C. Ciesla, cieslac@smccd.edu.</p>'));
+  }
   // re-entry ritual: gap of 2+ days since previous visit
   const prev = S.visits.filter(d=>d<t).sort().pop();
   if (prev){ const gap = Math.round((new Date(t)-new Date(prev))/86400000);
