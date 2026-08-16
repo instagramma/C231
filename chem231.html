@@ -6,7 +6,17 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.7  ·  built 2026-08-09, audited 2026-08-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.8  ·  built 2026-08-09 · audited 2026-08-11 (r1), 2026-08-15 (r2)
+  v2.8 (2026-08-15, round-2 audit response — FINAL prep build, then freeze until course material):
+        diagnostic restricted to prerequisite topics only; empty diag pill hidden; diagnostic
+        can complete its Aug 18 plan day (__diag↔diag); formal scaffold order survives
+        interruption; f6 wording order-independent; stale resonance/acid-base priorities and
+        Aug-17-diagnostic copy corrected; central-atom guidance fixed (no more "pick either");
+        report exports FC-mastery status; a5 reworded to equilibrium-favored phrasing.
+        Known-limitation note (documented, deferred): Lewis FC checker keys expected charges by
+        ELEMENT, not per-atom — sufficient for the current 10 neutral targets, NOT generic; ions,
+        resonance contributors, or all-zero-FC constitutional isomers need per-atom roles or an
+        accepted-graph comparison first (round-2 audit §2).
   v2.7 (2026-08-15): PREPARATION phase labeling per Gabe — header badge, Plan + Drill views
         marked as pre-semester prep; Semester section slots in beside it at v3.0 (syllabus).
   v2.6 (2026-08-15): re-anchored to Prof. Ciesla's welcome email. Runway now tracks HER review
@@ -365,7 +375,7 @@ const QUESTIONS = [
 {id:"f3",topic:"formal",type:"num",prompt:"Formal charge on N in NH₄⁺? (enter −1, 0, or 1)",answer:1,why:"N with <b>4 bonds, 0 LP</b>: FC = 5 − 0 − 4 = +1. Memorize the pattern — 4-bond nitrogen is positive."},
 {id:"f4",topic:"formal",type:"mc",prompt:"In CH₃O⁻ (methoxide), which atom carries the −1?",choices:["The oxygen","The carbon","A hydrogen","It's spread over all atoms equally"],answer:0,why:"<b>Oxygen</b>: 1 bond + 3 LPs → FC = −1. C has its normal 4 bonds (FC 0). Charge sits where the bond count deviates from the happy number."},
 {id:"f5",topic:"formal",type:"num",prompt:"FC formula: valence − lone-pair e⁻ − ½(bonding e⁻). For a C with 3 bonds and 1 lone pair, FC = ?",answer:-1,why:"3 bonds = 6 bonding e⁻ → ½ = 3. FC = 4 − 2 − 3 = <b>−1</b>. A 3-bond carbon with a lone pair is a carbanion — you'll meet these as nucleophiles."},
-{id:"f6",topic:"formal",type:"num",prompt:"A carbon has 3 bonds and NO lone pair (a carbocation, R₃C⁺). FC = ? (enter −1, 0, or 1)",answer:1,why:"FC = 4 − 0 − 3 = <b>+1</b>. Compare the last question: 3 bonds + 1 LP = −1, but 3 bonds + 0 LP = +1. <b>Same bond count, opposite charges — bond count alone never decides carbon's sign; the lone pair does.</b> When in doubt, run the full formula. (Carbocations are ochem's most important electrophiles.)"},
+{id:"f6",topic:"formal",type:"num",prompt:"A carbon has 3 bonds and NO lone pair (a carbocation, R₃C⁺). FC = ? (enter −1, 0, or 1)",answer:1,why:"FC = 4 − 0 − 3 = <b>+1</b>. Compare a 3-bond carbon WITH one lone pair: that's −1, while 3 bonds + 0 LP = +1. <b>Same bond count, opposite charges — bond count alone never decides carbon's sign; the lone pair does.</b> When in doubt, run the full formula. (Carbocations are ochem's most important electrophiles.)"},
 /* --- polarity --- */
 {id:"p1",topic:"polarity",type:"mc",prompt:"Electronegativity order — which is correct?",choices:["F > O > N ≈ Cl > C ≈ H","O > F > N > C > H","F > N > O > C > H","C > N > O > F > H"],answer:0,why:"<b>F > O > N ≈ Cl</b>, and C ≈ H near the bottom of the common set. This ordering predicts every δ+/δ− you'll ever label."},
 {id:"p2",topic:"polarity",type:"mc",prompt:"In a C=O bond, the partial charges are:",choices:["δ+ on C, δ− on O","δ− on C, δ+ on O","No polarity — it's a double bond","Depends on temperature"],answer:0,why:"O is more electronegative → pulls density → <b>δ− O, δ+ C</b>. That δ+ carbon is where nucleophiles attack — arguably the single most important fact in carbonyl chemistry."},
@@ -403,7 +413,7 @@ const QUESTIONS = [
 {id:"a2",topic:"acidbase1",type:"num",prompt:"Approximate pKa of a carboxylic acid (like acetic acid)?",answer:5,tolerance:1,why:"≈ <b>5</b> (4.76 for acetic — either is accepted). Landmarks to know cold: HCl −7 · H₃O⁺ −1.7 · RCOOH 5 · H₂O 15.7 · ROH 16 · alkyne 25 · alkane 50."},
 {id:"a3",topic:"acidbase1",type:"num",prompt:"Approximate pKa of water?",answer:16,why:"<b>15.7</b> (we accept 16). Water is a far weaker acid than a carboxylic acid — 10 pKa units ≈ 10 billion times weaker.",tolerance:1},
 {id:"a4",topic:"acidbase1",type:"mc",prompt:"An acid-base equilibrium favors the side with…",choices:["The weaker acid (higher pKa)","The stronger acid","More molecules","The heavier compounds"],answer:0,why:"Equilibrium runs <b>downhill to the weaker acid</b>. Compare the two pKa values; the side holding the higher-pKa acid wins."},
-{id:"a5",topic:"acidbase1",type:"mc",prompt:"Will acetate (CH₃CO₂⁻) deprotonate water?",choices:["No — that would form acetic acid (pKa 5) from water (pKa 15.7), uphill","Yes, completely","Yes, about half-way","Only when heated"],answer:0,why:"Going acetate + H₂O → acetic acid + OH⁻ converts a pKa-15.7 acid into a pKa-5 acid — <b>uphill by ~10¹¹</b>. Equilibrium says no."},
+{id:"a5",topic:"acidbase1",type:"mc",prompt:"Acetate (CH₃CO₂⁻) + water — is the equilibrium for acetate pulling a proton OFF water favored?",choices:["No — that would form acetic acid (pKa 5) from water (pKa 15.7), uphill","Yes, strongly favored","Yes, about half-way","Only when heated"],answer:0,why:"Going acetate + H₂O → acetic acid + OH⁻ converts a pKa-15.7 acid into a pKa-5 acid — <b>uphill by ~10¹¹</b>. Equilibrium says no."},
 {id:"a6",topic:"acidbase1",type:"text",prompt:"Conjugate base of H₂O? (type a formula, e.g. NH2-)",answer:"oh-",accept:["oh-","ho-","oh−","ho−"],why:"Remove H⁺ from H₂O → <b>OH⁻</b>. Conjugate pairs differ by exactly one proton."},
 /* --- acid-base II: ARIO --- */
 {id:"b1",topic:"acidbase2",type:"mc",prompt:"ARIO ranks what makes an acid strong. The letters stand for:",choices:["Atom, Resonance, Induction, Orbital","Acidity, Reactivity, Ionization, Orbital","Atom, Radius, Ion, Octet","Angle, Resonance, Induction, Overlap"],answer:0,why:"<b>A</b>tom → <b>R</b>esonance → <b>I</b>nduction → <b>O</b>rbital, checked in that order on the <b>conjugate base</b>: whatever stabilizes the conjugate base makes the acid stronger."},
@@ -578,7 +588,7 @@ VIEWS.home = (v) => {
       const rc = el("div",{class:"card cream"});
       rc.innerHTML = '<span class="tag coral">🩹 Recovery — 10 min, before or after</span>'+
         '<p style="margin:6px 0 10px">One missed day gets repaired: a short <b>'+(TOPICS[repair.topic]?.name||repair.topic)+'</b> round (was due '+fmtDay(repair.day)+'). '+
-        (behind.length>1?'Anything older than this is <b>not queued</b> — the Aug 17 diagnostic will surface whatever still matters. No pile.':'That\'s the whole backlog. No pile.')+'</p>';
+        (behind.length>1?'Older missed days are handled <b>one at a time, never as a pile</b> — and the Aug 18 prerequisite diagnostic will surface whatever still matters.':'That\'s the whole backlog. No pile.')+'</p>';
       rc.appendChild(el("button",{class:"btn coral",onclick:()=>{ if(repair.topic==="lewis"){ go("lab"); } else { startDrill(repair.topic); } }},"Run the repair round"));
       card._repairCard = rc;
     }
@@ -597,7 +607,7 @@ VIEWS.home = (v) => {
     '<div class="stat"><div class="n">'+a.pct+'%</div><div class="l">accuracy</div></div>'+
     '<div class="stat"><div class="n">'+S.molDone.length+'/'+MOLECULES.length+'</div><div class="l">molecules built</div></div>';
   v.appendChild(stats);
-  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Protect resonance (Aug 13) and both acid-base days (14–15) above everything else.</p>');
+  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Priorities per the professor\'s review list: polarity + dipoles (Aug 15) → hybridization + VSEPR (Aug 16) → IMFs (Aug 17, light — lab day) → prerequisite diagnostic Tue Aug 18 before lecture.</p>');
   v.appendChild(pb);
   if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
 };
@@ -627,9 +637,12 @@ VIEWS.track = (v) => {
 
 /* ---- DRILL ---- */
 function startDiagnostic(){
-  // 1 question per topic, unseen/missed first — the "walk in ahead of the curve" check
+  // v2.8: PREREQUISITE-ONLY readiness check (the prof's review list). Course-taught
+  // topics (resonance, acid-base, bond-line) are excluded — a miss there would read
+  // as "not ready" for material he isn't expected to know yet (round-2 audit, P1-A).
+  const PREREQ=["valence","lewis","formal","polarity","hybrid","imf"];
   const pool=[];
-  Object.keys(TOPICS).filter(k=>k!=="diag").forEach(k=>{
+  PREREQ.forEach(k=>{
     const qs=QUESTIONS.filter(q=>q.topic===k);
     if(!qs.length)return;
     const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
@@ -648,10 +661,13 @@ function startDrill(topic){
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
   // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
   if (topic==="formal"){
+    // v2.8: scaffold order survives interruption — until EVERY scaffold has been seen
+    // once, unseen scaffolds lead the queue in sequence (audit: interrupted first pass
+    // used to fall back to shuffle and could jump to f6 before f0b).
     const ORD=["f0","f0b","f1","f2"];
-    if (ORD.every(id=>seen(id)===0)){
-      pool = ORD.map(id=>pool.find(q=>q.id===id)).filter(Boolean)
-             .concat(pool.filter(q=>!ORD.includes(q.id)));
+    if (ORD.some(id=>seen(id)===0)){
+      const lead = ORD.filter(id=>seen(id)===0).map(id=>pool.find(q=>q.id===id)).filter(Boolean);
+      pool = lead.concat(pool.filter(q=>!lead.includes(q)));
     }
   }
   S.drill = {queue:pool.slice(0,10), i:0, right:0, wrong:0, topic, answered:false};
@@ -663,6 +679,7 @@ VIEWS.drill = (v) => {
     const pr = el("div",{class:"pill-row"});
     Object.entries(TOPICS).forEach(([k,t])=>{
       const qs = QUESTIONS.filter(q=>q.topic===k);
+      if (!qs.length) return; // v2.8: hide empty topics (the 0/0 "diag" pill — audit P1-B)
       const done = qs.filter(q=>S.qstats[q.id]?.r).length;
       pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>"));
     });
@@ -681,7 +698,8 @@ VIEWS.drill = (v) => {
     const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
     // v2.4: auto-complete needs ≥80% (matching the text) AND the round's topic must match
     // an unfinished TRACK day — no more marking today's mission done by drilling anything.
-    const claim = TRACK.filter(x=>x.day<=todayStr() && !S.doneDays.includes(x.day) && x.topic===D.topic).sort((a,b)=>a.day<b.day?-1:1)[0];
+    const claimTopic = D.topic==="__diag" ? "diag" : D.topic; // v2.8: diagnostic can complete its plan day (audit P1-C)
+    const claim = TRACK.filter(x=>x.day<=todayStr() && !S.doneDays.includes(x.day) && x.topic===claimTopic).sort((a,b)=>a.day<b.day?-1:1)[0];
     if (pct>=80 && claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day)) S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark “"+claim.title+"” ("+fmtDay(claim.day)+") done")); }
     else if (pct>=80){ c.appendChild(el("p",{class:"muted",style:"margin:4px 0 8px"},"Good round — but it doesn't match an open mission day, so nothing auto-completes. (Honest manual ✓ lives in the Plan tab.)")); }
     row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
@@ -788,7 +806,7 @@ VIEWS.lab = (v) => {
         if(m.central.includes(e)){ L.step=3; render(); } else { card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350); }
       }},e));
     });
-    if (Object.keys(m.atoms).filter(e=>e!=="H").length>1) ask.innerHTML+=' <span class="muted">(two heavy atoms? both are "central" — pick either, they bond to each other first)</span>';
+    if (Object.keys(m.atoms).filter(e=>e!=="H").length>1) ask.innerHTML+=' <span class="muted">(more than one heavy atom? They form the skeleton, bonded to each other — the app expects the conventional central atom: usually the one that makes the most bonds / is least electronegative. H is never central.)</span>';
   }
   else if (L.step===3){
     ask.innerHTML="<b>Step 3 — predict before you draw.</b> After connecting ALL atoms with single bonds, how many electrons will remain from your "+m.ve+"? <span class='muted'>(bonds × 2, subtracted — do the arithmetic, don't eyeball)</span>";
@@ -1034,6 +1052,7 @@ VIEWS.report = (v) => {
 "Questions: "+a.r+" right / "+a.w+" wrong ("+a.pct+"% overall)\n"+
 (perTopic?("By topic:\n"+perTopic+"\n"):"")+
 "Molecules built: "+(S.molDone.join(", ")||"none")+"\n"+
+"FC mastery: "+new Set(S.fcMastery).size+"/2 clean days"+(S.fcMastery.length?" ("+[...new Set(S.fcMastery)].join(", ")+")":"")+(new Set(S.fcMastery).size>=2?" — MASTERED":"")+"\n"+
 (missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
 "Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
   const c=el("div",{class:"card"});
