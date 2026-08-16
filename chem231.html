@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.9  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.10  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  v2.10 (2026-08-16): corrected first-day info to registration (Tue 8/18 lecture Rm319 + lab
+        Rm300); removed the welcome-email "Monday lab" claim (conflicted with registration)
+        and flagged it to confirm with the prof. No chemistry change.
   v2.9 (2026-08-16): runway re-anchored to START TODAY — finished Lewis days keep their dates
         (progress preserved), remaining prereq topics run Sun 8/16 → Tue 8/18 lecture wall;
         formal charge closes via the Mastery Check, not a dated day. No chemistry change.
@@ -326,7 +329,7 @@ const TRACK = [
   // TODAY (Sun 8/16) and end at the fixed lecture wall (Tue 8/18). Formal charge is
   // drilled-heavily-already — it closes via the Mastery Check (Drill tab), not a runway day.
   { day:"2026-08-16", topic:"polarity", title:"Polarity + molecular dipoles" },
-  { day:"2026-08-17", topic:"hybrid",   title:"Hybridization + VSEPR (lab day 2:10 — go light)" },
+  { day:"2026-08-17", topic:"hybrid",   title:"Hybridization + VSEPR" },
   { day:"2026-08-18", topic:"diag",     title:"IMF warm-up + final diagnostic (before lecture!)" },
 ];
 const TOPICS = {
@@ -561,7 +564,7 @@ VIEWS.home = (v) => {
   if (t<="2026-08-19"){
     v.appendChild(el("div",{class:"card cream"},
       '<span class="tag coral">FIRST WEEK — from the welcome email</span>'+
-      '<p style="margin:8px 0 4px"><b>⚠️ Labs meet MONDAY 8/17</b> (Bldg 36, Lab 300): A2 11:10 AM · A1 2:10 PM. Lecture (all sections): <b>Tue 8/18, 11:10 AM</b>, Bldg 36 Rm 319. <b>You MUST attend your first lab AND lecture to keep your seat</b> — check which section you\'re registered in TODAY.</p>'+
+      '<p style="margin:8px 0 4px"><b>⚠️ First day per your registration: TUESDAY 8/18</b> — Lecture 11:10 AM–12:25 PM (Bldg 36, Rm 319), Lab 2:10–5:00 PM (Rm 300). <b>You MUST attend the first lecture AND lab to keep your seat.</b> Note: the welcome email mentioned a Monday 8/17 lab — confirm with Prof. Ciesla (cieslac@smccd.edu) whether you have any Monday obligation, since your registration shows Tuesday only.</p>'+
       '<p class="muted" style="margin:6px 0 0">Bring/get: hardback <b>composition</b> lab notebook (NOT spiral) · ANSI Z-87.1 safety glasses (loaners exist) · Klein 5e is Inclusive Access via Canvas · Wiley Plus HW via Canvas · model set later. Prof: C. Ciesla, cieslac@smccd.edu.</p>'));
   }
   // re-entry ritual: gap of 2+ days since previous visit
