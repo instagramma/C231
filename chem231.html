@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.8  ·  built 2026-08-09 · audited 2026-08-11 (r1), 2026-08-15 (r2)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.9  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  v2.9 (2026-08-16): runway re-anchored to START TODAY — finished Lewis days keep their dates
+        (progress preserved), remaining prereq topics run Sun 8/16 → Tue 8/18 lecture wall;
+        formal charge closes via the Mastery Check, not a dated day. No chemistry change.
   v2.8 (2026-08-15, round-2 audit response — FINAL prep build, then freeze until course material):
         diagnostic restricted to prerequisite topics only; empty diag pill hidden; diagnostic
         can complete its Aug 18 plan day (__diag↔diag); formal scaffold order survives
@@ -318,15 +321,13 @@ const CLASS_START = "2026-08-17";
 const TRACK = [
   { day:"2026-08-08", topic:"lewis",    title:"Lewis structures" },
   { day:"2026-08-09", topic:"lewis",    title:"Lewis: H₂O + C₂H₄ (Lab)" },
-  { day:"2026-08-10", topic:"formal",   title:"Formal charge" },
-  // v2.6 — re-anchored to Prof. Ciesla's welcome email (8/15). Her review list:
-  // Lewis ✓, formal charges ✓, hybridization (sp/sp²/sp³ only), VSEPR, polar bonds,
-  // molecular dipoles, IMFs. Resonance/acid-base/bond-line dropped from the runway
-  // (the course teaches them; topics stay drillable). First LAB: Mon 8/17. Lecture: Tue 8/18.
-  { day:"2026-08-15", topic:"polarity", title:"Polarity + molecular dipoles" },
-  { day:"2026-08-16", topic:"hybrid",   title:"Hybridization + VSEPR" },
-  { day:"2026-08-17", topic:"imf",      title:"IMFs (lab day — keep it light)" },
-  { day:"2026-08-18", topic:"diag",     title:"Final diagnostic (before lecture!)" },
+  // v2.9 (2026-08-16) — runway RE-ANCHORED to start today. Finished Lewis days (8/8, 8/9)
+  // keep their dates so completed progress stays ✓; the remaining prereq topics now begin
+  // TODAY (Sun 8/16) and end at the fixed lecture wall (Tue 8/18). Formal charge is
+  // drilled-heavily-already — it closes via the Mastery Check (Drill tab), not a runway day.
+  { day:"2026-08-16", topic:"polarity", title:"Polarity + molecular dipoles" },
+  { day:"2026-08-17", topic:"hybrid",   title:"Hybridization + VSEPR (lab day 2:10 — go light)" },
+  { day:"2026-08-18", topic:"diag",     title:"IMF warm-up + final diagnostic (before lecture!)" },
 ];
 const TOPICS = {
   valence:  { name:"Valence electrons",  ico:"🔢" },
@@ -607,7 +608,7 @@ VIEWS.home = (v) => {
     '<div class="stat"><div class="n">'+a.pct+'%</div><div class="l">accuracy</div></div>'+
     '<div class="stat"><div class="n">'+S.molDone.length+'/'+MOLECULES.length+'</div><div class="l">molecules built</div></div>';
   v.appendChild(stats);
-  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Priorities per the professor\'s review list: polarity + dipoles (Aug 15) → hybridization + VSEPR (Aug 16) → IMFs (Aug 17, light — lab day) → prerequisite diagnostic Tue Aug 18 before lecture.</p>');
+  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Runway restarted today (Sun Aug 16): polarity + dipoles → hybridization + VSEPR (Mon, lab 2:10) → IMF warm-up + prerequisite diagnostic (Tue before the 11:10 lecture). Formal charge closes via the Mastery Check in Drill.</p>');
   v.appendChild(pb);
   if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
 };
