@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.10  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.11  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  v2.11 (2026-08-16): LEARN layer added — teach-first primers + Klein 5e sections + verified
+        free video links (Khan Academy hubs, The Organic Chemistry Tutor) per prereq topic;
+        new 📖 Learn nav tab. Closes the "no way to learn it, only to be tested" gap.
   v2.10 (2026-08-16): corrected first-day info to registration (Tue 8/18 lecture Rm319 + lab
         Rm300); removed the welcome-email "Monday lab" claim (conflicted with registration)
         and flagged it to confirm with the prof. No chemistry change.
@@ -486,12 +489,39 @@ function accuracy(){ let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=
 /* ================= ROUTER ================= */
 const NAV = [
   {id:"home",  ico:"🏠", label:"Today"},
+  {id:"learn", ico:"📖", label:"Learn"},
   {id:"lab",   ico:"🧪", label:"Lewis Lab"},
   {id:"drill", ico:"🎯", label:"Drill"},
   {id:"track", ico:"🗓️", label:"Plan"},
   {id:"cheat", ico:"📌", label:"Cheat Sheet"},
   {id:"report",ico:"📤", label:"Report"},
 ];
+
+/* ---- v2.11: LEARN layer — teach BEFORE testing. Each prereq topic gets a plain-language
+   primer (Claude's own words) + the Klein 5e section to read in your WileyPLUS eText +
+   free, verified video/lesson links (Khan Academy, The Organic Chemistry Tutor). You can't
+   answer what you were never taught — this is the input side the drills assumed. ---- */
+const OCT_ALLINONE = "https://www.youtube.com/watch?v=PeY_sihSh8E"; // OCT: Lewis, formal charge, geometry, polarity — one video
+const LESSONS = {
+  valence: { primer:"Valence electrons are the outer-shell electrons an atom brings to bonding — and for the main-group atoms you'll use, the count equals the group number: H 1, C 4, N 5, O 6, halogens 7. This one number drives everything downstream (how many bonds an atom wants, its formal charge, the whole Lewis structure). Memorize C/N/O/H cold — you'll use them every single problem.",
+    klein:"Klein 5e §1.2–1.3 (atomic structure, electron configuration)",
+    links:[{l:"Khan Academy — chemical bonds (valence, Lewis)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — intro video",u:OCT_ALLINONE}] },
+  lewis: { primer:"A Lewis structure is a bookkeeping map of every valence electron in a molecule. The 6-step method: (1) count total valence electrons (add 1 per negative charge, subtract 1 per positive), (2) pick the central atom (least electronegative, never H), (3) connect with single bonds, (4) fill lone pairs to give outer atoms octets, (5) put leftovers on the center, (6) if the center is short, convert a neighbor's lone pair into a double/triple bond. The whole game is: every electron accounted for, everyone gets an octet (except H, which stops at 2).",
+    klein:"Klein 5e §1.3–1.4 (Lewis structures, formal bonds)",
+    links:[{l:"Khan Academy — chemical bonds & Lewis structures",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — how to draw Lewis structures",u:"https://www.youtube.com/watch?v=6unef5Hz6SU"}] },
+  formal: { primer:"Formal charge = (the atom's group number) − (its lone-pair electrons) − (its number of bonds). It answers 'does this atom own more or fewer electrons than a neutral version of itself?' Key mental model, the one thing to lock in: the atom's group-number valence NEVER changes for the charge — the ion's extra/missing electron shows up in the STRUCTURE (a lone pair added or removed), never by bumping the valence number. O is always 6, N always 5.",
+    klein:"Klein 5e §1.4 (formal charges)",
+    links:[{l:"Khan Academy — formal charge & dot structures",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds/copy-of-dot-structures/v/formal-charge-and-dot-structures"},{l:"The Organic Chemistry Tutor — formal charge",u:"https://www.youtube.com/watch?v=C2l-76VP8s0"}] },
+  polarity: { primer:"Two different questions, don't conflate them. (1) Is a BOND polar? — yes if the two atoms differ in electronegativity (EN order to know: F > O > N ≈ Cl > C ≈ H). (2) Is the MOLECULE polar? — depends on GEOMETRY: if the bond dipoles cancel by symmetry (like linear CO₂) the molecule is nonpolar even with polar bonds; if they don't cancel (bent H₂O) it's polar. Geometry decides #2. This is the single most-tested distinction in the topic.",
+    klein:"Klein 5e §1.5–1.11 (electronegativity, bond & molecular polarity)",
+    links:[{l:"Khan Academy — chemical bonds (electronegativity, polarity)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — polar or nonpolar",u:OCT_ALLINONE}] },
+  hybrid: { primer:"Count ELECTRON DOMAINS on an atom = (number of atoms bonded to it) + (number of lone pairs). A double or triple bond counts as ONE domain. Then: 2 domains → sp, linear, 180°; 3 → sp², trigonal planar, 120°; 4 → sp³, tetrahedral, 109.5°. VSEPR shape names only the ATOMS (so sp³ N with a lone pair = 'trigonal pyramidal', not tetrahedral). The lone pair counts for hybridization but is invisible in the shape name — that's the classic trap.",
+    klein:"Klein 5e §1.9–1.10 (VSEPR geometry, orbital hybridization)",
+    links:[{l:"Khan Academy — chemical bonds (hybridization, VSEPR)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — hybridization & geometry",u:OCT_ALLINONE}] },
+  imf: { primer:"Intermolecular forces are the attractions BETWEEN molecules (not the bonds inside them) — they set boiling point, solubility, etc. Three, weakest to strongest: London dispersion (in everything; scales with size/surface area) < dipole-dipole (polar molecules) < hydrogen bonding (only when H is bonded to N, O, or F, AND there's an N/O/F lone pair to accept). To rank boiling points: identify the strongest force each molecule can do. H-bonding usually wins; among nonpolar molecules, bigger = stronger dispersion = higher bp.",
+    klein:"Klein 5e §1.12–1.13 (intermolecular forces, physical properties)",
+    links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
+};
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
 function renderNav(){ const n=$("#nav"); n.innerHTML=""; NAV.forEach(t=>{ const b=el("button",{class:S.view===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass(); $("#countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); }
@@ -996,6 +1026,24 @@ function runAudit(wrap){
 }
 
 /* ---- CHEAT SHEET ---- */
+VIEWS.learn = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">📖 Learn first · then drill</span><h2>Concepts before questions</h2><p class="muted">You can\'t answer what you were never taught. Each prereq topic below: a plain-language primer, the Klein 5e section to read in your WileyPLUS eText, and free videos (Khan Academy · The Organic Chemistry Tutor). Read/watch, then hit Drill on that topic. The drill\'s "why" after each answer reinforces it.</p>'));
+  const order=[["valence","🔢 Valence electrons"],["lewis","🧩 Lewis structures"],["formal","⚡ Formal charge"],["polarity","🧭 Polarity + dipoles"],["hybrid","📐 Hybridization + VSEPR"],["imf","🧲 Intermolecular forces"]];
+  order.forEach(([k,title])=>{
+    const L=LESSONS[k]; if(!L) return;
+    const c=el("div",{class:"card cream"});
+    c.innerHTML='<h3 style="margin-bottom:6px">'+title+'</h3>'+
+      '<p style="margin:0 0 8px">'+L.primer+'</p>'+
+      '<p class="muted" style="margin:0 0 8px">📕 Read: <b>'+L.klein+'</b> (WileyPLUS eText → Course Resources)</p>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      L.links.map(x=>'<a href="'+x.u+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none;font-size:.8rem">▶ '+x.l+'</a>').join("")+
+      '</div>';
+    const drill=el("button",{class:"btn teal",style:"margin-top:10px",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"Now drill "+title.replace(/^\S+\s/,"")+" →");
+    c.appendChild(drill);
+    v.appendChild(c);
+  });
+  v.appendChild(el("div",{class:"card"},'<p class="muted">Note: links open the free public lessons. Klein 5e sections are in your own WileyPLUS eText (Inclusive Access) — Course Resources → WileyPLUS eTextbook. Bring a specific chapter here to Claude when you want problems built from it.</p>'));
+};
 VIEWS.cheat = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole gen-chem bridge on one page</h2>'));
   v.appendChild(el("div",{class:"card"},
