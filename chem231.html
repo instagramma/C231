@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.11  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  CHEM 231 — OCHEM BOOTCAMP  ·  v2.12  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  v2.12 (2026-08-17): nav made coherent — Lewis Lab folded into a new PRACTICE hub (with
+        drills + FC mastery); new EXAM tab. Evaluator engine: 1 cold Q/prereq-topic → a
+        color-coded GAP MAP + priority-ordered study list, stashed to lastEval and written
+        into the Report export (→ Learning Profile). Written-exam PDFs linked in-app.
   v2.11 (2026-08-16): LEARN layer added — teach-first primers + Klein 5e sections + verified
         free video links (Khan Academy hubs, The Organic Chemistry Tutor) per prereq topic;
         new 📖 Learn nav tab. Closes the "no way to learn it, only to be tested" gap.
@@ -289,6 +293,7 @@ function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY,
 function mergeRemote(remote){
   if (!remote) return;
   ["doneDays","molDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
+  if (remote.lastEval && (!S.lastEval || remote.lastEval.date > S.lastEval.date)) S.lastEval = remote.lastEval;
   const seenM = new Set(S.missed);
   (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
   Object.entries(remote.qstats||{}).forEach(([id,st])=>{
@@ -309,7 +314,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -470,11 +475,12 @@ const S = {
   molDone:  safeStore.get("molDone", []),
   visits:   safeStore.get("visits", []),
   fcMastery: safeStore.get("fcMastery", []),  // dates of CLEAN 6/6 mastery-check runs; 2 distinct days = mastered
+  lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); cloudPush(false); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); cloudPush(false); }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -490,12 +496,15 @@ function accuracy(){ let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=
 const NAV = [
   {id:"home",  ico:"🏠", label:"Today"},
   {id:"learn", ico:"📖", label:"Learn"},
-  {id:"lab",   ico:"🧪", label:"Lewis Lab"},
-  {id:"drill", ico:"🎯", label:"Drill"},
+  {id:"practice", ico:"🎯", label:"Practice"},
+  {id:"exam",  ico:"📊", label:"Exam"},
   {id:"track", ico:"🗓️", label:"Plan"},
-  {id:"cheat", ico:"📌", label:"Cheat Sheet"},
+  {id:"cheat", ico:"📌", label:"Cheat"},
   {id:"report",ico:"📤", label:"Report"},
 ];
+// v2.12: full written exam PDFs (committed to the repo, so linkable from any device)
+const EXAM_READINESS = "./readiness.pdf";
+const EXAM1 = "./exam1-practice.pdf";
 
 /* ---- v2.11: LEARN layer — teach BEFORE testing. Each prereq topic gets a plain-language
    primer (Claude's own words) + the Klein 5e section to read in your WileyPLUS eText +
@@ -523,7 +532,8 @@ const LESSONS = {
     links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
 };
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
-function renderNav(){ const n=$("#nav"); n.innerHTML=""; NAV.forEach(t=>{ const b=el("button",{class:S.view===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
+const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice"}; // active-tab highlight for sub-views
+function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass(); $("#countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); }
 
 /* ================= VIEWS ================= */
@@ -682,8 +692,30 @@ function startDiagnostic(){
     const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
     pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]);
   });
-  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__diag",answered:false};
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__diag",answered:false,byTopic:{}};
   go("drill");
+}
+// v2.12: the Evaluator — the gap-finding engine. One question per prereq topic, cold,
+// tracked per-topic; ends with a color-coded gap map + a priority-ordered study list.
+// Result is stashed to S.lastEval so the Report export (→ Learning Profile) carries it.
+const GAP_PRIORITY=["valence","lewis","formal","polarity","hybrid","imf"]; // foundational first
+function startEvaluator(){
+  const PREREQ=["valence","lewis","formal","polarity","hybrid","imf"];
+  const pool=[];
+  PREREQ.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k); if(!qs.length)return;
+    const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+    pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]); });
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__eval",answered:false,byTopic:{}};
+  go("drill");
+}
+// compute gap report from a byTopic tally; returns {gaps:[topic], solid:[topic], pct}
+function gapReport(byTopic){
+  const gaps=[], solid=[];
+  Object.entries(byTopic).forEach(([k,bt])=>{ (bt.r>bt.w?solid:gaps).push(k); });
+  gaps.sort((a,b)=>GAP_PRIORITY.indexOf(a)-GAP_PRIORITY.indexOf(b));
+  const total=Object.values(byTopic).reduce((s,bt)=>s+bt.r+bt.w,0);
+  const right=Object.values(byTopic).reduce((s,bt)=>s+bt.r,0);
+  return {gaps,solid,pct:total?Math.round(100*right/total):0};
 }
 function startDrill(topic){
   let pool;
@@ -707,24 +739,71 @@ function startDrill(topic){
   S.drill = {queue:pool.slice(0,10), i:0, right:0, wrong:0, topic, answered:false};
   go("drill");
 }
-VIEWS.drill = (v) => {
-  if (!S.drill){ // topic chooser
-    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Drill · Preparation topics</span><h2>Pick a topic</h2><p class="muted">These are the <b>pre-semester prep</b> topics. Semester chapters (Klein Ch 1–13) get their own banks here once the syllabus posts. Or better: go back to Today and press the one button.</p>'));
-    const pr = el("div",{class:"pill-row"});
-    Object.entries(TOPICS).forEach(([k,t])=>{
-      const qs = QUESTIONS.filter(q=>q.topic===k);
-      if (!qs.length) return; // v2.8: hide empty topics (the 0/0 "diag" pill — audit P1-B)
-      const done = qs.filter(q=>S.qstats[q.id]?.r).length;
-      pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>"));
-    });
-    pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
-    pr.appendChild(el("button",{class:"pill",style:"background:var(--gold);font-weight:800",onclick:()=>startMastery()},(new Set(S.fcMastery).size>=2?"🏅":"⚖️")+" FC mastery check ("+new Set(S.fcMastery).size+"/2 days)"));
-    v.appendChild(pr);
-    return;
+// v2.12: Practice hub — Lewis Lab, topic drills, and the Mastery Check all live here
+// (Lewis Lab is a practice MODE, not a peer tab — this fixes the confusing nav).
+VIEWS.practice = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Three hands-on modes. New to a topic? Read its primer in 📖 Learn first, then practice it here.</p>'));
+  const lab=el("div",{class:"card cream"});
+  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">10 molecules, the 6-step method enforced (count → central → bonds → lone pairs → convert → audit). Blank-page building — the antidote to recognizing-without-deriving.</p>';
+  lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
+  v.appendChild(lab);
+  v.appendChild(el("div",{class:"card"},'<h3>🎯 Drill a topic</h3><p class="muted">Quick generation rounds; each answer explains the why.</p>'));
+  const pr=el("div",{class:"pill-row"});
+  Object.entries(TOPICS).forEach(([k,t])=>{ const qs=QUESTIONS.filter(q=>q.topic===k); if(!qs.length)return;
+    const done=qs.filter(q=>S.qstats[q.id]?.r).length;
+    pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>")); });
+  pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
+  v.appendChild(pr);
+  const m=el("div",{class:"card"});
+  m.innerHTML='<h3>'+(new Set(S.fcMastery).size>=2?"🏅":"⚖️")+' Formal-Charge Mastery Check</h3><p class="muted" style="margin:4px 0 8px">The real bar for formal charge: 6 species, inputs labeled, all-first-try = a clean day; 2 clean days = mastered. <b>'+new Set(S.fcMastery).size+'/2 clean days.</b></p>';
+  m.appendChild(el("button",{class:"btn gold",onclick:()=>startMastery()},"Run mastery check →"));
+  v.appendChild(m);
+};
+VIEWS.exam = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">📊 Exam · find your gaps</span><h2>Where am I? What do I study first?</h2><p class="muted">Two levels. The in-app <b>Evaluator</b> gives an instant per-topic gap map. The <b>full written exams</b> (blank-page — the true test) you do on paper, then send to Claude for a scored, ranked study plan.</p>'));
+  if (S.lastEval){ const nm=k=>TOPICS[k]?.name||k; const e=S.lastEval;
+    const card=el("div",{class:"card"+(e.gaps.length?"":" teal")});
+    card.innerHTML='<span class="tag violet">Last evaluator · '+fmtDay(e.date)+'</span><h3 style="margin:6px 0">'+e.pct+'% · '+(e.gaps.length?e.gaps.length+' gap'+(e.gaps.length>1?'s':''):'no gaps')+'</h3>'+(e.gaps.length?'<p class="muted">Study first: <b>'+e.gaps.map(nm).join(" → ")+'</b></p>':'<p class="muted">All prereqs solid.</p>');
+    v.appendChild(card);
   }
+  const ev=el("div",{class:"card cream"});
+  ev.innerHTML='<h3>⚡ Quick Evaluator (in-app, ~6 min)</h3><p class="muted" style="margin:4px 0 8px">One cold question per prereq topic → a color-coded gap map (🟢 solid / 🔴 study first) with a priority-ordered study list. No notes — this measures real recall. Result gets logged when you send your Report.</p>';
+  ev.appendChild(el("button",{class:"btn teal",onclick:()=>startEvaluator()},"Start Evaluator →"));
+  v.appendChild(ev);
+  const wr=el("div",{class:"card"});
+  wr.innerHTML='<h3>📝 Full written exams (blank-page)</h3><p class="muted" style="margin:4px 0 8px">The truest gauge — draw and derive from scratch, photograph, send to Claude for grading + a prioritized plan.</p>'+
+    '<p style="margin:6px 0"><a href="'+EXAM_READINESS+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none">▶ Pre-OChem Readiness Exam — take now</a></p>'+
+    '<p style="margin:6px 0"><a href="'+EXAM1+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none">▶ Exam 1 Practice · Klein Ch 1–4 — take in September</a></p>'+
+    '<p class="muted" style="margin-top:8px">Also in your CHEM 231 → Exams folder.</p>';
+  v.appendChild(wr);
+};
+VIEWS.drill = (v) => {
+  if (!S.drill){ go("practice"); return; }
   const D = S.drill;
   if (D.i>=D.queue.length){ // round over
     const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    // v2.12: Evaluator / diagnostic → show the GAP MAP instead of the generic score card
+    if ((D.topic==="__eval"||D.topic==="__diag") && D.byTopic){
+      const rep=gapReport(D.byTopic);
+      // stash for the Report export → Learning Profile
+      S.lastEval={date:todayStr(), pct:rep.pct, gaps:rep.gaps.slice(), solid:rep.solid.slice(), kind:D.topic==="__eval"?"evaluator":"diagnostic"};
+      save();
+      if(!rep.gaps.length) confetti();
+      const c=el("div",{class:"card"+(!rep.gaps.length?" teal":"")});
+      const nm=k=>TOPICS[k]?.name||k;
+      c.innerHTML='<span class="tag gold">Gap map · '+rep.pct+'%</span><h2>'+(rep.gaps.length?rep.gaps.length+' gap'+(rep.gaps.length>1?'s':'')+' found':'No gaps — all prereqs solid 🎉')+'</h2>'+
+        '<div style="margin:10px 0">'+
+        GAP_PRIORITY.filter(k=>D.byTopic[k]).map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(hit?'solid':'study first')+'</span></div>'; }).join("")+
+        '</div>'+
+        (rep.gaps.length?'<div class="why"><b>Study these first, in this order:</b> '+rep.gaps.map(nm).join(" → ")+'. Each has a primer in the 📖 Learn tab — read it, then drill that topic. Foundational topics (valence, Lewis) come before the rest even if you also missed a later one.</div>':'<p style="margin:6px 0">Every prereq topic answered correctly cold. Keep them warm with occasional drills; you\'re ready to start.</p>');
+      const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
+      if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>go("learn")},"📖 Go to Learn"));
+      row.appendChild(el("button",{class:"btn gold",onclick:()=>go("report")},"📤 Log this (send to Claude)"));
+      row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go(D.topic==="__eval"?"exam":"home");}},"Done"));
+      // diagnostic still completes its Aug-18 plan day if passed
+      if(D.topic==="__diag" && pct>=80){ const claim=TRACK.filter(x=>x.day<=todayStr()&&!S.doneDays.includes(x.day)&&x.topic==="diag").sort((a,b)=>a.day<b.day?-1:1)[0]; if(claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day))S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark diagnostic day done")); } }
+      c.appendChild(row); v.appendChild(c); return;
+    }
     if (pct>=80) confetti();
     const c = el("div",{class:"card"+(pct>=80?" teal":"")});
     c.innerHTML='<span class="tag gold">Round complete</span><h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)</h2>'+
@@ -749,6 +828,7 @@ VIEWS.drill = (v) => {
     D.answered=true;
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
     if(ok){st.r++;D.right++;}else{st.w++;D.wrong++;S.missed.push(q.id);}
+    if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; }
     save();
     fb.innerHTML='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?"✓ Right":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p><div class="why">'+q.why+'</div>';
     fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
@@ -1105,6 +1185,7 @@ VIEWS.report = (v) => {
 (perTopic?("By topic:\n"+perTopic+"\n"):"")+
 "Molecules built: "+(S.molDone.join(", ")||"none")+"\n"+
 "FC mastery: "+new Set(S.fcMastery).size+"/2 clean days"+(S.fcMastery.length?" ("+[...new Set(S.fcMastery)].join(", ")+")":"")+(new Set(S.fcMastery).size>=2?" — MASTERED":"")+"\n"+
+(S.lastEval?("Evaluator ("+S.lastEval.date+", "+S.lastEval.kind+"): "+S.lastEval.pct+"% · gaps to study first: "+(S.lastEval.gaps.length?S.lastEval.gaps.map(k=>TOPICS[k]?.name||k).join(" > "):"none")+"\n"):"")+
 (missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
 "Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
   const c=el("div",{class:"card"});
