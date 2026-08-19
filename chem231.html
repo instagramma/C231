@@ -6,7 +6,20 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v2.13  ·  built 2026-08-09 · audited r1 08-11, r2 08-15
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.0  ·  built 2026-08-09 · audited r1 08-11, r2 08-15 · r3 pending
+  v3.0 (2026-08-19): EVERY-2-DAY DIAGNOSTICS (Gabe-designed). Two alternating cold modes —
+        📚 Cumulative (all topics the course has covered, via SEMESTER week map, verified
+        Ciesla schedule 08-18) and 🎯 Scoped (next checkpoint only; editable nextQuiz seeded
+        Ch 1 Quiz Thu 8/27; fixed CHECKPOINTS: Exam 1 ~9/15, Exam 2 ~10/20, Exam 3 11/10,
+        Final 12/15). Due-every-2-days banner on Home (scoped auto-priority ≤2 days out).
+        NEW measurement semantics (Gabe-specified): 🎲 "I guessed" checkbox on every question
+        (correct+guessed = shaky → stays in rotation, qstats gains gr/gw; wrong+confident =
+        misconception, recorded distinctly); optional "why I chose this" rationale box (wrLog);
+        6 WRITTEN items (WR-CH1-001…006, UID'd + difficulty-scored) — typed/paper answers
+        self-graded vs model+rubric under the 08-19 honesty covenant, saved pendingReview for
+        Claude's process-grading via 📤 Report. qDiff() difficulty layer (explicit or per-topic
+        default). Header countdown → next checkpoint after semester start. Cloud sync extended:
+        diags/nextQuiz/wrLog merged cross-device. Written items excluded from short drills.
   v2.13 (2026-08-17): bank expansion + adaptive short sets. +68 questions (Lewis 7→37, plus
         +8 each valence/formal/polarity/hybrid, +6 IMF). Drill sessions now cap at 5 questions
         (SESSION_MAX), randomized each run and weighted by NEED (missed → unseen → known).
@@ -303,6 +316,14 @@ function mergeRemote(remote){
     const loc = S.qstats[id];
     if (!loc || (st.r+st.w) > (loc.r+loc.w)) S.qstats[id] = st;   // keep the copy with more attempts
   });
+  // v3.0: merge diagnostics runs (unique by date+type), written log (unique by ts), nextQuiz (latest setAt wins)
+  const dk = new Set(S.diags.map(d=>d.date+"|"+d.type));
+  (remote.diags||[]).forEach(d=>{ if(!dk.has(d.date+"|"+d.type)){ S.diags.push(d); dk.add(d.date+"|"+d.type); } });
+  S.diags.sort((a,b)=>a.date<b.date?-1:1);
+  const wk = new Set(S.wrLog.map(w=>w.ts));
+  (remote.wrLog||[]).forEach(w=>{ if(!wk.has(w.ts)){ S.wrLog.push(w); wk.add(w.ts); } });
+  S.wrLog.sort((a,b)=>a.ts<b.ts?-1:1); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120);
+  if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
 }
 async function cloudPull(){
   try {
@@ -317,7 +338,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -356,6 +377,79 @@ const TOPICS = {
   bondline: { name:"Bond-line + groups", ico:"⛓️" },
   diag:     { name:"Final diagnostic",   ico:"🏁" },
 };
+
+/* ================= v3.0 — COURSE-WEEK ENGINE + EVERY-2-DAY DIAGNOSTICS =================
+   Source of truth: Ciesla's Fall-26 schedule (Canvas Google Sheet, verified 2026-08-18)
+   + written syllabus (weights: HW10/Lab15/Quiz20/Exams35/Final20; 3 exams lowest dropped;
+   ≤11 quizzes lowest dropped, ≥3 days notice — hence the editable nextQuiz). */
+const SEMESTER = [ // courseWeek -> topics INTRODUCED that week (app-bank keys only)
+  {wk:1,  start:"2026-08-17", ch:"Ch 1 (gen-chem review)", topics:["valence","lewis","formal","polarity","hybrid","imf"]},
+  {wk:2,  start:"2026-08-24", ch:"Ch 2 (molecular representation)", topics:["bondline","resonance"]},
+  {wk:3,  start:"2026-08-31", ch:"Ch 3 (acids/bases)", topics:["acidbase1","acidbase2"]},
+  {wk:4,  start:"2026-09-07", ch:"Ch 4 (alkanes/cycloalkanes)", topics:[]}, // bank items TBD (future version)
+];
+const CHECKPOINTS = [ // fixed, from the verified schedule; quizzes come via S.nextQuiz
+  {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","formal","polarity","hybrid","imf","bondline","resonance","acidbase1","acidbase2"]},
+  {name:"Exam 2",   date:"2026-10-20", topics:null}, // null = cumulative at that date
+  {name:"Exam 3",   date:"2026-11-10", topics:null},
+  {name:"Final (comprehensive)", date:"2026-12-15", topics:null},
+];
+function courseWeek(){ const ms=new Date()-new Date(CLASS_START+"T00:00:00"); return Math.max(0, Math.floor(ms/(7*86400000))+1); }
+function coveredTopics(){ // everything the course has introduced up to the current week, that the bank actually has
+  const wk=courseWeek(); const t=[];
+  SEMESTER.forEach(w=>{ if(w.wk<=Math.max(wk,1)) t.push(...w.topics); });
+  return t.filter(k=>QUESTIONS.some(q=>q.topic===k));
+}
+function nextCheckpoint(){ // nearest future graded event: nextQuiz (if set & future) vs fixed checkpoints
+  const today=todayStr(); const fixed=CHECKPOINTS.find(c=>c.date>=today);
+  const q=(S.nextQuiz&&S.nextQuiz.date>=today)?S.nextQuiz:null;
+  if(q&&(!fixed||q.date<=fixed.date)) return {name:q.name,date:q.date,topics:q.topics};
+  return fixed||null;
+}
+function daysTo(iso){ return Math.ceil((new Date(iso+"T00:00:00")-new Date())/86400000); }
+/* difficulty: explicit q.diff wins; else per-topic default (1 easy recall · 2 apply · 3 multi-step) */
+const DIFF_DEFAULT={valence:1,lewis:2,formal:2,polarity:2,hybrid:2,imf:2,resonance:3,acidbase1:2,acidbase2:3,bondline:2};
+function qDiff(q){ return q.diff || DIFF_DEFAULT[q.topic] || 2; }
+/* the 2-day cadence: due when the last diagnostic of EITHER type is ≥2 days old; types alternate */
+function diagDue(){
+  if(!S.diags.length) return "cum";
+  const last=S.diags[S.diags.length-1];
+  const cp=nextCheckpoint();
+  if(cp && daysTo(cp.date)<=2 && daysTo(cp.date)>=0) { // final approach: scoped takes priority
+    const doneToday=S.diags.some(d=>d.date===todayStr()&&d.type==="scope");
+    return doneToday?null:"scope";
+  }
+  const age=Math.floor((new Date(todayStr()+"T00:00:00")-new Date(last.date+"T00:00:00"))/86400000);
+  if(age<2) return null;
+  return last.type==="cum"?"scope":"cum";
+}
+function startDiag2(type){
+  const cov=coveredTopics();
+  let scopeTopics, scopeName;
+  if(type==="scope"){ const cp=nextCheckpoint();
+    scopeTopics=(cp&&cp.topics)?cp.topics.filter(k=>cov.includes(k)||QUESTIONS.some(q=>q.topic===k)):cov;
+    scopeName=cp?cp.name+" ("+fmtDay(cp.date)+")":"next assessment";
+  } else { scopeTopics=cov; scopeName="semester so far (wk "+Math.max(courseWeek(),1)+")"; }
+  scopeTopics=scopeTopics.filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
+  if(!scopeTopics.length){ alert("No in-scope topics in the bank yet."); return; }
+  // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
+  const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&s.w>0)n+=3; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiff(q); return n+Math.random(); };
+  const pool=[];
+  scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
+  const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
+  S.drill={queue:shuffle(pool).concat(wr), i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName};
+  go("drill");
+}
+function editNextQuiz(){
+  const n=prompt("Quiz name:",S.nextQuiz.name)||S.nextQuiz.name;
+  const d=prompt("Date (YYYY-MM-DD):",S.nextQuiz.date)||S.nextQuiz.date;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ alert("Date must be YYYY-MM-DD"); return; }
+  const t=prompt("Topics (comma keys: "+Object.keys(TOPICS).filter(k=>k!=="diag").join(", ")+"):",(S.nextQuiz.topics||[]).join(","));
+  const topics=(t||"").split(",").map(s=>s.trim()).filter(k=>TOPICS[k]);
+  S.nextQuiz={name:n,date:d,topics:topics.length?topics:S.nextQuiz.topics,setAt:new Date().toISOString()};
+  save(); render();
+}
 const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
 
@@ -514,6 +608,27 @@ const QUESTIONS = [
 {id:"ix4",topic:"imf",type:"mc",prompt:"HF can hydrogen-bond because its hydrogen is bonded to:",answer:0,choices:["Fluorine (an N/O/F atom)","Carbon","Another hydrogen","Nothing — it can't"],why:"<b>Fluorine.</b> H attached to N, O, or F is the H-bond donor requirement. HF, H₂O, NH₃ all qualify."},
 {id:"ix5",topic:"imf",type:"mc",prompt:"A bigger molecule with more electrons has ___ London dispersion forces:",answer:0,choices:["Stronger","Weaker","The same","Zero"],why:"<b>Stronger.</b> More electrons + surface area = more polarizable = stronger dispersion. Why larger alkanes boil higher."},
 {id:"ix6",topic:"imf",type:"mc",prompt:"Which boils at a higher temperature, H₂O or H₂S?",answer:0,choices:["H₂O — it hydrogen-bonds","H₂S — it's heavier","They are equal","Neither boils"],why:"<b>H₂O</b> (100°C vs −60°C). Oxygen enables H-bonding; sulfur isn't electronegative enough."},
+/* --- v3.0: WRITTEN items (UID'd + difficulty-scored). Answered on paper/typed, self-graded
+       against the model honestly (the 08-19 covenant), and exported via 📤 Report for Claude's
+       process-review. type:"written" — never included in ordinary short drills. --- */
+{id:"WR-CH1-001",topic:"formal",type:"written",diff:2,prompt:"<b>Write out, showing EVERY count:</b> derive the formal charge on O in hydroxide (OH⁻).<br><span class='muted'>Required steps: O's neutral valence count → bonds in OH⁻ → lone pairs derived from the octet (not from memory of water) → the FC formula with numbers.</span>",
+ model:"O neutral valence = <b>6</b>. In OH⁻, O has <b>1 bond</b> (2 shared e⁻); octet needs 8 → 8−2 = 6 nonbonding e⁻ = <b>3 lone pairs</b>. FC = 6 − 6 − ½(2) = 6 − 6 − 1 = <b>−1</b>.",
+ rubric:["Used 6 (not 7) for O's neutral valence","Derived 3 lone pairs from the octet (not 2 by analogy to H₂O)","FC formula applied with explicit numbers","Final answer −1"]},
+{id:"WR-CH1-002",topic:"formal",type:"written",diff:3,prompt:"<b>Write out with every count:</b> derive the formal charge on O in hydronium (H₃O⁺). Then state in one sentence WHY the sign comes out positive.",
+ model:"O neutral valence = <b>6</b>. In H₃O⁺: <b>3 bonds</b> (6 shared e⁻) + <b>1 lone pair</b> (2 e⁻). FC = 6 − 2 − ½(6) = 6 − 2 − 3 = <b>+1</b>. Why positive: O 'owns' only 5 electrons here (2 nonbonding + 3 half-shares) vs its neutral 6 — one electron short → +1.",
+ rubric:["3 bonds + 1 lone pair identified (not guessed from LP count)","FC = 6−2−3 shown with numbers","Sign explained via owned-vs-neutral electron count, not memorized"]},
+{id:"WR-CH1-003",topic:"polarity",type:"written",diff:2,prompt:"<b>Explain to a classmate who missed class:</b> why is CO₂ nonpolar even though each C=O bond is strongly polar?",
+ model:"Each C=O bond dipole points from C toward O. But CO₂ is <b>linear</b>, so the two equal dipoles point in exactly opposite directions and their <b>vector sum is zero</b>. Molecular polarity = the vector sum of bond dipoles — geometry decides, not just bond polarity.",
+ rubric:["Names the linear geometry","Treats dipoles as vectors that cancel","States the general rule (molecule polarity = vector sum)"]},
+{id:"WR-CH1-004",topic:"hybrid",type:"written",diff:2,prompt:"<b>Derive, don't recall:</b> the hybridization of N in NH₃ and the approximate H–N–H angle — and why the angle is smaller than the perfect tetrahedral angle.",
+ model:"N has <b>4 electron domains</b> (3 bonds + 1 lone pair) → <b>sp³</b>, electron geometry tetrahedral. The lone pair repels more strongly than bonding pairs, compressing H–N–H to ≈<b>107°</b> (vs 109.5°).",
+ rubric:["Counts 4 domains including the lone pair","sp³ from domain count (not memorized)","≈107° with lone-pair-repulsion reasoning"]},
+{id:"WR-CH1-005",topic:"lewis",type:"written",diff:3,prompt:"<b>Find the error:</b> a student draws CO₂ as O–C≡O (one single bond, one triple bond). The electron budget (16) checks out and every atom has an octet. What's wrong, and what's the fix? Show the formal charges that prove it.",
+ model:"Octets are legal, but the formal charges aren't minimal: single-bonded O = 6−6−1 = <b>−1</b>; triple-bonded O = 6−2−3 = <b>+1</b>; C = 0. The symmetric <b>O=C=O</b> gives ALL atoms FC = 0 (each O: 6−4−2=0). Rule: among octet-legal structures, the best minimizes formal charge — budget + octets alone don't certify a structure.",
+ rubric:["Computes FCs on both oxygens (−1 and +1) with numbers","Shows O=C=O gives all zeros","States the minimize-formal-charge rule"]},
+{id:"WR-CH1-006",topic:"imf",type:"written",diff:2,prompt:"<b>Rank and justify:</b> order CH₄, CH₃Cl, and CH₃OH by boiling point (lowest→highest), naming the dominant intermolecular force for each.",
+ model:"<b>CH₄ &lt; CH₃Cl &lt; CH₃OH.</b> CH₄: London dispersion only (bp −161°C). CH₃Cl: polar C–Cl → dipole–dipole + dispersion (−24°C). CH₃OH: O–H → <b>hydrogen bonding</b>, the strongest of the three (65°C).",
+ rubric:["Correct order","Each species matched to its strongest IMF","H-bond requirement (H on N/O/F) stated or implied"]},
 ];
 /* fix f5 (answerOverride pattern demo): real answer is -1 */
 QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
@@ -548,11 +663,14 @@ const S = {
   visits:   safeStore.get("visits", []),
   fcMastery: safeStore.get("fcMastery", []),  // dates of CLEAN 6/6 mastery-check runs; 2 distinct days = mastered
   lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
+  diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
+  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","formal","polarity","hybrid","imf"]}), // v3.0: editable (Canvas gives ≥3 days notice)
+  wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); cloudPush(false); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); cloudPush(false); }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -606,7 +724,12 @@ const LESSONS = {
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
 const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice"}; // active-tab highlight for sub-views
 function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
-function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass(); $("#countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); }
+function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
+  // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
+  let txt;
+  if (d>0) txt = d+" days to class"; else if (d===0) txt = "CLASS STARTS TODAY";
+  else { const cp=nextCheckpoint(); txt = cp ? cp.name+" in "+daysTo(cp.date)+"d" : "semester live"; }
+  $("#countdown").textContent = txt; }
 
 /* ================= VIEWS ================= */
 const VIEWS = {};
@@ -672,6 +795,17 @@ VIEWS.mastery = (v) => {
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
   const t = todayStr();
+  // v3.0: every-2-day diagnostic banner — ONE next action, checkpoint-aware
+  const due = diagDue();
+  if (due){
+    const cp = nextCheckpoint();
+    const b = el("div",{class:"card cream"});
+    b.innerHTML = '<span class="tag coral">🩺 Diagnostic due · every 2 days</span>'+
+      '<h3 style="margin:6px 0">'+(due==="cum"?"📚 Cumulative — everything the course has covered":"🎯 Scoped — "+(cp?cp.name+" is in "+daysTo(cp.date)+" day"+(daysTo(cp.date)===1?"":"s"):"next assessment"))+'</h3>'+
+      '<p class="muted" style="margin:0 0 8px">Cold, honest, ~10 min. Ends with a gap map + ONE repair. Written items at the end get saved for Claude\'s review.</p>';
+    b.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2(due)},"Start diagnostic →"));
+    v.appendChild(b);
+  }
   // v2.6: first-week logistics from Prof. Ciesla's welcome email (shown through Wed 8/19)
   if (t<="2026-08-19"){
     v.appendChild(el("div",{class:"card cream"},
@@ -759,7 +893,7 @@ function startDiagnostic(){
   const PREREQ=["valence","lewis","formal","polarity","hybrid","imf"];
   const pool=[];
   PREREQ.forEach(k=>{
-    const qs=QUESTIONS.filter(q=>q.topic===k);
+    const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written");
     if(!qs.length)return;
     const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
     pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]);
@@ -774,7 +908,7 @@ const GAP_PRIORITY=["valence","lewis","formal","polarity","hybrid","imf"]; // fo
 function startEvaluator(){
   const PREREQ=["valence","lewis","formal","polarity","hybrid","imf"];
   const pool=[];
-  PREREQ.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k); if(!qs.length)return;
+  PREREQ.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"); if(!qs.length)return;
     const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
     pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]); });
   S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__eval",answered:false,byTopic:{}};
@@ -791,13 +925,13 @@ function gapReport(byTopic){
 }
 function startDrill(topic){
   let pool;
-  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
-  else pool = QUESTIONS.filter(q=>q.topic===topic);
+  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)&&q.type!=="written"); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
+  else pool = QUESTIONS.filter(q=>q.topic===topic&&q.type!=="written"); // v3.0: written items live in diagnostics, not short drills
   // v2.13: adaptive selection — randomize, then surface by NEED so a session targets
-  // what you're weakest on. Tier 3 = you've missed it (highest need), tier 2 = never seen,
-  // tier 1 = seen and right. Shuffle first so pick within a tier is random every session.
+  // what you're weakest on. Tier 3 = you've missed it OR only ever guessed it right (v3.0 shaky),
+  // tier 2 = never seen, tier 1 = seen and right. Shuffle first so pick within a tier is random.
   const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
-  const need = q => { const s=S.qstats[q.id]; if(s&&s.w>0) return 3; if(seen(q.id)===0) return 2; return 1; };
+  const need = q => { const s=S.qstats[q.id]; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; };
   pool = shuffle(pool).sort((a,b)=>need(b)-need(a));
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
   // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
@@ -825,7 +959,7 @@ VIEWS.practice = (v) => {
   v.appendChild(lab);
   v.appendChild(el("div",{class:"card"},'<h3>🎯 Drill a topic</h3><p class="muted">Quick generation rounds; each answer explains the why.</p>'));
   const pr=el("div",{class:"pill-row"});
-  Object.entries(TOPICS).forEach(([k,t])=>{ const qs=QUESTIONS.filter(q=>q.topic===k); if(!qs.length)return;
+  Object.entries(TOPICS).forEach(([k,t])=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"); if(!qs.length)return;
     const done=qs.filter(q=>S.qstats[q.id]?.r).length;
     pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>")); });
   pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
@@ -842,6 +976,17 @@ VIEWS.exam = (v) => {
     card.innerHTML='<span class="tag violet">Last evaluator · '+fmtDay(e.date)+'</span><h3 style="margin:6px 0">'+e.pct+'% · '+(e.gaps.length?e.gaps.length+' gap'+(e.gaps.length>1?'s':''):'no gaps')+'</h3>'+(e.gaps.length?'<p class="muted">Study first: <b>'+e.gaps.map(nm).join(" → ")+'</b></p>':'<p class="muted">All prereqs solid.</p>');
     v.appendChild(card);
   }
+  // v3.0: the every-2-day diagnostics + editable next-quiz target
+  const cp = nextCheckpoint();
+  const dg = el("div",{class:"card cream"});
+  dg.innerHTML='<h3>🩺 Every-2-Day Diagnostics (v3.0)</h3><p class="muted" style="margin:4px 0 8px">Two alternating modes, cold: <b>📚 Cumulative</b> = everything the course has covered so far (wk '+Math.max(courseWeek(),1)+'). <b>🎯 Scoped</b> = only what the next assessment covers'+(cp?' — <b>'+cp.name+' in '+daysTo(cp.date)+' day'+(daysTo(cp.date)===1?'':'s')+'</b> ('+fmtDay(cp.date)+')':'')+'. Each ends with a gap map, ONE repair, and 2 written items (UID\'d) saved for Claude\'s review. Guessed-right answers stay in rotation as shaky.</p>';
+  const dgr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+  dgr.appendChild(el("button",{class:"btn teal",onclick:()=>startDiag2("cum")},"📚 Cumulative now"));
+  dgr.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2("scope")},"🎯 Scoped now"));
+  dgr.appendChild(el("button",{class:"btn ghost small",onclick:()=>editNextQuiz()},"✎ next quiz: "+S.nextQuiz.name+" · "+fmtDay(S.nextQuiz.date)));
+  dg.appendChild(dgr);
+  if(S.diags.length){ dg.appendChild(el("p",{class:"muted",style:"margin:8px 0 0;font-size:.85em"},"History: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"% ("+fmtDay(d.date)+")").join(" · "))); }
+  v.appendChild(dg);
   const ev=el("div",{class:"card cream"});
   ev.innerHTML='<h3>⚡ Quick Evaluator (in-app, ~6 min)</h3><p class="muted" style="margin:4px 0 8px">One cold question per prereq topic → a color-coded gap map (🟢 solid / 🔴 study first) with a priority-ordered study list. No notes — this measures real recall. Result gets logged when you send your Report.</p>';
   ev.appendChild(el("button",{class:"btn teal",onclick:()=>startEvaluator()},"Start Evaluator →"));
@@ -858,6 +1003,29 @@ VIEWS.drill = (v) => {
   const D = S.drill;
   if (D.i>=D.queue.length){ // round over
     const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    // v3.0: every-2-day diagnostics (cumulative / scoped) → record the run + honest gap map
+    if ((D.topic==="__cum"||D.topic==="__scope") && D.byTopic){
+      const type=D.topic==="__cum"?"cum":"scope";
+      const rep=gapReport(D.byTopic);
+      S.diags.push({date:todayStr(), type, scope:D.scopeName, score:D.right, total:D.queue.length, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0});
+      if(S.diags.length>60) S.diags=S.diags.slice(-60);
+      save();
+      const solid = pct>=80 && !(D.guessedRight>0);
+      if(solid) confetti();
+      const c=el("div",{class:"card"+(solid?" teal":"")});
+      const nm=k=>TOPICS[k]?.name||k;
+      const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
+      c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
+        '<h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+
+        '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+
+        '<div class="why">'+(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Clean board. Next diagnostic unlocks in 2 days — go live your life.')+'</div>'+
+        (S.diags.length>=2?'<p class="muted" style="margin:6px 0 0;font-size:.85em">History: '+S.diags.slice(-5).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ")+'</p>':'');
+      const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
+      if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>{S.drill=null;startDrill(rep.gaps[0]);}},"🔧 Repair "+nm(rep.gaps[0])+" now"));
+      row.appendChild(el("button",{class:"btn gold",onclick:()=>go("report")},"📤 Send to Claude (written answers get graded)"));
+      row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go("home");}},"Done"));
+      c.appendChild(row); v.appendChild(c); return;
+    }
     // v2.12: Evaluator / diagnostic → show the GAP MAP instead of the generic score card
     if ((D.topic==="__eval"||D.topic==="__diag") && D.byTopic){
       const rep=gapReport(D.byTopic);
@@ -897,20 +1065,54 @@ VIEWS.drill = (v) => {
   }
   const q = D.queue[D.i];
   const c = el("div",{class:"card"});
-  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+'</span>'+
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+"●".repeat(qDiff(q))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
     '<div class="qprompt">'+q.prompt+'</div>';
   const fb = el("div");
-  const finish = (ok, revealHtml) => {
+  // v3.0: guessed checkbox + optional rationale — on every non-written question
+  let gk=null, rInp=null;
+  if(q.type!=="written"){
+    const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 2px"});
+    gk=el("input",{type:"checkbox",id:"gk"});
+    const gl=el("label",{for:"gk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I guessed on this");
+    rInp=el("input",{class:"answerbox wide",style:"flex:1;min-width:160px;font-size:.85em",placeholder:"(optional) why I chose this…"});
+    gRow.appendChild(gk); gRow.appendChild(gl); gRow.appendChild(rInp);
+    c.appendChild(gRow);
+  }
+  const finish = (ok, revealHtml, wrText) => {
     D.answered=true;
+    const guessed = !!(gk&&gk.checked) || D._wrGuessed===true;
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
-    if(ok){st.r++;D.right++;}else{st.w++;D.wrong++;S.missed.push(q.id);}
+    if(ok){st.r++;D.right++; if(guessed){ st.gr=(st.gr||0)+1; D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
+    else{st.w++;D.wrong++;S.missed.push(q.id); if(guessed) st.gw=(st.gw||0)+1;}
     if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; }
+    const rat=(rInp&&rInp.value.trim())||"";
+    if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
+    D._wrGuessed=false;
     save();
-    fb.innerHTML='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?"✓ Right":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p><div class="why">'+q.why+'</div>';
+    const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(guessed?"✓ Right — but flagged as a guess, so it stays in rotation":"✓ Right"):"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p>';
+    fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>');
     fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
     if(!ok)c.classList.add("shake");
   };
-  if (q.type==="mc"){
+  if (q.type==="written"){
+    // v3.0: written item — answer on paper or type it; compare to model; self-grade HONESTLY (08-19 covenant).
+    const ta=el("textarea",{class:"answerbox wide",style:"min-height:110px;width:100%;font-size:.95em",placeholder:"Work it on paper first if you prefer — then type your answer/derivation here (it gets saved for Claude's review)…"});
+    const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;margin:8px 0 2px"});
+    const wgk=el("input",{type:"checkbox",id:"wgk"});
+    gRow.appendChild(wgk); gRow.appendChild(el("label",{for:"wgk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I'm not confident in this"));
+    const sub=el("button",{class:"btn teal",style:"margin-top:8px",onclick:()=>{
+      if(D.answered||!ta.value.trim())return;
+      D._wrGuessed=wgk.checked;
+      const box=el("div",{class:"why",style:"margin-top:10px"});
+      box.innerHTML='<b>Model answer:</b><br>'+q.model+'<br><br><b>Check yourself against the rubric:</b><ul style="margin:6px 0 0 18px">'+q.rubric.map(r=>'<li>'+r+'</li>').join("")+'</ul><p style="margin-top:8px"><b>Honest call — did your answer hit ALL rubric points?</b></p>';
+      const bar=el("div",{style:"display:flex;gap:8px;margin-top:8px"});
+      bar.appendChild(el("button",{class:"btn teal",onclick:()=>finish(true,"",ta.value.trim())},"✓ Yes — all points"));
+      bar.appendChild(el("button",{class:"btn coral",onclick:()=>finish(false,"",ta.value.trim())},"✗ Missed something"));
+      box.appendChild(bar); c.appendChild(box); sub.disabled=true; ta.disabled=true;
+    }},"Compare to model →");
+    c.appendChild(ta); c.appendChild(gRow); c.appendChild(sub);
+  }
+  else if (q.type==="mc"){
     const ch=el("div",{class:"choices"});
     const order=shuffle(q.choices.map((txt,i)=>({txt,i})));
     order.forEach(o=>{
