@@ -6,7 +6,7 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.0  ·  built 2026-08-09 · audited r1 08-11, r2 08-15 · r3 pending
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.0.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15 · r3 pending
   v3.0 (2026-08-19): EVERY-2-DAY DIAGNOSTICS (Gabe-designed). Two alternating cold modes —
         📚 Cumulative (all topics the course has covered, via SEMESTER week map, verified
         Ciesla schedule 08-18) and 🎯 Scoped (next checkpoint only; editable nextQuiz seeded
@@ -1465,6 +1465,11 @@ VIEWS.report = (v) => {
 "FC mastery: "+new Set(S.fcMastery).size+"/2 clean days"+(S.fcMastery.length?" ("+[...new Set(S.fcMastery)].join(", ")+")":"")+(new Set(S.fcMastery).size>=2?" — MASTERED":"")+"\n"+
 (S.lastEval?("Evaluator ("+S.lastEval.date+", "+S.lastEval.kind+"): "+S.lastEval.pct+"% · gaps to study first: "+(S.lastEval.gaps.length?S.lastEval.gaps.map(k=>TOPICS[k]?.name||k).join(" > "):"none")+"\n"):"")+
 (missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
+// v3.0.1: include the v3.0 measurement layer in the export (guessed flags, diagnostics, written answers + rationales)
+(function(){ const g=Object.entries(S.qstats).filter(([id,s])=>(s.gr||0)+(s.gw||0)>0); if(!g.length) return "";
+  return "Guessed-flagged: "+g.map(([id,s])=>"["+id+"] "+(s.gr||0)+" right-but-guessed / "+(s.gw||0)+" wrong-guessed").join(" · ")+"\n"; })()+
+(S.diags.length?("Diagnostics: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"CUM ":"SCOPE ")+d.pct+"% ("+d.date+(d.scope?", "+d.scope:"")+")").join(" · ")+"\n"):"")+
+((S.wrLog||[]).length?("Written answers & rationales (last 8, for Claude's process-grading):\n"+S.wrLog.slice(-8).map(w=>"  ["+w.id+"] "+(w.ok?"self-✓":"self-✗")+(w.guessed?" (guessed)":"")+" — \""+String(w.text).slice(0,160)+"\"").join("\n")+"\n"):"")+
 "Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
   const c=el("div",{class:"card"});
   c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';

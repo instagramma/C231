@@ -205,7 +205,7 @@
 <body>
 <header>
   <h1><span class="flask">🚀</span>PHYS 210 · Physics Bootcamp</h1>
-  <span style="display:flex;gap:8px;align-items:baseline"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:baseline"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -224,6 +224,53 @@ const safeStore = (() => {
     persistent: ok
   };
 })();
+
+
+/* ============ v2.2 CLOUD SYNC (ported from chem231 v3.0; same Supabase project) ============
+   One row in `progress`, profile "gabe-p210". Fixes the signals-dashboard HIGH item:
+   "PHYS 210 has no cloud row — ever" — root cause was that this app had NO sync code at all. */
+const SB_URL = "https://tzdreklmkntpopqncada.supabase.co";
+const SB_KEY = "sb_publishable_PWdbyaBoBg8hM2kptSrwBA_I4lFrnQr";
+const SB_PROFILE = "gabe-p210";
+let cloudState = "init";
+let _pushT = null;
+function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Content-Type":"application/json"}; }
+function mergeRemote(remote){
+  if (!remote) return;
+  ["doneDays","probDone","visits"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
+  const seenM = new Set(S.missed);
+  (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
+  Object.entries(remote.qstats||{}).forEach(([id,st])=>{
+    const loc = S.qstats[id];
+    if (!loc || (st.r+st.w) > (loc.r+loc.w)) S.qstats[id] = st;
+  });
+  Object.entries(remote.stepMiss||{}).forEach(([k,v])=>{ S.stepMiss[k]=Math.max(S.stepMiss[k]||0, v||0); });
+}
+async function cloudPull(){
+  try {
+    const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq."+SB_PROFILE+"&select=data", {headers:sbHeaders()});
+    if (!r.ok) throw 0;
+    const rows = await r.json();
+    mergeRemote(rows[0] && rows[0].data);
+    cloudState = "synced"; save(); if(typeof render==="function") render(); cloudPush(true);
+  } catch(e){ cloudState = "offline"; renderSyncDot(); }
+}
+async function cloudPush(now){
+  if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
+  try {
+    const body = JSON.stringify({ profile: SB_PROFILE,
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, probDone:S.probDone, stepMiss:S.stepMiss, visits:S.visits},
+      updated_at: new Date().toISOString() });
+    const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
+    cloudState = r.ok ? "synced" : "offline";
+  } catch(e){ cloudState = "offline"; }
+  renderSyncDot();
+}
+function renderSyncDot(){
+  const d = document.getElementById("syncdot"); if(!d) return;
+  d.textContent = cloudState==="synced" ? "● cloud" : cloudState==="offline" ? "○ local only" : "◌ syncing…";
+  d.style.color = cloudState==="synced" ? "#8FE3A1" : "#F2B705";
+}
 
 /* ================= TRACK — the 9-day runway, WITH DUE DATES =================
    day = the due date. Miss one → it becomes tomorrow's catch-up mission
@@ -405,7 +452,7 @@ const S = {
   drill: null,
   lab: null,
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("probDone",S.probDone); safeStore.set("stepMiss",S.stepMiss); safeStore.set("visits",S.visits); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("probDone",S.probDone); safeStore.set("stepMiss",S.stepMiss); safeStore.set("visits",S.visits); cloudPush(false); }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -758,6 +805,7 @@ VIEWS.report = (v) => {
 
 /* ================= BOOT ================= */
 render();
+cloudPull();  // v2.2: create/merge the gabe-p210 cloud row on every load
 </script>
 <script>
 /* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
