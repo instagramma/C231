@@ -6,7 +6,16 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.2  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.2 measurement patch (audit r3 findings 6,7 + Gabe's spec 08-20): EVENT LOG — every
+  answer appends {id,ts,ok,g,d(seconds),mode,topic} to S.attempts (cap 5000, cross-device
+  union-merge by id|ts — nothing overwritten). HONEST SCORING — accuracy separates clean
+  rights from guessed rights everywhere (home stat, gap map, report); a topic is only
+  "solid" if clean rights beat wrongs. MISCONCEPTION PRIORITY — confident-wrong now
+  outranks guessed-wrong in every selection queue. MEASURED DIFFICULTY — qDiffM() derives
+  difficulty from actual miss rate + guess rate + time-vs-topic-median, blended with the
+  static prior until enough attempts accumulate (weight n/(n+4)). Rationale ANALYSIS
+  stays Claude-side (wrLog review); the app measures answer/frequency/time.
   v3.1 truth patch (audit r3, findings 1,2,3,15,16): semester-mode Home (no stale runway
   missions), water sp³ qualified per Klein §1.11, c5/fx8/ix1 wording, diagDue checkpoint-
   first ordering, scoped/cumulative runs NAME uncovered topics, evaluator "solid"→"screen"
@@ -326,6 +335,10 @@ function mergeRemote(remote){
   const wk = new Set(S.wrLog.map(w=>w.ts));
   (remote.wrLog||[]).forEach(w=>{ if(!wk.has(w.ts)){ S.wrLog.push(w); wk.add(w.ts); } });
   S.wrLog.sort((a,b)=>a.ts<b.ts?-1:1); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120);
+  // v3.2: attempts = UNION by id|ts — every device's events survive; nothing is overwritten
+  const ak = new Set(S.attempts.map(a=>a.id+"|"+a.ts));
+  (remote.attempts||[]).forEach(a=>{ if(!ak.has(a.id+"|"+a.ts)){ S.attempts.push(a); ak.add(a.id+"|"+a.ts); } });
+  S.attempts.sort((a,b)=>a.ts-b.ts); if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
   if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
 }
 async function cloudPull(){
@@ -341,7 +354,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -447,7 +460,8 @@ function startDiag2(type){
   if(missing.length) alert("⚠ HONESTY NOTE — this "+(type==="scope"?"scoped":"cumulative")+" run does NOT cover: "+missing.join(", ")+".\nThe score below excludes those. Study them from the book/Canvas — the app can't see them.");
   // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
   const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
-  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&s.w>0)n+=3; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiff(q); return n+Math.random(); };
+  // v3.2: misconception (confident-wrong) ranked above guessed-wrong; difficulty is MEASURED (qDiffM), not the static constant
+  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiffM(q); return n+Math.random(); };
   const pool=[];
   scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
   const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
@@ -679,11 +693,12 @@ const S = {
   diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
   nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","formal","polarity","hybrid","imf"]}), // v3.0: editable (Canvas gives ≥3 days notice)
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
+  attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); cloudPush(false); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); cloudPush(false); }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -693,7 +708,25 @@ const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Ob
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function confetti(){ const c=$("#confetti"); const em=["🎉","⚗️","✨","🧪","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
 function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
-function accuracy(){ let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;}); const t=r+w; return {r,w,t,pct:t?Math.round(100*r/t):0}; }
+function accuracy(){ let r=0,w=0,g=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;g+=(s.gr||0);}); const t=r+w; const clean=r-g;
+  return {r,w,g,t,pct:t?Math.round(100*r/t):0, cleanPct:t?Math.round(100*Math.max(0,clean)/t):0}; }
+/* v3.2: measured difficulty — miss rate + guess rate + time vs topic median from the
+   event log, blended with the static prior until n is meaningful (weight n/(n+4)). */
+function qDiffM(q){
+  const ev=(S.attempts||[]).filter(a=>a.id===q.id); const n=ev.length; const prior=qDiff(q);
+  if(!n) return prior;
+  const miss=ev.filter(a=>!a.ok).length/n, guess=ev.filter(a=>a.g).length/n;
+  const med=a=>{const d=a.filter(x=>x.d>0).map(x=>x.d).sort((x,y)=>x-y); return d.length?d[Math.floor(d.length/2)]:null;};
+  const m1=med(ev), m2=med((S.attempts||[]).filter(a=>a.t===q.topic));
+  let m=1+2*miss+guess+((m1&&m2&&m1>m2*1.5)?0.5:0);
+  const w=n/(n+4);
+  return Math.max(1,Math.min(3,Math.round((w*m+(1-w)*prior)*10)/10));
+}
+function logAttempt(q,ok,guessed,D){
+  const secs=D&&D._shownAt?Math.min(600,Math.round((Date.now()-D._shownAt)/1000)):0;
+  S.attempts.push({id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic});
+  if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
+}
 
 /* ================= ROUTER ================= */
 const NAV = [
@@ -852,7 +885,7 @@ VIEWS.home = (v) => {
     st.innerHTML =
       '<div class="stat"><div class="n">'+S.diags.length+'</div><div class="l">diagnostics</div></div>'+
       '<div class="stat"><div class="n">'+a2.t+'</div><div class="l">questions</div></div>'+
-      '<div class="stat"><div class="n">'+a2.pct+'%</div><div class="l">accuracy</div></div>'+
+      '<div class="stat"><div class="n">'+a2.cleanPct+'%</div><div class="l">clean accuracy'+(a2.g?' ('+a2.g+'🎲 excluded)':'')+'</div></div>'+
       '<div class="stat"><div class="n">'+S.missed.length+'</div><div class="l">in missed rotation</div></div>';
     v.appendChild(st);
     if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
@@ -955,11 +988,13 @@ function startEvaluator(){
 // compute gap report from a byTopic tally; returns {gaps:[topic], solid:[topic], pct}
 function gapReport(byTopic){
   const gaps=[], solid=[];
-  Object.entries(byTopic).forEach(([k,bt])=>{ (bt.r>bt.w?solid:gaps).push(k); });
+  // v3.2 honest scoring: a topic is only "solid" if CLEAN rights (right minus guessed-right) beat wrongs
+  Object.entries(byTopic).forEach(([k,bt])=>{ ((bt.r-(bt.g||0))>bt.w?solid:gaps).push(k); });
   gaps.sort((a,b)=>GAP_PRIORITY.indexOf(a)-GAP_PRIORITY.indexOf(b));
   const total=Object.values(byTopic).reduce((s,bt)=>s+bt.r+bt.w,0);
   const right=Object.values(byTopic).reduce((s,bt)=>s+bt.r,0);
-  return {gaps,solid,pct:total?Math.round(100*right/total):0};
+  const clean=Object.values(byTopic).reduce((s,bt)=>s+bt.r-(bt.g||0),0);
+  return {gaps,solid,pct:total?Math.round(100*right/total):0,cleanPct:total?Math.round(100*Math.max(0,clean)/total):0};
 }
 function startDrill(topic){
   let pool;
@@ -969,7 +1004,8 @@ function startDrill(topic){
   // what you're weakest on. Tier 3 = you've missed it OR only ever guessed it right (v3.0 shaky),
   // tier 2 = never seen, tier 1 = seen and right. Shuffle first so pick within a tier is random.
   const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
-  const need = q => { const s=S.qstats[q.id]; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; };
+  // v3.2: confident-wrong (a broken rule = misconception) outranks guessed-wrong (just unknown)
+  const need = q => { const s=S.qstats[q.id]; if(s&&(s.w-(s.gw||0))>0) return 4; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; };
   pool = shuffle(pool).sort((a,b)=>need(b)-need(a));
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
   // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
@@ -1073,7 +1109,7 @@ VIEWS.drill = (v) => {
       if(!rep.gaps.length) confetti();
       const c=el("div",{class:"card"+(!rep.gaps.length?" teal":"")});
       const nm=k=>TOPICS[k]?.name||k;
-      c.innerHTML='<span class="tag gold">Gap map · '+rep.pct+'%</span><h2>'+(rep.gaps.length?rep.gaps.length+' gap'+(rep.gaps.length>1?'s':'')+' found':'No flags on this screen 🎉 (n=1–2/topic — a screen, not mastery)')+'</h2>'+
+      c.innerHTML='<span class="tag gold">Gap map · '+rep.cleanPct+'% clean'+(rep.pct!==rep.cleanPct?' ('+rep.pct+'% raw)':'')+'</span><h2>'+(rep.gaps.length?rep.gaps.length+' gap'+(rep.gaps.length>1?'s':'')+' found':'No flags on this screen 🎉 (n=1–2/topic — a screen, not mastery)')+'</h2>'+
         '<div style="margin:10px 0">'+
         GAP_PRIORITY.filter(k=>D.byTopic[k]).map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(hit?'passed screen':'study first')+'</span></div>'; }).join("")+
         '</div>'+
@@ -1102,8 +1138,9 @@ VIEWS.drill = (v) => {
     c.appendChild(row); v.appendChild(c); return;
   }
   const q = D.queue[D.i];
+  if(D._shownQ!==q.id+":"+D.i){ D._shownQ=q.id+":"+D.i; D._shownAt=Date.now(); } // v3.2: start the answer clock (survives re-renders of same card)
   const c = el("div",{class:"card"});
-  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+"●".repeat(qDiff(q))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+"●".repeat(Math.round(qDiffM(q)))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
     '<div class="qprompt">'+q.prompt+'</div>';
   const fb = el("div");
   // v3.0: guessed checkbox + optional rationale — on every non-written question
@@ -1119,10 +1156,11 @@ VIEWS.drill = (v) => {
   const finish = (ok, revealHtml, wrText) => {
     D.answered=true;
     const guessed = !!(gk&&gk.checked) || D._wrGuessed===true;
+    logAttempt(q,ok,guessed,D); // v3.2: immutable event — id, timestamp, correctness, guessed, seconds
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
     if(ok){st.r++;D.right++; if(guessed){ st.gr=(st.gr||0)+1; D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
     else{st.w++;D.wrong++;S.missed.push(q.id); if(guessed) st.gw=(st.gw||0)+1;}
-    if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; }
+    if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; } // v3.2: guessed-rights tallied per topic
     const rat=(rInp&&rInp.value.trim())||"";
     if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
     D._wrGuessed=false;
@@ -1506,6 +1544,10 @@ VIEWS.report = (v) => {
 // v3.0.1: include the v3.0 measurement layer in the export (guessed flags, diagnostics, written answers + rationales)
 (function(){ const g=Object.entries(S.qstats).filter(([id,s])=>(s.gr||0)+(s.gw||0)>0); if(!g.length) return "";
   return "Guessed-flagged: "+g.map(([id,s])=>"["+id+"] "+(s.gr||0)+" right-but-guessed / "+(s.gw||0)+" wrong-guessed").join(" · ")+"\n"; })()+
+(function(){ const A=S.attempts||[]; if(!A.length) return "";
+  const secs=A.filter(a=>a.d>0).map(a=>a.d).sort((a,b)=>a-b); const med=secs.length?secs[Math.floor(secs.length/2)]:0;
+  const clean=A.filter(a=>a.ok&&!a.g).length;
+  return "Event log (v3.2): "+A.length+" attempts · "+clean+" clean-right · median "+med+"s/answer · since "+new Date(A[0].ts).toLocaleDateString()+"\n"; })()+
 (S.diags.length?("Diagnostics: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"CUM ":"SCOPE ")+d.pct+"% ("+d.date+(d.scope?", "+d.scope:"")+")").join(" · ")+"\n"):"")+
 ((S.wrLog||[]).length?("Written answers & rationales (last 8, for Claude's process-grading):\n"+S.wrLog.slice(-8).map(w=>"  ["+w.id+"] "+(w.ok?"self-✓":"self-✗")+(w.guessed?" (guessed)":"")+" — \""+String(w.text).slice(0,160)+"\"").join("\n")+"\n"):"")+
 "Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
