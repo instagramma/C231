@@ -6,7 +6,14 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.2  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.3  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.3 LECTURE 1 (Ciesla Thu 8/20, from Gabe's transcript): +19 auto items + 5 written
+  (WR-CH1-007…011) covering her emphases and named traps — lone-pair orbitals (sp²/sp³),
+  σ/π overlap, bond angles + SO₂ trap (<120 not 109.5), C–halogen ALWAYS polar, the four
+  nonpolar-cancellation cases, cis/trans bp, phase-changes-break-IMFs-not-bonds wording,
+  bond-line implicit H. New 📝 Lecture Check mode (Exam tab): cold 24-item run → per-topic
+  focus/strengthen/strength map. Transcript also CONFIRMS course uses steric-number model
+  (water O = sp³ for this course; Klein fine print stands).
   v3.2 measurement patch (audit r3 findings 6,7 + Gabe's spec 08-20): EVENT LOG — every
   answer appends {id,ts,ok,g,d(seconds),mode,topic} to S.attempts (cap 5000, cross-device
   union-merge by id|ts — nothing overwritten). HONEST SCORING — accuracy separates clean
@@ -468,6 +475,16 @@ function startDiag2(type){
   S.drill={queue:shuffle(pool).concat(wr), i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName};
   go("drill");
 }
+/* v3.3: Lecture Check — fixed cold deck of the Aug 20 lecture items (auto + written),
+   scored per-topic through the same gap-map path as diagnostics. */
+function startLectureCheck(){
+  const ids=["l1s1","l1s2","l1s3","l1s4","l1s5","l1g1","l1g2","l1g3","l1p1","l1p2","l1p4","l1p5","l1p6","l1p7","l1i1","l1i2","l1i3","l1b1","l1b2"];
+  const wr=["WR-CH1-007","WR-CH1-008","WR-CH1-009","WR-CH1-010","WR-CH1-011"];
+  const pool=QUESTIONS.filter(q=>ids.includes(q.id));
+  const wrq=QUESTIONS.filter(q=>wr.includes(q.id));
+  S.drill={queue:shuffle(pool).concat(shuffle(wrq)), i:0, right:0, wrong:0, topic:"__lec", answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName:"Lecture check · Aug 20"};
+  go("drill");
+}
 function editNextQuiz(){
   const n=prompt("Quiz name:",S.nextQuiz.name)||S.nextQuiz.name;
   const d=prompt("Date (YYYY-MM-DD):",S.nextQuiz.date)||S.nextQuiz.date;
@@ -656,6 +673,45 @@ const QUESTIONS = [
 {id:"WR-CH1-006",topic:"imf",type:"written",diff:2,prompt:"<b>Rank and justify:</b> order CH₄, CH₃Cl, and CH₃OH by boiling point (lowest→highest), naming the dominant intermolecular force for each.",
  model:"<b>CH₄ &lt; CH₃Cl &lt; CH₃OH.</b> CH₄: London dispersion only (bp −161°C). CH₃Cl: polar C–Cl → dipole–dipole + dispersion (−24°C). CH₃OH: O–H → <b>hydrogen bonding</b>, the strongest of the three (65°C).",
  rubric:["Correct order","Each species matched to its strongest IMF","H-bond requirement (H on N/O/F) stated or implied"]},
+
+/* ===== v3.3 LECTURE 1 BANK (Ciesla lecture, Thu 2026-08-20 — built from Gabe's transcript) =====
+   Every item below maps to something she EMPHASIZED or named as a trap. */
+{id:"l1s1",topic:"hybrid",type:"mc",diff:2,prompt:"Pi (π) bonds are formed by:",choices:["Side-on overlap of two UNhybridized p orbitals","Head-on overlap of hybridized orbitals","Side-on overlap of hybridized orbitals","Overlap of two s orbitals"],answer:0,why:"σ bonds = head-on overlap of <b>hybridized</b> orbitals; π bonds = side-on overlap of <b>unhybridized p</b> orbitals (they must be in the same plane; there's a node at the nucleus plane). Lecture 8/20: she called this a classic glitch."},
+{id:"l1s2",topic:"hybrid",type:"mc",diff:1,prompt:"Hydrogen forms its sigma bonds using:",choices:["Its 1s orbital — H is never hybridized","An sp orbital","An sp³ orbital","An unhybridized p orbital"],answer:0,why:"<b>Hydrogen is the exception</b>: it always bonds with its 1s orbital, never hybridized. Every other σ bond in Ch 1 uses hybridized orbitals."},
+{id:"l1s5",topic:"hybrid",type:"mc",diff:2,prompt:"A LOCALIZED lone pair sits in:",choices:["A hybridized orbital matching the hybridization of its atom","An unhybridized p orbital, always","An sp³ orbital, always","The 1s orbital"],answer:0,why:"Her exact rule (8/20): <b>localized lone pairs live in hybridized orbitals</b> — and WHICH one is set by the hybridization of the atom they sit on. sp³ N → lone pair in sp³ orbital; sp² N → sp². In Ch 1, every lone pair you'll be asked about is localized. (Delocalized pairs arrive in Ch 2.)"},
+{id:"l1s3",topic:"hybrid",type:"text",diff:2,prompt:"A nitrogen is sp² hybridized and carries a localized lone pair. Which orbital is the lone pair in? (type like sp2)",answer:"sp2",why:"Lone pair orbital = the atom's hybridization → <b>sp²</b>. She said: 'you need to be able to tell me which orbital the lone pair is in.'"},
+{id:"l1s4",topic:"hybrid",type:"text",diff:2,prompt:"An sp³ nitrogen (3 bonds + 1 lone pair) holds its lone pair in which orbital? (type like sp3)",answer:"sp3",why:"Same rule: localized lone pair lives in a hybridized orbital matching its atom → <b>sp³</b>."},
+{id:"l1g1",topic:"hybrid",type:"num",diff:1,prompt:"Bond angle (degrees) for a trigonal planar electron geometry?",answer:120,why:"Tetrahedral 109.5° · trigonal planar <b>120°</b> · linear 180°."},
+{id:"l1g2",topic:"hybrid",type:"mc",diff:2,prompt:"NH₃'s H–N–H bond angle is:",choices:["≈107° — the lone pair takes more volume and compresses the bonds below 109.5°","Exactly 109.5° — 4 electron domains","120° — three atoms attached","90° — p orbitals"],answer:0,why:"Lone pairs occupy MORE volume than bonding pairs → repulsion pushes the N–H bonds together → <b>less than 109.5°</b> (~107°; water ~105° with two lone pairs). She requires: know it's <b>less than 109.5</b>, not the exact numbers."},
+{id:"l1g3",topic:"hybrid",type:"mc",diff:3,prompt:"SO₂: what is the O–S–O bond angle?",choices:["Slightly LESS than 120° — steric number 3 (sp², trigonal planar) with a lone pair compressing","109.5° — like water","Exactly 120°","180° — linear like CO₂"],answer:0,why:"Her named trap: students answer 109.5 by pattern-matching to H₂O. Work it: S has 2 bonded atoms + 1 lone pair → steric number <b>3</b> → sp², trigonal planar electron geometry, bent shape → base angle 120°, compressed slightly below by the lone pair. <b>To get a bond angle you MUST go through the geometry.</b>"},
+{id:"l1p1",topic:"polarity",type:"mc",diff:3,prompt:"ΔEN for C–Br is 0.3 (below the 0.5 'pure covalent' cutoff). The C–Br bond is:",choices:["Polar — carbon bonded to ANY halogen is always polar, regardless of ΔEN","Pure covalent — ΔEN < 0.5","Ionic — Br is much bigger","Nonpolar — the electrons are shared equally"],answer:0,why:"Her TOP TIP, verbatim: <b>'carbon bonded to a halogen is ALWAYS a polar bond, regardless of the ΔEN.'</b> ΔEN alone oversimplifies — real polarity is charge distribution over DISTANCE, and Br is a big atom. Named trap: assessments hand you EN values hoping you'll calculate and answer 'pure covalent.'"},
+{id:"l1p2",topic:"polarity",type:"num",diff:1,prompt:"Below what ΔEN (course values) is a bond considered 'pure covalent'? (e.g. 0.4)",answer:0.5,why:"Course cutoffs: ΔEN &lt; <b>0.5</b> pure covalent · 0.5–1.7 polar covalent · &gt; 1.7 ionic. (Use OUR values — homework is based on them.) But remember the C–halogen override."},
+{id:"l1p4",topic:"polarity",type:"mc",diff:2,prompt:"CCl₄ (carbon tetrachloride) has four polar C–Cl bonds. The MOLECULE is:",choices:["Nonpolar — four identical bond dipoles on a tetrahedron cancel (sum to zero)","Polar — it contains polar bonds","Ionic","Nonpolar — C–Cl bonds aren't polar"],answer:0,why:"Bond polarity ≠ molecular polarity. Four identical vectors on a tetrahedron <b>sum to zero</b> → no net dipole → nonpolar molecule, despite four polar bonds. The four cancel cases: tetrahedral-identical (CCl₄), trigonal-planar-identical (BF₃), linear (CO₂), and trans-disubstituted alkenes."},
+{id:"l1p5",topic:"polarity",type:"mc",diff:2,prompt:"Swap one Cl of CCl₄ for Br → CCl₃Br. Now the molecule is:",choices:["Polar — the C–Br dipole is smaller than C–Cl, so the vectors no longer cancel","Still nonpolar — it's still tetrahedral","Nonpolar — Br isn't electronegative enough","Ionic"],answer:0,why:"Cancellation requires <b>identical</b> atoms at every position. C–Br has a smaller bond dipole than C–Cl (Cl is more electronegative), so the vector sum ≠ 0 → polar."},
+{id:"l1p6",topic:"polarity",type:"mc",diff:2,prompt:"BF₃ (trigonal planar, three polar B–F bonds) is:",choices:["Nonpolar — three identical dipoles at 120° sum to zero","Polar — F is the most electronegative element","Polar — boron is electron-poor","Ionic"],answer:0,why:"Trigonal planar with the <b>same atom at every position</b> → vectors cancel → nonpolar. Her classic example (hard to build with carbon, easy with boron)."},
+{id:"l1p7",topic:"polarity",type:"mc",diff:3,prompt:"1,2-dichloroethene, two isomers:<svg viewBox='0 0 330 115' width='300' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='55' y1='53' x2='105' y2='53'/><line x1='55' y1='59' x2='105' y2='59'/><line x1='55' y1='56' x2='30' y2='31'/><line x1='55' y1='56' x2='30' y2='83'/><line x1='105' y1='56' x2='130' y2='31'/><line x1='105' y1='56' x2='130' y2='83'/><line x1='215' y1='53' x2='265' y2='53'/><line x1='215' y1='59' x2='265' y2='59'/><line x1='215' y1='56' x2='190' y2='31'/><line x1='215' y1='56' x2='190' y2='83'/><line x1='265' y1='56' x2='290' y2='31'/><line x1='265' y1='56' x2='290' y2='83'/></g><g font-size='13' fill='currentColor'><text x='12' y='28'>Cl</text><text x='22' y='95'>H</text><text x='133' y='28'>H</text><text x='128' y='95'>Cl</text><text x='68' y='108'>A</text><text x='172' y='28'>Cl</text><text x='182' y='95'>H</text><text x='293' y='28'>Cl</text><text x='288' y='95'>H</text><text x='228' y='108'>B</text></g></svg>Which isomer is NONPOLAR?",choices:["A (trans) — the two C–Cl dipoles point opposite ways and cancel","B (cis) — both Cl on the same side","Both are nonpolar","Neither — C–Cl bonds are polar so both molecules are polar"],answer:0,why:"<b>A is trans</b> (Cl on opposite sides): equal C–Cl vectors in opposite directions sum to zero → nonpolar. <b>B is cis</b>: both dipoles point the same general way → net dipole → polar. Containing polar bonds is necessary but NOT sufficient for a polar molecule."},
+{id:"l1i1",topic:"imf",type:"mc",diff:2,prompt:"When water boils, what breaks?",choices:["Intermolecular forces only — every H₂O molecule stays intact","The O–H covalent bonds","Both the H-bonds and the O–H bonds","The hydrogen turns to gas first"],answer:0,why:"Her top emphasis: <b>phase changes break INTERMOLECULAR FORCES, never bonds.</b> Liquid→gas hexanol is still hexanol — nothing happened to the structure. Writing 'the bonds are harder to break' on an exam explanation = wrong."},
+{id:"l1i2",topic:"imf",type:"mc",diff:3,prompt:"cis- and trans-1,2-dichloroethene (same molecular formula — stereoisomers). Which boils higher, and why?",choices:["cis — it's polar, so it has dipole–dipole ON TOP of dispersion; trans's dipoles cancel","trans — it's more symmetric so it packs better","They boil at the same temperature — same mass","cis — it has hydrogen bonding"],answer:0,why:"Same formula → mass is irrelevant. Neither has H-bonding (no H on N/O). trans: dipoles cancel → nonpolar → dispersion only. cis: net dipole → <b>dipole–dipole + dispersion</b> → stronger IMFs → higher boiling point. This was her closing worked example."},
+{id:"l1i3",topic:"imf",type:"mc",diff:2,prompt:"'Hydrogen bonding' is:",choices:["An intermolecular ATTRACTION between an H (δ+) on N/O and a lone pair on another N/O — not a covalent bond","A covalent bond between hydrogen atoms","Any bond containing hydrogen","A bond between H and any electronegative atom, including C"],answer:0,why:"'And by the way, it's not a bond.' Requires H <b>directly bonded</b> to N or O (F in organic molecules is bonded to C, so no H-bonding through it). Strength order: H-bonding &gt; dipole–dipole &gt; dispersion (which everything has)."},
+{id:"l1b1",topic:"bondline",type:"num",diff:1,prompt:"Bond-line structure (each line-end/vertex = a carbon; H's on carbon are NOT drawn):<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>How many implicit hydrogens are on <b>C4</b>?",answer:3,why:"C4 shows ONE bond (to C3). Carbon wants 4 → <b>3 hidden H's</b> (a CH₃). Reading rule: carbon's H's are never drawn; you supply them by counting to four."},
+{id:"l1b2",topic:"bondline",type:"num",diff:2,prompt:"Same structure:<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>How many implicit hydrogens are on <b>C2</b>?",answer:1,why:"C2 has a DOUBLE bond to C1 (counts as 2) + a single bond to C3 = 3 bonds shown → <b>1 hidden H</b>. Her homework for next class is exactly this skill."},
+
+/* v3.3 written items — lecture 1 */
+{id:"WR-CH1-007",topic:"hybrid",type:"written",diff:3,prompt:"<b>Lone-pair orbitals:</b> a molecule has two nitrogens — N1 has three single bonds + 1 lone pair; N2 has a double bond, a single bond + 1 lone pair. For EACH nitrogen: give its hybridization AND name the orbital holding its lone pair. Then state the general rule.",
+ model:"<b>N1:</b> 4 electron domains (3 bonds + 1 LP) → <b>sp³</b>; its lone pair is in an <b>sp³ orbital</b>. <b>N2:</b> 3 domains (double bond counts as ONE domain, + single bond + LP) → <b>sp²</b>; lone pair in an <b>sp² orbital</b>. <b>Rule:</b> a localized lone pair lives in a hybridized orbital, and WHICH one is set by the hybridization of the atom it sits on.",
+ rubric:["Both hybridizations derived from domain count (double bond = one domain)","Lone-pair orbital = atom's hybridization, stated as the rule","sp³/sp² assigned to the right nitrogens"]},
+{id:"WR-CH1-008",topic:"polarity",type:"written",diff:2,prompt:"<b>The C–Br trap:</b> ΔEN(C–Br) = 0.3, below the 0.5 cutoff — 'pure covalent' by the numbers. Is the C–Br bond polar? Explain what the ΔEN method misses.",
+ model:"<b>Polar.</b> Course rule: carbon bonded to ANY halogen is always polar, regardless of ΔEN. The cutoff method oversimplifies: bond polarity is really <b>charge distribution over distance</b> — bromine is a much larger atom than carbon, so even a small EN difference produces a real dipole. (Related: C–Li at ΔEN 1.5 is drawn BOTH as ionic and polar covalent — it's a spectrum.)",
+ rubric:["Answers polar despite the cutoff","States the C–halogen-always-polar rule","Mentions size / charge-over-distance as what ΔEN misses"]},
+{id:"WR-CH1-009",topic:"lewis",type:"written",diff:3,prompt:"<b>SO₂ from scratch:</b> draw a Lewis structure for SO₂ (S and O are both group 6). Then give the electron geometry and the O–S–O bond angle, justified. (Two different valid structures exist — name both if you can.)",
+ model:"<b>Structure 1 (minimized FC, expanded octet):</b> O=S=O with one lone pair on S — S holds 10 electrons, allowed because sulfur is period 3. <b>Structure 2:</b> O=S–O⁻ with S⁺ (octet kept, charges +1/−1). BOTH are valid and give the same answer: S has 2 bonded atoms + 1 lone pair → steric number <b>3</b> → sp², <b>trigonal planar electron geometry</b>, bent molecular shape → bond angle just <b>under 120°</b> (lone pair compression). NOT 109.5 — that's the H₂O pattern-match trap.",
+ rubric:["Valid Lewis structure including the lone pair on S","Steric number 3 → trigonal planar (not tetrahedral)","Angle <120° with lone-pair justification — and not 109.5"]},
+{id:"WR-CH1-010",topic:"imf",type:"written",diff:2,prompt:"<b>Exam-wording drill:</b> molecule Y boils higher than molecule X (same formula; Y is polar, X is not). Write TWO explanations: (1) the one that LOSES points, (2) the full-credit version.",
+ model:"<b>(1) Loses points:</b> 'Y's bonds are harder to break.' — wrong because phase changes never break covalent bonds. <b>(2) Full credit:</b> 'Y has a net dipole, so it has dipole–dipole forces in addition to dispersion; X's bond dipoles cancel, leaving dispersion only. Stronger INTERMOLECULAR forces require more energy to separate the molecules, so Y has the higher boiling point. The molecules themselves are unchanged.'",
+ rubric:["Identifies 'breaking bonds' as the losing phrase","Full-credit version names the specific IMF difference","Links IMF strength → energy → boiling point, molecules intact"]},
+{id:"WR-CH1-011",topic:"bondline",type:"written",diff:2,prompt:"<b>Add every hydrogen:</b> for the bond-line structure below, list the number of hydrogens on EACH carbon, then give the molecular formula.<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>",
+ model:"Count each carbon to 4 bonds: <b>C1</b>: double bond (2) → <b>2 H</b>. <b>C2</b>: double (2) + single to C3 (1) = 3 → <b>1 H</b>. <b>C3</b>: two singles → <b>2 H</b>. <b>C4</b>: one single → <b>3 H</b>. Total: <b>C₄H₈</b> (1-butene). Rule: H's on carbon are implicit; H's on N/O/S are always drawn.",
+ rubric:["Every carbon brought to exactly 4 bonds","Correct per-carbon counts (2,1,2,3)","Correct formula C₄H₈"]},
 ];
 /* fix f5 (answerOverride pattern demo): real answer is -1 */
 QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
@@ -1059,8 +1115,14 @@ VIEWS.exam = (v) => {
   dgr.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2("scope")},"🎯 Scoped now"));
   dgr.appendChild(el("button",{class:"btn ghost small",onclick:()=>editNextQuiz()},"✎ next quiz: "+S.nextQuiz.name+" · "+fmtDay(S.nextQuiz.date)));
   dg.appendChild(dgr);
-  if(S.diags.length){ dg.appendChild(el("p",{class:"muted",style:"margin:8px 0 0;font-size:.85em"},"History: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"% ("+fmtDay(d.date)+")").join(" · "))); }
+  if(S.diags.length){ dg.appendChild(el("p",{class:"muted",style:"margin:8px 0 0;font-size:.85em"},"History: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"📚":d.type==="lec"?"📝":"🎯")+d.pct+"% ("+fmtDay(d.date)+")").join(" · "))); }
   v.appendChild(dg);
+  // v3.3: Lecture Check — Gabe felt lost in the 8/20 lecture; this measures exactly what she taught
+  const lc = el("div",{class:"card teal"});
+  const lcDone = S.diags.filter(d=>d.type==="lec").length;
+  lc.innerHTML='<h3>📝 Lecture Check · Thu Aug 20</h3><p style="margin:4px 0 8px;opacity:.92">24 items (19 scored + 5 written) built from <b>her actual lecture</b>: σ/π orbitals, which orbital holds a lone pair, bond angles (the SO₂ trap), C–halogen polarity, the four nonpolar-cancellation cases, cis/trans boiling points, phase-change wording, bond-line hydrogens. Cold run → per-topic gap map = your <b>focus / strengthen / strength</b> list.'+(lcDone?' <b>Taken '+lcDone+'×.</b>':'')+'</p>';
+  lc.appendChild(el("button",{class:"bigbtn",onclick:()=>startLectureCheck()},"▶ &nbsp;Start the Lecture Check (~20 min)"));
+  v.appendChild(lc);
   const ev=el("div",{class:"card cream"});
   ev.innerHTML='<h3>⚡ Quick Evaluator (in-app, ~6 min)</h3><p class="muted" style="margin:4px 0 8px">One cold question per prereq topic → a color-coded gap map (🟢 passed screen / 🔴 study first) with a priority-ordered study list. No notes — this measures real recall. Result gets logged when you send your Report.</p>';
   ev.appendChild(el("button",{class:"btn teal",onclick:()=>startEvaluator()},"Start Evaluator →"));
@@ -1078,8 +1140,8 @@ VIEWS.drill = (v) => {
   if (D.i>=D.queue.length){ // round over
     const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
     // v3.0: every-2-day diagnostics (cumulative / scoped) → record the run + honest gap map
-    if ((D.topic==="__cum"||D.topic==="__scope") && D.byTopic){
-      const type=D.topic==="__cum"?"cum":"scope";
+    if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec") && D.byTopic){
+      const type=D.topic==="__cum"?"cum":(D.topic==="__lec"?"lec":"scope");
       const rep=gapReport(D.byTopic);
       S.diags.push({date:todayStr(), type, scope:D.scopeName, score:D.right, total:D.queue.length, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0});
       if(S.diags.length>60) S.diags=S.diags.slice(-60);
@@ -1089,7 +1151,7 @@ VIEWS.drill = (v) => {
       const c=el("div",{class:"card"+(solid?" teal":"")});
       const nm=k=>TOPICS[k]?.name||k;
       const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
-      c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
+      c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
         '<h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+
         '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+
         '<div class="why">'+(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Clean board. Next diagnostic unlocks in 2 days — go live your life.')+'</div>'+
