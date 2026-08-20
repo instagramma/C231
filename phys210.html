@@ -6,7 +6,10 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v1.0  ·  built 2026-08-10
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.3  ·  built 2026-08-10
+  v2.3 truth patch (audit r3, findings 1,18): semester-mode Home (no expired runway
+  missions, no auto-queuing backlog; journal-first on class nights), k6 velocity wording.
+  v2.2: cloud sync (gabe-p210).
   For Gabe. Single file, no server, no dependencies.
   Sibling of chem231-bootcamp.html v2.1 — same architecture and
   due-date system, blue "graph paper" colorway.
@@ -359,7 +362,7 @@ const QUESTIONS = [
 {id:"k3",topic:"kin1",type:"num",prompt:"Constant velocity 15 m/s for 6 s. Displacement = ? (m)",answer:90,why:"Δx = vt = 15 × 6 = <b>90 m</b>. Constant v → no ½at² term, don't overcomplicate it."},
 {id:"k4",topic:"kin1",type:"mc",prompt:"On a position-time graph, the SLOPE is the:",choices:["Velocity","Acceleration","Displacement","Distance"],answer:0,why:"Slope = rise/run = Δx/Δt = <b>velocity</b>. (On a velocity-time graph, slope = acceleration.) Graph questions are free points once these two facts are cold."},
 {id:"k5",topic:"kin1",type:"mc",prompt:"A ball is thrown straight up. At the very top of its flight:",choices:["v = 0 but a = −9.8 m/s² still","v = 0 and a = 0","Both v and a point up","a = 0 but v is maximum"],answer:0,why:"Velocity passes through zero, but gravity never turns off: <b>a = −9.8 m/s² the whole flight</b>. 'v = 0 so a = 0' is the single most-tested misconception in kinematics."},
-{id:"k6",topic:"kin1",type:"num",prompt:"120 m covered in 60 s. Average velocity = ? (m/s)",answer:2,why:"v̄ = Δx/Δt = <b>2 m/s</b>."},
+{id:"k6",topic:"kin1",type:"num",prompt:"Displacement of +120 m in 60 s. Average velocity = ? (m/s)",answer:2,why:"v̄ = Δx/Δt = 120/60 = <b>+2 m/s</b>. (Velocity needs displacement, a signed vector — distance alone only gives average speed.)"},
 {id:"k7",topic:"kin1",type:"mc",prompt:"On a velocity-time graph, the AREA under the curve is the:",choices:["Displacement","Acceleration","Average speed","Jerk"],answer:0,why:"Area = v × t summed = <b>displacement</b>. Slope-and-area on the two graphs: four facts that answer every graph question the course will throw."},
 {id:"k8",topic:"kin1",type:"num",prompt:"Moving at 10 m/s, braking at 2 m/s². Time to stop = ? (s)",answer:5,why:"t = Δv/a = 10/2 = <b>5 s</b>."},
 {id:"k9",topic:"kin1",type:"mc",prompt:"'Uniform acceleration' means:",choices:["Velocity changes by equal amounts in equal times","Velocity is constant","The object moves equal distances each second","Speed only increases"],answer:0,why:"Uniform a → <b>Δv is the same every second</b> (distances are NOT — they grow). This is exactly when the kinematic equations apply, and only then."},
@@ -492,6 +495,30 @@ VIEWS.home = (v) => {
       '<span class="tag coral">Re-entry ritual</span><h2>Welcome back ('+gap+' days away)</h2>'+
       '<p>Break decay is steep for you — that\'s measured, not a guess. Before anything new: <b>redo the last Problem Lab problem you completed, cold.</b> Then continue with today\'s mission.</p>'));
   }
+  // v2.3 (audit F1): SEMESTER MODE — after class start, the runway never issues expired
+  // missions and there is no auto-queuing backlog. Deadlines live on Canvas; the journal
+  // (20% of the grade, written cold before sleep on class nights) is the real daily mission.
+  if (t >= CLASS_START){
+    const card0 = el("div",{class:"card teal"});
+    const isClassNight = [1,3].includes(new Date(t+"T12:00:00").getDay()); // Mon/Wed
+    card0.innerHTML = '<span class="tag gold">Semester mode</span>'+
+      '<h2 style="font-size:1.4rem">Deadlines live on Canvas — check there first</h2>'+
+      '<p style="margin:6px 0 14px;opacity:.92">This app is practice, not your planner. '+
+      (isClassNight?'<b>Tonight is a class night: journal in your own words, cold, before sleep.</b> (Claude checks recall only AFTER you write.) ':'')+
+      'Highest-yield practice here: the Problem Lab, blank-page first.</p>';
+    card0.appendChild(el("button",{class:"bigbtn",onclick:()=>{ go("lab"); }},"▶ &nbsp;Open the Problem Lab"));
+    v.appendChild(card0);
+    const a0 = accuracy();
+    const st0 = el("div",{class:"statrow"});
+    st0.innerHTML =
+      '<div class="stat"><div class="n">'+Object.keys(S.probDone||{}).length+'</div><div class="l">problems done</div></div>'+
+      '<div class="stat"><div class="n">'+a0.t+'</div><div class="l">questions</div></div>'+
+      '<div class="stat"><div class="n">'+a0.pct+'%</div><div class="l">accuracy</div></div>'+
+      '<div class="stat"><div class="n">'+S.missed.length+'</div><div class="l">in missed rotation</div></div>';
+    v.appendChild(st0);
+    if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your PHYS 210 folder for saved progress.</p>'));
+    return;
+  }
   const todayPlan = TRACK.find(x=>x.day===t);
   const behind = TRACK.filter(x=>x.day<t && !S.doneDays.includes(x.day));
   const mission = behind.length ? behind[0] : (todayPlan && !S.doneDays.includes(t) ? todayPlan : null);
@@ -500,8 +527,7 @@ VIEWS.home = (v) => {
     const isCatchup = behind.length && mission.day!==t;
     card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ OVERDUE — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
       '<h2 style="font-size:1.5rem">'+ (TOPICS[mission.topic]?TOPICS[mission.topic].ico:"🚀") +' '+mission.title+'</h2>'+
-      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. 20–30 min — physics is the light track; ochem keeps the bigger block.'+
-      (behind.length>1?' <b>('+(behind.length-1)+' more overdue behind this one — they queue up automatically.)</b>':'')+'</p>';
+      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. 20–30 min — physics is the light track; ochem keeps the bigger block.</p>';
     const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lab"){ go("lab"); } else if(mission.topic==="diag"){ startDiagnostic(); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
     card.appendChild(btn);
   } else {

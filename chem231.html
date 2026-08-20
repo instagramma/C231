@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.0.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15 · r3 pending
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.1 truth patch (audit r3, findings 1,2,3,15,16): semester-mode Home (no stale runway
+  missions), water sp³ qualified per Klein §1.11, c5/fx8/ix1 wording, diagDue checkpoint-
+  first ordering, scoped/cumulative runs NAME uncovered topics, evaluator "solid"→"screen"
   v3.0 (2026-08-19): EVERY-2-DAY DIAGNOSTICS (Gabe-designed). Two alternating cold modes —
         📚 Cumulative (all topics the course has covered, via SEMESTER week map, verified
         Ciesla schedule 08-18) and 🎯 Scoped (next checkpoint only; editable nextQuiz seeded
@@ -412,13 +415,14 @@ const DIFF_DEFAULT={valence:1,lewis:2,formal:2,polarity:2,hybrid:2,imf:2,resonan
 function qDiff(q){ return q.diff || DIFF_DEFAULT[q.topic] || 2; }
 /* the 2-day cadence: due when the last diagnostic of EITHER type is ≥2 days old; types alternate */
 function diagDue(){
-  if(!S.diags.length) return "cum";
-  const last=S.diags[S.diags.length-1];
   const cp=nextCheckpoint();
+  // v3.1 (audit F3): checkpoint-proximity check runs FIRST — even on a first-ever run
   if(cp && daysTo(cp.date)<=2 && daysTo(cp.date)>=0) { // final approach: scoped takes priority
     const doneToday=S.diags.some(d=>d.date===todayStr()&&d.type==="scope");
     return doneToday?null:"scope";
   }
+  if(!S.diags.length) return "cum";
+  const last=S.diags[S.diags.length-1];
   const age=Math.floor((new Date(todayStr()+"T00:00:00")-new Date(last.date+"T00:00:00"))/86400000);
   if(age<2) return null;
   return last.type==="cum"?"scope":"cum";
@@ -426,12 +430,21 @@ function diagDue(){
 function startDiag2(type){
   const cov=coveredTopics();
   let scopeTopics, scopeName;
+  let missing=[]; // v3.1 (audit F3): topics the checkpoint requires but the bank can't test — NAMED, never silent
   if(type==="scope"){ const cp=nextCheckpoint();
-    scopeTopics=(cp&&cp.topics)?cp.topics.filter(k=>cov.includes(k)||QUESTIONS.some(q=>q.topic===k)):cov;
+    const wanted=(cp&&cp.topics)?cp.topics:cov;
+    scopeTopics=wanted.filter(k=>cov.includes(k)&&QUESTIONS.some(q=>q.topic===k&&q.type!=="written")); // covered AND testable only
+    missing=wanted.filter(k=>!scopeTopics.includes(k));
     scopeName=cp?cp.name+" ("+fmtDay(cp.date)+")":"next assessment";
-  } else { scopeTopics=cov; scopeName="semester so far (wk "+Math.max(courseWeek(),1)+")"; }
+  } else { scopeTopics=cov; scopeName="semester so far (wk "+Math.max(courseWeek(),1)+")";
+    // cumulative: name any covered course topic the bank has no items for (e.g. Ch 4 from wk 4)
+    missing=(SEMESTER.filter(w=>w.wk<=courseWeek()).flatMap(w=>w.topics)).filter(k=>!QUESTIONS.some(q=>q.topic===k));
+    const wkNow=SEMESTER.find(w=>w.wk===courseWeek());
+    if(wkNow&&!wkNow.topics.length&&courseWeek()>=4) missing.push("Ch 4 (no bank items yet)");
+  }
   scopeTopics=scopeTopics.filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
-  if(!scopeTopics.length){ alert("No in-scope topics in the bank yet."); return; }
+  if(!scopeTopics.length){ alert("No in-scope topics in the bank yet."+(missing.length?" Uncovered: "+missing.join(", "):"")); return; }
+  if(missing.length) alert("⚠ HONESTY NOTE — this "+(type==="scope"?"scoped":"cumulative")+" run does NOT cover: "+missing.join(", ")+".\nThe score below excludes those. Study them from the book/Canvas — the app can't see them.");
   // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
   const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&s.w>0)n+=3; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiff(q); return n+Math.random(); };
@@ -497,7 +510,7 @@ const QUESTIONS = [
 {id:"h1",topic:"hybrid",type:"text",prompt:"Hybridization of carbon in CH₄? (type like: sp3)",answer:"sp3",why:"4 attached groups + 0 LP = 4 electron domains → <b>sp³</b>, tetrahedral, 109.5°. Count domains, that's the whole trick."},
 {id:"h2",topic:"hybrid",type:"text",prompt:"Hybridization of the carbon in H₂C=O?",answer:"sp2",why:"3 domains (2 H + 1 O, the double bond counts once) → <b>sp²</b>, trigonal planar, 120°."},
 {id:"h3",topic:"hybrid",type:"text",prompt:"Hybridization of each carbon in HC≡CH?",answer:"sp",why:"2 domains each → <b>sp</b>, linear, 180°."},
-{id:"h4",topic:"hybrid",type:"mc",prompt:"Water's oxygen is sp³ with 2 lone pairs. Its shape is:",choices:["Bent","Linear","Tetrahedral","Trigonal planar"],answer:0,why:"4 domains arrange tetrahedrally, but shape names only the atoms: 2 bonds + 2 LPs = <b>bent</b> (~104.5°)."},
+{id:"h4",topic:"hybrid",type:"mc",prompt:"In the VSEPR/steric-number model, water's O is treated as sp³ with 2 lone pairs. Its molecular shape is:",choices:["Bent","Linear","Tetrahedral","Trigonal planar"],answer:0,why:"4 domains arrange tetrahedrally, but shape names only the atoms: 2 bonds + 2 LPs = <b>bent</b> (~104.5°). <i>Fine print (Klein §1.11): experiment shows a lone pair sits in a p orbital, so water's O is not literally sp³ — VSEPR is the course's working approximation.</i>"},
 {id:"h5",topic:"hybrid",type:"mc",prompt:"A C=C double bond consists of:",choices:["1 sigma + 1 pi bond","2 sigma bonds","2 pi bonds","1 sigma + 2 pi"],answer:0,why:"<b>1σ + 1π</b>. The π bond is side-on p-orbital overlap — which is why double bonds can't rotate: rotating breaks the π overlap."},
 {id:"h7",topic:"hybrid",type:"mc",prompt:"NH₃'s shape (VSEPR)?",choices:["Trigonal pyramidal","Trigonal planar","Tetrahedral","Bent"],answer:0,why:"Count ALL 4 domains: 3 bonds + <b>1 lone pair</b> → sp³, but the SHAPE names only the atoms: <b>trigonal pyramidal</b> (~107°). Forgetting the lone pair (calling it trigonal planar) is your documented trap — the LP counts as a domain."},
 {id:"h8",topic:"hybrid",type:"num",prompt:"Bond angle in CH₄ (tetrahedral), in degrees? (one decimal)",answer:109.5,why:"4 equal domains → <b>109.5°</b>. The set to memorize: sp 180° · sp² 120° · sp³ 109.5° (squeezed slightly by lone pairs: NH₃ ~107°, H₂O ~104.5°)."},
@@ -536,7 +549,7 @@ const QUESTIONS = [
 {id:"c2",topic:"bondline",type:"num",prompt:"Total hydrogens in cyclohexane (the plain hexagon)?",answer:12,why:"6 carbons, each with 2 ring bonds → 2 H's each → <b>12</b>. Formula C₆H₁₂ ✓ (CₙH₂ₙ for one ring/double bond)."},
 {id:"c3",topic:"bondline",type:"num",prompt:"CH₃CH(OH)CH₂CH₃ — how many H's on the carbon bearing the OH?",answer:1,why:"That C has bonds to: CH₃, OH, CH₂CH₃ = 3 → needs <b>1 H</b>. Translating condensed ↔ bond-line and counting hidden H's is a day-one class skill."},
 {id:"c4",topic:"bondline",type:"mc",prompt:"A C=O with an H directly on the carbonyl carbon is a(n)…",choices:["Aldehyde","Ketone","Carboxylic acid","Ester"],answer:0,why:"<b>Aldehyde</b> = C=O at a chain END (has H). Ketone = C=O between two carbons. Acid = C=O with OH. Ester = C=O with OR."},
-{id:"c5",topic:"bondline",type:"mc",prompt:"CH₃–O–CH₃ contains which functional group?",choices:["Ether","Ester","Alcohol","Epoxide… wait that's an ether too"],answer:0,why:"C–O–C with no C=O = <b>ether</b>. (An epoxide is a 3-membered cyclic ether — so choice D was half right, but 'ether' is the group name.)"},
+{id:"c5",topic:"bondline",type:"mc",prompt:"CH₃–O–CH₃ contains which functional group?",choices:["Ether","Ester","Alcohol","Aldehyde"],answer:0,why:"C–O–C with no C=O = <b>ether</b>. Ester needs C(=O)O, alcohol needs O–H, aldehyde needs C(=O)H."},
 {id:"c6",topic:"bondline",type:"mc",prompt:"Ibuprofen contains a benzene ring and which acidic group?",choices:["Carboxylic acid (–COOH)","Amide","Ester","Phenol"],answer:0,why:"Ibuprofen = aromatic ring + <b>carboxylic acid</b> (pKa ≈ 4.9). Spotting groups on real drugs is exactly how exams dress up easy questions."},
 {id:"c7",topic:"bondline",type:"mc",prompt:"An N between two carbons (R–NH–R), no C=O anywhere near it:",choices:["Amine","Amide","Nitrile","Imine"],answer:0,why:"<b>Amine</b> = N with C/H neighbors. <b>Amide</b> = N attached to a C=O — totally different behavior. This pair is the most-confused of all groups."},
 // v2.13: bank expansion — +30 Lewis, +8 each valence/formal/polarity/hybrid, +6 IMF.
@@ -585,7 +598,7 @@ const QUESTIONS = [
 {id:"fx5",topic:"formal",type:"num",prompt:"Formal charge on a terminal oxygen in ozone with 1 bond and 3 lone pairs?",answer:-1,why:"FC = 6 − 6 − 1 = <b>−1</b>. Fewer bonds than neutral → negative. (Ozone: center +1, one end −1, sum 0.)"},
 {id:"fx6",topic:"formal",type:"num",prompt:"In any NEUTRAL molecule, the sum of all formal charges equals?",answer:0,why:"<b>0</b>. Individual atoms can be ±, but they must sum to the molecule's overall charge."},
 {id:"fx7",topic:"formal",type:"num",prompt:"In NH₄⁺, the sum of all formal charges equals? (enter −1, 0, or 1)",answer:1,why:"<b>+1</b> — the sum always equals the ion's overall charge. N carries the +1; the H's are 0."},
-{id:"fx8",topic:"formal",type:"num",prompt:"Formal charge on an N with 2 bonds and 2 lone pairs?",answer:-1,why:"FC = 5 − 4 − 2 = <b>−1</b>. Fewer bonds than nitrogen's neutral 3 → negative (a deprotonated/amide nitrogen)."},
+{id:"fx8",topic:"formal",type:"num",prompt:"Formal charge on an N with 2 bonds and 2 lone pairs?",answer:-1,why:"FC = 5 − 4 − 2 = <b>−1</b>. Fewer bonds than nitrogen's neutral 3 → negative (an <b>amide ion / anionic nitrogen</b>, like H₂N⁻ — not the neutral N of a carboxamide)."},
 {id:"px1",topic:"polarity",type:"mc",prompt:"Which is more electronegative, oxygen or carbon?",answer:0,choices:["Oxygen","Carbon","They are equal","Depends on the molecule"],why:"<b>Oxygen</b>. EN order: F > O > N ≈ Cl > C ≈ H. A C–O bond is polar with δ− on O."},
 {id:"px2",topic:"polarity",type:"mc",prompt:"Is a C–H bond strongly polar?",answer:0,choices:["No — C and H are close in electronegativity","Yes — very polar","Yes — H is much more electronegative","Only in water"],why:"<b>Nearly nonpolar.</b> C and H sit close on the EN scale, so C–H barely has a dipole. That's why hydrocarbons are nonpolar."},
 {id:"px3",topic:"polarity",type:"mc",prompt:"In an O–H bond, which atom carries the δ− (partial negative)?",answer:0,choices:["Oxygen","Hydrogen","Neither","Both"],why:"<b>Oxygen</b> — more electronegative, pulls the shared electrons → δ−; H becomes δ+. Why water H-bonds."},
@@ -598,11 +611,11 @@ const QUESTIONS = [
 {id:"hx2",topic:"hybrid",type:"num",prompt:"Ideal bond angle at an sp² atom (degrees)?",answer:120,why:"<b>120°</b> — 3 domains, trigonal planar. Set: sp 180 · sp² 120 · sp³ 109.5."},
 {id:"hx3",topic:"hybrid",type:"mc",prompt:"Geometry of an sp atom (2 electron domains)?",answer:0,choices:["Linear","Bent","Trigonal planar","Tetrahedral"],why:"<b>Linear</b>, 180°. Two domains push as far apart as possible. e.g. the carbons in acetylene, or CO₂."},
 {id:"hx4",topic:"hybrid",type:"text",prompt:"Hybridization of the carbon in CO₂? (type like sp2)",answer:"sp",why:"2 domains (each C=O counts as ONE) → <b>sp</b>, linear. Double bonds don't add domains."},
-{id:"hx5",topic:"hybrid",type:"text",prompt:"Hybridization of the oxygen in water (2 bonds, 2 lone pairs)? (type like sp3)",answer:"sp3",why:"4 domains (2 bonds + 2 lone pairs) → <b>sp³</b>. Lone pairs count — that's why water's O is sp³ and bent."},
+{id:"hx5",topic:"hybrid",type:"text",prompt:"Using the steric-number (VSEPR) model: what hybridization is ASSIGNED to the oxygen in water (2 bonds, 2 lone pairs)? (type like sp3)",answer:"sp3",why:"4 domains → <b>sp³</b> in the steric-number model; lone pairs count. <i>Fine print (Klein §1.11): experimentally at least one lone pair occupies a p orbital — water's O cannot be described as literally sp³. Know both layers; use whichever Ciesla asks for.</i>"},
 {id:"hx6",topic:"hybrid",type:"num",prompt:"How many pi bonds are in a triple bond?",answer:2,why:"<b>2</b> pi + 1 sigma. Single = 1σ. Double = 1σ+1π. Triple = 1σ+2π."},
 {id:"hx7",topic:"hybrid",type:"mc",prompt:"A single bond consists of:",answer:0,choices:["1 sigma bond","1 pi bond","2 sigma bonds","1 sigma + 1 pi"],why:"<b>1 sigma bond.</b> The first bond between two atoms is always sigma; extra bonds (double/triple) add pi."},
 {id:"hx8",topic:"hybrid",type:"text",prompt:"Hybridization of the nitrogen in ammonia, NH₃? (type like sp3)",answer:"sp3",why:"4 domains (3 bonds + 1 lone pair) → <b>sp³</b>. Counting the lone pair is the whole trick."},
-{id:"ix1",topic:"imf",type:"mc",prompt:"Which is the stronger intermolecular force?",answer:0,choices:["Hydrogen bonding","London dispersion","They are equal","Neither is a force"],why:"<b>Hydrogen bonding</b> > dipole-dipole > London dispersion. H-bonding is a specially strong dipole interaction (H on N/O/F)."},
+{id:"ix1",topic:"imf",type:"mc",prompt:"For molecules of COMPARABLE SIZE, which is the stronger intermolecular force?",answer:0,choices:["Hydrogen bonding","London dispersion","They are equal","Neither is a force"],why:"For comparable size: <b>hydrogen bonding</b> > dipole-dipole > London dispersion (H-bonding = specially strong dipole interaction, H on N/O/F). <i>Careful — 'H-bonding always wins' is NOT a rule: in large, polarizable molecules, summed dispersion can dominate. Size matters.</i>"},
 {id:"ix2",topic:"imf",type:"mc",prompt:"Can two CH₄ (methane) molecules hydrogen-bond to each other?",answer:0,choices:["No — no H bonded to N, O, or F","Yes — it has hydrogens","Yes — carbon is electronegative","Only when frozen"],why:"<b>No.</b> H-bonding needs H on N/O/F. Methane's H's are on carbon → only London dispersion."},
 {id:"ix3",topic:"imf",type:"mc",prompt:"Which intermolecular force is present in EVERY molecule?",answer:0,choices:["London dispersion","Hydrogen bonding","Dipole-dipole","Ionic bonding"],why:"<b>London dispersion</b> — from temporary electron fluctuations, so everything has it. The only IMF nonpolar molecules get."},
 {id:"ix4",topic:"imf",type:"mc",prompt:"HF can hydrogen-bond because its hydrogen is bonded to:",answer:0,choices:["Fluorine (an N/O/F atom)","Carbon","Another hydrogen","Nothing — it can't"],why:"<b>Fluorine.</b> H attached to N, O, or F is the H-bond donor requirement. HF, H₂O, NH₃ all qualify."},
@@ -820,6 +833,31 @@ VIEWS.home = (v) => {
       '<span class="tag coral">Re-entry ritual</span><h2>Welcome back ('+gap+' days away)</h2>'+
       '<p>Break decay is steep for you — that\'s measured, not a guess. Before anything new: <b>one warm-up problem from the last topic you touched.</b> Open the Lewis Lab and rebuild the last molecule you completed, cold. Then continue.</p>'));
   }
+  // v3.1 (audit F1): SEMESTER MODE — after class start, the runway is history and Home
+  // never issues an expired mission. Real deadlines live on Canvas; the app's job is
+  // diagnostics + drills + written practice.
+  if (t >= CLASS_START){
+    const cp = nextCheckpoint(); const due = diagDue();
+    const card = el("div",{class:"card teal"});
+    card.innerHTML = '<span class="tag gold">Semester mode · week '+Math.max(courseWeek(),1)+'</span>'+
+      '<h2 style="font-size:1.4rem">Deadlines live on Canvas — check there first</h2>'+
+      '<p style="margin:6px 0 14px;opacity:.92">This app is practice, not your planner. '+
+      (cp?'Next checkpoint: <b>'+cp.name+'</b> · '+fmtDay(cp.date)+' ('+daysTo(cp.date)+'d). ':'')+
+      (due?'A <b>'+(due==="cum"?"📚 cumulative":"🎯 scoped")+' diagnostic</b> is due today.':'No diagnostic due today.')+'</p>';
+    card.appendChild(el("button",{class:"bigbtn",onclick:()=>{ due?startDiag2(due):startDrill("__missed"); }},
+      due?("▶ &nbsp;Start "+(due==="cum"?"cumulative":"scoped")+" diagnostic"):"▶ &nbsp;Review my missed questions"));
+    v.appendChild(card);
+    const a2 = accuracy();
+    const st = el("div",{class:"statrow"});
+    st.innerHTML =
+      '<div class="stat"><div class="n">'+S.diags.length+'</div><div class="l">diagnostics</div></div>'+
+      '<div class="stat"><div class="n">'+a2.t+'</div><div class="l">questions</div></div>'+
+      '<div class="stat"><div class="n">'+a2.pct+'%</div><div class="l">accuracy</div></div>'+
+      '<div class="stat"><div class="n">'+S.missed.length+'</div><div class="l">in missed rotation</div></div>';
+    v.appendChild(st);
+    if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
+    return;
+  }
   const todayPlan = TRACK.find(x=>x.day===t);
   const behind = TRACK.filter(x=>x.day<t && !S.doneDays.includes(x.day));
   // v2.4 recovery mode: today's topic is ALWAYS the mission (highest yield now).
@@ -864,7 +902,7 @@ VIEWS.home = (v) => {
 
 /* ---- TRACK ---- */
 VIEWS.track = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">PREPARATION · pre-semester</span><h2>The runway · Aug 8 → 18</h2><p class="muted">Everything below is <b>Preparation</b> — the gen-chem review Prof. Ciesla listed, done before day one. Tap a day to open its work; tap ✓ to toggle done (honest self-report only). When the official syllabus posts, a separate <b>Semester</b> section appears here with the real 17 weeks — prep history stays intact.</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">HISTORY · pre-semester runway (Aug 8 → 18)</span><h2>Preparation archive</h2><p class="muted">This runway is <b>finished history</b> — it no longer steers anything. Semester steering lives on <b>Canvas</b> (real deadlines) and the <b>Exam tab</b> (every-2-day diagnostics). Kept here so the prep record stays intact.</p>'));
   const g = el("div",{class:"daygrid"});
   const t = todayStr();
   TRACK.forEach(d=>{
@@ -973,7 +1011,7 @@ VIEWS.exam = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">📊 Exam · find your gaps</span><h2>Where am I? What do I study first?</h2><p class="muted">Two levels. The in-app <b>Evaluator</b> gives an instant per-topic gap map. The <b>full written exams</b> (blank-page — the true test) you do on paper, then send to Claude for a scored, ranked study plan.</p>'));
   if (S.lastEval){ const nm=k=>TOPICS[k]?.name||k; const e=S.lastEval;
     const card=el("div",{class:"card"+(e.gaps.length?"":" teal")});
-    card.innerHTML='<span class="tag violet">Last evaluator · '+fmtDay(e.date)+'</span><h3 style="margin:6px 0">'+e.pct+'% · '+(e.gaps.length?e.gaps.length+' gap'+(e.gaps.length>1?'s':''):'no gaps')+'</h3>'+(e.gaps.length?'<p class="muted">Study first: <b>'+e.gaps.map(nm).join(" → ")+'</b></p>':'<p class="muted">All prereqs solid.</p>');
+    card.innerHTML='<span class="tag violet">Last evaluator · '+fmtDay(e.date)+'</span><h3 style="margin:6px 0">'+e.pct+'% · '+(e.gaps.length?e.gaps.length+' gap'+(e.gaps.length>1?'s':''):'no gaps')+'</h3>'+(e.gaps.length?'<p class="muted">Study first: <b>'+e.gaps.map(nm).join(" → ")+'</b></p>':'<p class="muted">Screen passed (n=1/topic) — no flags. A screen, not proof of mastery.</p>');
     v.appendChild(card);
   }
   // v3.0: the every-2-day diagnostics + editable next-quiz target
@@ -988,7 +1026,7 @@ VIEWS.exam = (v) => {
   if(S.diags.length){ dg.appendChild(el("p",{class:"muted",style:"margin:8px 0 0;font-size:.85em"},"History: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"% ("+fmtDay(d.date)+")").join(" · "))); }
   v.appendChild(dg);
   const ev=el("div",{class:"card cream"});
-  ev.innerHTML='<h3>⚡ Quick Evaluator (in-app, ~6 min)</h3><p class="muted" style="margin:4px 0 8px">One cold question per prereq topic → a color-coded gap map (🟢 solid / 🔴 study first) with a priority-ordered study list. No notes — this measures real recall. Result gets logged when you send your Report.</p>';
+  ev.innerHTML='<h3>⚡ Quick Evaluator (in-app, ~6 min)</h3><p class="muted" style="margin:4px 0 8px">One cold question per prereq topic → a color-coded gap map (🟢 passed screen / 🔴 study first) with a priority-ordered study list. No notes — this measures real recall. Result gets logged when you send your Report.</p>';
   ev.appendChild(el("button",{class:"btn teal",onclick:()=>startEvaluator()},"Start Evaluator →"));
   v.appendChild(ev);
   const wr=el("div",{class:"card"});
@@ -1035,9 +1073,9 @@ VIEWS.drill = (v) => {
       if(!rep.gaps.length) confetti();
       const c=el("div",{class:"card"+(!rep.gaps.length?" teal":"")});
       const nm=k=>TOPICS[k]?.name||k;
-      c.innerHTML='<span class="tag gold">Gap map · '+rep.pct+'%</span><h2>'+(rep.gaps.length?rep.gaps.length+' gap'+(rep.gaps.length>1?'s':'')+' found':'No gaps — all prereqs solid 🎉')+'</h2>'+
+      c.innerHTML='<span class="tag gold">Gap map · '+rep.pct+'%</span><h2>'+(rep.gaps.length?rep.gaps.length+' gap'+(rep.gaps.length>1?'s':'')+' found':'No flags on this screen 🎉 (n=1–2/topic — a screen, not mastery)')+'</h2>'+
         '<div style="margin:10px 0">'+
-        GAP_PRIORITY.filter(k=>D.byTopic[k]).map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(hit?'solid':'study first')+'</span></div>'; }).join("")+
+        GAP_PRIORITY.filter(k=>D.byTopic[k]).map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(hit?'passed screen':'study first')+'</span></div>'; }).join("")+
         '</div>'+
         (rep.gaps.length?'<div class="why"><b>Study these first, in this order:</b> '+rep.gaps.map(nm).join(" → ")+'. Each has a primer in the 📖 Learn tab — read it, then drill that topic. Foundational topics (valence, Lewis) come before the rest even if you also missed a later one.</div>':'<p style="margin:6px 0">Every prereq topic answered correctly cold. Keep them warm with occasional drills; you\'re ready to start.</p>');
       const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
