@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CHEM 231 · Ochem Bootcamp</title>
+<!--
+  ============================================================
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.3  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.3 LECTURE 1 (Ciesla Thu 8/20, from Gabe's transcript): +19 auto items + 5 written
+  (WR-CH1-007…011) covering her emphases and named traps — lone-pair orbitals (sp²/sp³),
+  σ/π overlap, bond angles + SO₂ trap (<120 not 109.5), C–halogen ALWAYS polar, the four
+  nonpolar-cancellation cases, cis/trans bp, phase-changes-break-IMFs-not-bonds wording,
+  bond-line implicit H. New 📝 Lecture Check mode (Exam tab): cold 24-item run → per-topic
+  focus/strengthen/strength map. Transcript also CONFIRMS course uses steric-number model
+  (water O = sp³ for this course; Klein fine print stands).
+  v3.3 (2026-08-24, Gabe's specs): TUTORIAL-STANDARD BANK — 15 items modeled on Ciesla's
+        Ch-1 tutorial (real molecules: vinyl chloride, isonitriles, CHCl3/CFCl3) + the official
+        quiz-scope topics not previously drilled (isomers, bonding patterns, sigma/pi, s-character,
+        orbitals/nodes, EPM, LDF branching, solubility, PE curve). Plus: 📅 DEADLINES card (real
+        due dates + countdowns, estimates marked ~) and 📊 MEASURED card (all-time & 7-day %,
+        per-topic bars, median time, FC clean days, latest diags) at the top of Home.
+  v3.2 measurement patch (audit r3 findings 6,7 + Gabe's spec 08-20): EVENT LOG — every
+  answer appends {id,ts,ok,g,d(seconds),mode,topic} to S.attempts (cap 5000, cross-device
+  union-merge by id|ts — nothing overwritten). HONEST SCORING — accuracy separates clean
+  rights from guessed rights everywhere (home stat, gap map, report); a topic is only
+  "solid" if clean rights beat wrongs. MISCONCEPTION PRIORITY — confident-wrong now
+  outranks guessed-wrong in every selection queue. MEASURED DIFFICULTY — qDiffM() derives
+  difficulty from actual miss rate + guess rate + time-vs-topic-median, blended with the
+  static prior until enough attempts accumulate (weight n/(n+4)). Rationale ANALYSIS
+  stays Claude-side (wrLog review); the app measures answer/frequency/time.
+  v3.1 truth patch (audit r3, findings 1,2,3,15,16): semester-mode Home (no stale runway
+  missions), water sp³ qualified per Klein §1.11, c5/fx8/ix1 wording, diagDue checkpoint-
+  first ordering, scoped/cumulative runs NAME uncovered topics, evaluator "solid"→"screen"
+  v3.0 (2026-08-19): EVERY-2-DAY DIAGNOSTICS (Gabe-designed). Two alternating cold modes —
+        📚 Cumulative (all topics the course has covered, via SEMESTER week map, verified
+        Ciesla schedule 08-18) and 🎯 Scoped (next checkpoint only; editable nextQuiz seeded
+        Ch 1 Quiz Thu 8/27; fixed CHECKPOINTS: Exam 1 ~9/15, Exam 2 ~10/20, Exam 3 11/10,
+        Final 12/15). Due-every-2-days banner on Home (scoped auto-priority ≤2 days out).
+        NEW measurement semantics (Gabe-specified): 🎲 "I guessed" checkbox on every question
+        (correct+guessed = shaky → stays in rotation, qstats gains gr/gw; wrong+confident =
+        misconception, recorded distinctly); optional "why I chose this" rationale box (wrLog);
+        6 WRITTEN items (WR-CH1-001…006, UID'd + difficulty-scored) — typed/paper answers
+        self-graded vs model+rubric under the 08-19 honesty covenant, saved pendingReview for
+        Claude's process-grading via 📤 Report. qDiff() difficulty layer (explicit or per-topic
+        default). Header countdown → next checkpoint after semester start. Cloud sync extended:
+        diags/nextQuiz/wrLog merged cross-device. Written items excluded from short drills.
+  v2.13 (2026-08-17): bank expansion + adaptive short sets. +68 questions (Lewis 7→37, plus
+        +8 each valence/formal/polarity/hybrid, +6 IMF). Drill sessions now cap at 5 questions
+        (SESSION_MAX), randomized each run and weighted by NEED (missed → unseen → known).
+  v2.12 (2026-08-17): nav made coherent — Lewis Lab folded into a new PRACTICE hub (with
+        drills + FC mastery); new EXAM tab. Evaluator engine: 1 cold Q/prereq-topic → a
+        color-coded GAP MAP + priority-ordered study list, stashed to lastEval and written
+        into the Report export (→ Learning Profile). Written-exam PDFs linked in-app.
+  v2.11 (2026-08-16): LEARN layer added — teach-first primers + Klein 5e sections + verified
+        free video links (Khan Academy hubs, The Organic Chemistry Tutor) per prereq topic;
+        new 📖 Learn nav tab. Closes the "no way to learn it, only to be tested" gap.
+  v2.10 (2026-08-16): corrected first-day info to registration (Tue 8/18 lecture Rm319 + lab
+        Rm300); removed the welcome-email "Monday lab" claim (conflicted with registration)
+        and flagged it to confirm with the prof. No chemistry change.
+  v2.9 (2026-08-16): runway re-anchored to START TODAY — finished Lewis days keep their dates
+        (progress preserved), remaining prereq topics run Sun 8/16 → Tue 8/18 lecture wall;
+        formal charge closes via the Mastery Check, not a dated day. No chemistry change.
+  v2.8 (2026-08-15, round-2 audit response — FINAL prep build, then freeze until course material):
+        diagnostic restricted to prerequisite topics only; empty diag pill hidden; diagnostic
+        can complete its Aug 18 plan day (__diag↔diag); formal scaffold order survives
+        interruption; f6 wording order-independent; stale resonance/acid-base priorities and
+        Aug-17-diagnostic copy corrected; central-atom guidance fixed (no more "pick either");
+        report exports FC-mastery status; a5 reworded to equilibrium-favored phrasing.
+        Known-limitation note (documented, deferred): Lewis FC checker keys expected charges by
+        ELEMENT, not per-atom — sufficient for the current 10 neutral targets, NOT generic; ions,
+        resonance contributors, or all-zero-FC constitutional isomers need per-atom roles or an
+        accepted-graph comparison first (round-2 audit §2).
+  v2.7 (2026-08-15): PREPARATION phase labeling per Gabe — header badge, Plan + Drill views
+        marked as pre-semester prep; Semester section slots in beside it at v3.0 (syllabus).
+  v2.6 (2026-08-15): re-anchored to Prof. Ciesla's welcome email. Runway now tracks HER review
+        list (polarity/dipoles → hybridization+VSEPR → IMFs → diagnostic before Tue lecture);
+        resonance/acid-base/bond-line dropped from runway (course teaches them; still drillable).
+        NEW imf topic (6 Qs) + VSEPR shapes (h7–h10) + molecular-dipole pair (p7/p8).
+        First-week logistics card on Home through 8/19 (labs MONDAY 8/17; lecture Tue 8/18).
+  v2.5: FC mastery check — the audit's transfer gate as an in-app mode: 6 species (OH⁻, H₃O⁺,
+        NH₄⁺, CH₃O⁻, R₃C⁺, R₃C⁻), inputs labeled (bonds → LPs → FC), clean 6/6 runs on
+        2 distinct days = mastered; synced via fcMastery array.
+  v2.1: due dates + overdue flags on days/molecules; Aug 17 final diagnostic day (mixed 1-per-topic round)
+  v2.2: cross-device cloud sync via the B250 Supabase project (`progress` table, profile "gabe-c231") —
+        pull+merge on load (arrays union, per-question stats keep the higher-attempt copy), debounced push on change.
+        localStorage stays as offline cache; header dot shows sync state.
+  v2.3: audit fixes — labeled FC explanations, LP scaffold questions (f0/f0b), pKa tolerance, notation.
+  v2.4: external-audit response — Lewis Lab formal-charge audit (rejects legal-octet-but-wrong
+        structures like H–N≡C and charge-separated CO₂); carbon sign-rule corrected on cheat sheet
+        (C⁺ 3 bonds/0 LP vs C⁻ 3 bonds/1 LP) + new f6 carbocation question; formal drill runs
+        f0→f0b→f1→f2 in order on first pass; auto-complete now needs ≥80% AND topic must match an
+        open mission day; recovery mode replaces FIFO backlog (today first + ONE repair, no pile).
+  For Gabe. Single file, no server, no dependencies.
+
+  ARCHITECTURE (for future updates when course material lands):
+  · THEME        — CSS custom properties, swap freely
+  · TRACK        — the day plan; replace with syllabus weeks later
+  · QUESTIONS    — flat array, schema below; append per-chapter
+                   banks when the course starts (same shape as
+                   claudebank_*.json: id/topic/type/prompt/answer/why)
+  · MOLECULES    — Lewis Lab targets; add any molecule by listing
+                   atoms + expected valences, checker is generic
+  · Storage      — safeStore wrapper: persists in a real browser,
+                   degrades to in-memory inside sandboxed previews
+  ============================================================
+-->
+<style>
+  :root{
+    --paper:#FBF6EA;
+    --paper2:#F4EDDA;
+    --ink:#20241F;
+    --teal:#0E7C6B;
+    --teal-dk:#0A5C50;
+    --coral:#E4572E;
+    --gold:#F2B705;
+    --violet:#6A4C93;
+    --ok:#2E7D32;
+    --line:#20241F;
+    --shadow:4px 4px 0 var(--ink);
+    --shadow-sm:2px 2px 0 var(--ink);
+    --serif:"Iowan Old Style","Palatino","Georgia",serif;
+    --mono:"SF Mono","Menlo","Consolas",monospace;
+    --sans:-apple-system,"Segoe UI","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{font-size:16px}
+  body{
+    background:var(--paper);
+    background-image:radial-gradient(circle at 1px 1px, rgba(32,36,31,.07) 1px, transparent 0);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  header{
+    background:var(--teal);
+    color:var(--paper);
+    border-bottom:3px solid var(--ink);
+    padding:14px 18px 12px;
+    display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px;
+  }
+  header h1{font-family:var(--serif);font-size:1.45rem;letter-spacing:.5px}
+  header h1 .flask{display:inline-block;transform:rotate(-8deg);margin-right:6px}
+  header .countdown{font-family:var(--mono);font-size:.8rem;background:var(--ink);color:var(--gold);padding:3px 10px;border-radius:99px}
+  .menubtn{font-family:var(--mono);font-size:.8rem;background:var(--paper);color:var(--ink);border:2px solid var(--ink);padding:3px 12px;border-radius:99px;font-weight:800;text-decoration:none;box-shadow:var(--shadow-sm)}
+  .menubtn:active{transform:translate(1px,1px);box-shadow:none}
+  nav{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    display:flex;background:var(--paper);border-top:3px solid var(--ink);
+  }
+  nav button{
+    flex:1;padding:10px 2px 12px;background:none;border:none;border-right:1px solid rgba(32,36,31,.15);
+    font-family:var(--sans);font-size:.68rem;font-weight:700;color:var(--ink);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+  }
+  nav button:last-child{border-right:none}
+  nav button .ico{font-size:1.25rem;line-height:1}
+  nav button.active{background:var(--gold)}
+  main{max-width:860px;margin:0 auto;padding:18px 14px 30px}
+  .card{
+    background:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .card.cream{background:var(--paper2)}
+  .card.teal{background:var(--teal);color:var(--paper)}
+  .card h2{font-family:var(--serif);font-size:1.25rem;margin-bottom:8px}
+  .card h3{font-family:var(--serif);font-size:1.05rem;margin-bottom:6px}
+  .tag{
+    display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);padding:3px 9px;border-radius:99px;margin-bottom:8px;
+  }
+  .tag.gold{background:var(--gold);color:var(--ink)}
+  .tag.coral{background:var(--coral);color:#fff}
+  .tag.violet{background:var(--violet);color:#fff}
+  .bigbtn{
+    display:block;width:100%;text-align:center;
+    background:var(--coral);color:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);padding:16px;font-size:1.1rem;font-weight:800;font-family:var(--serif);
+    cursor:pointer;transition:transform .06s;
+  }
+  .bigbtn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+  .btn{
+    display:inline-block;background:var(--teal);color:#fff;border:2px solid var(--ink);border-radius:8px;
+    box-shadow:var(--shadow-sm);padding:8px 14px;font-size:.85rem;font-weight:700;cursor:pointer;
+    transition:transform .06s;font-family:var(--sans);
+  }
+  .btn:active{transform:translate(2px,2px);box-shadow:none}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.coral{background:var(--coral)}
+  .btn.gold{background:var(--gold);color:var(--ink)}
+  .btn.violet{background:var(--violet)}
+  .btn.small{padding:5px 10px;font-size:.75rem}
+  .btn:disabled{opacity:.4;pointer-events:none}
+  .statrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .stat{
+    flex:1;min-width:90px;background:#fff;border:2px solid var(--ink);border-radius:8px;
+    box-shadow:var(--shadow-sm);padding:8px 10px;text-align:center;
+  }
+  .stat .n{font-family:var(--serif);font-size:1.5rem;font-weight:800}
+  .stat .l{font-size:.62rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.75}
+  .progressbar{height:14px;background:#fff;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:6px 0}
+  .progressbar>div{height:100%;background:var(--teal);border-right:2px solid var(--ink);transition:width .4s}
+  .daygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .daycard{
+    background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:var(--shadow-sm);
+    padding:10px;cursor:pointer;position:relative;
+  }
+  .daycard.today{background:var(--gold)}
+  .daycard.overdue{border-color:var(--coral);box-shadow:2px 2px 0 var(--coral)}
+  .duetag{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:#fff;border:1.5px solid var(--ink);border-radius:99px;padding:2px 8px;margin-top:6px}
+  .duetag.today-due{background:var(--gold)}
+  .duetag.overdue{background:var(--coral);color:#fff}
+  .daycard.done{background:#DDEEDD}
+  .daycard.done::after{content:"✓";position:absolute;top:6px;right:9px;font-weight:900;color:var(--ok);font-size:1.1rem}
+  .daycard .d{font-family:var(--mono);font-size:.65rem;font-weight:700;opacity:.7}
+  .daycard .t{font-family:var(--serif);font-weight:700;font-size:.9rem;margin-top:2px}
+  .qprompt{font-size:1.05rem;line-height:1.5;margin:10px 0 14px}
+  .qprompt .formula{font-family:var(--mono);font-weight:700}
+  .choices{display:flex;flex-direction:column;gap:8px}
+  .choice{
+    text-align:left;background:#fff;border:2px solid var(--ink);border-radius:8px;box-shadow:var(--shadow-sm);
+    padding:10px 12px;font-size:.95rem;cursor:pointer;font-family:var(--sans);
+  }
+  .choice.picked-right{background:#CDEBCB;border-color:var(--ok)}
+  .choice.picked-wrong{background:#F6CFC2;border-color:var(--coral)}
+  .choice.reveal-right{background:#CDEBCB}
+  .choice:disabled{cursor:default}
+  input.answerbox{
+    font-family:var(--mono);font-size:1.2rem;padding:10px 12px;border:2.5px solid var(--ink);
+    border-radius:8px;width:130px;background:#fff;box-shadow:inset 2px 2px 0 rgba(32,36,31,.12);
+  }
+  input.answerbox.wide{width:100%}
+  .why{
+    border-left:5px solid var(--gold);background:var(--paper2);border-radius:0 8px 8px 0;
+    padding:10px 12px;margin-top:12px;font-size:.9rem;line-height:1.5;
+  }
+  .why b{color:var(--teal-dk)}
+  .feedback-right{color:var(--ok);font-weight:800;font-family:var(--serif);font-size:1.1rem}
+  .feedback-wrong{color:var(--coral);font-weight:800;font-family:var(--serif);font-size:1.1rem}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  .pill{
+    background:#fff;border:2px solid var(--ink);border-radius:99px;padding:6px 13px;font-size:.8rem;
+    font-weight:700;cursor:pointer;box-shadow:var(--shadow-sm);
+  }
+  .pill.on{background:var(--teal);color:#fff}
+  .pill.done{background:#DDEEDD}
+  /* ---------- Lewis Lab ---------- */
+  .labwrap{display:flex;flex-direction:column;gap:12px}
+  .stepper{display:flex;gap:6px;flex-wrap:wrap}
+  .step{
+    flex:1;min-width:64px;text-align:center;font-size:.62rem;font-weight:800;letter-spacing:.3px;
+    border:2px solid var(--ink);border-radius:8px;padding:5px 3px;background:#fff;opacity:.45;
+  }
+  .step.on{background:var(--gold);opacity:1}
+  .step.ok{background:#CDEBCB;opacity:1}
+  .stepask{font-size:.98rem;line-height:1.5;margin:6px 0}
+  #lab-canvas{
+    width:100%;height:340px;background:#fff;border:2.5px solid var(--ink);border-radius:10px;
+    box-shadow:var(--shadow);touch-action:none;display:block;
+  }
+  .tooltray{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tool{
+    border:2px solid var(--ink);border-radius:8px;background:#fff;box-shadow:var(--shadow-sm);
+    padding:7px 12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:var(--mono);
+  }
+  .tool.on{background:var(--violet);color:#fff}
+  .ledger{
+    display:flex;gap:10px;font-family:var(--mono);font-size:.85rem;font-weight:700;
+    background:var(--ink);color:var(--paper);border-radius:8px;padding:8px 12px;flex-wrap:wrap;
+  }
+  .ledger .warn{color:var(--gold)}
+  .ledger .bad{color:#FF9A7B}
+  .ledger .good{color:#8FE3A1}
+  .audit li{margin:4px 0 4px 18px;font-size:.9rem}
+  .audit .pass{color:var(--ok);font-weight:700}
+  .audit .fail{color:var(--coral);font-weight:700}
+  table.cheat{width:100%;border-collapse:collapse;font-size:.85rem;margin:8px 0}
+  table.cheat th,table.cheat td{border:1.5px solid var(--ink);padding:6px 8px;text-align:left}
+  table.cheat th{background:var(--teal);color:#fff;font-family:var(--serif)}
+  table.cheat tr:nth-child(even){background:var(--paper2)}
+  .mono{font-family:var(--mono)}
+  .center{text-align:center}
+  .muted{opacity:.7;font-size:.85rem}
+  textarea.report{
+    width:100%;height:220px;font-family:var(--mono);font-size:.75rem;border:2px solid var(--ink);
+    border-radius:8px;padding:10px;background:#fff;
+  }
+  .confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99}
+  .confetti span{position:absolute;font-size:1.4rem;animation:fall 1.4s ease-in forwards}
+  @keyframes fall{from{transform:translateY(-40px) rotate(0)}to{transform:translateY(105vh) rotate(340deg);opacity:.2}}
+  .shake{animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @media(max-width:520px){
+    header h1{font-size:1.15rem}
+    #lab-canvas{height:300px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+</header>
+<main id="view"></main>
+<nav id="nav"></nav>
+<div class="confetti" id="confetti"></div>
+<script>
+"use strict";
+
+/* ================= STORAGE (safe wrapper) ================= */
+const safeStore = (() => {
+  let mem = {};
+  let ok = false;
+  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true; } catch(e){ ok = false; }
+  return {
+    get(k, fallback){ try { const v = ok ? localStorage.getItem(k) : mem[k]; return v == null ? fallback : JSON.parse(v); } catch(e){ return fallback; } },
+    set(k, v){ try { const s = JSON.stringify(v); if (ok) localStorage.setItem(k, s); else mem[k] = s; } catch(e){} },
+    persistent: ok
+  };
+})();
+
+/* ============ CLOUD SYNC (same Supabase project as B250) ============
+   One row in the `progress` table, profile "gabe-c231".
+   Pull + merge on load, debounced push on every change →
+   iPad / iPhone / Mac / any browser all see the same progress.  */
+const SB_URL = "https://tzdreklmkntpopqncada.supabase.co";
+const SB_KEY = "sb_publishable_PWdbyaBoBg8hM2kptSrwBA_I4lFrnQr";
+const SB_PROFILE = "gabe-c231";
+let cloudState = "init";
+let _pushT = null;
+function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Content-Type":"application/json"}; }
+function mergeRemote(remote){
+  if (!remote) return;
+  ["doneDays","molDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
+  if (remote.lastEval && (!S.lastEval || remote.lastEval.date > S.lastEval.date)) S.lastEval = remote.lastEval;
+  const seenM = new Set(S.missed);
+  (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
+  Object.entries(remote.qstats||{}).forEach(([id,st])=>{
+    const loc = S.qstats[id];
+    if (!loc || (st.r+st.w) > (loc.r+loc.w)) S.qstats[id] = st;   // keep the copy with more attempts
+  });
+  // v3.0: merge diagnostics runs (unique by date+type), written log (unique by ts), nextQuiz (latest setAt wins)
+  const dk = new Set(S.diags.map(d=>d.date+"|"+d.type));
+  (remote.diags||[]).forEach(d=>{ if(!dk.has(d.date+"|"+d.type)){ S.diags.push(d); dk.add(d.date+"|"+d.type); } });
+  S.diags.sort((a,b)=>a.date<b.date?-1:1);
+  const wk = new Set(S.wrLog.map(w=>w.ts));
+  (remote.wrLog||[]).forEach(w=>{ if(!wk.has(w.ts)){ S.wrLog.push(w); wk.add(w.ts); } });
+  S.wrLog.sort((a,b)=>a.ts<b.ts?-1:1); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120);
+  // v3.2: attempts = UNION by id|ts — every device's events survive; nothing is overwritten
+  const ak = new Set(S.attempts.map(a=>a.id+"|"+a.ts));
+  (remote.attempts||[]).forEach(a=>{ if(!ak.has(a.id+"|"+a.ts)){ S.attempts.push(a); ak.add(a.id+"|"+a.ts); } });
+  S.attempts.sort((a,b)=>a.ts-b.ts); if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
+  if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
+}
+async function cloudPull(){
+  try {
+    const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq."+SB_PROFILE+"&select=data", {headers:sbHeaders()});
+    if (!r.ok) throw 0;
+    const rows = await r.json();
+    mergeRemote(rows[0] && rows[0].data);
+    cloudState = "synced"; save(); render(); cloudPush(true);
+  } catch(e){ cloudState = "offline"; renderSyncDot(); }
+}
+async function cloudPush(now){
+  if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
+  try {
+    const body = JSON.stringify({ profile: SB_PROFILE,
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts},
+      updated_at: new Date().toISOString() });
+    const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
+    cloudState = r.ok ? "synced" : "offline";
+  } catch(e){ cloudState = "offline"; }
+  renderSyncDot();
+}
+function renderSyncDot(){
+  const d = document.getElementById("syncdot"); if(!d) return;
+  d.textContent = cloudState==="synced" ? "● cloud" : cloudState==="offline" ? "○ local only" : "◌ syncing…";
+  d.style.color = cloudState==="synced" ? "#8FE3A1" : "#F2B705";
+}
+
+/* ================= TRACK (swap for syllabus later) ================= */
+const CLASS_START = "2026-08-17";
+const TRACK = [
+  { day:"2026-08-08", topic:"lewis",    title:"Lewis structures" },
+  { day:"2026-08-09", topic:"lewis",    title:"Lewis: H₂O + C₂H₄ (Lab)" },
+  // v2.9 (2026-08-16) — runway RE-ANCHORED to start today. Finished Lewis days (8/8, 8/9)
+  // keep their dates so completed progress stays ✓; the remaining prereq topics now begin
+  // TODAY (Sun 8/16) and end at the fixed lecture wall (Tue 8/18). Formal charge is
+  // drilled-heavily-already — it closes via the Mastery Check (Drill tab), not a runway day.
+  { day:"2026-08-16", topic:"polarity", title:"Polarity + molecular dipoles" },
+  { day:"2026-08-17", topic:"hybrid",   title:"Hybridization + VSEPR" },
+  { day:"2026-08-18", topic:"diag",     title:"IMF warm-up + final diagnostic (before lecture!)" },
+];
+const TOPICS = {
+  valence:  { name:"Valence electrons",  ico:"🔢" },
+  lewis:    { name:"Lewis structures",   ico:"🧩" },
+  formal:   { name:"Formal charge",      ico:"⚡" },
+  polarity: { name:"Polarity + dipoles", ico:"🧭" },
+  hybrid:   { name:"Hybridization+VSEPR",ico:"📐" },
+  imf:      { name:"Intermolec. forces", ico:"🧲" },
+  resonance:{ name:"Resonance",          ico:"🔁" },
+  acidbase1:{ name:"Acid-base: pKa",     ico:"🍋" },
+  acidbase2:{ name:"Acid-base: ARIO",    ico:"⚖️" },
+  bondline: { name:"Bond-line + groups", ico:"⛓️" },
+  diag:     { name:"Final diagnostic",   ico:"🏁" },
+};
+
+/* ================= v3.0 — COURSE-WEEK ENGINE + EVERY-2-DAY DIAGNOSTICS =================
+   Source of truth: Ciesla's Fall-26 schedule (Canvas Google Sheet, verified 2026-08-18)
+   + written syllabus (weights: HW10/Lab15/Quiz20/Exams35/Final20; 3 exams lowest dropped;
+   ≤11 quizzes lowest dropped, ≥3 days notice — hence the editable nextQuiz). */
+const SEMESTER = [ // courseWeek -> topics INTRODUCED that week (app-bank keys only)
+  {wk:1,  start:"2026-08-17", ch:"Ch 1 (gen-chem review)", topics:["valence","lewis","formal","polarity","hybrid","imf"]},
+  {wk:2,  start:"2026-08-24", ch:"Ch 2 (molecular representation)", topics:["bondline","resonance"]},
+  {wk:3,  start:"2026-08-31", ch:"Ch 3 (acids/bases)", topics:["acidbase1","acidbase2"]},
+  {wk:4,  start:"2026-09-07", ch:"Ch 4 (alkanes/cycloalkanes)", topics:[]}, // bank items TBD (future version)
+];
+const CHECKPOINTS = [ // fixed, from the verified schedule; quizzes come via S.nextQuiz
+  {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","formal","polarity","hybrid","imf","bondline","resonance","acidbase1","acidbase2"]},
+  {name:"Exam 2",   date:"2026-10-20", topics:null}, // null = cumulative at that date
+  {name:"Exam 3",   date:"2026-11-10", topics:null},
+  {name:"Final (comprehensive)", date:"2026-12-15", topics:null},
+];
+function courseWeek(){ const ms=new Date()-new Date(CLASS_START+"T00:00:00"); return Math.max(0, Math.floor(ms/(7*86400000))+1); }
+function coveredTopics(){ // everything the course has introduced up to the current week, that the bank actually has
+  const wk=courseWeek(); const t=[];
+  SEMESTER.forEach(w=>{ if(w.wk<=Math.max(wk,1)) t.push(...w.topics); });
+  return t.filter(k=>QUESTIONS.some(q=>q.topic===k));
+}
+function nextCheckpoint(){ // nearest future graded event: nextQuiz (if set & future) vs fixed checkpoints
+  const today=todayStr(); const fixed=CHECKPOINTS.find(c=>c.date>=today);
+  const q=(S.nextQuiz&&S.nextQuiz.date>=today)?S.nextQuiz:null;
+  if(q&&(!fixed||q.date<=fixed.date)) return {name:q.name,date:q.date,topics:q.topics};
+  return fixed||null;
+}
+function daysTo(iso){ return Math.ceil((new Date(iso+"T00:00:00")-new Date())/86400000); }
+/* difficulty: explicit q.diff wins; else per-topic default (1 easy recall · 2 apply · 3 multi-step) */
+const DIFF_DEFAULT={valence:1,lewis:2,formal:2,polarity:2,hybrid:2,imf:2,resonance:3,acidbase1:2,acidbase2:3,bondline:2};
+function qDiff(q){ return q.diff || DIFF_DEFAULT[q.topic] || 2; }
+/* the 2-day cadence: due when the last diagnostic of EITHER type is ≥2 days old; types alternate */
+function diagDue(){
+  const cp=nextCheckpoint();
+  // v3.1 (audit F3): checkpoint-proximity check runs FIRST — even on a first-ever run
+  if(cp && daysTo(cp.date)<=2 && daysTo(cp.date)>=0) { // final approach: scoped takes priority
+    const doneToday=S.diags.some(d=>d.date===todayStr()&&d.type==="scope");
+    return doneToday?null:"scope";
+  }
+  if(!S.diags.length) return "cum";
+  const last=S.diags[S.diags.length-1];
+  const age=Math.floor((new Date(todayStr()+"T00:00:00")-new Date(last.date+"T00:00:00"))/86400000);
+  if(age<2) return null;
+  return last.type==="cum"?"scope":"cum";
+}
+function startDiag2(type){
+  const cov=coveredTopics();
+  let scopeTopics, scopeName;
+  let missing=[]; // v3.1 (audit F3): topics the checkpoint requires but the bank can't test — NAMED, never silent
+  if(type==="scope"){ const cp=nextCheckpoint();
+    const wanted=(cp&&cp.topics)?cp.topics:cov;
+    scopeTopics=wanted.filter(k=>cov.includes(k)&&QUESTIONS.some(q=>q.topic===k&&q.type!=="written")); // covered AND testable only
+    missing=wanted.filter(k=>!scopeTopics.includes(k));
+    scopeName=cp?cp.name+" ("+fmtDay(cp.date)+")":"next assessment";
+  } else { scopeTopics=cov; scopeName="semester so far (wk "+Math.max(courseWeek(),1)+")";
+    // cumulative: name any covered course topic the bank has no items for (e.g. Ch 4 from wk 4)
+    missing=(SEMESTER.filter(w=>w.wk<=courseWeek()).flatMap(w=>w.topics)).filter(k=>!QUESTIONS.some(q=>q.topic===k));
+    const wkNow=SEMESTER.find(w=>w.wk===courseWeek());
+    if(wkNow&&!wkNow.topics.length&&courseWeek()>=4) missing.push("Ch 4 (no bank items yet)");
+  }
+  scopeTopics=scopeTopics.filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
+  if(!scopeTopics.length){ alert("No in-scope topics in the bank yet."+(missing.length?" Uncovered: "+missing.join(", "):"")); return; }
+  if(missing.length) alert("⚠ HONESTY NOTE — this "+(type==="scope"?"scoped":"cumulative")+" run does NOT cover: "+missing.join(", ")+".\nThe score below excludes those. Study them from the book/Canvas — the app can't see them.");
+  // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
+  const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+  // v3.2: misconception (confident-wrong) ranked above guessed-wrong; difficulty is MEASURED (qDiffM), not the static constant
+  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiffM(q); return n+Math.random(); };
+  const pool=[];
+  scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
+  const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
+  S.drill={queue:shuffle(pool).concat(wr), i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName};
+  go("drill");
+}
+/* v3.3: Lecture Check — fixed cold deck of the Aug 20 lecture items (auto + written),
+   scored per-topic through the same gap-map path as diagnostics. */
+function startLectureCheck(){
+  const ids=["l1s1","l1s2","l1s3","l1s4","l1s5","l1g1","l1g2","l1g3","l1p1","l1p2","l1p4","l1p5","l1p6","l1p7","l1i1","l1i2","l1i3","l1b1","l1b2"];
+  const wr=["WR-CH1-007","WR-CH1-008","WR-CH1-009","WR-CH1-010","WR-CH1-011"];
+  const pool=QUESTIONS.filter(q=>ids.includes(q.id));
+  const wrq=QUESTIONS.filter(q=>wr.includes(q.id));
+  S.drill={queue:shuffle(pool).concat(shuffle(wrq)), i:0, right:0, wrong:0, topic:"__lec", answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName:"Lecture check · Aug 20"};
+  go("drill");
+}
+function editNextQuiz(){
+  const n=prompt("Quiz name:",S.nextQuiz.name)||S.nextQuiz.name;
+  const d=prompt("Date (YYYY-MM-DD):",S.nextQuiz.date)||S.nextQuiz.date;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ alert("Date must be YYYY-MM-DD"); return; }
+  const t=prompt("Topics (comma keys: "+Object.keys(TOPICS).filter(k=>k!=="diag").join(", ")+"):",(S.nextQuiz.topics||[]).join(","));
+  const topics=(t||"").split(",").map(s=>s.trim()).filter(k=>TOPICS[k]);
+  S.nextQuiz={name:n,date:d,topics:topics.length?topics:S.nextQuiz.topics,setAt:new Date().toISOString()};
+  save(); render();
+}
+const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
+
+/* ================= QUESTION BANK =================
+   schema: {id, topic, type:"num"|"mc"|"text", prompt, answer, choices?, why}
+   Add course-specific banks below this array when the syllabus lands. */
+const QUESTIONS = [
+/* --- valence electrons (feeds lewis) --- */
+{id:"v1",topic:"valence",type:"num",prompt:"How many valence electrons does carbon have?",answer:4,why:"Group 14 → <b>4 valence electrons</b>. This is why carbon makes 4 bonds — it's halfway to 8, so sharing 4 more is cheapest."},
+{id:"v2",topic:"valence",type:"num",prompt:"How many valence electrons does nitrogen have?",answer:5,why:"Group 15 → <b>5</b>. Nitrogen typically makes 3 bonds + 1 lone pair (3×2 shared + 2 = 8)."},
+{id:"v3",topic:"valence",type:"num",prompt:"How many valence electrons does oxygen have?",answer:6,why:"Group 16 → <b>6</b>. Oxygen typically makes 2 bonds + 2 lone pairs."},
+{id:"v4",topic:"valence",type:"num",prompt:"How many valence electrons does chlorine have?",answer:7,why:"Halogens (group 17) → <b>7</b>. One bond + 3 lone pairs completes the octet."},
+{id:"v5",topic:"valence",type:"num",prompt:"Total valence electrons in CO₂?",answer:16,why:"C(4) + 2×O(6) = <b>16</b>. Always compute the total first — it's the budget the whole structure must spend exactly."},
+{id:"v6",topic:"valence",type:"num",prompt:"Total valence electrons in NH₃?",answer:8,why:"N(5) + 3×H(1) = <b>8</b>."},
+{id:"v7",topic:"valence",type:"num",prompt:"Total valence electrons in HCN?",answer:10,why:"H(1) + C(4) + N(5) = <b>10</b>."},
+{id:"v8",topic:"valence",type:"num",prompt:"Total valence electrons in CH₃OH (methanol)?",answer:14,why:"C(4) + 4 H's (1 each = 4) + O(6) = <b>14</b>."},
+{id:"v9",topic:"valence",type:"num",prompt:"Total valence electrons in the hydroxide ion, OH⁻?",answer:8,why:"O(6) + H(1) <b>+ 1 for the negative charge</b> = 8. Charges change the budget: add e⁻ for −, subtract for +."},
+{id:"v10",topic:"valence",type:"num",prompt:"Total valence electrons in NH₄⁺?",answer:8,why:"N(5) + 4 H's (1 each = 4) = 9, <b>− 1 for the + charge</b> = 8. The charge adjusts the WHOLE structure's budget — never any single atom's own valence count."},
+/* --- lewis --- */
+{id:"l1",topic:"lewis",type:"mc",prompt:"In a Lewis structure, the central atom is usually…",choices:["The atom that wants the most bonds (never H)","The most electronegative atom","Whichever is written first","Always carbon"],answer:0,why:"Central = <b>most bonds wanted</b> (C > N > O). Hydrogen is never central — it only makes 1 bond, so it's always terminal."},
+{id:"l2",topic:"lewis",type:"num",prompt:"You draw 2 single bonds in H₂O (8 e⁻ total). How many electrons remain after step 3?",answer:4,why:"2 bonds × 2 e⁻ = 4 used. 8 − 4 = <b>4 remaining</b> → they become oxygen's 2 lone pairs. This is the step-3 arithmetic — always write it."},
+{id:"l3",topic:"lewis",type:"num",prompt:"A central carbon has 2 single bonds and no lone pairs. It needs 8. How many electrons SHORT is it?",answer:4,why:"2 bonds = 4 e⁻. 8 − 4 = <b>short by 4</b> — quantify, don't eyeball. Short÷2 = 2 lone pairs to pull in → a triple bond (or two doubles)."},
+{id:"l4",topic:"lewis",type:"mc",prompt:"A central atom is short by 2 electrons. The fix:",choices:["Convert a neighbor's lone pair into a double bond","Add lone pairs to the central atom from nowhere","Rearrange the neighbor's lone pairs","Remove a hydrogen"],answer:0,why:"Only <b>converting a lone pair into a shared bond</b> helps — sharing lets both atoms count the same 2 electrons. Rearranging lone pairs on a neighbor changes nothing (your documented trap!). And you can't invent electrons: the budget is fixed."},
+{id:"l5",topic:"lewis",type:"num",prompt:"How many lone pairs sit on the N in HCN (H–C≡N)?",answer:1,why:"N started with 3 lone pairs' worth, gave 2 pairs into the triple bond, keeps <b>1</b>. Audit: N has 3 bonds (6 e⁻) + 1 LP (2 e⁻) = 8 ✓."},
+{id:"l6",topic:"lewis",type:"num",prompt:"How many TOTAL lone pairs are in CO₂ (O=C=O)?",answer:4,why:"Each O: 2 bonds + <b>2 lone pairs</b>. Carbon: 4 bonds, 0 LP. Total = 4 LPs = 8 e⁻, plus 8 in bonds = 16 ✓."},
+{id:"l7",topic:"lewis",type:"mc",prompt:"Memorized bond counts — which row is WRONG?",choices:["C: 4 bonds, 0 lone pairs","N: 3 bonds, 1 lone pair","O: 2 bonds, 2 lone pairs","F: 2 bonds, 2 lone pairs"],answer:3,why:"Halogens make <b>1 bond + 3 lone pairs</b>. The table (H 1/0 · C 4/0 · N 3/1 · O 2/2 · X 1/3) double-checks every structure you draw."},
+/* --- formal charge --- */
+{id:"f0",topic:"formal",type:"num",prompt:"O in hydroxide (OH⁻) has just 1 bond. How many LONE PAIRS does it need to complete its octet?",answer:3,why:"1 bond gives O 2 e⁻ of credit; the octet needs 8, so lone pairs supply the other 6 → <b>3 lone pairs</b>. Fewer bonds = MORE lone pairs. Recount this for every structure — never reuse water's 2-LP pattern by memory."},
+{id:"f0b",topic:"formal",type:"num",prompt:"O in hydronium (H₃O⁺) has 3 bonds. How many lone pairs does it keep?",answer:1,why:"3 bonds = 6 e⁻ of credit; 8 − 6 = 2 left → <b>1 lone pair</b>. More bonds = fewer lone pairs. (Bond count + LP count always changes together, in opposite directions.)"},
+{id:"f1",topic:"formal",type:"num",prompt:"Formal charge on O in hydronium, H₃O⁺? (enter −1, 0, or 1)",answer:1,why:"FC = 6 (O's own valence — ALWAYS 6, in any molecule) − 2 (its 1 lone pair = 2 e⁻) − 3 (half of the 6 bonding e⁻ in 3 bonds) = <b>+1</b>. More bonds than neutral O's 2 → positive. Shortcut: O with 3 bonds + 1 LP is always +1."},
+{id:"f2",topic:"formal",type:"num",prompt:"Formal charge on O in hydroxide, OH⁻? (enter −1, 0, or 1)",answer:-1,why:"FC = 6 (O's own valence — always 6; the ion's extra e⁻ lives in the structure, NOT in this number) − 6 (its 3 lone pairs = 6 e⁻) − 1 (half of the 2 bonding e⁻ in the single bond) = <b>−1</b>. Fewer bonds than neutral O's 2 → negative. Shortcut: O with 1 bond + 3 LPs is always −1."},
+{id:"f3",topic:"formal",type:"num",prompt:"Formal charge on N in NH₄⁺? (enter −1, 0, or 1)",answer:1,why:"N with <b>4 bonds, 0 LP</b>: FC = 5 − 0 − 4 = +1. Memorize the pattern — 4-bond nitrogen is positive."},
+{id:"f4",topic:"formal",type:"mc",prompt:"In CH₃O⁻ (methoxide), which atom carries the −1?",choices:["The oxygen","The carbon","A hydrogen","It's spread over all atoms equally"],answer:0,why:"<b>Oxygen</b>: 1 bond + 3 LPs → FC = −1. C has its normal 4 bonds (FC 0). Charge sits where the bond count deviates from the happy number."},
+{id:"f5",topic:"formal",type:"num",prompt:"FC formula: valence − lone-pair e⁻ − ½(bonding e⁻). For a C with 3 bonds and 1 lone pair, FC = ?",answer:-1,why:"3 bonds = 6 bonding e⁻ → ½ = 3. FC = 4 − 2 − 3 = <b>−1</b>. A 3-bond carbon with a lone pair is a carbanion — you'll meet these as nucleophiles."},
+{id:"f6",topic:"formal",type:"num",prompt:"A carbon has 3 bonds and NO lone pair (a carbocation, R₃C⁺). FC = ? (enter −1, 0, or 1)",answer:1,why:"FC = 4 − 0 − 3 = <b>+1</b>. Compare a 3-bond carbon WITH one lone pair: that's −1, while 3 bonds + 0 LP = +1. <b>Same bond count, opposite charges — bond count alone never decides carbon's sign; the lone pair does.</b> When in doubt, run the full formula. (Carbocations are ochem's most important electrophiles.)"},
+/* --- polarity --- */
+{id:"p1",topic:"polarity",type:"mc",prompt:"Electronegativity order — which is correct?",choices:["F > O > N ≈ Cl > C ≈ H","O > F > N > C > H","F > N > O > C > H","C > N > O > F > H"],answer:0,why:"<b>F > O > N ≈ Cl</b>, and C ≈ H near the bottom of the common set. This ordering predicts every δ+/δ− you'll ever label."},
+{id:"p2",topic:"polarity",type:"mc",prompt:"In a C=O bond, the partial charges are:",choices:["δ+ on C, δ− on O","δ− on C, δ+ on O","No polarity — it's a double bond","Depends on temperature"],answer:0,why:"O is more electronegative → pulls density → <b>δ− O, δ+ C</b>. That δ+ carbon is where nucleophiles attack — arguably the single most important fact in carbonyl chemistry."},
+{id:"p3",topic:"polarity",type:"mc",prompt:"Which molecule can hydrogen-bond with itself?",choices:["CH₃OH","CH₄","CH₃OCH₃ (ether)","CO₂"],answer:0,why:"H-bonding needs an <b>H attached to O, N, or F</b>. Methanol has O–H ✓. The ether has O but no O–H — it can accept H-bonds, not donate."},
+{id:"p4",topic:"polarity",type:"mc",prompt:"Ethanol dissolves in water; hexane doesn't. Why?",choices:["Ethanol H-bonds with water; hexane only has London forces","Ethanol is smaller","Hexane is too dense","Water is ionic"],answer:0,why:"<b>Like dissolves like</b>: ethanol's O–H matches water's H-bond network. Hexane is nonpolar — mixing it into water breaks water-water H-bonds without paying them back."},
+{id:"p5",topic:"polarity",type:"mc",prompt:"Rank boiling points, highest first: butanol (C₄ alcohol), butane, diethyl ether",choices:["butanol > ether > butane","butane > ether > butanol","ether > butanol > butane","all equal"],answer:0,why:"H-bonding (butanol) > dipole-dipole (ether) > London only (butane). <b>Stronger IMFs = higher bp.</b>"},
+{id:"p7",topic:"polarity",type:"mc",prompt:"CO₂ has two very polar C=O bonds. Is the MOLECULE polar?",choices:["No — the bond dipoles point opposite ways and cancel","Yes — polar bonds always mean a polar molecule","Only when it's hot","Yes, because oxygen is electronegative"],answer:0,why:"Linear + symmetric → the two dipole arrows cancel exactly → <b>net dipole = 0, nonpolar molecule</b>. Bond polarity and MOLECULAR polarity are different questions — geometry decides the second one. (Predicted trap: answering bond-level when the question says 'molecule'.)"},
+{id:"p8",topic:"polarity",type:"mc",prompt:"H₂O also has two polar bonds. Is the molecule polar?",choices:["Yes — it's bent, so the dipoles add instead of canceling","No — two dipoles always cancel","No — it's symmetric","Only in ice"],answer:0,why:"Bent (~104.5°) → both O–H dipoles have a component pointing the same way → they <b>add</b> → strongly polar. CO₂ vs H₂O is the classic geometry-decides-polarity pair."},
+/* --- hybrid --- */
+{id:"h1",topic:"hybrid",type:"text",prompt:"Hybridization of carbon in CH₄? (type like: sp3)",answer:"sp3",why:"4 attached groups + 0 LP = 4 electron domains → <b>sp³</b>, tetrahedral, 109.5°. Count domains, that's the whole trick."},
+{id:"h2",topic:"hybrid",type:"text",prompt:"Hybridization of the carbon in H₂C=O?",answer:"sp2",why:"3 domains (2 H + 1 O, the double bond counts once) → <b>sp²</b>, trigonal planar, 120°."},
+{id:"h3",topic:"hybrid",type:"text",prompt:"Hybridization of each carbon in HC≡CH?",answer:"sp",why:"2 domains each → <b>sp</b>, linear, 180°."},
+{id:"h4",topic:"hybrid",type:"mc",prompt:"In the VSEPR/steric-number model, water's O is treated as sp³ with 2 lone pairs. Its molecular shape is:",choices:["Bent","Linear","Tetrahedral","Trigonal planar"],answer:0,why:"4 domains arrange tetrahedrally, but shape names only the atoms: 2 bonds + 2 LPs = <b>bent</b> (~104.5°). <i>Fine print (Klein §1.11): experiment shows a lone pair sits in a p orbital, so water's O is not literally sp³ — VSEPR is the course's working approximation.</i>"},
+{id:"h5",topic:"hybrid",type:"mc",prompt:"A C=C double bond consists of:",choices:["1 sigma + 1 pi bond","2 sigma bonds","2 pi bonds","1 sigma + 2 pi"],answer:0,why:"<b>1σ + 1π</b>. The π bond is side-on p-orbital overlap — which is why double bonds can't rotate: rotating breaks the π overlap."},
+{id:"h7",topic:"hybrid",type:"mc",prompt:"NH₃'s shape (VSEPR)?",choices:["Trigonal pyramidal","Trigonal planar","Tetrahedral","Bent"],answer:0,why:"Count ALL 4 domains: 3 bonds + <b>1 lone pair</b> → sp³, but the SHAPE names only the atoms: <b>trigonal pyramidal</b> (~107°). Forgetting the lone pair (calling it trigonal planar) is your documented trap — the LP counts as a domain."},
+{id:"h8",topic:"hybrid",type:"num",prompt:"Bond angle in CH₄ (tetrahedral), in degrees? (one decimal)",answer:109.5,why:"4 equal domains → <b>109.5°</b>. The set to memorize: sp 180° · sp² 120° · sp³ 109.5° (squeezed slightly by lone pairs: NH₃ ~107°, H₂O ~104.5°)."},
+{id:"h9",topic:"hybrid",type:"mc",prompt:"CO₂'s shape and angle?",choices:["Linear, 180°","Bent, ~120°","Trigonal planar, 120°","Bent, ~104.5°"],answer:0,why:"C has 2 domains (each double bond counts ONCE) → sp, <b>linear, 180°</b>. Domain counting, not bond counting."},
+{id:"h10",topic:"hybrid",type:"mc",prompt:"CH₂O (formaldehyde) — shape around the C?",choices:["Trigonal planar, ~120°","Tetrahedral, 109.5°","Bent","Linear"],answer:0,why:"3 domains (2 H + the C=O counted once) → sp², <b>trigonal planar, 120°</b>."},
+{id:"h6",topic:"hybrid",type:"text",prompt:"In CH₂=CH–C≡N, the hybridization of the carbon in C≡N?",answer:"sp",why:"Triple-bonded carbon: 2 domains → <b>sp</b>. Walking a molecule assigning sp/sp²/sp³ per atom should take seconds by day one of class."},
+/* --- imf (v2.6 — on Prof. Ciesla's review list) --- */
+{id:"i1",topic:"imf",type:"mc",prompt:"Strongest intermolecular force in pure water?",choices:["Hydrogen bonding","London dispersion","Dipole-dipole only","Covalent bonds between molecules"],answer:0,why:"O–H bonds + lone pairs on O → water both donates and accepts <b>H-bonds</b>. (H-bonding IS a strong dipole-dipole special case — name the strongest force present.)"},
+{id:"i2",topic:"imf",type:"mc",prompt:"A hydrogen bond requires:",choices:["H bonded to N, O, or F + a lone pair on another N, O, or F","Any H near any O","A charged molecule","A metal atom"],answer:0,why:"Both halves matter: a polarized <b>H on N/O/F</b> (the donor) and a <b>lone pair on N/O/F</b> (the acceptor). C–H hydrogens don't count — carbon isn't electronegative enough."},
+{id:"i3",topic:"imf",type:"mc",prompt:"CH₄'s only intermolecular force?",choices:["London dispersion","Hydrogen bonding","Dipole-dipole","Ion-dipole"],answer:0,why:"No polar bonds worth counting, no net dipole → only <b>London dispersion</b> (present in EVERYTHING, and the only thing nonpolar molecules get). Hence bp −162 °C."},
+{id:"i4",topic:"imf",type:"mc",prompt:"Higher boiling point: ethanol (CH₃CH₂OH) or dimethyl ether (CH₃OCH₃)? Same formula!",choices:["Ethanol — it can H-bond with itself (O–H); the ether can't","The ether — oxygen in the middle","Identical, same atoms","Depends on pressure"],answer:0,why:"Same C₂H₆O, wildly different bp (+78° vs −24°). Ethanol has an <b>O–H</b> → H-bond donor. The ether's H's are all on carbon → acceptor only, no donation between its own molecules. Connectivity beats formula."},
+{id:"i5",topic:"imf",type:"mc",prompt:"Why does octane (C₈) boil higher than butane (C₄)?",choices:["More surface area → stronger London dispersion","Octane has hydrogen bonds","Octane is polar","It doesn't"],answer:0,why:"Dispersion scales with <b>contact surface area</b> — more electrons, more molecule to stick. This is why 'weakest force' ≠ 'small effect': in big molecules dispersion dominates."},
+{id:"i6",topic:"imf",type:"mc",prompt:"Acetone (CH₃)₂C=O has a polar C=O but no O–H. Strongest IMF between acetone molecules?",choices:["Dipole-dipole","Hydrogen bonding","London only","Ionic"],answer:0,why:"Net dipole (that C=O) → <b>dipole-dipole</b>. No O–H/N–H means it can't H-bond donate to itself. (It CAN accept H-bonds from water — why acetone mixes with water — but between acetone molecules, dipole-dipole is the ceiling.)"},
+/* --- resonance --- */
+{id:"r1",topic:"resonance",type:"mc",prompt:"Resonance structures are…",choices:["Imaginary snapshots; the real molecule is one blended hybrid","Structures the molecule flips between rapidly","Different molecules in equilibrium","Excited states"],answer:0,why:"The molecule is <b>always the hybrid</b> — it never 'flips.' Resonance is a limitation of drawing, not a motion of the molecule."},
+{id:"r2",topic:"resonance",type:"mc",prompt:"When drawing resonance structures, what is allowed to move?",choices:["Electrons only (lone pairs and π bonds)","Atoms only","Both atoms and electrons","Protons"],answer:0,why:"<b>Only electrons move</b> — lone pairs ↔ π bonds. If an atom moved, it's a different molecule (an isomer), not resonance."},
+{id:"r3",topic:"resonance",type:"num",prompt:"How many equivalent resonance structures does the nitrate ion NO₃⁻ have?",answer:3,why:"The double bond can sit on any of the 3 oxygens → <b>3 equivalent structures</b>; the real ion has three identical 1⅓ bonds."},
+{id:"r4",topic:"resonance",type:"mc",prompt:"The two C–O bonds in acetate (CH₃CO₂⁻) are the same length because…",choices:["The true structure is a hybrid — each bond is order 1.5","They alternate quickly","One is sigma, one is pi","Measurement error"],answer:0,why:"Two equivalent resonance forms average to <b>bond order 1.5 on both C–O bonds</b>, charge spread over both oxygens. Delocalized charge = stabilized charge — this becomes the #1 acidity argument."},
+{id:"r5",topic:"resonance",type:"mc",prompt:"Which resonance structure contributes MOST to the hybrid?",choices:["Full octets, least charge separation, − on the most electronegative atom","The one with the most charges","The one drawn first","They always contribute equally"],answer:0,why:"Ranking rules: <b>octets full > minimal charge > negative on the EN atom</b>. Equivalent structures (like acetate's) contribute equally."},
+/* --- acid-base I --- */
+{id:"a1",topic:"acidbase1",type:"mc",prompt:"Lower pKa means…",choices:["Stronger acid","Weaker acid","Stronger base","Higher pH always"],answer:0,why:"<b>pKa down = acid strength up</b> (it's a log scale: each unit = 10×). Burn this in — every ochem acid-base question routes through it."},
+{id:"a2",topic:"acidbase1",type:"num",prompt:"Approximate pKa of a carboxylic acid (like acetic acid)?",answer:5,tolerance:1,why:"≈ <b>5</b> (4.76 for acetic — either is accepted). Landmarks to know cold: HCl −7 · H₃O⁺ −1.7 · RCOOH 5 · H₂O 15.7 · ROH 16 · alkyne 25 · alkane 50."},
+{id:"a3",topic:"acidbase1",type:"num",prompt:"Approximate pKa of water?",answer:16,why:"<b>15.7</b> (we accept 16). Water is a far weaker acid than a carboxylic acid — 10 pKa units ≈ 10 billion times weaker.",tolerance:1},
+{id:"a4",topic:"acidbase1",type:"mc",prompt:"An acid-base equilibrium favors the side with…",choices:["The weaker acid (higher pKa)","The stronger acid","More molecules","The heavier compounds"],answer:0,why:"Equilibrium runs <b>downhill to the weaker acid</b>. Compare the two pKa values; the side holding the higher-pKa acid wins."},
+{id:"a5",topic:"acidbase1",type:"mc",prompt:"Acetate (CH₃CO₂⁻) + water — is the equilibrium for acetate pulling a proton OFF water favored?",choices:["No — that would form acetic acid (pKa 5) from water (pKa 15.7), uphill","Yes, strongly favored","Yes, about half-way","Only when heated"],answer:0,why:"Going acetate + H₂O → acetic acid + OH⁻ converts a pKa-15.7 acid into a pKa-5 acid — <b>uphill by ~10¹¹</b>. Equilibrium says no."},
+{id:"a6",topic:"acidbase1",type:"text",prompt:"Conjugate base of H₂O? (type a formula, e.g. NH2-)",answer:"oh-",accept:["oh-","ho-","oh−","ho−"],why:"Remove H⁺ from H₂O → <b>OH⁻</b>. Conjugate pairs differ by exactly one proton."},
+/* --- acid-base II: ARIO --- */
+{id:"b1",topic:"acidbase2",type:"mc",prompt:"ARIO ranks what makes an acid strong. The letters stand for:",choices:["Atom, Resonance, Induction, Orbital","Acidity, Reactivity, Ionization, Orbital","Atom, Radius, Ion, Octet","Angle, Resonance, Induction, Overlap"],answer:0,why:"<b>A</b>tom → <b>R</b>esonance → <b>I</b>nduction → <b>O</b>rbital, checked in that order on the <b>conjugate base</b>: whatever stabilizes the conjugate base makes the acid stronger."},
+{id:"b2",topic:"acidbase2",type:"mc",prompt:"Why is acetic acid (pKa 5) a much stronger acid than ethanol (pKa 16)?",choices:["Resonance: acetate's charge spreads over 2 oxygens; ethoxide's sits on 1","Acetic acid has more hydrogens","Ethanol is bigger","Induction from the CH₃"],answer:0,why:"Same atom (O) holds the charge in both — the difference is <b>R: resonance delocalization</b> in acetate. Delocalized charge = stable conjugate base = stronger acid. This exact comparison is an Exam-1 classic."},
+{id:"b3",topic:"acidbase2",type:"mc",prompt:"Rank acidity: HF vs H₂O vs NH₃",choices:["HF > H₂O > NH₃","NH₃ > H₂O > HF","H₂O > HF > NH₃","All equal"],answer:0,why:"<b>A (atom)</b>: across a row, more electronegative atom stabilizes − better: F⁻ > OH⁻ > NH₂⁻. So HF (pKa 3.2) > H₂O (15.7) > NH₃ (38)."},
+{id:"b4",topic:"acidbase2",type:"mc",prompt:"Which effect explains why CF₃COOH (pKa 0.2) beats CH₃COOH (pKa 4.8)?",choices:["Induction — the F's pull electron density through the bonds","Resonance","A heavier molecule","Orbital size"],answer:0,why:"Both have identical resonance; the F's add <b>I: induction</b> — electron-withdrawal through σ bonds that further stabilizes the anion. Closer + more EN groups = bigger effect."},
+{id:"b5",topic:"acidbase2",type:"mc",prompt:"Terminal alkynes (pKa 25) are more acidic than alkanes (pKa 50) because…",choices:["The sp carbanion holds the lone pair closer to the nucleus","Triple bonds are weak","Resonance","Alkynes are polar molecules"],answer:0,why:"<b>O: orbital.</b> sp (50% s-character) holds electrons tighter than sp³ (25%) → more stable carbanion → more acidic. The O factor only matters when A/R/I tie."},
+{id:"b6",topic:"acidbase2",type:"mc",prompt:"HBr is a stronger acid than HF. But F is more electronegative! Why?",choices:["Size wins down a column — Br⁻ spreads charge over a bigger volume","It isn't stronger","Br has resonance","HF hydrogen-bonds"],answer:0,why:"<b>A has two sub-rules</b>: across a row → electronegativity; down a column → <b>size</b>. Big soft Br⁻ dilutes the charge → very stable → HBr pKa −9 vs HF +3.2."},
+/* --- bond-line + functional groups --- */
+{id:"c1",topic:"bondline",type:"num",prompt:"In bond-line notation, a plain zigzag of 4 line-ends/vertices (no letters) = butane. How many H's on each END carbon?",answer:3,why:"End carbons have 1 C–C bond → need <b>3 H's</b> to reach 4 bonds. Interior carbons with 2 C–C bonds carry 2 H's. Hydrogens are implied, never drawn."},
+{id:"c2",topic:"bondline",type:"num",prompt:"Total hydrogens in cyclohexane (the plain hexagon)?",answer:12,why:"6 carbons, each with 2 ring bonds → 2 H's each → <b>12</b>. Formula C₆H₁₂ ✓ (CₙH₂ₙ for one ring/double bond)."},
+{id:"c3",topic:"bondline",type:"num",prompt:"CH₃CH(OH)CH₂CH₃ — how many H's on the carbon bearing the OH?",answer:1,why:"That C has bonds to: CH₃, OH, CH₂CH₃ = 3 → needs <b>1 H</b>. Translating condensed ↔ bond-line and counting hidden H's is a day-one class skill."},
+{id:"c4",topic:"bondline",type:"mc",prompt:"A C=O with an H directly on the carbonyl carbon is a(n)…",choices:["Aldehyde","Ketone","Carboxylic acid","Ester"],answer:0,why:"<b>Aldehyde</b> = C=O at a chain END (has H). Ketone = C=O between two carbons. Acid = C=O with OH. Ester = C=O with OR."},
+{id:"c5",topic:"bondline",type:"mc",prompt:"CH₃–O–CH₃ contains which functional group?",choices:["Ether","Ester","Alcohol","Aldehyde"],answer:0,why:"C–O–C with no C=O = <b>ether</b>. Ester needs C(=O)O, alcohol needs O–H, aldehyde needs C(=O)H."},
+{id:"c6",topic:"bondline",type:"mc",prompt:"Ibuprofen contains a benzene ring and which acidic group?",choices:["Carboxylic acid (–COOH)","Amide","Ester","Phenol"],answer:0,why:"Ibuprofen = aromatic ring + <b>carboxylic acid</b> (pKa ≈ 4.9). Spotting groups on real drugs is exactly how exams dress up easy questions."},
+{id:"c7",topic:"bondline",type:"mc",prompt:"An N between two carbons (R–NH–R), no C=O anywhere near it:",choices:["Amine","Amide","Nitrile","Imine"],answer:0,why:"<b>Amine</b> = N with C/H neighbors. <b>Amide</b> = N attached to a C=O — totally different behavior. This pair is the most-confused of all groups."},
+// v2.13: bank expansion — +30 Lewis, +8 each valence/formal/polarity/hybrid, +6 IMF.
+{id:"lx1",topic:"lewis",type:"num",prompt:"Total valence electrons in CCl₄?",answer:32,why:"C(4) + 4×Cl(7) = <b>32</b>. Count every atom's group number; no charge to adjust."},
+{id:"lx2",topic:"lewis",type:"num",prompt:"Total valence electrons in PCl₃?",answer:26,why:"P(5) + 3×Cl(7) = <b>26</b>."},
+{id:"lx3",topic:"lewis",type:"num",prompt:"Total valence electrons in SO₂?",answer:18,why:"S(6) + 2×O(6) = <b>18</b>."},
+{id:"lx4",topic:"lewis",type:"num",prompt:"Total valence electrons in ozone, O₃?",answer:18,why:"3×O(6) = <b>18</b>. Same count as SO₂ — both bent with a resonance-shared double bond."},
+{id:"lx5",topic:"lewis",type:"num",prompt:"Total valence electrons in carbonate, CO₃²⁻?",answer:24,why:"C(4) + 3×O(6) + 2 (for the 2− charge) = <b>24</b>. Add electrons for negative charge."},
+{id:"lx6",topic:"lewis",type:"num",prompt:"Total valence electrons in nitrate, NO₃⁻?",answer:24,why:"N(5) + 3×O(6) + 1 = <b>24</b>. Isoelectronic with carbonate."},
+{id:"lx7",topic:"lewis",type:"num",prompt:"Total valence electrons in sulfate, SO₄²⁻?",answer:32,why:"S(6) + 4×O(6) + 2 = <b>32</b>."},
+{id:"lx8",topic:"lewis",type:"num",prompt:"Total valence electrons in ammonium, NH₄⁺?",answer:8,why:"N(5) + 4×H(1) − 1 (for the + charge) = <b>8</b>. Subtract for positive charge."},
+{id:"lx9",topic:"lewis",type:"num",prompt:"Total valence electrons in cyanide, CN⁻?",answer:10,why:"C(4) + N(5) + 1 = <b>10</b>. Drawn C≡N with a lone pair on each — like N₂."},
+{id:"lx10",topic:"lewis",type:"num",prompt:"Total valence electrons in acetylene, C₂H₂?",answer:10,why:"2×C(4) + 2×H(1) = <b>10</b>. Structure H–C≡C–H."},
+{id:"lx11",topic:"lewis",type:"num",prompt:"Total valence electrons in BF₃?",answer:24,why:"B(3) + 3×F(7) = <b>24</b>. Boron ends with only 6 around it — a real octet exception."},
+{id:"lx12",topic:"lewis",type:"num",prompt:"Total valence electrons in hydrogen peroxide, H₂O₂?",answer:14,why:"2×H(1) + 2×O(6) = <b>14</b>. Structure H–O–O–H."},
+{id:"lx13",topic:"lewis",type:"num",prompt:"Total valence electrons in chloromethane, CH₃Cl?",answer:14,why:"C(4) + 3×H(1) + Cl(7) = <b>14</b>."},
+{id:"lx14",topic:"lewis",type:"num",prompt:"Total valence electrons in nitric acid, HNO₃?",answer:24,why:"H(1) + N(5) + 3×O(6) = <b>24</b>."},
+{id:"lx15",topic:"lewis",type:"num",prompt:"Total valence electrons in hydrazine, N₂H₄?",answer:14,why:"2×N(5) + 4×H(1) = <b>14</b>. Structure H₂N–NH₂."},
+{id:"lx16",topic:"lewis",type:"mc",prompt:"Central atom of SO₂?",answer:1,choices:["Oxygen","Sulfur","It has no central atom","Both equally"],why:"<b>Sulfur</b> — the least electronegative atom (excluding H) goes in the center; oxygens hang off it."},
+{id:"lx17",topic:"lewis",type:"num",prompt:"In CO₂ (O=C=O), how many lone pairs are on the central carbon?",answer:0,why:"<b>0</b> — carbon's octet is full from two double bonds. Every leftover electron sat on the oxygens."},
+{id:"lx18",topic:"lewis",type:"num",prompt:"In one resonance structure of CO₃²⁻, how many of the three C–O bonds is a DOUBLE bond?",answer:1,why:"<b>1</b> double + 2 single. Resonance averages them to 1.33, but any single drawn structure shows exactly one C=O."},
+{id:"lx19",topic:"lewis",type:"num",prompt:"In BF₃, how many electrons end up around the boron?",answer:6,why:"<b>6</b> (3 single bonds, no lone pairs). Boron is a Group-13 exception — electron-deficient, which makes BF₃ a strong Lewis acid."},
+{id:"lx20",topic:"lewis",type:"mc",prompt:"Which atom is NEVER a central atom?",answer:0,choices:["Hydrogen","Carbon","Nitrogen","Oxygen"],why:"<b>Hydrogen</b> — it forms only 1 bond, so it can never sit in the middle. Always terminal."},
+{id:"lx21",topic:"lewis",type:"mc",prompt:"In acetylene, H–C≡C–H, the bond between the two carbons is a:",answer:0,choices:["Triple bond","Double bond","Single bond","Ionic bond"],why:"<b>Triple bond</b> (1 sigma + 2 pi). Each carbon: 1 bond to H + triple to C = 4 bonds, octet complete."},
+{id:"lx22",topic:"lewis",type:"num",prompt:"In N₂ (:N≡N:), how many lone pairs are on EACH nitrogen?",answer:1,why:"<b>1</b> each. Triple bond (6 e⁻) + 1 lone pair (2 e⁻) = 8 around each N. 10 valence e⁻ total."},
+{id:"lx23",topic:"lewis",type:"mc",prompt:"In HCN, carbon bonds once to H and how to the nitrogen?",answer:0,choices:["Triple bond","Double bond","Single bond","No bond"],why:"A <b>triple bond</b> to N. Carbon: 1 (to H) + 3 (to N) = 4 bonds ✓. Nitrogen keeps one lone pair."},
+{id:"lx24",topic:"lewis",type:"num",prompt:"In ozone (O₃), how many lone pairs are on the CENTRAL oxygen?",answer:1,why:"<b>1</b>. The center O has one single bond, one double bond, and one lone pair → formal charge +1."},
+{id:"lx25",topic:"lewis",type:"num",prompt:"A second-row atom (C, N, O, F) holds at most how many electrons in its valence shell?",answer:8,why:"<b>8</b> — the octet. Period-2 atoms have no d-orbitals, so never exceed 8."},
+{id:"lx26",topic:"lewis",type:"num",prompt:"You drew CO₂ with all single bonds; the central C has only 4 electrons. It is short by how many?",answer:4,why:"Octet is 8, it has 4 → short by <b>4</b>. Quantify the deficit — never eyeball it."},
+{id:"lx27",topic:"lewis",type:"num",prompt:"An atom short by 4 electrons — convert how many neighbor lone pairs into bonds?",answer:2,why:"Short ÷ 2 = <b>2</b> pairs. Each converted lone pair becomes a shared bond. (CO₂: one from each O → two C=O.)"},
+{id:"lx28",topic:"lewis",type:"mc",prompt:"In formaldehyde, CH₂O, the carbon–oxygen bond is a:",answer:0,choices:["Double bond","Single bond","Triple bond","No direct bond"],why:"<b>Double bond</b> (C=O). Carbon: 2 bonds to H + double to O = 4 bonds."},
+{id:"lx29",topic:"lewis",type:"num",prompt:"Total number of lone pairs in the whole H₂O molecule?",answer:2,why:"<b>2</b> — both on oxygen; hydrogens have none. O: 2 bonds + 2 lone pairs."},
+{id:"lx30",topic:"lewis",type:"num",prompt:"In NH₃, how many lone pairs does the nitrogen have?",answer:1,why:"<b>1</b>. N makes 3 bonds + keeps 1 lone pair → octet complete. That lone pair makes ammonia a base."},
+{id:"vx1",topic:"valence",type:"num",prompt:"Valence electrons in a neutral oxygen atom?",answer:6,why:"<b>6</b> — Group 16. Drives O's whole behavior (2 bonds, 2 lone pairs when neutral)."},
+{id:"vx2",topic:"valence",type:"num",prompt:"Valence electrons in a neutral nitrogen atom?",answer:5,why:"<b>5</b> — Group 15. Neutral N makes 3 bonds + 1 lone pair."},
+{id:"vx3",topic:"valence",type:"num",prompt:"Valence electrons in a neutral carbon atom?",answer:4,why:"<b>4</b> — Group 14. Four bonds, no lone pairs when neutral."},
+{id:"vx4",topic:"valence",type:"num",prompt:"Valence electrons in a neutral fluorine atom?",answer:7,why:"<b>7</b> — Group 17. One bond + 3 lone pairs when neutral."},
+{id:"vx5",topic:"valence",type:"mc",prompt:"For a main-group atom, the group number tells you its:",answer:0,choices:["Number of valence electrons","Number of neutrons","Atomic mass","Number of rings"],why:"<b>Valence electron count</b> = group number. C group 14 → 4, O group 16 → 6. Sources every Lewis structure."},
+{id:"vx6",topic:"valence",type:"num",prompt:"Valence electrons in a neutral chlorine atom?",answer:7,why:"<b>7</b> — Group 17, same as fluorine. Halogens all bring 7."},
+{id:"vx7",topic:"valence",type:"num",prompt:"Valence electrons in a hydrogen atom?",answer:1,why:"<b>1</b>. H makes exactly 1 bond and stops at 2 electrons (not 8) — the octet exception."},
+{id:"vx8",topic:"valence",type:"num",prompt:"Valence electrons in a neutral sulfur atom?",answer:6,why:"<b>6</b> — Group 16, directly below oxygen, same valence count."},
+{id:"fx1",topic:"formal",type:"num",prompt:"Formal charge on N in ammonia, NH₃ (3 bonds, 1 lone pair)?",answer:0,why:"FC = 5 − 2 − 3 = <b>0</b>. Nitrogen's NEUTRAL pattern: 3 bonds + 1 lone pair. The baseline."},
+{id:"fx2",topic:"formal",type:"num",prompt:"Formal charge on O in water, H₂O (2 bonds, 2 lone pairs)?",answer:0,why:"FC = 6 − 4 − 2 = <b>0</b>. Oxygen's neutral pattern: 2 bonds + 2 lone pairs."},
+{id:"fx3",topic:"formal",type:"num",prompt:"Formal charge on C in methane, CH₄ (4 bonds, 0 lone pairs)?",answer:0,why:"FC = 4 − 0 − 4 = <b>0</b>. Carbon's neutral pattern: 4 bonds, no lone pairs."},
+{id:"fx4",topic:"formal",type:"num",prompt:"Formal charge on the CENTRAL oxygen in ozone (3 bonds, 1 lone pair)?",answer:1,why:"FC = 6 − 2 − 3 = <b>+1</b>. More bonds than O's neutral 2 → positive."},
+{id:"fx5",topic:"formal",type:"num",prompt:"Formal charge on a terminal oxygen in ozone with 1 bond and 3 lone pairs?",answer:-1,why:"FC = 6 − 6 − 1 = <b>−1</b>. Fewer bonds than neutral → negative. (Ozone: center +1, one end −1, sum 0.)"},
+{id:"fx6",topic:"formal",type:"num",prompt:"In any NEUTRAL molecule, the sum of all formal charges equals?",answer:0,why:"<b>0</b>. Individual atoms can be ±, but they must sum to the molecule's overall charge."},
+{id:"fx7",topic:"formal",type:"num",prompt:"In NH₄⁺, the sum of all formal charges equals? (enter −1, 0, or 1)",answer:1,why:"<b>+1</b> — the sum always equals the ion's overall charge. N carries the +1; the H's are 0."},
+{id:"fx8",topic:"formal",type:"num",prompt:"Formal charge on an N with 2 bonds and 2 lone pairs?",answer:-1,why:"FC = 5 − 4 − 2 = <b>−1</b>. Fewer bonds than nitrogen's neutral 3 → negative (an <b>amide ion / anionic nitrogen</b>, like H₂N⁻ — not the neutral N of a carboxamide)."},
+{id:"px1",topic:"polarity",type:"mc",prompt:"Which is more electronegative, oxygen or carbon?",answer:0,choices:["Oxygen","Carbon","They are equal","Depends on the molecule"],why:"<b>Oxygen</b>. EN order: F > O > N ≈ Cl > C ≈ H. A C–O bond is polar with δ− on O."},
+{id:"px2",topic:"polarity",type:"mc",prompt:"Is a C–H bond strongly polar?",answer:0,choices:["No — C and H are close in electronegativity","Yes — very polar","Yes — H is much more electronegative","Only in water"],why:"<b>Nearly nonpolar.</b> C and H sit close on the EN scale, so C–H barely has a dipole. That's why hydrocarbons are nonpolar."},
+{id:"px3",topic:"polarity",type:"mc",prompt:"In an O–H bond, which atom carries the δ− (partial negative)?",answer:0,choices:["Oxygen","Hydrogen","Neither","Both"],why:"<b>Oxygen</b> — more electronegative, pulls the shared electrons → δ−; H becomes δ+. Why water H-bonds."},
+{id:"px4",topic:"polarity",type:"mc",prompt:"CCl₄ is tetrahedral and symmetric. Is the MOLECULE polar?",answer:0,choices:["No — the four C–Cl dipoles cancel","Yes — chlorine is electronegative","Yes — it has polar bonds","Only when cold"],why:"<b>Nonpolar molecule</b> despite four polar bonds — tetrahedral symmetry cancels the dipoles. Same lesson as CO₂: geometry decides."},
+{id:"px5",topic:"polarity",type:"mc",prompt:"CH₃Cl (one C–Cl bond on a tetrahedral carbon) — polar molecule?",answer:0,choices:["Yes — nothing cancels the single C–Cl dipole","No — it's symmetric","No — carbon is central","Only as a gas"],why:"<b>Polar.</b> One C–Cl dipole with nothing to oppose it → net dipole. Contrast CCl₄ where four cancel."},
+{id:"px6",topic:"polarity",type:"mc",prompt:"NH₃ (trigonal pyramidal) — polar molecule?",answer:0,choices:["Yes — asymmetric shape, and the lone pair adds to the dipole","No — it's symmetric","No — N–H bonds are nonpolar","Only in water"],why:"<b>Polar.</b> The pyramidal shape means the N–H dipoles don't cancel; the lone pair bends it and adds to the dipole."},
+{id:"px7",topic:"polarity",type:"mc",prompt:"Which is the most electronegative element on the common scale?",answer:0,choices:["Fluorine","Oxygen","Chlorine","Carbon"],why:"<b>Fluorine</b> — top of the EN order. Whatever F bonds to, F is δ−."},
+{id:"px8",topic:"polarity",type:"mc",prompt:"Two identical atoms bonded together (e.g. Cl₂) — is the bond polar?",answer:0,choices:["No — equal electronegativity, no dipole","Yes — chlorine is electronegative","Yes — all bonds are polar","Only if bent"],why:"<b>Nonpolar bond.</b> Identical atoms pull equally → electrons shared evenly. Polarity needs an EN difference."},
+{id:"hx1",topic:"hybrid",type:"num",prompt:"An sp³ atom has how many electron domains?",answer:4,why:"<b>4</b> → sp³ → tetrahedral, 109.5°. (Domains = bonded atoms + lone pairs.)"},
+{id:"hx2",topic:"hybrid",type:"num",prompt:"Ideal bond angle at an sp² atom (degrees)?",answer:120,why:"<b>120°</b> — 3 domains, trigonal planar. Set: sp 180 · sp² 120 · sp³ 109.5."},
+{id:"hx3",topic:"hybrid",type:"mc",prompt:"Geometry of an sp atom (2 electron domains)?",answer:0,choices:["Linear","Bent","Trigonal planar","Tetrahedral"],why:"<b>Linear</b>, 180°. Two domains push as far apart as possible. e.g. the carbons in acetylene, or CO₂."},
+{id:"hx4",topic:"hybrid",type:"text",prompt:"Hybridization of the carbon in CO₂? (type like sp2)",answer:"sp",why:"2 domains (each C=O counts as ONE) → <b>sp</b>, linear. Double bonds don't add domains."},
+{id:"hx5",topic:"hybrid",type:"text",prompt:"Using the steric-number (VSEPR) model: what hybridization is ASSIGNED to the oxygen in water (2 bonds, 2 lone pairs)? (type like sp3)",answer:"sp3",why:"4 domains → <b>sp³</b> in the steric-number model; lone pairs count. <i>Fine print (Klein §1.11): experimentally at least one lone pair occupies a p orbital — water's O cannot be described as literally sp³. Know both layers; use whichever Ciesla asks for.</i>"},
+{id:"hx6",topic:"hybrid",type:"num",prompt:"How many pi bonds are in a triple bond?",answer:2,why:"<b>2</b> pi + 1 sigma. Single = 1σ. Double = 1σ+1π. Triple = 1σ+2π."},
+{id:"hx7",topic:"hybrid",type:"mc",prompt:"A single bond consists of:",answer:0,choices:["1 sigma bond","1 pi bond","2 sigma bonds","1 sigma + 1 pi"],why:"<b>1 sigma bond.</b> The first bond between two atoms is always sigma; extra bonds (double/triple) add pi."},
+{id:"hx8",topic:"hybrid",type:"text",prompt:"Hybridization of the nitrogen in ammonia, NH₃? (type like sp3)",answer:"sp3",why:"4 domains (3 bonds + 1 lone pair) → <b>sp³</b>. Counting the lone pair is the whole trick."},
+{id:"ix1",topic:"imf",type:"mc",prompt:"For molecules of COMPARABLE SIZE, which is the stronger intermolecular force?",answer:0,choices:["Hydrogen bonding","London dispersion","They are equal","Neither is a force"],why:"For comparable size: <b>hydrogen bonding</b> > dipole-dipole > London dispersion (H-bonding = specially strong dipole interaction, H on N/O/F). <i>Careful — 'H-bonding always wins' is NOT a rule: in large, polarizable molecules, summed dispersion can dominate. Size matters.</i>"},
+{id:"ix2",topic:"imf",type:"mc",prompt:"Can two CH₄ (methane) molecules hydrogen-bond to each other?",answer:0,choices:["No — no H bonded to N, O, or F","Yes — it has hydrogens","Yes — carbon is electronegative","Only when frozen"],why:"<b>No.</b> H-bonding needs H on N/O/F. Methane's H's are on carbon → only London dispersion."},
+{id:"ix3",topic:"imf",type:"mc",prompt:"Which intermolecular force is present in EVERY molecule?",answer:0,choices:["London dispersion","Hydrogen bonding","Dipole-dipole","Ionic bonding"],why:"<b>London dispersion</b> — from temporary electron fluctuations, so everything has it. The only IMF nonpolar molecules get."},
+{id:"ix4",topic:"imf",type:"mc",prompt:"HF can hydrogen-bond because its hydrogen is bonded to:",answer:0,choices:["Fluorine (an N/O/F atom)","Carbon","Another hydrogen","Nothing — it can't"],why:"<b>Fluorine.</b> H attached to N, O, or F is the H-bond donor requirement. HF, H₂O, NH₃ all qualify."},
+{id:"ix5",topic:"imf",type:"mc",prompt:"A bigger molecule with more electrons has ___ London dispersion forces:",answer:0,choices:["Stronger","Weaker","The same","Zero"],why:"<b>Stronger.</b> More electrons + surface area = more polarizable = stronger dispersion. Why larger alkanes boil higher."},
+{id:"ix6",topic:"imf",type:"mc",prompt:"Which boils at a higher temperature, H₂O or H₂S?",answer:0,choices:["H₂O — it hydrogen-bonds","H₂S — it's heavier","They are equal","Neither boils"],why:"<b>H₂O</b> (100°C vs −60°C). Oxygen enables H-bonding; sulfur isn't electronegative enough."},
+/* --- v3.0: WRITTEN items (UID'd + difficulty-scored). Answered on paper/typed, self-graded
+       against the model honestly (the 08-19 covenant), and exported via 📤 Report for Claude's
+       process-review. type:"written" — never included in ordinary short drills. --- */
+{id:"WR-CH1-001",topic:"formal",type:"written",diff:2,prompt:"<b>Write out, showing EVERY count:</b> derive the formal charge on O in hydroxide (OH⁻).<br><span class='muted'>Required steps: O's neutral valence count → bonds in OH⁻ → lone pairs derived from the octet (not from memory of water) → the FC formula with numbers.</span>",
+ model:"O neutral valence = <b>6</b>. In OH⁻, O has <b>1 bond</b> (2 shared e⁻); octet needs 8 → 8−2 = 6 nonbonding e⁻ = <b>3 lone pairs</b>. FC = 6 − 6 − ½(2) = 6 − 6 − 1 = <b>−1</b>.",
+ rubric:["Used 6 (not 7) for O's neutral valence","Derived 3 lone pairs from the octet (not 2 by analogy to H₂O)","FC formula applied with explicit numbers","Final answer −1"]},
+{id:"WR-CH1-002",topic:"formal",type:"written",diff:3,prompt:"<b>Write out with every count:</b> derive the formal charge on O in hydronium (H₃O⁺). Then state in one sentence WHY the sign comes out positive.",
+ model:"O neutral valence = <b>6</b>. In H₃O⁺: <b>3 bonds</b> (6 shared e⁻) + <b>1 lone pair</b> (2 e⁻). FC = 6 − 2 − ½(6) = 6 − 2 − 3 = <b>+1</b>. Why positive: O 'owns' only 5 electrons here (2 nonbonding + 3 half-shares) vs its neutral 6 — one electron short → +1.",
+ rubric:["3 bonds + 1 lone pair identified (not guessed from LP count)","FC = 6−2−3 shown with numbers","Sign explained via owned-vs-neutral electron count, not memorized"]},
+{id:"WR-CH1-003",topic:"polarity",type:"written",diff:2,prompt:"<b>Explain to a classmate who missed class:</b> why is CO₂ nonpolar even though each C=O bond is strongly polar?",
+ model:"Each C=O bond dipole points from C toward O. But CO₂ is <b>linear</b>, so the two equal dipoles point in exactly opposite directions and their <b>vector sum is zero</b>. Molecular polarity = the vector sum of bond dipoles — geometry decides, not just bond polarity.",
+ rubric:["Names the linear geometry","Treats dipoles as vectors that cancel","States the general rule (molecule polarity = vector sum)"]},
+{id:"WR-CH1-004",topic:"hybrid",type:"written",diff:2,prompt:"<b>Derive, don't recall:</b> the hybridization of N in NH₃ and the approximate H–N–H angle — and why the angle is smaller than the perfect tetrahedral angle.",
+ model:"N has <b>4 electron domains</b> (3 bonds + 1 lone pair) → <b>sp³</b>, electron geometry tetrahedral. The lone pair repels more strongly than bonding pairs, compressing H–N–H to ≈<b>107°</b> (vs 109.5°).",
+ rubric:["Counts 4 domains including the lone pair","sp³ from domain count (not memorized)","≈107° with lone-pair-repulsion reasoning"]},
+{id:"WR-CH1-005",topic:"lewis",type:"written",diff:3,prompt:"<b>Find the error:</b> a student draws CO₂ as O–C≡O (one single bond, one triple bond). The electron budget (16) checks out and every atom has an octet. What's wrong, and what's the fix? Show the formal charges that prove it.",
+ model:"Octets are legal, but the formal charges aren't minimal: single-bonded O = 6−6−1 = <b>−1</b>; triple-bonded O = 6−2−3 = <b>+1</b>; C = 0. The symmetric <b>O=C=O</b> gives ALL atoms FC = 0 (each O: 6−4−2=0). Rule: among octet-legal structures, the best minimizes formal charge — budget + octets alone don't certify a structure.",
+ rubric:["Computes FCs on both oxygens (−1 and +1) with numbers","Shows O=C=O gives all zeros","States the minimize-formal-charge rule"]},
+{id:"WR-CH1-006",topic:"imf",type:"written",diff:2,prompt:"<b>Rank and justify:</b> order CH₄, CH₃Cl, and CH₃OH by boiling point (lowest→highest), naming the dominant intermolecular force for each.",
+ model:"<b>CH₄ &lt; CH₃Cl &lt; CH₃OH.</b> CH₄: London dispersion only (bp −161°C). CH₃Cl: polar C–Cl → dipole–dipole + dispersion (−24°C). CH₃OH: O–H → <b>hydrogen bonding</b>, the strongest of the three (65°C).",
+ rubric:["Correct order","Each species matched to its strongest IMF","H-bond requirement (H on N/O/F) stated or implied"]},
+
+/* ===== v3.3 LECTURE 1 BANK (Ciesla lecture, Thu 2026-08-20 — built from Gabe's transcript) =====
+   Every item below maps to something she EMPHASIZED or named as a trap. */
+{id:"l1s1",topic:"hybrid",type:"mc",diff:2,prompt:"Pi (π) bonds are formed by:",choices:["Side-on overlap of two UNhybridized p orbitals","Head-on overlap of hybridized orbitals","Side-on overlap of hybridized orbitals","Overlap of two s orbitals"],answer:0,why:"σ bonds = head-on overlap of <b>hybridized</b> orbitals; π bonds = side-on overlap of <b>unhybridized p</b> orbitals (they must be in the same plane; there's a node at the nucleus plane). Lecture 8/20: she called this a classic glitch."},
+{id:"l1s2",topic:"hybrid",type:"mc",diff:1,prompt:"Hydrogen forms its sigma bonds using:",choices:["Its 1s orbital — H is never hybridized","An sp orbital","An sp³ orbital","An unhybridized p orbital"],answer:0,why:"<b>Hydrogen is the exception</b>: it always bonds with its 1s orbital, never hybridized. Every other σ bond in Ch 1 uses hybridized orbitals."},
+{id:"l1s5",topic:"hybrid",type:"mc",diff:2,prompt:"A LOCALIZED lone pair sits in:",choices:["A hybridized orbital matching the hybridization of its atom","An unhybridized p orbital, always","An sp³ orbital, always","The 1s orbital"],answer:0,why:"Her exact rule (8/20): <b>localized lone pairs live in hybridized orbitals</b> — and WHICH one is set by the hybridization of the atom they sit on. sp³ N → lone pair in sp³ orbital; sp² N → sp². In Ch 1, every lone pair you'll be asked about is localized. (Delocalized pairs arrive in Ch 2.)"},
+{id:"l1s3",topic:"hybrid",type:"text",diff:2,prompt:"A nitrogen is sp² hybridized and carries a localized lone pair. Which orbital is the lone pair in? (type like sp2)",answer:"sp2",why:"Lone pair orbital = the atom's hybridization → <b>sp²</b>. She said: 'you need to be able to tell me which orbital the lone pair is in.'"},
+{id:"l1s4",topic:"hybrid",type:"text",diff:2,prompt:"An sp³ nitrogen (3 bonds + 1 lone pair) holds its lone pair in which orbital? (type like sp3)",answer:"sp3",why:"Same rule: localized lone pair lives in a hybridized orbital matching its atom → <b>sp³</b>."},
+{id:"l1g1",topic:"hybrid",type:"num",diff:1,prompt:"Bond angle (degrees) for a trigonal planar electron geometry?",answer:120,why:"Tetrahedral 109.5° · trigonal planar <b>120°</b> · linear 180°."},
+{id:"l1g2",topic:"hybrid",type:"mc",diff:2,prompt:"NH₃'s H–N–H bond angle is:",choices:["≈107° — the lone pair takes more volume and compresses the bonds below 109.5°","Exactly 109.5° — 4 electron domains","120° — three atoms attached","90° — p orbitals"],answer:0,why:"Lone pairs occupy MORE volume than bonding pairs → repulsion pushes the N–H bonds together → <b>less than 109.5°</b> (~107°; water ~105° with two lone pairs). She requires: know it's <b>less than 109.5</b>, not the exact numbers."},
+{id:"l1g3",topic:"hybrid",type:"mc",diff:3,prompt:"SO₂: what is the O–S–O bond angle?",choices:["Slightly LESS than 120° — steric number 3 (sp², trigonal planar) with a lone pair compressing","109.5° — like water","Exactly 120°","180° — linear like CO₂"],answer:0,why:"Her named trap: students answer 109.5 by pattern-matching to H₂O. Work it: S has 2 bonded atoms + 1 lone pair → steric number <b>3</b> → sp², trigonal planar electron geometry, bent shape → base angle 120°, compressed slightly below by the lone pair. <b>To get a bond angle you MUST go through the geometry.</b>"},
+{id:"l1p1",topic:"polarity",type:"mc",diff:3,prompt:"ΔEN for C–Br is 0.3 (below the 0.5 'pure covalent' cutoff). The C–Br bond is:",choices:["Polar — carbon bonded to ANY halogen is always polar, regardless of ΔEN","Pure covalent — ΔEN < 0.5","Ionic — Br is much bigger","Nonpolar — the electrons are shared equally"],answer:0,why:"Her TOP TIP, verbatim: <b>'carbon bonded to a halogen is ALWAYS a polar bond, regardless of the ΔEN.'</b> ΔEN alone oversimplifies — real polarity is charge distribution over DISTANCE, and Br is a big atom. Named trap: assessments hand you EN values hoping you'll calculate and answer 'pure covalent.'"},
+{id:"l1p2",topic:"polarity",type:"num",diff:1,prompt:"Below what ΔEN (course values) is a bond considered 'pure covalent'? (e.g. 0.4)",answer:0.5,why:"Course cutoffs: ΔEN &lt; <b>0.5</b> pure covalent · 0.5–1.7 polar covalent · &gt; 1.7 ionic. (Use OUR values — homework is based on them.) But remember the C–halogen override."},
+{id:"l1p4",topic:"polarity",type:"mc",diff:2,prompt:"CCl₄ (carbon tetrachloride) has four polar C–Cl bonds. The MOLECULE is:",choices:["Nonpolar — four identical bond dipoles on a tetrahedron cancel (sum to zero)","Polar — it contains polar bonds","Ionic","Nonpolar — C–Cl bonds aren't polar"],answer:0,why:"Bond polarity ≠ molecular polarity. Four identical vectors on a tetrahedron <b>sum to zero</b> → no net dipole → nonpolar molecule, despite four polar bonds. The four cancel cases: tetrahedral-identical (CCl₄), trigonal-planar-identical (BF₃), linear (CO₂), and trans-disubstituted alkenes."},
+{id:"l1p5",topic:"polarity",type:"mc",diff:2,prompt:"Swap one Cl of CCl₄ for Br → CCl₃Br. Now the molecule is:",choices:["Polar — the C–Br dipole is smaller than C–Cl, so the vectors no longer cancel","Still nonpolar — it's still tetrahedral","Nonpolar — Br isn't electronegative enough","Ionic"],answer:0,why:"Cancellation requires <b>identical</b> atoms at every position. C–Br has a smaller bond dipole than C–Cl (Cl is more electronegative), so the vector sum ≠ 0 → polar."},
+{id:"l1p6",topic:"polarity",type:"mc",diff:2,prompt:"BF₃ (trigonal planar, three polar B–F bonds) is:",choices:["Nonpolar — three identical dipoles at 120° sum to zero","Polar — F is the most electronegative element","Polar — boron is electron-poor","Ionic"],answer:0,why:"Trigonal planar with the <b>same atom at every position</b> → vectors cancel → nonpolar. Her classic example (hard to build with carbon, easy with boron)."},
+{id:"l1p7",topic:"polarity",type:"mc",diff:3,prompt:"1,2-dichloroethene, two isomers:<svg viewBox='0 0 330 115' width='300' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='55' y1='53' x2='105' y2='53'/><line x1='55' y1='59' x2='105' y2='59'/><line x1='55' y1='56' x2='30' y2='31'/><line x1='55' y1='56' x2='30' y2='83'/><line x1='105' y1='56' x2='130' y2='31'/><line x1='105' y1='56' x2='130' y2='83'/><line x1='215' y1='53' x2='265' y2='53'/><line x1='215' y1='59' x2='265' y2='59'/><line x1='215' y1='56' x2='190' y2='31'/><line x1='215' y1='56' x2='190' y2='83'/><line x1='265' y1='56' x2='290' y2='31'/><line x1='265' y1='56' x2='290' y2='83'/></g><g font-size='13' fill='currentColor'><text x='12' y='28'>Cl</text><text x='22' y='95'>H</text><text x='133' y='28'>H</text><text x='128' y='95'>Cl</text><text x='68' y='108'>A</text><text x='172' y='28'>Cl</text><text x='182' y='95'>H</text><text x='293' y='28'>Cl</text><text x='288' y='95'>H</text><text x='228' y='108'>B</text></g></svg>Which isomer is NONPOLAR?",choices:["A (trans) — the two C–Cl dipoles point opposite ways and cancel","B (cis) — both Cl on the same side","Both are nonpolar","Neither — C–Cl bonds are polar so both molecules are polar"],answer:0,why:"<b>A is trans</b> (Cl on opposite sides): equal C–Cl vectors in opposite directions sum to zero → nonpolar. <b>B is cis</b>: both dipoles point the same general way → net dipole → polar. Containing polar bonds is necessary but NOT sufficient for a polar molecule."},
+{id:"l1i1",topic:"imf",type:"mc",diff:2,prompt:"When water boils, what breaks?",choices:["Intermolecular forces only — every H₂O molecule stays intact","The O–H covalent bonds","Both the H-bonds and the O–H bonds","The hydrogen turns to gas first"],answer:0,why:"Her top emphasis: <b>phase changes break INTERMOLECULAR FORCES, never bonds.</b> Liquid→gas hexanol is still hexanol — nothing happened to the structure. Writing 'the bonds are harder to break' on an exam explanation = wrong."},
+{id:"l1i2",topic:"imf",type:"mc",diff:3,prompt:"cis- and trans-1,2-dichloroethene (same molecular formula — stereoisomers). Which boils higher, and why?",choices:["cis — it's polar, so it has dipole–dipole ON TOP of dispersion; trans's dipoles cancel","trans — it's more symmetric so it packs better","They boil at the same temperature — same mass","cis — it has hydrogen bonding"],answer:0,why:"Same formula → mass is irrelevant. Neither has H-bonding (no H on N/O). trans: dipoles cancel → nonpolar → dispersion only. cis: net dipole → <b>dipole–dipole + dispersion</b> → stronger IMFs → higher boiling point. This was her closing worked example."},
+{id:"l1i3",topic:"imf",type:"mc",diff:2,prompt:"'Hydrogen bonding' is:",choices:["An intermolecular ATTRACTION between an H (δ+) on N/O and a lone pair on another N/O — not a covalent bond","A covalent bond between hydrogen atoms","Any bond containing hydrogen","A bond between H and any electronegative atom, including C"],answer:0,why:"'And by the way, it's not a bond.' Requires H <b>directly bonded</b> to N or O (F in organic molecules is bonded to C, so no H-bonding through it). Strength order: H-bonding &gt; dipole–dipole &gt; dispersion (which everything has)."},
+{id:"l1b1",topic:"bondline",type:"num",diff:1,prompt:"Bond-line structure (each line-end/vertex = a carbon; H's on carbon are NOT drawn):<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>How many implicit hydrogens are on <b>C4</b>?",answer:3,why:"C4 shows ONE bond (to C3). Carbon wants 4 → <b>3 hidden H's</b> (a CH₃). Reading rule: carbon's H's are never drawn; you supply them by counting to four."},
+{id:"l1b2",topic:"bondline",type:"num",diff:2,prompt:"Same structure:<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>How many implicit hydrogens are on <b>C2</b>?",answer:1,why:"C2 has a DOUBLE bond to C1 (counts as 2) + a single bond to C3 = 3 bonds shown → <b>1 hidden H</b>. Her homework for next class is exactly this skill."},
+
+/* v3.3 written items — lecture 1 */
+{id:"WR-CH1-007",topic:"hybrid",type:"written",diff:3,prompt:"<b>Lone-pair orbitals:</b> a molecule has two nitrogens — N1 has three single bonds + 1 lone pair; N2 has a double bond, a single bond + 1 lone pair. For EACH nitrogen: give its hybridization AND name the orbital holding its lone pair. Then state the general rule.",
+ model:"<b>N1:</b> 4 electron domains (3 bonds + 1 LP) → <b>sp³</b>; its lone pair is in an <b>sp³ orbital</b>. <b>N2:</b> 3 domains (double bond counts as ONE domain, + single bond + LP) → <b>sp²</b>; lone pair in an <b>sp² orbital</b>. <b>Rule:</b> a localized lone pair lives in a hybridized orbital, and WHICH one is set by the hybridization of the atom it sits on.",
+ rubric:["Both hybridizations derived from domain count (double bond = one domain)","Lone-pair orbital = atom's hybridization, stated as the rule","sp³/sp² assigned to the right nitrogens"]},
+{id:"WR-CH1-008",topic:"polarity",type:"written",diff:2,prompt:"<b>The C–Br trap:</b> ΔEN(C–Br) = 0.3, below the 0.5 cutoff — 'pure covalent' by the numbers. Is the C–Br bond polar? Explain what the ΔEN method misses.",
+ model:"<b>Polar.</b> Course rule: carbon bonded to ANY halogen is always polar, regardless of ΔEN. The cutoff method oversimplifies: bond polarity is really <b>charge distribution over distance</b> — bromine is a much larger atom than carbon, so even a small EN difference produces a real dipole. (Related: C–Li at ΔEN 1.5 is drawn BOTH as ionic and polar covalent — it's a spectrum.)",
+ rubric:["Answers polar despite the cutoff","States the C–halogen-always-polar rule","Mentions size / charge-over-distance as what ΔEN misses"]},
+{id:"WR-CH1-009",topic:"lewis",type:"written",diff:3,prompt:"<b>SO₂ from scratch:</b> draw a Lewis structure for SO₂ (S and O are both group 6). Then give the electron geometry and the O–S–O bond angle, justified. (Two different valid structures exist — name both if you can.)",
+ model:"<b>Structure 1 (minimized FC, expanded octet):</b> O=S=O with one lone pair on S — S holds 10 electrons, allowed because sulfur is period 3. <b>Structure 2:</b> O=S–O⁻ with S⁺ (octet kept, charges +1/−1). BOTH are valid and give the same answer: S has 2 bonded atoms + 1 lone pair → steric number <b>3</b> → sp², <b>trigonal planar electron geometry</b>, bent molecular shape → bond angle just <b>under 120°</b> (lone pair compression). NOT 109.5 — that's the H₂O pattern-match trap.",
+ rubric:["Valid Lewis structure including the lone pair on S","Steric number 3 → trigonal planar (not tetrahedral)","Angle <120° with lone-pair justification — and not 109.5"]},
+{id:"WR-CH1-010",topic:"imf",type:"written",diff:2,prompt:"<b>Exam-wording drill:</b> molecule Y boils higher than molecule X (same formula; Y is polar, X is not). Write TWO explanations: (1) the one that LOSES points, (2) the full-credit version.",
+ model:"<b>(1) Loses points:</b> 'Y's bonds are harder to break.' — wrong because phase changes never break covalent bonds. <b>(2) Full credit:</b> 'Y has a net dipole, so it has dipole–dipole forces in addition to dispersion; X's bond dipoles cancel, leaving dispersion only. Stronger INTERMOLECULAR forces require more energy to separate the molecules, so Y has the higher boiling point. The molecules themselves are unchanged.'",
+ rubric:["Identifies 'breaking bonds' as the losing phrase","Full-credit version names the specific IMF difference","Links IMF strength → energy → boiling point, molecules intact"]},
+{id:"WR-CH1-011",topic:"bondline",type:"written",diff:2,prompt:"<b>Add every hydrogen:</b> for the bond-line structure below, list the number of hydrogens on EACH carbon, then give the molecular formula.<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>",
+ model:"Count each carbon to 4 bonds: <b>C1</b>: double bond (2) → <b>2 H</b>. <b>C2</b>: double (2) + single to C3 (1) = 3 → <b>1 H</b>. <b>C3</b>: two singles → <b>2 H</b>. <b>C4</b>: one single → <b>3 H</b>. Total: <b>C₄H₈</b> (1-butene). Rule: H's on carbon are implicit; H's on N/O/S are always drawn.",
+ rubric:["Every carbon brought to exactly 4 bonds","Correct per-carbon counts (2,1,2,3)","Correct formula C₄H₈"]},
+/* ---- v3.3 TUTORIAL-STANDARD SET — modeled on Ciesla's Ch-1 tutorial + official quiz scope ---- */
+{id:"T-CH1-01",topic:"lewis",type:"mc",diff:1,prompt:"Two compounds are <b>constitutional isomers</b>. Which MUST be true?",choices:["Same molecular formula, different connectivity of atoms","Same connectivity, different 3-D arrangement","Same properties, different formulas","They are the same compound drawn differently"],answer:0,why:"Constitutional isomers share a molecular formula but connect their atoms differently — and structure (connectivity), not formula, determines properties. (Same connectivity/different 3-D = stereoisomers.)"},
+{id:"T-CH1-02",topic:"lewis",type:"mc",diff:1,prompt:"Which bonding pattern is <b>WRONG</b> for a neutral atom in an organic molecule?",choices:["C — 4 bonds","N — 3 bonds + 1 lone pair","O — 2 bonds + 2 lone pairs","F — 2 bonds + 2 lone pairs"],answer:3,why:"Neutral halogens form 1 bond + 3 lone pairs. Memorize the neutral patterns: C=4 bonds · N=3+1LP · O=2+2LP · H=1 · halogen=1+3LP. Any deviation means a formal charge."},
+{id:"T-CH1-03",topic:"hybrid",type:"mc",diff:2,prompt:"Rank C–H bond strength: ethyne (HC≡CH), ethene (H₂C=CH₂), ethane (H₃C–CH₃).",choices:["ethyne > ethene > ethane","ethane > ethene > ethyne","ethene > ethyne > ethane","all equal — they're all C–H bonds"],answer:0,why:"More s-character = shorter, stronger bond. sp (50% s, ethyne) > sp² (33%, ethene) > sp³ (25%, ethane). s orbitals hold electrons closer to the nucleus."},
+{id:"T-CH1-04",topic:"hybrid",type:"mc",diff:1,prompt:"A C=C double bond consists of:",choices:["1 σ bond + 1 π bond","2 σ bonds","2 π bonds","1 σ + 2 π"],answer:0,why:"Every bond's FIRST connection is a σ (head-on overlap of hybridized orbitals). The second is a π — side-on overlap of unhybridized p orbitals. π is the weaker of the two."},
+{id:"T-CH1-05",topic:"hybrid",type:"mc",diff:2,prompt:"A p orbital has:",choices:["two lobes of opposite phase separated by a node","one spherical lobe, no nodes","two lobes of the same phase","a node only at infinite distance"],answer:0,why:"p orbitals are dumbbells: two lobes of opposite phase (+/−) with a node (zero electron density) at the nucleus. Bonding requires CONSTRUCTIVE overlap — same-phase lobes meeting."},
+{id:"T-CH1-06",topic:"polarity",type:"mc",diff:1,prompt:"On an electrostatic potential map of water, the <b>red</b> region sits on:",choices:["the oxygen (high electron density, δ−)","the hydrogens (δ+)","the O–H bond midpoints","nowhere — water is nonpolar"],answer:0,why:"EPM color code: red = electron-rich (δ−), blue = electron-poor (δ+). O is the most electronegative atom in water, so red concentrates there; the H end reads blue."},
+{id:"T-CH1-07",topic:"imf",type:"mc",diff:2,prompt:"Pentane and neopentane (2,2-dimethylpropane) are both C₅H₁₂. Which boils higher, and why?",choices:["Pentane — linear shape gives more surface contact for London forces","Neopentane — branching adds strain","They boil identically — same formula, same mass","Neopentane — spheres pack tighter"],answer:0,why:"Same mass → same-strength question comes down to CONTACT AREA. Linear pentane molecules touch along their whole length (more LDF); branched neopentane is ball-shaped with less contact. Branching LOWERS boiling point."},
+{id:"T-CH1-08",topic:"imf",type:"mc",diff:1,prompt:'"Like dissolves like": which pair actually mixes?',choices:["CH₃OH and H₂O — both hydrogen-bond","hexane and H₂O — both contain H","NaCl and hexane — opposites attract","CO₂ and H₂O — both contain oxygen"],answer:0,why:"Polar/H-bonding dissolves polar/H-bonding; nonpolar dissolves nonpolar. Methanol H-bonds with water. Hexane (nonpolar, LDF-only) can't pay the energy cost of breaking water's H-bond network."},
+{id:"T-CH1-09",topic:"imf",type:"mc",diff:2,prompt:"Why does oil NOT dissolve in water?",choices:["Mixing would break water's H-bonds but oil offers only weak LDF in return","Oil is denser than water","Oil molecules repel water electrostatically","Oil's covalent bonds can't break in water"],answer:0,why:"Solubility is an energy trade. Water gives up strong H-bonding interactions to make room; nonpolar oil can only repay with weak dispersion forces. Bad trade → no mixing. (No covalent bonds break in dissolving.)"},
+{id:"T-CH1-10",topic:"valence",type:"mc",diff:2,prompt:"On the potential-energy curve for H + H approaching, the bond length corresponds to:",choices:["the minimum of the curve — attraction and repulsion balanced","the point where PE = 0","the closest possible approach","where attraction is strongest"],answer:0,why:"Bonds form because energy is RELEASED as atoms approach (attraction between each nucleus and both electrons). Too close, nucleus–nucleus repulsion spikes. The PE minimum = most stable separation = bond length."},
+{id:"WR-CH1-101",topic:"lewis",type:"written",diff:3,prompt:"<b>Tutorial standard:</b> C₃H₉N has FOUR constitutional isomers. Describe (or draw in your notebook) all four — name the connectivity of each.<br><span class='muted'>Hint: move the N through the chain: end, middle, in-chain, fully branched.</span>",
+ model:"1) <b>CH₃CH₂CH₂–NH₂</b> (propan-1-amine: N on the end). 2) <b>(CH₃)₂CH–NH₂</b> (propan-2-amine: N on the middle carbon). 3) <b>CH₃–NH–CH₂CH₃</b> (N-methylethanamine: N inside the chain). 4) <b>(CH₃)₃N</b> (trimethylamine: N bonded to three CH₃). All are C₃H₉N; each N keeps 3 bonds + 1 lone pair.",
+ rubric:["All four connectivities found","Same formula C₃H₉N verified for each","N has 3 bonds + 1 lone pair in every isomer"]},
+{id:"WR-CH1-102",topic:"polarity",type:"written",diff:2,prompt:"<b>Tutorial standard:</b> label δ+ and δ− in each bond and justify: (a) Cl–P (b) C–Br (c) H–N.",
+ model:"(a) Cl is more electronegative than P → <b>Cl δ−, P δ+</b>. (b) <b>Br δ−, C δ+</b> — and remember: C bonded to ANY halogen counts as a polar bond even when ΔEN looks small (C–Br ΔEN ≈ 0.3). (c) N is more electronegative than H → <b>N δ−, H δ+</b> (this polarity is what enables hydrogen bonding).",
+ rubric:["δ− on the more electronegative atom in all three","C–halogen treated as polar despite small ΔEN","Reasoning references electronegativity, not memorization"]},
+{id:"WR-CH1-103",topic:"polarity",type:"written",diff:3,prompt:"<b>Tutorial standard:</b> CHCl₃ has a LARGER molecular dipole moment than CFCl₃. Use the 3-D (tetrahedral) structures and bond dipoles to explain why.",
+ model:"Both are tetrahedral. In <b>CHCl₃</b>, the three C–Cl dipoles sum to a net vector and the C–H bond adds almost no opposing dipole → large net dipole. In <b>CFCl₃</b>, the C–F bond is strongly polar in the OPPOSITE direction of the three C–Cl sum — F pulls against the chlorines, partially canceling → smaller net dipole. Molecular polarity is a VECTOR SUM: an opposing strong dipole shrinks the total.",
+ rubric:["Treats bond dipoles as vectors in 3-D","C–F opposes the C–Cl resultant in CFCl₃","Concludes partial cancellation → smaller net dipole"]},
+{id:"WR-CH1-104",topic:"hybrid",type:"written",diff:3,prompt:"<b>Tutorial standard (real molecule):</b> in tert-butyl isonitrile, (CH₃)₃C–N⁺≡C⁻ — (a) hybridization of the central C of the tert-butyl group, the N, and the terminal C; (b) which orbital holds the terminal carbon's lone pair; (c) predict the C–N–C angle.",
+ model:"(a) tert-butyl C: 4 σ bonds → <b>sp³</b>. N: 2 σ domains (C–N σ + N≡C σ), no lone pair on N⁺ → <b>sp</b>. Terminal C: 1 σ + 1 lone pair = 2 domains → <b>sp</b>. (b) A LOCALIZED lone pair lives in a HYBRID orbital matching its atom's hybridization → the terminal C's lone pair is in an <b>sp orbital</b>. (c) N is sp with no lone pairs → C–N–C = <b>180° (linear)</b>.",
+ rubric:["Hybridizations from domain counts (sp³ / sp / sp)","Lone pair placed in the atom's hybrid orbital (sp)","180° from sp nitrogen"]},
+{id:"WR-CH1-105",topic:"hybrid",type:"written",diff:3,prompt:"<b>Tutorial standard (real molecule):</b> in the isonitrile dihalide (CH₃)₃C–N=CCl₂ the N carries a lone pair — (a) hybridization of N; (b) which orbital holds N's lone pair; (c) predict the C–N=C angle.",
+ model:"(a) N has 3 domains: σ to C(CH₃)₃, σ+π to CCl₂ (the double bond counts once), and 1 lone pair → <b>sp²</b>. (b) The localized lone pair sits in an <b>sp² orbital</b> (lone pairs live in hybrid orbitals matching the atom's hybridization). (c) sp² base angle 120°, compressed slightly by the bulky lone pair → <b>a bit less than 120°</b>.",
+ rubric:["3 domains → sp² (double bond = one domain)","Lone pair in sp² hybrid orbital","<120° with lone-pair compression reasoning"]},
+];
+/* fix f5 (answerOverride pattern demo): real answer is -1 */
+QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
+
+/* ================= MOLECULES (Lewis Lab) =================
+   atoms: element counts · ve: total valence e⁻ (the step-1 answer)
+   central: accepted central atom element(s)
+   afterSingles: e⁻ remaining after connecting the skeleton with single bonds (step-3 answer)
+   hint: shown only after 2 failed audits
+   Generic checker: formula match + budget spent + H rule + octets + connectivity. */
+const MOLECULES = [
+  {formula:"H₂O",  key:"H2O",  atoms:{O:1,H:2}, ve:8,  central:["O"], afterSingles:4, due:"2026-08-09", done:false, blurb:"The owed warm-up. Finish your steps 3–5 properly this time.", hint:"2 bonds use 4 e⁻; the remaining 4 = 2 lone pairs on O."},
+  {formula:"C₂H₄", key:"C2H4", atoms:{C:2,H:4}, ve:12, central:["C"], afterSingles:2, due:"2026-08-09", done:false, blurb:"Two central atoms! Connect C–C first, hang the H's, then audit.", hint:"5 single bonds spend 10 of 12. Put the last 2 on a carbon as a lone pair — then CONVERT that pair into a second C–C bond: C=C, and no lone pairs anywhere in the final structure."},
+  {formula:"NH₃",  key:"NH3",  atoms:{N:1,H:3}, ve:8,  central:["N"], afterSingles:2, done:false, blurb:"Straightforward — if your bond-number table is loaded.", hint:"N: 3 bonds + 1 lone pair."},
+  {formula:"CO₂",  key:"CO2",  atoms:{C:1,O:2}, ve:16, central:["C"], afterSingles:12, done:false, blurb:"Redo from tutoring. Carbon will come up short — quantify how short.", hint:"C is short by 4 after singles → pull one pair from EACH oxygen → two double bonds."},
+  {formula:"CH₂O", key:"CH2O", atoms:{C:1,O:1,H:2}, ve:12, central:["C"], afterSingles:6, done:false, blurb:"Formaldehyde — your first double-bond fix, revisited.", hint:"C short by 2 → one pair off O → C=O."},
+  {formula:"HCN",  key:"HCN",  atoms:{H:1,C:1,N:1}, ve:10, central:["C"], afterSingles:6, done:false, blurb:"The triple-bond one. Short by 4 → 2 pairs convert.", hint:"H–C≡N with one lone pair left on N."},
+  {formula:"CH₃OH",key:"CH3OH",atoms:{C:1,O:1,H:4}, ve:14, central:["C"], afterSingles:4, done:false, blurb:"Two heavy atoms again: C–O skeleton, H's around.", hint:"All singles; O keeps 2 lone pairs."},
+  {formula:"CH₃NH₂",key:"CH3NH2",atoms:{C:1,N:1,H:5}, ve:14, central:["C"], afterSingles:2, done:false, blurb:"Methylamine — N's lone pair is the business end of every amine.", hint:"All singles; 1 lone pair on N."},
+  {formula:"N₂",   key:"N2",   atoms:{N:2}, ve:10, central:["N"], afterSingles:8, done:false, blurb:"Deceptively simple. Both atoms short → big conversion.", hint:"N≡N with a lone pair on each end."},
+  {formula:"C₂H₆", key:"C2H6", atoms:{C:2,H:6}, ve:14, central:["C"], afterSingles:0, done:false, blurb:"Ethane — pure skeleton practice, zero leftovers.", hint:"7 single bonds spend all 14 exactly."},
+];
+const VALENCE = {H:1, C:4, N:5, O:6, F:7, Cl:7, Br:7, S:6, P:5};
+const ATOM_COLORS = {H:"#8aa4b8", C:"#20241F", N:"#2E5EAA", O:"#C0392B", F:"#2E7D32", Cl:"#2E7D32", Br:"#8B4513", S:"#B7950B", P:"#B7950B"};
+
+/* ================= STATE ================= */
+const S = {
+  doneDays: safeStore.get("doneDays", []),
+  qstats:   safeStore.get("qstats", {}),      // id -> {r,w}
+  missed:   safeStore.get("missed", []),      // ids, most recent last
+  molDone:  safeStore.get("molDone", []),
+  visits:   safeStore.get("visits", []),
+  fcMastery: safeStore.get("fcMastery", []),  // dates of CLEAN 6/6 mastery-check runs; 2 distinct days = mastered
+  lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
+  diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
+  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","formal","polarity","hybrid","imf"]}), // v3.0: editable (Canvas gives ≥3 days notice)
+  wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
+  attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
+  view: "home",
+  drill: null,   // {queue:[], i, right, wrong, topic}
+  lab: null,     // lab session state
+};
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); cloudPush(false); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+(function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
+
+/* ================= HELPERS ================= */
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else e.setAttribute(k,v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function confetti(){ const c=$("#confetti"); const em=["🎉","⚗️","✨","🧪","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
+function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
+function accuracy(){ let r=0,w=0,g=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;g+=(s.gr||0);}); const t=r+w; const clean=r-g;
+  return {r,w,g,t,pct:t?Math.round(100*r/t):0, cleanPct:t?Math.round(100*Math.max(0,clean)/t):0}; }
+/* v3.2: measured difficulty — miss rate + guess rate + time vs topic median from the
+   event log, blended with the static prior until n is meaningful (weight n/(n+4)). */
+function qDiffM(q){
+  const ev=(S.attempts||[]).filter(a=>a.id===q.id); const n=ev.length; const prior=qDiff(q);
+  if(!n) return prior;
+  const miss=ev.filter(a=>!a.ok).length/n, guess=ev.filter(a=>a.g).length/n;
+  const med=a=>{const d=a.filter(x=>x.d>0).map(x=>x.d).sort((x,y)=>x-y); return d.length?d[Math.floor(d.length/2)]:null;};
+  const m1=med(ev), m2=med((S.attempts||[]).filter(a=>a.t===q.topic));
+  let m=1+2*miss+guess+((m1&&m2&&m1>m2*1.5)?0.5:0);
+  const w=n/(n+4);
+  return Math.max(1,Math.min(3,Math.round((w*m+(1-w)*prior)*10)/10));
+}
+function logAttempt(q,ok,guessed,D){
+  const secs=D&&D._shownAt?Math.min(600,Math.round((Date.now()-D._shownAt)/1000)):0;
+  S.attempts.push({id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic});
+  if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
+}
+
+/* ================= ROUTER ================= */
+const NAV = [
+  {id:"home",  ico:"🏠", label:"Today"},
+  {id:"learn", ico:"📖", label:"Learn"},
+  {id:"practice", ico:"🎯", label:"Practice"},
+  {id:"exam",  ico:"📊", label:"Exam"},
+  {id:"track", ico:"🗓️", label:"Plan"},
+  {id:"cheat", ico:"📌", label:"Cheat"},
+  {id:"report",ico:"📤", label:"Report"},
+];
+// v2.12: full written exam PDFs (committed to the repo, so linkable from any device)
+const EXAM_READINESS = "./readiness.pdf";
+const EXAM1 = "./exam1-practice.pdf";
+
+/* ---- v2.11: LEARN layer — teach BEFORE testing. Each prereq topic gets a plain-language
+   primer (Claude's own words) + the Klein 5e section to read in your WileyPLUS eText +
+   free, verified video/lesson links (Khan Academy, The Organic Chemistry Tutor). You can't
+   answer what you were never taught — this is the input side the drills assumed. ---- */
+const OCT_ALLINONE = "https://www.youtube.com/watch?v=PeY_sihSh8E"; // OCT: Lewis, formal charge, geometry, polarity — one video
+const LESSONS = {
+  valence: { primer:"Valence electrons are the outer-shell electrons an atom brings to bonding — and for the main-group atoms you'll use, the count equals the group number: H 1, C 4, N 5, O 6, halogens 7. This one number drives everything downstream (how many bonds an atom wants, its formal charge, the whole Lewis structure). Memorize C/N/O/H cold — you'll use them every single problem.",
+    klein:"Klein 5e §1.2–1.3 (atomic structure, electron configuration)",
+    links:[{l:"Khan Academy — chemical bonds (valence, Lewis)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — intro video",u:OCT_ALLINONE}] },
+  lewis: { primer:"A Lewis structure is a bookkeeping map of every valence electron in a molecule. The 6-step method: (1) count total valence electrons (add 1 per negative charge, subtract 1 per positive), (2) pick the central atom (least electronegative, never H), (3) connect with single bonds, (4) fill lone pairs to give outer atoms octets, (5) put leftovers on the center, (6) if the center is short, convert a neighbor's lone pair into a double/triple bond. The whole game is: every electron accounted for, everyone gets an octet (except H, which stops at 2).",
+    klein:"Klein 5e §1.3–1.4 (Lewis structures, formal bonds)",
+    links:[{l:"Khan Academy — chemical bonds & Lewis structures",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — how to draw Lewis structures",u:"https://www.youtube.com/watch?v=6unef5Hz6SU"}] },
+  formal: { primer:"Formal charge = (the atom's group number) − (its lone-pair electrons) − (its number of bonds). It answers 'does this atom own more or fewer electrons than a neutral version of itself?' Key mental model, the one thing to lock in: the atom's group-number valence NEVER changes for the charge — the ion's extra/missing electron shows up in the STRUCTURE (a lone pair added or removed), never by bumping the valence number. O is always 6, N always 5.",
+    klein:"Klein 5e §1.4 (formal charges)",
+    links:[{l:"Khan Academy — formal charge & dot structures",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds/copy-of-dot-structures/v/formal-charge-and-dot-structures"},{l:"The Organic Chemistry Tutor — formal charge",u:"https://www.youtube.com/watch?v=C2l-76VP8s0"}] },
+  polarity: { primer:"Two different questions, don't conflate them. (1) Is a BOND polar? — yes if the two atoms differ in electronegativity (EN order to know: F > O > N ≈ Cl > C ≈ H). (2) Is the MOLECULE polar? — depends on GEOMETRY: if the bond dipoles cancel by symmetry (like linear CO₂) the molecule is nonpolar even with polar bonds; if they don't cancel (bent H₂O) it's polar. Geometry decides #2. This is the single most-tested distinction in the topic.",
+    klein:"Klein 5e §1.5–1.11 (electronegativity, bond & molecular polarity)",
+    links:[{l:"Khan Academy — chemical bonds (electronegativity, polarity)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — polar or nonpolar",u:OCT_ALLINONE}] },
+  hybrid: { primer:"Count ELECTRON DOMAINS on an atom = (number of atoms bonded to it) + (number of lone pairs). A double or triple bond counts as ONE domain. Then: 2 domains → sp, linear, 180°; 3 → sp², trigonal planar, 120°; 4 → sp³, tetrahedral, 109.5°. VSEPR shape names only the ATOMS (so sp³ N with a lone pair = 'trigonal pyramidal', not tetrahedral). The lone pair counts for hybridization but is invisible in the shape name — that's the classic trap.",
+    klein:"Klein 5e §1.9–1.10 (VSEPR geometry, orbital hybridization)",
+    links:[{l:"Khan Academy — chemical bonds (hybridization, VSEPR)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — hybridization & geometry",u:OCT_ALLINONE}] },
+  imf: { primer:"Intermolecular forces are the attractions BETWEEN molecules (not the bonds inside them) — they set boiling point, solubility, etc. Three, weakest to strongest: London dispersion (in everything; scales with size/surface area) < dipole-dipole (polar molecules) < hydrogen bonding (only when H is bonded to N, O, or F, AND there's an N/O/F lone pair to accept). To rank boiling points: identify the strongest force each molecule can do. H-bonding usually wins; among nonpolar molecules, bigger = stronger dispersion = higher bp.",
+    klein:"Klein 5e §1.12–1.13 (intermolecular forces, physical properties)",
+    links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
+};
+function go(view){ S.view=view; render(); window.scrollTo(0,0); }
+const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice"}; // active-tab highlight for sub-views
+function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
+function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
+  // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
+  let txt;
+  if (d>0) txt = d+" days to class"; else if (d===0) txt = "CLASS STARTS TODAY";
+  else { const cp=nextCheckpoint(); txt = cp ? cp.name+" in "+daysTo(cp.date)+"d" : "semester live"; }
+  $("#countdown").textContent = txt; }
+
+/* ================= VIEWS ================= */
+const VIEWS = {};
+
+/* ---- v2.5: FORMAL-CHARGE MASTERY CHECK (the external audit's transfer gate) ----
+   Six species, cold, inputs labeled: bonds → lone pairs → FC for the key atom.
+   A run is CLEAN only if all 18 inputs are right first try. Two clean runs on
+   two different days = mastered. Draw each one on paper BEFORE answering. */
+const MASTERY_FC = [
+  {name:"OH⁻ (hydroxide)",      atom:"O", bonds:1, lp:3, fc:-1},
+  {name:"H₃O⁺ (hydronium)",     atom:"O", bonds:3, lp:1, fc:1},
+  {name:"NH₄⁺ (ammonium)",      atom:"N", bonds:4, lp:0, fc:1},
+  {name:"CH₃O⁻ (methoxide)",    atom:"O", bonds:1, lp:3, fc:-1},
+  {name:"R₃C⁺ (a carbocation)", atom:"C", bonds:3, lp:0, fc:1},
+  {name:"R₃C⁻ (a carbanion)",   atom:"C", bonds:3, lp:1, fc:-1},
+];
+function startMastery(){
+  S.mastery = {queue: shuffle(MASTERY_FC), i:0, clean:true};
+  go("mastery");
+}
+VIEWS.mastery = (v) => {
+  const M = S.mastery;
+  if (!M){ go("home"); return; }
+  const mastered = new Set(S.fcMastery).size>=2;
+  if (M.i>=M.queue.length){ // run over
+    const c = el("div",{class:"card"+(M.clean?" teal":"")});
+    if (M.clean){
+      confetti();
+      const t=todayStr(); if(!S.fcMastery.includes(t)) S.fcMastery.push(t); save();
+      const days=new Set(S.fcMastery).size;
+      c.innerHTML='<span class="tag gold">CLEAN RUN — 6/6, all inputs</span><h2>'+(days>=2?"🏅 MASTERED. Two clean days on record ("+[...new Set(S.fcMastery)].join(", ")+").":"Clean day 1 banked ("+t+"). One more clean run on a DIFFERENT day and formal charge is officially mastered.")+'</h2><p class="muted">Per the audit rule: drill percentages never count as mastery — only this does.</p>';
+    } else {
+      c.innerHTML='<span class="tag coral">Not clean</span><h2>Run finished with misses</h2><p>No shame, real data: the missed inputs are the exact gap. Reread the charge model (a − is one extra paired-up electron; a + is one missing), then retry — a clean run requires every input right on the first try.</p>';
+    }
+    const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+    row.appendChild(el("button",{class:"btn gold",onclick:()=>startMastery()},"Run again"));
+    row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.mastery=null; go("home");}},"Home"));
+    c.appendChild(row); v.appendChild(c); return;
+  }
+  const sp = M.queue[M.i];
+  const c = el("div",{class:"card"});
+  c.innerHTML='<span class="tag violet">Mastery check · '+(M.i+1)+'/6'+(mastered?' · 🏅':'')+'</span>'+
+    '<h2>'+sp.name+' — the '+sp.atom+'</h2>'+
+    '<p class="muted">Draw it on paper first. Then label the inputs — no formula until the last box.</p>';
+  const mkRow=(label,id)=>'<div style="display:flex;align-items:center;gap:10px;margin:8px 0"><span style="min-width:210px;font-weight:700">'+label+'</span><input id="'+id+'" type="number" inputmode="numeric" style="width:90px;padding:8px;border:2px solid var(--ink);border-radius:8px;font-family:var(--mono);font-size:1rem"></div>';
+  c.innerHTML += mkRow("Bonds on the "+sp.atom+":","m_b") + mkRow("Lone PAIRS on the "+sp.atom+":","m_l") + mkRow("Formal charge:","m_f");
+  const fb=el("div");
+  const btn=el("button",{class:"btn teal",onclick:()=>{
+    const b=parseInt($("#m_b").value,10), l=parseInt($("#m_l").value,10), f=parseInt($("#m_f").value,10);
+    if ([b,l,f].some(x=>Number.isNaN(x))){ fb.innerHTML='<p class="muted">Fill all three boxes.</p>'; return; }
+    const ok = b===sp.bonds && l===sp.lp && f===sp.fc;
+    if (!ok) M.clean=false;
+    fb.innerHTML = ok
+      ? '<p style="color:var(--ok);font-weight:700">✓ All three inputs right.</p>'
+      : '<p style="color:var(--coral);font-weight:700">✗ Correct: '+sp.bonds+' bond(s), '+sp.lp+' LP, FC '+(sp.fc>0?"+":"")+sp.fc+'.</p><p class="muted">FC = '+VALENCE[sp.atom]+' − '+(2*sp.lp)+' (LP e⁻) − '+sp.bonds+' (bonds) = '+(sp.fc>0?"+":"")+sp.fc+'</p>';
+    btn.replaceWith(el("button",{class:"btn gold",onclick:()=>{M.i++; render();}},"Next →"));
+  }},"Check all three");
+  c.appendChild(btn); c.appendChild(fb);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"card cream"},'<p class="muted">Status: '+new Set(S.fcMastery).size+'/2 clean days'+(S.fcMastery.length?' ('+[...new Set(S.fcMastery)].join(", ")+')':'')+'. A single miss anywhere makes the run not-clean — that\'s the point.</p>'));
+};
+
+/* ---- HOME ---- */
+VIEWS.home = (v) => {
+  const t = todayStr();
+  // ---- v3.3: 📅 DEADLINES — real due dates, always visible (est. = confirm on Canvas) ----
+  const DL=[
+    {d:"2026-08-25",n:"EC Tutorial Ch 1 (WileyPLUS)",note:"extra credit — completion counts"},
+    {d:"2026-08-27",n:"Ch 1 QUIZ — in lab 2:10 PM",note:"10 Q (MC + short answer) · 25 min · 20 pts · solo, no AI",big:1},
+    {d:"2026-08-27",n:"Exp 1 melting point — same lab",note:"bring lab notebook; write-up walkthrough after"},
+    {d:"2026-08-28",n:"Drop deadline (partial refund)"},
+    {d:"2026-08-30",n:"Ch 2 WileyPLUS HW",note:"date est. — check Canvas",est:1},
+    {d:"2026-09-07",n:"Drop deadline (no record)"},
+    {d:"2026-09-15",n:"EXAM 1 — wk of Sep 14 (likely Thu 9/17)",note:"Ch 1–4 · lowest of 3 exams dropped",est:1,big:1},
+    {d:"2026-10-20",n:"EXAM 2 — wk of Oct 19",est:1,big:1},
+    {d:"2026-11-10",n:"EXAM 3 — wk of Nov 9",est:1,big:1},
+    {d:"2026-11-16",n:"Last day to withdraw (W)"},
+    {d:"2026-11-30",n:"LAB EXAM — wk of Nov 30",est:1},
+    {d:"2026-12-15",n:"FINAL — Tue 11:10–1:40 · Rm 36-319 · comprehensive · required to pass",big:1},
+  ];
+  const up=DL.filter(x=>x.d>=t);
+  if(up.length){
+    const dl=el("div",{class:"card"});
+    dl.innerHTML='<span class="tag coral">📅 Deadlines</span>'+
+      up.slice(0,5).map(x=>{const n=daysTo(x.d);return '<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b class="mono" style="min-width:52px">'+x.d.slice(5).replace("-","/")+'</b><span style="flex:1">'+(x.big?'<b>'+x.n+'</b>':x.n)+(x.est?' <span class="muted">(~est.)</span>':'')+(x.note?'<br><span class="muted" style="font-size:.78rem">'+x.note+'</span>':'')+'</span><span class="tag '+(n<=3?'coral':'gold')+'">'+(n===0?'TODAY':'in '+n+'d')+'</span></div>';}).join("")+
+      (up.length>5?'<p class="muted" style="margin:4px 0 0">…+'+(up.length-5)+' more later — full list matches the verified course schedule</p>':'');
+    v.appendChild(dl);
+  }
+  // ---- v3.3: 📊 MEASURED — your numbers, front and center ----
+  (function(){
+    let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=(s.r||0);w+=(s.w||0);});
+    const A=S.attempts||[]; if(!(r+w) && !A.length) return;
+    const wkAgo=Date.now()-7*86400000, A7=A.filter(a=>a.ts>=wkAgo);
+    const ok7=A7.filter(a=>a.ok).length;
+    const ds=A7.map(a=>a.d).filter(x=>x>0).sort((a,b)=>a-b); const med=ds.length?Math.round(ds[Math.floor(ds.length/2)]):null;
+    const per=Object.keys(TOPICS).map(k=>{let tr=0,tw=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){tr+=s.r;tw+=s.w;}}});const tot=tr+tw;return tot?{k,pct:Math.round(100*tr/tot)}:null;}).filter(Boolean);
+    const worst=per.slice().sort((a,b)=>a.pct-b.pct)[0];
+    const lastD=S.diags.slice(-2).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ");
+    const c=el("div",{class:"card cream"});
+    c.innerHTML='<span class="tag violet">📊 Measured</span>'+
+      '<p style="margin:6px 0 6px"><b>All-time '+(r+w?Math.round(100*r/(r+w)):0)+'%</b> ('+r+'✓ '+w+'✗) · <b>7-day '+(A7.length?Math.round(100*ok7/A7.length):0)+'%</b> ('+A7.length+' attempts'+(med?' · median '+med+'s':'')+')'+(lastD?' · diags '+lastD:'')+' · FC clean days '+new Set(S.fcMastery).size+'/2</p>'+
+      per.map(p=>'<div style="display:flex;align-items:center;gap:6px;margin:2px 0"><span style="min-width:150px;font-size:.75rem">'+TOPICS[p.k].ico+' '+TOPICS[p.k].name+'</span><div style="flex:1;height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden"><div style="width:'+p.pct+'%;height:8px;background:'+(p.pct>=75?'#2a9d8f':p.pct>=55?'#e9c46a':'#e76f51')+'"></div></div><b class="mono" style="min-width:38px;text-align:right;font-size:.75rem">'+p.pct+'%</b></div>').join("")+
+      (worst?'<p class="muted" style="margin:6px 0 0">Priority: <b>'+TOPICS[worst.k].name+'</b> — lowest at '+worst.pct+'%. Quiz weight: quizzes are 20% of the grade.</p>':'');
+    v.appendChild(c);
+  })();
+  // v3.0: every-2-day diagnostic banner — ONE next action, checkpoint-aware
+  const due = diagDue();
+  if (due){
+    const cp = nextCheckpoint();
+    const b = el("div",{class:"card cream"});
+    b.innerHTML = '<span class="tag coral">🩺 Diagnostic due · every 2 days</span>'+
+      '<h3 style="margin:6px 0">'+(due==="cum"?"📚 Cumulative — everything the course has covered":"🎯 Scoped — "+(cp?cp.name+" is in "+daysTo(cp.date)+" day"+(daysTo(cp.date)===1?"":"s"):"next assessment"))+'</h3>'+
+      '<p class="muted" style="margin:0 0 8px">Cold, honest, ~10 min. Ends with a gap map + ONE repair. Written items at the end get saved for Claude\'s review.</p>';
+    b.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2(due)},"Start diagnostic →"));
+    v.appendChild(b);
+  }
+  // v2.6: first-week logistics from Prof. Ciesla's welcome email (shown through Wed 8/19)
+  if (t<="2026-08-19"){
+    v.appendChild(el("div",{class:"card cream"},
+      '<span class="tag coral">FIRST WEEK — from the welcome email</span>'+
+      '<p style="margin:8px 0 4px"><b>⚠️ First day per your registration: TUESDAY 8/18</b> — Lecture 11:10 AM–12:25 PM (Bldg 36, Rm 319), Lab 2:10–5:00 PM (Rm 300). <b>You MUST attend the first lecture AND lab to keep your seat.</b> Note: the welcome email mentioned a Monday 8/17 lab — confirm with Prof. Ciesla (cieslac@smccd.edu) whether you have any Monday obligation, since your registration shows Tuesday only.</p>'+
+      '<p class="muted" style="margin:6px 0 0">Bring/get: hardback <b>composition</b> lab notebook (NOT spiral) · ANSI Z-87.1 safety glasses (loaners exist) · Klein 5e is Inclusive Access via Canvas · Wiley Plus HW via Canvas · model set later. Prof: C. Ciesla, cieslac@smccd.edu.</p>'));
+  }
+  // re-entry ritual: gap of 2+ days since previous visit
+  const prev = S.visits.filter(d=>d<t).sort().pop();
+  if (prev){ const gap = Math.round((new Date(t)-new Date(prev))/86400000);
+    if (gap>=2) v.appendChild(el("div",{class:"card cream"},
+      '<span class="tag coral">Re-entry ritual</span><h2>Welcome back ('+gap+' days away)</h2>'+
+      '<p>Break decay is steep for you — that\'s measured, not a guess. Before anything new: <b>one warm-up problem from the last topic you touched.</b> Open the Lewis Lab and rebuild the last molecule you completed, cold. Then continue.</p>'));
+  }
+  // v3.1 (audit F1): SEMESTER MODE — after class start, the runway is history and Home
+  // never issues an expired mission. Real deadlines live on Canvas; the app's job is
+  // diagnostics + drills + written practice.
+  if (t >= CLASS_START){
+    const cp = nextCheckpoint(); const due = diagDue();
+    const card = el("div",{class:"card teal"});
+    card.innerHTML = '<span class="tag gold">Semester mode · week '+Math.max(courseWeek(),1)+'</span>'+
+      '<h2 style="font-size:1.4rem">Deadlines live on Canvas — check there first</h2>'+
+      '<p style="margin:6px 0 14px;opacity:.92">This app is practice, not your planner. '+
+      (cp?'Next checkpoint: <b>'+cp.name+'</b> · '+fmtDay(cp.date)+' ('+daysTo(cp.date)+'d). ':'')+
+      (due?'A <b>'+(due==="cum"?"📚 cumulative":"🎯 scoped")+' diagnostic</b> is due today.':'No diagnostic due today.')+'</p>';
+    card.appendChild(el("button",{class:"bigbtn",onclick:()=>{ due?startDiag2(due):startDrill("__missed"); }},
+      due?("▶ &nbsp;Start "+(due==="cum"?"cumulative":"scoped")+" diagnostic"):"▶ &nbsp;Review my missed questions"));
+    v.appendChild(card);
+    const a2 = accuracy();
+    const st = el("div",{class:"statrow"});
+    st.innerHTML =
+      '<div class="stat"><div class="n">'+S.diags.length+'</div><div class="l">diagnostics</div></div>'+
+      '<div class="stat"><div class="n">'+a2.t+'</div><div class="l">questions</div></div>'+
+      '<div class="stat"><div class="n">'+a2.cleanPct+'%</div><div class="l">clean accuracy'+(a2.g?' ('+a2.g+'🎲 excluded)':'')+'</div></div>'+
+      '<div class="stat"><div class="n">'+S.missed.length+'</div><div class="l">in missed rotation</div></div>';
+    v.appendChild(st);
+    if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
+    return;
+  }
+  const todayPlan = TRACK.find(x=>x.day===t);
+  const behind = TRACK.filter(x=>x.day<t && !S.doneDays.includes(x.day));
+  // v2.4 recovery mode: today's topic is ALWAYS the mission (highest yield now).
+  // A missed day becomes ONE short repair — the backlog never stacks into a pile.
+  const mission = (todayPlan && !S.doneDays.includes(t)) ? todayPlan : (behind.length ? behind[0] : null);
+  const repair = (mission===todayPlan && behind.length) ? behind[0] : null;
+  const card = el("div",{class:"card teal"});
+  if (mission){
+    const isCatchup = mission.day!==t;
+    card.innerHTML = '<span class="tag '+(isCatchup?"coral":"gold")+'">'+(isCatchup?"⏰ Catch-up — was due "+fmtDay(mission.day):"Due today · "+fmtDay(t))+'</span>'+
+      '<h2 style="font-size:1.5rem">'+ (TOPICS[mission.topic]?TOPICS[mission.topic].ico:"⚗️") +' '+mission.title+'</h2>'+
+      '<p style="margin:6px 0 14px;opacity:.92">One mission. No deciding, no browsing. ~1 hour, timer optional but a finish line helps.</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ if(mission.topic==="lewis"){ go("lab"); } else if(mission.topic==="diag"){ startDiagnostic(); } else { startDrill(mission.topic); } }},"▶ &nbsp;Start: "+mission.title);
+    card.appendChild(btn);
+    if (repair){
+      const rc = el("div",{class:"card cream"});
+      rc.innerHTML = '<span class="tag coral">🩹 Recovery — 10 min, before or after</span>'+
+        '<p style="margin:6px 0 10px">One missed day gets repaired: a short <b>'+(TOPICS[repair.topic]?.name||repair.topic)+'</b> round (was due '+fmtDay(repair.day)+'). '+
+        (behind.length>1?'Older missed days are handled <b>one at a time, never as a pile</b> — and the Aug 18 prerequisite diagnostic will surface whatever still matters.':'That\'s the whole backlog. No pile.')+'</p>';
+      rc.appendChild(el("button",{class:"btn coral",onclick:()=>{ if(repair.topic==="lewis"){ go("lab"); } else { startDrill(repair.topic); } }},"Run the repair round"));
+      card._repairCard = rc;
+    }
+  } else {
+    card.innerHTML = '<span class="tag gold">All caught up</span><h2>Nothing owed today 🎉</h2><p style="margin:6px 0 14px">Optional: run <b>Review missed</b> in Drill — converting old misses is the highest-yield hour that exists.</p>';
+    const btn = el("button",{class:"bigbtn",onclick:()=>{ startDrill("__missed"); }},"▶ &nbsp;Review my missed questions");
+    card.appendChild(btn);
+  }
+  v.appendChild(card);
+  if (card._repairCard) v.appendChild(card._repairCard);
+  const a = accuracy();
+  const stats = el("div",{class:"statrow"});
+  stats.innerHTML =
+    '<div class="stat"><div class="n">'+S.doneDays.length+'/'+TRACK.length+'</div><div class="l">days done</div></div>'+
+    '<div class="stat"><div class="n">'+a.t+'</div><div class="l">questions</div></div>'+
+    '<div class="stat"><div class="n">'+a.pct+'%</div><div class="l">accuracy</div></div>'+
+    '<div class="stat"><div class="n">'+S.molDone.length+'/'+MOLECULES.length+'</div><div class="l">molecules built</div></div>';
+  v.appendChild(stats);
+  const pb = el("div",{class:"card"},'<h3>Track progress</h3><div class="progressbar"><div style="width:'+Math.round(100*S.doneDays.length/TRACK.length)+'%"></div></div><p class="muted">Runway restarted today (Sun Aug 16): polarity + dipoles → hybridization + VSEPR (Mon, lab 2:10) → IMF warm-up + prerequisite diagnostic (Tue before the 11:10 lecture). Formal charge closes via the Mastery Check in Drill.</p>');
+  v.appendChild(pb);
+  if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
+};
+
+/* ---- TRACK ---- */
+VIEWS.track = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">HISTORY · pre-semester runway (Aug 8 → 18)</span><h2>Preparation archive</h2><p class="muted">This runway is <b>finished history</b> — it no longer steers anything. Semester steering lives on <b>Canvas</b> (real deadlines) and the <b>Exam tab</b> (every-2-day diagnostics). Kept here so the prep record stays intact.</p>'));
+  const g = el("div",{class:"daygrid"});
+  const t = todayStr();
+  TRACK.forEach(d=>{
+    const isDone=S.doneDays.includes(d.day), isOver=d.day<t&&!isDone;
+    const c = el("div",{class:"daycard"+(d.day===t?" today":"")+(isDone?" done":"")+(isOver?" overdue":"")});
+    const due = isDone ? "" :
+      isOver ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(d.day)+'</span>' :
+      d.day===t ? '<span class="duetag today-due">due today</span>' :
+      '<span class="duetag">due '+fmtDay(d.day)+'</span>';
+    c.innerHTML = '<div class="d">'+d.day.slice(5)+'</div><div class="t">'+(TOPICS[d.topic]?TOPICS[d.topic].ico+" ":"")+d.title+'</div>'+due;
+    const row = el("div",{style:"margin-top:8px;display:flex;gap:6px"});
+    row.appendChild(el("button",{class:"btn small",onclick:(e)=>{e.stopPropagation(); d.topic==="lewis"?go("lab"):d.topic==="diag"?startDiagnostic():startDrill(d.topic);}},"Open"));
+    row.appendChild(el("button",{class:"btn small ghost",onclick:(e)=>{e.stopPropagation(); const i=S.doneDays.indexOf(d.day); i>=0?S.doneDays.splice(i,1):S.doneDays.push(d.day); save(); render();}},"✓"));
+    c.appendChild(row);
+    g.appendChild(c);
+  });
+  v.appendChild(g);
+  v.appendChild(el("div",{class:"card cream",style:"margin-top:16px"},'<h3>Cut from the 14-day plan (on purpose)</h3><p class="muted">Thermo/kinetics diagrams and curved-arrow mechanisms — the course teaches both in week 1. If you finish a day early, preview curved arrows on the Cheat Sheet instead.</p>'));
+};
+
+/* ---- DRILL ---- */
+function startDiagnostic(){
+  // v2.8: PREREQUISITE-ONLY readiness check (the prof's review list). Course-taught
+  // topics (resonance, acid-base, bond-line) are excluded — a miss there would read
+  // as "not ready" for material he isn't expected to know yet (round-2 audit, P1-A).
+  const PREREQ=["valence","lewis","formal","polarity","hybrid","imf"];
+  const pool=[];
+  PREREQ.forEach(k=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written");
+    if(!qs.length)return;
+    const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+    pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]);
+  });
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__diag",answered:false,byTopic:{}};
+  go("drill");
+}
+// v2.12: the Evaluator — the gap-finding engine. One question per prereq topic, cold,
+// tracked per-topic; ends with a color-coded gap map + a priority-ordered study list.
+// Result is stashed to S.lastEval so the Report export (→ Learning Profile) carries it.
+const GAP_PRIORITY=["valence","lewis","formal","polarity","hybrid","imf"]; // foundational first
+function startEvaluator(){
+  const PREREQ=["valence","lewis","formal","polarity","hybrid","imf"];
+  const pool=[];
+  PREREQ.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"); if(!qs.length)return;
+    const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+    pool.push(shuffle(qs).sort((a,b)=>seen(a.id)-seen(b.id))[0]); });
+  S.drill={queue:shuffle(pool),i:0,right:0,wrong:0,topic:"__eval",answered:false,byTopic:{}};
+  go("drill");
+}
+// compute gap report from a byTopic tally; returns {gaps:[topic], solid:[topic], pct}
+function gapReport(byTopic){
+  const gaps=[], solid=[];
+  // v3.2 honest scoring: a topic is only "solid" if CLEAN rights (right minus guessed-right) beat wrongs
+  Object.entries(byTopic).forEach(([k,bt])=>{ ((bt.r-(bt.g||0))>bt.w?solid:gaps).push(k); });
+  gaps.sort((a,b)=>GAP_PRIORITY.indexOf(a)-GAP_PRIORITY.indexOf(b));
+  const total=Object.values(byTopic).reduce((s,bt)=>s+bt.r+bt.w,0);
+  const right=Object.values(byTopic).reduce((s,bt)=>s+bt.r,0);
+  const clean=Object.values(byTopic).reduce((s,bt)=>s+bt.r-(bt.g||0),0);
+  return {gaps,solid,pct:total?Math.round(100*right/total):0,cleanPct:total?Math.round(100*Math.max(0,clean)/total):0};
+}
+function startDrill(topic){
+  let pool;
+  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)&&q.type!=="written"); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
+  else pool = QUESTIONS.filter(q=>q.topic===topic&&q.type!=="written"); // v3.0: written items live in diagnostics, not short drills
+  // v2.13: adaptive selection — randomize, then surface by NEED so a session targets
+  // what you're weakest on. Tier 3 = you've missed it OR only ever guessed it right (v3.0 shaky),
+  // tier 2 = never seen, tier 1 = seen and right. Shuffle first so pick within a tier is random.
+  const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
+  // v3.2: confident-wrong (a broken rule = misconception) outranks guessed-wrong (just unknown)
+  const need = q => { const s=S.qstats[q.id]; if(s&&(s.w-(s.gw||0))>0) return 4; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; };
+  pool = shuffle(pool).sort((a,b)=>need(b)-need(a));
+  // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
+  // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
+  if (topic==="formal"){
+    // v2.8: scaffold order survives interruption — until EVERY scaffold has been seen
+    // once, unseen scaffolds lead the queue in sequence (audit: interrupted first pass
+    // used to fall back to shuffle and could jump to f6 before f0b).
+    const ORD=["f0","f0b","f1","f2"];
+    if (ORD.some(id=>seen(id)===0)){
+      const lead = ORD.filter(id=>seen(id)===0).map(id=>pool.find(q=>q.id===id)).filter(Boolean);
+      pool = lead.concat(pool.filter(q=>!lead.includes(q)));
+    }
+  }
+  S.drill = {queue:pool.slice(0,SESSION_MAX), i:0, right:0, wrong:0, topic, answered:false};
+  go("drill");
+}
+const SESSION_MAX = 5; // v2.13: max questions per drill session (short sets, big bank, randomized)
+// v2.12: Practice hub — Lewis Lab, topic drills, and the Mastery Check all live here
+// (Lewis Lab is a practice MODE, not a peer tab — this fixes the confusing nav).
+VIEWS.practice = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Three hands-on modes. New to a topic? Read its primer in 📖 Learn first, then practice it here.</p>'));
+  const lab=el("div",{class:"card cream"});
+  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">10 molecules, the 6-step method enforced (count → central → bonds → lone pairs → convert → audit). Blank-page building — the antidote to recognizing-without-deriving.</p>';
+  lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
+  v.appendChild(lab);
+  v.appendChild(el("div",{class:"card"},'<h3>🎯 Drill a topic</h3><p class="muted">Quick generation rounds; each answer explains the why.</p>'));
+  const pr=el("div",{class:"pill-row"});
+  Object.entries(TOPICS).forEach(([k,t])=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"); if(!qs.length)return;
+    const done=qs.filter(q=>S.qstats[q.id]?.r).length;
+    pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>")); });
+  pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
+  v.appendChild(pr);
+  const m=el("div",{class:"card"});
+  m.innerHTML='<h3>'+(new Set(S.fcMastery).size>=2?"🏅":"⚖️")+' Formal-Charge Mastery Check</h3><p class="muted" style="margin:4px 0 8px">The real bar for formal charge: 6 species, inputs labeled, all-first-try = a clean day; 2 clean days = mastered. <b>'+new Set(S.fcMastery).size+'/2 clean days.</b></p>';
+  m.appendChild(el("button",{class:"btn gold",onclick:()=>startMastery()},"Run mastery check →"));
+  v.appendChild(m);
+};
+VIEWS.exam = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">📊 Exam · find your gaps</span><h2>Where am I? What do I study first?</h2><p class="muted">Two levels. The in-app <b>Evaluator</b> gives an instant per-topic gap map. The <b>full written exams</b> (blank-page — the true test) you do on paper, then send to Claude for a scored, ranked study plan.</p>'));
+  if (S.lastEval){ const nm=k=>TOPICS[k]?.name||k; const e=S.lastEval;
+    const card=el("div",{class:"card"+(e.gaps.length?"":" teal")});
+    card.innerHTML='<span class="tag violet">Last evaluator · '+fmtDay(e.date)+'</span><h3 style="margin:6px 0">'+e.pct+'% · '+(e.gaps.length?e.gaps.length+' gap'+(e.gaps.length>1?'s':''):'no gaps')+'</h3>'+(e.gaps.length?'<p class="muted">Study first: <b>'+e.gaps.map(nm).join(" → ")+'</b></p>':'<p class="muted">Screen passed (n=1/topic) — no flags. A screen, not proof of mastery.</p>');
+    v.appendChild(card);
+  }
+  // v3.0: the every-2-day diagnostics + editable next-quiz target
+  const cp = nextCheckpoint();
+  const dg = el("div",{class:"card cream"});
+  dg.innerHTML='<h3>🩺 Every-2-Day Diagnostics (v3.0)</h3><p class="muted" style="margin:4px 0 8px">Two alternating modes, cold: <b>📚 Cumulative</b> = everything the course has covered so far (wk '+Math.max(courseWeek(),1)+'). <b>🎯 Scoped</b> = only what the next assessment covers'+(cp?' — <b>'+cp.name+' in '+daysTo(cp.date)+' day'+(daysTo(cp.date)===1?'':'s')+'</b> ('+fmtDay(cp.date)+')':'')+'. Each ends with a gap map, ONE repair, and 2 written items (UID\'d) saved for Claude\'s review. Guessed-right answers stay in rotation as shaky.</p>';
+  const dgr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+  dgr.appendChild(el("button",{class:"btn teal",onclick:()=>startDiag2("cum")},"📚 Cumulative now"));
+  dgr.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2("scope")},"🎯 Scoped now"));
+  dgr.appendChild(el("button",{class:"btn ghost small",onclick:()=>editNextQuiz()},"✎ next quiz: "+S.nextQuiz.name+" · "+fmtDay(S.nextQuiz.date)));
+  dg.appendChild(dgr);
+  if(S.diags.length){ dg.appendChild(el("p",{class:"muted",style:"margin:8px 0 0;font-size:.85em"},"History: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"📚":d.type==="lec"?"📝":"🎯")+d.pct+"% ("+fmtDay(d.date)+")").join(" · "))); }
+  v.appendChild(dg);
+  // v3.3: Lecture Check — Gabe felt lost in the 8/20 lecture; this measures exactly what she taught
+  const lc = el("div",{class:"card teal"});
+  const lcDone = S.diags.filter(d=>d.type==="lec").length;
+  lc.innerHTML='<h3>📝 Lecture Check · Thu Aug 20</h3><p style="margin:4px 0 8px;opacity:.92">24 items (19 scored + 5 written) built from <b>her actual lecture</b>: σ/π orbitals, which orbital holds a lone pair, bond angles (the SO₂ trap), C–halogen polarity, the four nonpolar-cancellation cases, cis/trans boiling points, phase-change wording, bond-line hydrogens. Cold run → per-topic gap map = your <b>focus / strengthen / strength</b> list.'+(lcDone?' <b>Taken '+lcDone+'×.</b>':'')+'</p>';
+  lc.appendChild(el("button",{class:"bigbtn",onclick:()=>startLectureCheck()},"▶ &nbsp;Start the Lecture Check (~20 min)"));
+  v.appendChild(lc);
+  const ev=el("div",{class:"card cream"});
+  ev.innerHTML='<h3>⚡ Quick Evaluator (in-app, ~6 min)</h3><p class="muted" style="margin:4px 0 8px">One cold question per prereq topic → a color-coded gap map (🟢 passed screen / 🔴 study first) with a priority-ordered study list. No notes — this measures real recall. Result gets logged when you send your Report.</p>';
+  ev.appendChild(el("button",{class:"btn teal",onclick:()=>startEvaluator()},"Start Evaluator →"));
+  v.appendChild(ev);
+  const wr=el("div",{class:"card"});
+  wr.innerHTML='<h3>📝 Full written exams (blank-page)</h3><p class="muted" style="margin:4px 0 8px">The truest gauge — draw and derive from scratch, photograph, send to Claude for grading + a prioritized plan.</p>'+
+    '<p style="margin:6px 0"><a href="'+EXAM_READINESS+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none">▶ Pre-OChem Readiness Exam — take now</a></p>'+
+    '<p style="margin:6px 0"><a href="'+EXAM1+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none">▶ Exam 1 Practice · Klein Ch 1–4 — take in September</a></p>'+
+    '<p class="muted" style="margin-top:8px">Also in your CHEM 231 → Exams folder.</p>';
+  v.appendChild(wr);
+};
+VIEWS.drill = (v) => {
+  if (!S.drill){ go("practice"); return; }
+  const D = S.drill;
+  if (D.i>=D.queue.length){ // round over
+    const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    // v3.0: every-2-day diagnostics (cumulative / scoped) → record the run + honest gap map
+    if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec") && D.byTopic){
+      const type=D.topic==="__cum"?"cum":(D.topic==="__lec"?"lec":"scope");
+      const rep=gapReport(D.byTopic);
+      S.diags.push({date:todayStr(), type, scope:D.scopeName, score:D.right, total:D.queue.length, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0});
+      if(S.diags.length>60) S.diags=S.diags.slice(-60);
+      save();
+      const solid = pct>=80 && !(D.guessedRight>0);
+      if(solid) confetti();
+      const c=el("div",{class:"card"+(solid?" teal":"")});
+      const nm=k=>TOPICS[k]?.name||k;
+      const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
+      c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
+        '<h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+
+        '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+
+        '<div class="why">'+(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Clean board. Next diagnostic unlocks in 2 days — go live your life.')+'</div>'+
+        (S.diags.length>=2?'<p class="muted" style="margin:6px 0 0;font-size:.85em">History: '+S.diags.slice(-5).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ")+'</p>':'');
+      const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
+      if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>{S.drill=null;startDrill(rep.gaps[0]);}},"🔧 Repair "+nm(rep.gaps[0])+" now"));
+      row.appendChild(el("button",{class:"btn gold",onclick:()=>go("report")},"📤 Send to Claude (written answers get graded)"));
+      row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go("home");}},"Done"));
+      c.appendChild(row); v.appendChild(c); return;
+    }
+    // v2.12: Evaluator / diagnostic → show the GAP MAP instead of the generic score card
+    if ((D.topic==="__eval"||D.topic==="__diag") && D.byTopic){
+      const rep=gapReport(D.byTopic);
+      // stash for the Report export → Learning Profile
+      S.lastEval={date:todayStr(), pct:rep.pct, gaps:rep.gaps.slice(), solid:rep.solid.slice(), kind:D.topic==="__eval"?"evaluator":"diagnostic"};
+      save();
+      if(!rep.gaps.length) confetti();
+      const c=el("div",{class:"card"+(!rep.gaps.length?" teal":"")});
+      const nm=k=>TOPICS[k]?.name||k;
+      c.innerHTML='<span class="tag gold">Gap map · '+rep.cleanPct+'% clean'+(rep.pct!==rep.cleanPct?' ('+rep.pct+'% raw)':'')+'</span><h2>'+(rep.gaps.length?rep.gaps.length+' gap'+(rep.gaps.length>1?'s':'')+' found':'No flags on this screen 🎉 (n=1–2/topic — a screen, not mastery)')+'</h2>'+
+        '<div style="margin:10px 0">'+
+        GAP_PRIORITY.filter(k=>D.byTopic[k]).map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(hit?'passed screen':'study first')+'</span></div>'; }).join("")+
+        '</div>'+
+        (rep.gaps.length?'<div class="why"><b>Study these first, in this order:</b> '+rep.gaps.map(nm).join(" → ")+'. Each has a primer in the 📖 Learn tab — read it, then drill that topic. Foundational topics (valence, Lewis) come before the rest even if you also missed a later one.</div>':'<p style="margin:6px 0">Every prereq topic answered correctly cold. Keep them warm with occasional drills; you\'re ready to start.</p>');
+      const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
+      if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>go("learn")},"📖 Go to Learn"));
+      row.appendChild(el("button",{class:"btn gold",onclick:()=>go("report")},"📤 Log this (send to Claude)"));
+      row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go(D.topic==="__eval"?"exam":"home");}},"Done"));
+      // diagnostic still completes its Aug-18 plan day if passed
+      if(D.topic==="__diag" && pct>=80){ const claim=TRACK.filter(x=>x.day<=todayStr()&&!S.doneDays.includes(x.day)&&x.topic==="diag").sort((a,b)=>a.day<b.day?-1:1)[0]; if(claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day))S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark diagnostic day done")); } }
+      c.appendChild(row); v.appendChild(c); return;
+    }
+    if (pct>=80) confetti();
+    const c = el("div",{class:"card"+(pct>=80?" teal":"")});
+    c.innerHTML='<span class="tag gold">Round complete</span><h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)</h2>'+
+      '<p style="margin:8px 0">'+(pct>=80?"That clears the bar. Mark the day and stop — consistency beats intensity.":"Below 80 — the misses just joined your Review queue. Read each 'why', then re-run them tomorrow (spacing, not re-cramming today).")+'</p>';
+    const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+    // v2.4: auto-complete needs ≥80% (matching the text) AND the round's topic must match
+    // an unfinished TRACK day — no more marking today's mission done by drilling anything.
+    const claimTopic = D.topic==="__diag" ? "diag" : D.topic; // v2.8: diagnostic can complete its plan day (audit P1-C)
+    const claim = TRACK.filter(x=>x.day<=todayStr() && !S.doneDays.includes(x.day) && x.topic===claimTopic).sort((a,b)=>a.day<b.day?-1:1)[0];
+    if (pct>=80 && claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day)) S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark “"+claim.title+"” ("+fmtDay(claim.day)+") done")); }
+    else if (pct>=80){ c.appendChild(el("p",{class:"muted",style:"margin:4px 0 8px"},"Good round — but it doesn't match an open mission day, so nothing auto-completes. (Honest manual ✓ lives in the Plan tab.)")); }
+    row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
+    if (D.topic==="formal") row.appendChild(el("button",{class:"btn teal",onclick:()=>startMastery()},"⚖️ Mastery check (the real bar)"));
+    c.appendChild(row); v.appendChild(c); return;
+  }
+  const q = D.queue[D.i];
+  if(D._shownQ!==q.id+":"+D.i){ D._shownQ=q.id+":"+D.i; D._shownAt=Date.now(); } // v3.2: start the answer clock (survives re-renders of same card)
+  const c = el("div",{class:"card"});
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+"●".repeat(Math.round(qDiffM(q)))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
+    '<div class="qprompt">'+q.prompt+'</div>';
+  const fb = el("div");
+  // v3.0: guessed checkbox + optional rationale — on every non-written question
+  let gk=null, rInp=null;
+  if(q.type!=="written"){
+    const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 2px"});
+    gk=el("input",{type:"checkbox",id:"gk"});
+    const gl=el("label",{for:"gk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I guessed on this");
+    rInp=el("input",{class:"answerbox wide",style:"flex:1;min-width:160px;font-size:.85em",placeholder:"(optional) why I chose this…"});
+    gRow.appendChild(gk); gRow.appendChild(gl); gRow.appendChild(rInp);
+    c.appendChild(gRow);
+  }
+  const finish = (ok, revealHtml, wrText) => {
+    D.answered=true;
+    const guessed = !!(gk&&gk.checked) || D._wrGuessed===true;
+    logAttempt(q,ok,guessed,D); // v3.2: immutable event — id, timestamp, correctness, guessed, seconds
+    const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
+    if(ok){st.r++;D.right++; if(guessed){ st.gr=(st.gr||0)+1; D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
+    else{st.w++;D.wrong++;S.missed.push(q.id); if(guessed) st.gw=(st.gw||0)+1;}
+    if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; } // v3.2: guessed-rights tallied per topic
+    const rat=(rInp&&rInp.value.trim())||"";
+    if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
+    D._wrGuessed=false;
+    save();
+    const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(guessed?"✓ Right — but flagged as a guess, so it stays in rotation":"✓ Right"):"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p>';
+    fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>');
+    fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
+    if(!ok)c.classList.add("shake");
+  };
+  if (q.type==="written"){
+    // v3.0: written item — answer on paper or type it; compare to model; self-grade HONESTLY (08-19 covenant).
+    const ta=el("textarea",{class:"answerbox wide",style:"min-height:110px;width:100%;font-size:.95em",placeholder:"Work it on paper first if you prefer — then type your answer/derivation here (it gets saved for Claude's review)…"});
+    const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;margin:8px 0 2px"});
+    const wgk=el("input",{type:"checkbox",id:"wgk"});
+    gRow.appendChild(wgk); gRow.appendChild(el("label",{for:"wgk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I'm not confident in this"));
+    const sub=el("button",{class:"btn teal",style:"margin-top:8px",onclick:()=>{
+      if(D.answered||!ta.value.trim())return;
+      D._wrGuessed=wgk.checked;
+      const box=el("div",{class:"why",style:"margin-top:10px"});
+      box.innerHTML='<b>Model answer:</b><br>'+q.model+'<br><br><b>Check yourself against the rubric:</b><ul style="margin:6px 0 0 18px">'+q.rubric.map(r=>'<li>'+r+'</li>').join("")+'</ul><p style="margin-top:8px"><b>Honest call — did your answer hit ALL rubric points?</b></p>';
+      const bar=el("div",{style:"display:flex;gap:8px;margin-top:8px"});
+      bar.appendChild(el("button",{class:"btn teal",onclick:()=>finish(true,"",ta.value.trim())},"✓ Yes — all points"));
+      bar.appendChild(el("button",{class:"btn coral",onclick:()=>finish(false,"",ta.value.trim())},"✗ Missed something"));
+      box.appendChild(bar); c.appendChild(box); sub.disabled=true; ta.disabled=true;
+    }},"Compare to model →");
+    c.appendChild(ta); c.appendChild(gRow); c.appendChild(sub);
+  }
+  else if (q.type==="mc"){
+    const ch=el("div",{class:"choices"});
+    const order=shuffle(q.choices.map((txt,i)=>({txt,i})));
+    order.forEach(o=>{
+      ch.appendChild(el("button",{class:"choice",onclick:(e)=>{
+        if(D.answered)return;
+        const ok=o.i===q.answer;
+        e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
+        if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
+        finish(ok,"");
+      }},o.txt));
+    });
+    c.appendChild(ch);
+  } else {
+    const inp=el("input",{class:"answerbox"+(q.type==="text"?" wide":""),type:q.type==="num"?"text":"text",inputmode:q.type==="num"?"numeric":"text",placeholder:q.type==="num"?"#":"answer"});
+    const sub=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(D.answered)return;
+      let ok=false, val=inp.value.trim();
+      if(!val)return;
+      if(q.type==="num"){ const n=parseFloat(val.replace("−","-")); const tol=q.tolerance||0; ok=Math.abs(n-q.answer)<=tol; }
+      else { const norm=s=>s.toLowerCase().replace(/[\s−]/g,"-").replace(/-+/g,"-").replace(/[^a-z0-9+\-]/g,""); const acc=(q.accept||[String(q.answer)]).map(norm); ok=acc.includes(norm(val)); }
+      finish(ok,"<b class='mono'>"+q.answer+"</b>");
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub.click();});
+    const row=el("div"); row.appendChild(inp); row.appendChild(sub); c.appendChild(row);
+    setTimeout(()=>inp.focus(),50);
+  }
+  c.appendChild(fb);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="S.drill=null;render()">quit round</button>'));
+};
+
+/* ---- LEWIS LAB ---- */
+function startLab(molKey){
+  const mol = MOLECULES.find(m=>m.key===molKey);
+  S.lab = {mol, step:1, tries:0, atoms:[], bonds:[], nextId:1, tool:"atom", selElement:Object.keys(mol.atoms)[0], selAtom:null, fails:0, msg:""};
+  go("lab");
+}
+VIEWS.lab = (v) => {
+  if (!S.lab){ // molecule chooser
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Lewis Lab</span><h2>Build structures, step by step</h2><p class="muted">The six steps are enforced — no skipping to the answer picture. Counts first, drawing second, audit last. (Yes, this is aimed directly at your H₂O attempt.)</p>'));
+    const t=todayStr();
+    MOLECULES.forEach(m=>{
+      const done=S.molDone.includes(m.key);
+      const mdue = m.due||"2026-08-16";
+      const dueTag = done ? "" :
+        mdue<t ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(mdue)+'</span>' :
+        mdue===t ? '<span class="duetag today-due">due today</span>' :
+        '<span class="duetag">due by '+fmtDay(mdue)+'</span>';
+      const c=el("div",{class:"card"+(done?" cream":"")});
+      c.innerHTML='<h3 class="mono" style="font-size:1.3rem">'+m.formula+(done?' <span style="color:var(--ok)">✓ built</span>':'')+'</h3><p class="muted">'+m.blurb+'</p>'+dueTag;
+      c.appendChild(el("button",{class:"btn"+(done?" ghost":" coral"),style:"margin-top:8px",onclick:()=>startLab(m.key)},done?"Rebuild cold":"Build it"));
+      v.appendChild(c);
+    });
+    return;
+  }
+  const L=S.lab, m=L.mol;
+  const wrap=el("div",{class:"labwrap"});
+  // stepper
+  const stepNames=["1 Count","2 Central","3 Predict","4-5 Build","6 Audit"];
+  const stepIdx = L.step<=3 ? L.step-1 : (L.step<=5?3:4);
+  const st=el("div",{class:"stepper"});
+  stepNames.forEach((s,i)=>st.appendChild(el("div",{class:"step"+(i<stepIdx?" ok":i===stepIdx?" on":"")},s)));
+  wrap.appendChild(st);
+  const card=el("div",{class:"card"});
+  card.innerHTML='<span class="tag">Lewis Lab · <span class="mono">'+m.formula+'</span></span>';
+  const ask=el("div",{class:"stepask"});
+  card.appendChild(ask);
+  if (L.step===1){
+    ask.innerHTML="<b>Step 1 — the budget.</b> Total valence electrons in <span class='mono'>"+m.formula+"</span>? Add every atom's valence count"+(m.charge?" and adjust for the charge":"")+".";
+    const inp=el("input",{class:"answerbox",inputmode:"numeric",placeholder:"#"});
+    const b=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(parseInt(inp.value,10)===m.ve){ L.step=2; L.tries=0; render(); }
+      else { L.tries++; card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350);
+        ask.innerHTML+= L.tries>=2?'<div class="why">Add per atom: '+Object.entries(m.atoms).map(([e,n])=>n+"×"+e+"("+VALENCE[e]+")").join(" + ")+'.</div>':""; }
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")b.click();});
+    card.appendChild(inp); card.appendChild(b);
+  }
+  else if (L.step===2){
+    ask.innerHTML="<b>Step 2 — central atom.</b> Which element sits in the middle (wants the most bonds — never H)?";
+    Object.keys(m.atoms).forEach(e=>{
+      card.appendChild(el("button",{class:"btn ghost",style:"margin-right:8px;font-family:var(--mono)",onclick:()=>{
+        if(m.central.includes(e)){ L.step=3; render(); } else { card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350); }
+      }},e));
+    });
+    if (Object.keys(m.atoms).filter(e=>e!=="H").length>1) ask.innerHTML+=' <span class="muted">(more than one heavy atom? They form the skeleton, bonded to each other — the app expects the conventional central atom: usually the one that makes the most bonds / is least electronegative. H is never central.)</span>';
+  }
+  else if (L.step===3){
+    ask.innerHTML="<b>Step 3 — predict before you draw.</b> After connecting ALL atoms with single bonds, how many electrons will remain from your "+m.ve+"? <span class='muted'>(bonds × 2, subtracted — do the arithmetic, don't eyeball)</span>";
+    const inp=el("input",{class:"answerbox",inputmode:"numeric",placeholder:"#"});
+    const b=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
+      if(parseInt(inp.value,10)===m.afterSingles){ L.step=4; render(); }
+      else { L.tries++; card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"),350);
+        if(L.tries>=2) ask.innerHTML+='<div class="why">A molecule with '+Object.values(m.atoms).reduce((a,b)=>a+b,0)+' atoms needs '+(Object.values(m.atoms).reduce((a,b)=>a+b,0)-1)+' single bonds to connect (if no rings). Each bond spends 2.</div>'; }
+    }},"Check");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")b.click();});
+    card.appendChild(inp); card.appendChild(b);
+  }
+  else {
+    ask.innerHTML="<b>Steps 4–5 — build it.</b> Place atoms, connect bonds (tap two atoms; tap the pair again to upgrade single→double→triple), give lone pairs to whoever needs them. The ledger does your bookkeeping — it must hit exactly 0 remaining. Then audit.";
+  }
+  wrap.appendChild(card);
+  if (L.step>=4){
+    // tool tray
+    const tray=el("div",{class:"tooltray"});
+    Object.entries(m.atoms).forEach(([e,total])=>{
+      const placed=L.atoms.filter(a=>a.el===e).length;
+      tray.appendChild(el("button",{class:"tool"+(L.tool==="atom"&&L.selElement===e?" on":""),onclick:()=>{L.tool="atom";L.selElement=e;render();}},e+" "+placed+"/"+total));
+    });
+    [["bond","⌁ Bond"],["lp","·· Lone pair"],["erase","⌫ Erase"]].forEach(([t,label])=>{
+      tray.appendChild(el("button",{class:"tool"+(L.tool===t?" on":""),onclick:()=>{L.tool=t;L.selAtom=null;render();}},label));
+    });
+    tray.appendChild(el("button",{class:"tool",style:"margin-left:auto",onclick:()=>{L.atoms=[];L.bonds=[];L.selAtom=null;render();}},"Clear"));
+    wrap.appendChild(tray);
+    // ledger
+    const used = 2*L.bonds.reduce((s,b)=>s+b.order,0) + 2*L.atoms.reduce((s,a)=>s+a.lp,0);
+    const rem = m.ve-used;
+    const led=el("div",{class:"ledger"});
+    led.innerHTML='<span>budget <b>'+m.ve+'</b></span><span>bonds <b>'+L.bonds.reduce((s,b)=>s+b.order,0)+'</b></span><span>lone pairs <b>'+L.atoms.reduce((s,a)=>s+a.lp,0)+'</b></span><span class="'+(rem===0?"good":rem<0?"bad":"warn")+'">remaining <b>'+rem+'</b></span>';
+    wrap.appendChild(led);
+    // canvas
+    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("id","lab-canvas");
+    svg.addEventListener("pointerdown",ev=>labPointer(ev,svg));
+    wrap.appendChild(svg);
+    // audit
+    const arow=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;align-items:center"});
+    arow.appendChild(el("button",{class:"btn coral",onclick:()=>runAudit(wrap)},"⚖️ Step 6 — Audit every octet"));
+    arow.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← molecules"));
+    wrap.appendChild(arow);
+    L.auditBox=el("div"); wrap.appendChild(L.auditBox);
+    v.appendChild(wrap);
+    drawLab(svg);
+    return;
+  }
+  wrap.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← molecules"));
+  v.appendChild(wrap);
+};
+function labPointer(ev,svg){
+  const L=S.lab; if(!L)return;
+  const r=svg.getBoundingClientRect();
+  const x=(ev.clientX-r.left)*(860/r.width>1?1:1), y=(ev.clientY-r.top);
+  const px=ev.clientX-r.left, py=ev.clientY-r.top;
+  const hit=L.atoms.find(a=>Math.hypot(a.x-px,a.y-py)<26);
+  if (L.tool==="atom"){
+    if (hit) return;
+    const total=L.mol.atoms[L.selElement]||0, placed=L.atoms.filter(a=>a.el===L.selElement).length;
+    if (placed>=total){ return; }
+    L.atoms.push({id:L.nextId++, el:L.selElement, x:px, y:py, lp:0});
+    // auto-advance selection to an element with remaining count
+    const remEl=Object.entries(L.mol.atoms).find(([e,n])=>L.atoms.filter(a=>a.el===e).length<n);
+    if (L.atoms.filter(a=>a.el===L.selElement).length>=total && remEl) L.selElement=remEl[0];
+    render();
+  } else if (L.tool==="bond"){
+    if (!hit){ L.selAtom=null; drawLab(svg); return; }
+    if (L.selAtom==null){ L.selAtom=hit.id; drawLab(svg); return; }
+    if (L.selAtom===hit.id){ L.selAtom=null; drawLab(svg); return; }
+    const a=Math.min(L.selAtom,hit.id), b=Math.max(L.selAtom,hit.id);
+    const ex=L.bonds.find(bd=>bd.a===a&&bd.b===b);
+    if (ex){ ex.order++; if(ex.order>3) L.bonds.splice(L.bonds.indexOf(ex),1); }
+    else L.bonds.push({a,b,order:1});
+    L.selAtom=null; render();
+  } else if (L.tool==="lp"){
+    if (!hit) return;
+    hit.lp=(hit.lp+1)%5;
+    render();
+  } else if (L.tool==="erase"){
+    if (!hit) return;
+    L.bonds=L.bonds.filter(b=>b.a!==hit.id&&b.b!==hit.id);
+    L.atoms.splice(L.atoms.indexOf(hit),1);
+    render();
+  }
+}
+function drawLab(svg){
+  const L=S.lab; if(!L)return;
+  svg.innerHTML="";
+  const NS="http://www.w3.org/2000/svg";
+  const mk=(t,at)=>{const e=document.createElementNS(NS,t);Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v));svg.appendChild(e);return e;};
+  if (!L.atoms.length){
+    mk("text",{x:"50%",y:"48%","text-anchor":"middle","font-size":"15","fill":"#999","font-family":"sans-serif"}).textContent="Tap to place your first "+L.selElement+" atom";
+    mk("text",{x:"50%",y:"58%","text-anchor":"middle","font-size":"12","fill":"#bbb","font-family":"sans-serif"}).textContent="(central atom in the middle is a good habit)";
+  }
+  // bonds
+  L.bonds.forEach(b=>{
+    const A=L.atoms.find(a=>a.id===b.a), B=L.atoms.find(a=>a.id===b.b); if(!A||!B)return;
+    const dx=B.x-A.x, dy=B.y-A.y, len=Math.hypot(dx,dy)||1;
+    const ox=-dy/len*4.5, oy=dx/len*4.5;
+    const offs = b.order===1?[0]:b.order===2?[-1,1]:[-1.6,0,1.6];
+    offs.forEach(o=>mk("line",{x1:A.x+ox*o,y1:A.y+oy*o,x2:B.x+ox*o,y2:B.y+oy*o,stroke:"#20241F","stroke-width":"3","stroke-linecap":"round"}));
+  });
+  // atoms
+  L.atoms.forEach(a=>{
+    const sel=L.selAtom===a.id;
+    mk("circle",{cx:a.x,cy:a.y,r:"21",fill:"#fff",stroke:sel?"#E4572E":"#20241F","stroke-width":sel?"4":"2.5"});
+    const t=mk("text",{x:a.x,y:a.y+6,"text-anchor":"middle","font-size":"19","font-weight":"800","font-family":"monospace",fill:ATOM_COLORS[a.el]||"#20241F"});
+    t.textContent=a.el;
+    // lone pairs at N,E,S,W
+    const slots=[[0,-31],[31,0],[0,31],[-31,0]];
+    for(let i=0;i<a.lp;i++){
+      const [sx,sy]=slots[i%4];
+      const horiz = sy===0;
+      mk("circle",{cx:a.x+sx+(horiz?0:-4),cy:a.y+sy+(horiz?-4:0),r:"3",fill:"#0E7C6B"});
+      mk("circle",{cx:a.x+sx+(horiz?0:4),cy:a.y+sy+(horiz?4:0),r:"3",fill:"#0E7C6B"});
+    }
+  });
+}
+// v2.4: per-atom formal-charge audit. FC = valence − lone-pair e⁻ − bond orders.
+// For these neutral molecules every atom's FC must be 0 (a mol may declare an fc map later
+// for ions). A structure can pass every octet and still be the WRONG molecule — this catches it.
+function fcAuditFails(m,L){
+  const fails=[]; const expected = m.fc || {};
+  L.atoms.forEach(a=>{
+    const orders=L.bonds.filter(b=>b.a===a.id||b.b===a.id).reduce((s,b)=>s+b.order,0);
+    const fc=(VALENCE[a.el]||0) - 2*a.lp - orders;
+    const want = expected[a.el]!==undefined ? expected[a.el] : 0;
+    if (fc!==want) fails.push("Formal-charge audit: your "+a.el+" carries FC "+(fc>0?"+":"")+fc+
+      " (FC = "+VALENCE[a.el]+" − "+(2*a.lp)+" LP e⁻ − "+orders+" bonds). Every atom in neutral "+
+      m.formula+" must be 0 — the octets check out, but this is a different structure (charge-separated or rearranged). Recount which atom took too many or too few bonds.");
+  });
+  return fails;
+}
+function runAudit(wrap){
+  const L=S.lab, m=L.mol;
+  const fails=[];
+  // formula
+  Object.entries(m.atoms).forEach(([e,n])=>{
+    const placed=L.atoms.filter(a=>a.el===e).length;
+    if (placed!==n) fails.push("Formula: need "+n+"× "+e+", you placed "+placed+".");
+  });
+  // connectivity
+  if (L.atoms.length>1){
+    const adj={}; L.atoms.forEach(a=>adj[a.id]=[]);
+    L.bonds.forEach(b=>{ if(adj[b.a]&&adj[b.b]){adj[b.a].push(b.b);adj[b.b].push(b.a);} });
+    const seen=new Set([L.atoms[0].id]); const q=[L.atoms[0].id];
+    while(q.length){ const c=q.pop(); (adj[c]||[]).forEach(n=>{if(!seen.has(n)){seen.add(n);q.push(n);}}); }
+    if (seen.size!==L.atoms.length) fails.push("Not all atoms are connected into one molecule.");
+  } else if (L.atoms.length===0) fails.push("Canvas is empty.");
+  // per-atom rules
+  L.atoms.forEach(a=>{
+    const orders=L.bonds.filter(b=>b.a===a.id||b.b===a.id).reduce((s,b)=>s+b.order,0);
+    if (a.el==="H"){
+      if (orders!==1||a.lp!==0) fails.push("H needs exactly 1 bond and 0 lone pairs (has "+orders+" bond(s), "+a.lp+" LP). H stops at 2 — it's the exception.");
+    } else {
+      const count=2*orders+2*a.lp;
+      if (count!==8) fails.push(a.el+" audit: "+orders+" bond(s) ×2 + "+a.lp+" LP ×2 = "+count+" — "+(count<8?"short by "+(8-count)+". Quantify it: short÷2 = pairs to convert into bonds.":"OVER 8 by "+(count-8)+". Second-row atoms can't exceed the octet."));
+    }
+  });
+  // budget
+  const used=2*L.bonds.reduce((s,b)=>s+b.order,0)+2*L.atoms.reduce((s,a)=>s+a.lp,0);
+  if (used!==m.ve) fails.push("Budget: you spent "+used+" of "+m.ve+" electrons. Must land exactly.");
+  // v2.4 formal-charge audit: catches legal-octet-but-WRONG structures (H–N≡C, charge-separated CO₂, misplaced H's)
+  fails.push(...fcAuditFails(m,L));
+  const box=L.auditBox; box.innerHTML="";
+  if (!fails.length){
+    confetti();
+    if (!S.molDone.includes(m.key)) S.molDone.push(m.key);
+    // lewis day auto-credit
+    const t=todayStr(); const plan=TRACK.find(x=>x.day===t);
+    if (plan && plan.topic==="lewis" && !S.doneDays.includes(t) && S.molDone.length>=2) S.doneDays.push(t);
+    save();
+    const c=el("div",{class:"card teal"},'<h2>✓ '+m.formula+' — every octet checks out</h2><p>Final audit passed: formula ✓ · connected ✓ · H rule ✓ · octets ✓ · budget spent exactly ✓ · formal charges all correct ✓</p>');
+    c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{S.lab=null;render();}},"Next molecule →"));
+    box.appendChild(c);
+  } else {
+    L.fails++;
+    const c=el("div",{class:"card cream"},'<h3>Audit found problems</h3><ul class="audit">'+fails.map(f=>'<li class="fail">'+f+'</li>').join("")+'</ul>'+(L.fails>=2?'<div class="why"><b>Hint:</b> '+m.hint+'</div>':""));
+    box.appendChild(c);
+  }
+}
+
+/* ---- CHEAT SHEET ---- */
+VIEWS.learn = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">📖 Learn first · then drill</span><h2>Concepts before questions</h2><p class="muted">You can\'t answer what you were never taught. Each prereq topic below: a plain-language primer, the Klein 5e section to read in your WileyPLUS eText, and free videos (Khan Academy · The Organic Chemistry Tutor). Read/watch, then hit Drill on that topic. The drill\'s "why" after each answer reinforces it.</p>'));
+  const order=[["valence","🔢 Valence electrons"],["lewis","🧩 Lewis structures"],["formal","⚡ Formal charge"],["polarity","🧭 Polarity + dipoles"],["hybrid","📐 Hybridization + VSEPR"],["imf","🧲 Intermolecular forces"]];
+  order.forEach(([k,title])=>{
+    const L=LESSONS[k]; if(!L) return;
+    const c=el("div",{class:"card cream"});
+    c.innerHTML='<h3 style="margin-bottom:6px">'+title+'</h3>'+
+      '<p style="margin:0 0 8px">'+L.primer+'</p>'+
+      '<p class="muted" style="margin:0 0 8px">📕 Read: <b>'+L.klein+'</b> (WileyPLUS eText → Course Resources)</p>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      L.links.map(x=>'<a href="'+x.u+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none;font-size:.8rem">▶ '+x.l+'</a>').join("")+
+      '</div>';
+    const drill=el("button",{class:"btn teal",style:"margin-top:10px",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"Now drill "+title.replace(/^\S+\s/,"")+" →");
+    c.appendChild(drill);
+    v.appendChild(c);
+  });
+  v.appendChild(el("div",{class:"card"},'<p class="muted">Note: links open the free public lessons. Klein 5e sections are in your own WileyPLUS eText (Inclusive Access) — Course Resources → WileyPLUS eTextbook. Bring a specific chapter here to Claude when you want problems built from it.</p>'));
+};
+VIEWS.cheat = (v) => {
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole gen-chem bridge on one page</h2>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Bond numbers (the everyday table)</h3>'+
+    '<table class="cheat"><tr><th>Atom</th><th>Bonds</th><th>Lone pairs</th></tr>'+
+    '<tr><td class="mono">H</td><td>1</td><td>0</td></tr><tr><td class="mono">C</td><td>4</td><td>0</td></tr>'+
+    '<tr><td class="mono">N</td><td>3</td><td>1</td></tr><tr><td class="mono">O</td><td>2</td><td>2</td></tr>'+
+    '<tr><td class="mono">F Cl Br I</td><td>1</td><td>3</td></tr></table>'+
+    '<p class="muted">Charged versions shift by one: N⁺ 4 bonds · O⁺ 3 bonds/1 LP · O⁻ 1 bond/3 LP · C⁻ 3 bonds/1 LP · C⁺ 3 bonds/0 LP (C⁺ vs C⁻: same bonds — the lone pair decides).</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Lewis: the six steps + the deficit rule</h3>'+
+    '<ol style="margin-left:18px;line-height:1.7"><li>Count total valence e⁻ (adjust for charge: + subtracts, − adds)</li><li>Central atom = wants most bonds, never H</li><li>Connect all with single bonds, −2 each</li><li>Fill OUTER atoms (H stops at 2)</li><li>Leftovers → central atom</li><li>Central short? <b>(short ÷ 2) = lone pairs to convert to bonds</b>: short by 2 → double, short by 4 → triple</li></ol>'+
+    '<p class="muted">Only converting a lone pair into a shared bond fixes a short atom — sharing lets both atoms count the same 2 e⁻. Rearranging never does.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Formal charge</h3><p class="mono center" style="font-size:1.05rem;margin:8px 0">FC = valence − lone-pair e⁻ − ½(bonding e⁻)</p>'+
+    '<p class="muted"><b>"Valence" = the atom\'s own group number, always</b> (O is 6 in every molecule — an ion\'s charge changes the total e⁻ budget in step 1, never this number). Count lone pairs fresh from the octet each time: fewer bonds → more LPs. For octet-keeping atoms like O and N: more bonds than the neutral pattern → +, fewer → −. <b>Carbon breaks that shortcut:</b> C⁺ (3 bonds, 0 LP) and C⁻ (3 bonds, 1 LP) have the SAME bond count — the lone pair decides the sign. When lone pairs are uncertain, run the full formula.</p>'+
+    '<p class="muted">Sight-read shortcuts: N with 4 bonds = +1 · O with 3 bonds = +1 · O with 1 bond = −1 · C with 3 bonds + 1 LP = −1 · C with 3 bonds + 0 LP = +1.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Electronegativity & geometry</h3>'+
+    '<p class="mono center" style="margin:6px 0">F &gt; O &gt; N ≈ Cl &gt; Br &gt; C ≈ H</p>'+
+    '<table class="cheat"><tr><th>Domains</th><th>Hybrid</th><th>Shape (no LP)</th><th>Angle</th></tr>'+
+    '<tr><td>4</td><td class="mono">sp³</td><td>tetrahedral</td><td>109.5°</td></tr>'+
+    '<tr><td>3</td><td class="mono">sp²</td><td>trigonal planar</td><td>120°</td></tr>'+
+    '<tr><td>2</td><td class="mono">sp</td><td>linear</td><td>180°</td></tr></table>'+
+    '<p class="muted">Lone pairs bend the name: sp³ + 1 LP = pyramidal, + 2 LP = bent. Double bond = 1σ + 1π (no rotation).</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>pKa ladder (memorize cold)</h3>'+
+    '<table class="cheat"><tr><th>Acid</th><th>pKa</th></tr>'+
+    '<tr><td>HCl</td><td class="mono">−7</td></tr><tr><td>H₃O⁺</td><td class="mono">−1.7</td></tr>'+
+    '<tr><td>RCOOH (carboxylic)</td><td class="mono">~5</td></tr><tr><td>H₂O</td><td class="mono">15.7</td></tr>'+
+    '<tr><td>ROH (alcohol)</td><td class="mono">~16</td></tr><tr><td>terminal alkyne</td><td class="mono">~25</td></tr>'+
+    '<tr><td>alkane</td><td class="mono">~50</td></tr></table>'+
+    '<p class="muted">Lower pKa = stronger acid. Equilibrium favors the weaker acid (higher pKa) side. <b>ARIO</b> ranks conjugate-base stability: <b>A</b>tom (row → EN, column → size) &gt; <b>R</b>esonance &gt; <b>I</b>nduction &gt; <b>O</b>rbital.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Functional groups (recognize on sight)</h3>'+
+    '<p style="line-height:1.8" class="mono">alkene C=C · alkyne C≡C · alcohol –OH · ether C–O–C · amine C–N · aldehyde –CHO · ketone C(=O)C · carboxylic acid –COOH · ester –CO₂R · amide –C(=O)N · halide –X · nitrile –C≡N</p>'+
+    '<p class="muted">Amine vs amide: amide\'s N touches a C=O. That single difference changes everything about reactivity.</p>'));
+  v.appendChild(el("div",{class:"card cream"},
+    '<h3>Curved arrows (week-1 preview)</h3>'+
+    '<p class="muted" style="line-height:1.7">Arrows show ELECTRON movement, never atoms. Start at an electron source (lone pair or π bond) → point to where they land. Nucleophile = electron-rich, attacks δ+. Electrophile = electron-poor, gets attacked. Every acid-base reaction you\'ve drilled is secretly a mechanism: base\'s lone pair → H, H\'s bond → back onto the acid.</p>'));
+};
+
+/* ---- REPORT ---- */
+VIEWS.report = (v) => {
+  const a=accuracy();
+  const perTopic = Object.entries(TOPICS).map(([k,t])=>{
+    const qs=QUESTIONS.filter(q=>q.topic===k); let r=0,w=0;
+    qs.forEach(q=>{const s=S.qstats[q.id]; if(s){r+=s.r;w+=s.w;}});
+    return (r+w)?("  "+t.name+": "+r+"✓ "+w+"✗ ("+Math.round(100*r/(r+w))+"%)"):null;
+  }).filter(Boolean).join("\n");
+  const missedIds=[...new Set(S.missed)];
+  const missedTxt=missedIds.slice(-12).map(id=>{const q=QUESTIONS.find(x=>x.id===id);return "  ["+id+"] "+q.prompt.replace(/<[^>]+>/g,"").slice(0,70);}).join("\n");
+  const txt =
+"CHEM 231 BOOTCAMP REPORT — "+todayStr()+"\n"+
+"(paste this to Claude in the CHEM 231 session)\n\n"+
+"Track: "+S.doneDays.length+"/"+TRACK.length+" days marked done ("+S.doneDays.join(", ")+")\n"+
+"Visits: "+S.visits.join(", ")+"\n"+
+"Questions: "+a.r+" right / "+a.w+" wrong ("+a.pct+"% overall)\n"+
+(perTopic?("By topic:\n"+perTopic+"\n"):"")+
+"Molecules built: "+(S.molDone.join(", ")||"none")+"\n"+
+"FC mastery: "+new Set(S.fcMastery).size+"/2 clean days"+(S.fcMastery.length?" ("+[...new Set(S.fcMastery)].join(", ")+")":"")+(new Set(S.fcMastery).size>=2?" — MASTERED":"")+"\n"+
+(S.lastEval?("Evaluator ("+S.lastEval.date+", "+S.lastEval.kind+"): "+S.lastEval.pct+"% · gaps to study first: "+(S.lastEval.gaps.length?S.lastEval.gaps.map(k=>TOPICS[k]?.name||k).join(" > "):"none")+"\n"):"")+
+(missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
+// v3.0.1: include the v3.0 measurement layer in the export (guessed flags, diagnostics, written answers + rationales)
+(function(){ const g=Object.entries(S.qstats).filter(([id,s])=>(s.gr||0)+(s.gw||0)>0); if(!g.length) return "";
+  return "Guessed-flagged: "+g.map(([id,s])=>"["+id+"] "+(s.gr||0)+" right-but-guessed / "+(s.gw||0)+" wrong-guessed").join(" · ")+"\n"; })()+
+(function(){ const A=S.attempts||[]; if(!A.length) return "";
+  const secs=A.filter(a=>a.d>0).map(a=>a.d).sort((a,b)=>a-b); const med=secs.length?secs[Math.floor(secs.length/2)]:0;
+  const clean=A.filter(a=>a.ok&&!a.g).length;
+  return "Event log (v3.2): "+A.length+" attempts · "+clean+" clean-right · median "+med+"s/answer · since "+new Date(A[0].ts).toLocaleDateString()+"\n"; })()+
+(S.diags.length?("Diagnostics: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"CUM ":"SCOPE ")+d.pct+"% ("+d.date+(d.scope?", "+d.scope:"")+")").join(" · ")+"\n"):"")+
+((S.wrLog||[]).length?("Written answers & rationales (last 8, for Claude's process-grading):\n"+S.wrLog.slice(-8).map(w=>"  ["+w.id+"] "+(w.ok?"self-✓":"self-✗")+(w.guessed?" (guessed)":"")+" — \""+String(w.text).slice(0,160)+"\"").join("\n")+"\n"):"")+
+"Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
+  const c=el("div",{class:"card"});
+  c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
+  const ta=el("textarea",{class:"report",readonly:"readonly"}); ta.value=txt; c.appendChild(ta);
+  const b=el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{ ta.select(); try{ navigator.clipboard.writeText(txt); b.textContent="✓ Copied";}catch(e){ document.execCommand("copy"); b.textContent="✓ Copied"; } setTimeout(()=>b.textContent="Copy report",1600); }},"Copy report");
+  c.appendChild(b);
+  v.appendChild(c);
+  v.appendChild(el("div",{class:"card cream"},'<h3>When the syllabus lands</h3><p class="muted">Bring the course files to Claude — this app is built to grow: the TRACK swaps to real weeks, per-chapter question banks append to the same schema, and the Lab gains whatever molecules your problem sets use. v2.0 → v3.0 in one session.</p>'));
+};
+
+/* ================= BOOT ================= */
+render();
+cloudPull();
+/* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
+(function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
+</script>
+</body>
+</html>
