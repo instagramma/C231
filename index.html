@@ -84,12 +84,12 @@
   <span class="countdown" id="countdown"></span>
 </header>
 <main>
-  <p class="intro">One place, two runways. Open a course, press the one button, do the mission. Progress saves on this device and shows here.</p>
+  <p class="intro">One place, two courses — <b>semester live</b>. The apps are practice; Canvas is the planner. Open a course, run what's due (diagnostic, drill, journal), close the loop.</p>
 
   <a class="coursecard chem" href="chem231.html">
     <div class="band"></div>
     <h2>⚗️ CHEM 231 · Ochem Bootcamp</h2>
-    <div class="sub">Tue/Thu · Ciesla · 9-day runway + final diagnostic, due Aug 8 → 17</div>
+    <div class="sub">Ciesla · lecture Tue/Thu 11:10 · lab Tue 2:10 · quizzes 20% / exams 35% / final 20%</div>
     <div class="statrow" id="chem-stats"></div>
     <div class="progressbar"><div id="chem-bar" style="width:0%"></div></div>
     <div class="duenote" id="chem-due"></div>
@@ -99,7 +99,7 @@
   <a class="coursecard phys" href="phys210.html">
     <div class="band"></div>
     <h2>🚀 PHYS 210 · Physics Bootcamp</h2>
-    <div class="sub">Mon/Wed · Janatpour/Wong · 9-day runway + mini-diagnostic, due Aug 8 → 16</div>
+    <div class="sub">Janatpour/Wong · Mon/Wed 12:40–3:25 · daily journal = 20% (write cold, before sleep, never AI)</div>
     <div class="statrow" id="phys-stats"></div>
     <div class="progressbar"><div id="phys-bar" style="width:0%"></div></div>
     <div class="duenote" id="phys-due"></div>
@@ -107,33 +107,50 @@
   </a>
 </main>
 <footer>
-  Class starts Mon Aug 17 · College of San Mateo. Rules of the house: one mission a day, blank-page generation only, quantify — don't eyeball, hard stop at night (sleep is strategy). Progress is per-device; run the in-app Report to sync learnings back to Claude.
+  College of San Mateo · Fall 2026. Rules of the house: one mission a day, blank-page generation only, quantify — don't eyeball, honest 🎲/🤷 flags, hard stop at night (sleep is strategy). Cloud-synced across devices; Canvas feed refreshes daily.
 </footer>
 <script>
 "use strict";
 function readLS(key, fallback){ try{ const v=localStorage.getItem(key); return v==null?fallback:JSON.parse(v); }catch(e){ return fallback; } }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-function acc(qstats){ let r=0,w=0; Object.values(qstats||{}).forEach(s=>{r+=s.r||0;w+=s.w||0;}); const t=r+w; return t?Math.round(100*r/t)+"%":"—"; }
-function paint(prefix, ids, trackDays, builtLabel, builtDone, builtTotal){
-  const done=readLS(prefix+"doneDays",[]);
-  const qstats=readLS(prefix+"qstats",{});
-  const t=todayStr();
-  const overdue=trackDays.filter(d=>d<t && !done.includes(d)).length;
-  document.getElementById(ids+"-stats").innerHTML=
-    '<div class="stat"><div class="n">'+done.length+'/'+trackDays.length+'</div><div class="l">days done</div></div>'+
-    '<div class="stat"><div class="n">'+acc(qstats)+'</div><div class="l">accuracy</div></div>'+
-    '<div class="stat"><div class="n">'+builtDone+'/'+builtTotal+'</div><div class="l">'+builtLabel+'</div></div>';
-  document.getElementById(ids+"-bar").style.width=Math.round(100*done.length/trackDays.length)+"%";
-  document.getElementById(ids+"-due").innerHTML= overdue
-    ? '<span class="overdue">⏰ '+overdue+' day'+(overdue>1?'s':'')+' overdue</span> — the app queues them up for you'
-    : '<span class="clear">✓ on schedule</span>';
-}
-const CHEM_DAYS=["2026-08-08","2026-08-09","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-15","2026-08-16","2026-08-17"];
-const PHYS_DAYS=["2026-08-08","2026-08-09","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-15","2026-08-16"];
-paint("","chem",CHEM_DAYS,"molecules",(readLS("molDone",[])||[]).length,10);
-paint("p210_","phys",PHYS_DAYS,"problems",(readLS("p210_probDone",[])||[]).length,6);
-(function(){ const ms=new Date("2026-08-17T00:00:00")-new Date(); const d=Math.ceil(ms/86400000);
-  document.getElementById("countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); })();
+function daysTo(iso){ return Math.ceil((new Date(iso+"T00:00:00")-new Date())/86400000); }
+function cleanAcc(qstats){ let r=0,w=0,g=0; Object.values(qstats||{}).forEach(s=>{r+=s.r||0;w+=s.w||0;g+=s.gr||0;}); const t=r+w; return t?{pct:Math.round(100*Math.max(0,r-g)/t),n:t}:{pct:null,n:0}; }
+const CLASS_START="2026-08-17";
+function courseWeek(){ const ms=new Date(todayStr()+"T00:00:00")-new Date(CLASS_START+"T00:00:00"); return Math.floor(ms/86400000/7)+1; }
+// CHEM — semester card: week, clean accuracy, missed rotation, next-checkpoint countdown
+(function(){
+  const CPS=[{name:"Exam 1",date:"2026-09-15"},{name:"Exam 2",date:"2026-10-20"},{name:"Exam 3",date:"2026-11-10"},{name:"Final (comprehensive)",date:"2026-12-15"}];
+  const nq=readLS("nextQuiz",null); const t=todayStr();
+  let cp=CPS.find(c=>c.date>=t)||null;
+  if(nq&&nq.date>=t&&(!cp||nq.date<=cp.date)) cp={name:nq.name,date:nq.date};
+  const a=cleanAcc(readLS("qstats",{}));
+  const missed=[...new Set(readLS("missed",[]))].length;
+  document.getElementById("chem-stats").innerHTML=
+    '<div class="stat"><div class="n">wk '+Math.max(courseWeek(),1)+'</div><div class="l">semester</div></div>'+
+    '<div class="stat"><div class="n">'+(a.pct===null?"—":a.pct+"%")+'</div><div class="l">clean accuracy</div></div>'+
+    '<div class="stat"><div class="n">'+missed+'</div><div class="l">in missed rotation</div></div>';
+  document.getElementById("chem-bar").style.width=(a.pct||0)+"%";
+  document.getElementById("chem-due").innerHTML= cp
+    ? (daysTo(cp.date)<=3?'<span class="overdue">🎯 '+cp.name+' in '+daysTo(cp.date)+'d</span> — readiness gate: ≥80% clean + scoped diag ≥80%'
+                         :'<span class="clear">🎯 '+cp.name+' · '+cp.date.slice(5).replace("-","/")+' ('+daysTo(cp.date)+'d)</span>')
+    : '<span class="clear">✓ no checkpoint on the radar</span>';
+})();
+// PHYS — semester card: week, accuracy, problems done, journal reminder on class nights
+(function(){
+  const a=cleanAcc(readLS("p210_qstats",{}));
+  const prob=(readLS("p210_probDone",[])||[]).length;
+  const dow=new Date(todayStr()+"T12:00:00").getDay(); // 1=Mon 3=Wed
+  const classNight=(dow===1||dow===3);
+  document.getElementById("phys-stats").innerHTML=
+    '<div class="stat"><div class="n">wk '+Math.max(courseWeek(),1)+'</div><div class="l">semester</div></div>'+
+    '<div class="stat"><div class="n">'+(a.pct===null?"—":a.pct+"%")+'</div><div class="l">clean accuracy</div></div>'+
+    '<div class="stat"><div class="n">'+prob+'</div><div class="l">problems done</div></div>';
+  document.getElementById("phys-bar").style.width=(a.pct||0)+"%";
+  document.getElementById("phys-due").innerHTML= classNight
+    ? '<span class="overdue">📓 class night — journal in your own words, cold, before sleep</span> (20% of the grade)'
+    : '<span class="clear">✓ no journal tonight · Problem Lab = highest-yield practice</span>';
+})();
+(function(){ document.getElementById("countdown").textContent="semester live · wk "+Math.max(courseWeek(),1); })();
 </script>
 </body>
 </html>
