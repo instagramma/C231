@@ -6,7 +6,15 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.5  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.6  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.6 TODAY TILES (Gabe: "tiles of what section to tackle today… a schedule of what to
+  cover, and what to review because of my weaknesses/strengths"): 📌 COVER TODAY —
+  schedule-driven (this week's chapter topics, unseen→lowest-clean first; flips to
+  weakest-quiz-scope-topic in final approach ≤2d) with Drill + Learn-first buttons.
+  🔧 REVIEW TODAY — weakness-driven priority chain: misconceptions (confident-wrong) →
+  🤷 learn-first topics → weakest clean topic; shows the checkpoint GAP LIST (<80% scope
+  topics) inside 7 days and a strengths line ("maintain, don't grind"). ONE primary
+  action per tile — the §3.5 overwhelm guard applies to tiles too.
   v3.5 CANVAS BRIDGE: daily `canvas-sync` scheduled task reads Gabe's signed-in Canvas (no
   tokens/credentials) and posts JSON to Supabase profile `canvas-feed`; app pulls it on load —
   live deadlines merge into 📅 (☁-tagged, Canvas wins on conflicts), announcements strip on
@@ -1115,6 +1123,60 @@ VIEWS.home = (v) => {
       rr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedDrill=null;safeStore.set("pausedDrill",null);render();}},"discard"));
       rc.appendChild(rr); v.appendChild(rc);
     }
+    // v3.6: TODAY TILES (Gabe's ask — the daily tiles are back, semester-smart).
+    // 📌 Cover = schedule-driven (this week's chapter; quiz-scope in final approach).
+    // 🔧 Review = weakness-driven (misconceptions → dk/learn-first → weakest topic). ONE primary action each.
+    (function(){
+      const tStats=k=>{let r=0,w=0,g=0,dk=0,cw=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=s.r||0;w+=s.w||0;g+=s.gr||0;dk+=s.dk||0;cw+=Math.max(0,(s.w||0)-(s.gw||0)-(s.dk||0));}}});const tt=r+w;return{clean:tt?Math.round(100*Math.max(0,r-g)/tt):null,att:tt,dk,cw};};
+      const nm=k=>TOPICS[k]?(TOPICS[k].ico+" "+TOPICS[k].name):k;
+      const cpT=nextCheckpoint(); const cpDays=cpT?daysTo(cpT.date):99;
+      const wkRow=SEMESTER.find(x=>x.wk===Math.max(courseWeek(),1));
+      const row=el("div",{style:"display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:10px"});
+      // ---- 📌 COVER TODAY ----
+      const cov=el("div",{class:"card teal",style:"margin:0"});
+      let covTopic=null, covWhy="", covHead="";
+      if(cpT&&cpDays<=2){
+        const sc=(cpT.topics||[]).filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
+        covTopic=sc.slice().sort((a,b)=>((tStats(a).clean??-1)-(tStats(b).clean??-1)))[0]||null;
+        covHead="Final approach — "+cpT.name+" in "+cpDays+"d";
+        covWhy=covTopic?("Weakest in scope: "+nm(covTopic)+" ("+(tStats(covTopic).clean??"—")+"% clean). Everything else waits."):"";
+      } else if(wkRow&&wkRow.topics.length){
+        const todo=wkRow.topics.filter(k=>{const s=tStats(k);return s.clean===null||s.clean<75;})
+          .sort((a,b)=>{const A=tStats(a),B=tStats(b);if(A.att===0&&B.att>0)return -1;if(B.att===0&&A.att>0)return 1;return (A.clean??0)-(B.clean??0);});
+        covTopic=todo[0]||null;
+        covHead=wkRow.ch+" — this week";
+        covWhy=covTopic?((tStats(covTopic).att===0?"Not started yet":"At "+(tStats(covTopic).clean)+"% clean — push it past 75")+". Rest of the week: "+wkRow.topics.filter(k=>k!==covTopic).map(k=>nm(k)+(tStats(k).clean!==null?" "+tStats(k).clean+"%":"")).join(" · ")):"";
+      }
+      cov.innerHTML='<span class="tag gold">📌 Cover today</span>'+(covHead?'<p class="muted" style="margin:4px 0 2px;font-size:.8rem">'+covHead+'</p>':'')+
+        (covTopic?'<h3 style="margin:2px 0 6px">'+nm(covTopic)+'</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">'+covWhy+'</p>':'<h3 style="margin:2px 0 6px">Week covered ✓</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">Every topic this week is ≥75% clean. Bank ahead in Learn, or rest — consistency beats intensity.</p>');
+      if(covTopic){ const bb=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap"});
+        bb.appendChild(el("button",{class:"btn coral",onclick:()=>startDrill(covTopic)},"▶ Drill "+(TOPICS[covTopic]?.name||covTopic)));
+        bb.appendChild(el("button",{class:"btn ghost small",onclick:()=>go("learn")},"📖 Learn first"));
+        cov.appendChild(bb); }
+      row.appendChild(cov);
+      // ---- 🔧 REVIEW TODAY ----
+      const rev=el("div",{class:"card cream",style:"margin:0"});
+      const allT=[...new Set(QUESTIONS.filter(q=>q.type!=="written").map(q=>q.topic))];
+      const scored=allT.map(k=>({k,...tStats(k)})).filter(x=>x.att>0);
+      const weak=scored.filter(x=>x.clean!==null&&x.clean<80).sort((a,b)=>a.clean-b.clean);
+      const strong=scored.filter(x=>x.clean>=80);
+      const totCW=scored.reduce((s,x)=>s+x.cw,0), totDK=scored.reduce((s,x)=>s+x.dk,0);
+      const dkTop=scored.filter(x=>x.dk>0).sort((a,b)=>b.dk-a.dk)[0];
+      let rHead,rWhy,rBtnTxt,rAct;
+      if(totCW>0){ rHead="Misconceptions first"; rWhy=totCW+" confident-wrong answer"+(totCW>1?"s":"")+" on record — broken rules beat blank spots. Fix these before anything new."; rBtnTxt="▶ Review missed (misconceptions surface first)"; rAct=()=>startDrill("__missed"); }
+      else if(dkTop){ rHead="Learn-first: "+nm(dkTop.k); rWhy=dkTop.dk+"× marked 🤷 don't-know there — read the primer, THEN re-drill. Drilling blind teaches guessing."; rBtnTxt="📖 Open Learn"; rAct=()=>go("learn"); }
+      else if(weak.length){ rHead="Weakest: "+nm(weak[0].k)+" · "+weak[0].clean+"%"; rWhy="Lowest clean topic with real attempts. One focused round."; rBtnTxt="▶ Drill "+(TOPICS[weak[0].k]?.name||weak[0].k); rAct=()=>startDrill(weak[0].k); }
+      else { rHead="Nothing owed"; rWhy="No misconceptions, no don't-knows, nothing under 80%. Run Review-missed as maintenance or close the tab."; rBtnTxt="▶ Review missed"; rAct=()=>startDrill("__missed"); }
+      let scopeLine="";
+      if(cpT&&cpDays<=7){ const sw=(cpT.topics||[]).map(k=>({k,...tStats(k)})).filter(x=>x.clean===null||x.clean<80);
+        scopeLine=sw.length?'<p style="margin:6px 0 0;font-size:.8rem"><b>'+cpT.name+' gap list:</b> '+sw.map(x=>nm(x.k)+" "+(x.clean??"—")+"%").join(" · ")+' <span class="muted">(gate: 80)</span></p>':'<p style="margin:6px 0 0;font-size:.8rem"><b>'+cpT.name+':</b> all scope topics ≥80% clean ✅</p>'; }
+      rev.innerHTML='<span class="tag coral">🔧 Review today</span><h3 style="margin:2px 0 6px">'+rHead+'</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">'+rWhy+'</p>';
+      const rb=el("button",{class:"btn teal",onclick:rAct},rBtnTxt); rev.appendChild(rb);
+      if(scopeLine){ const d=el("div"); d.innerHTML=scopeLine; rev.appendChild(d); }
+      if(strong.length){ const d2=el("div"); d2.innerHTML='<p class="muted" style="margin:6px 0 0;font-size:.78rem">💪 Solid (≥80): '+strong.map(x=>TOPICS[x.k]?.name||x.k).join(", ")+' — maintain, don\'t grind.</p>'; rev.appendChild(d2); }
+      row.appendChild(rev);
+      v.appendChild(row);
+    })();
     const cp = nextCheckpoint(); const due = diagDue();
     const card = el("div",{class:"card teal"});
     card.innerHTML = '<span class="tag gold">Semester mode · week '+Math.max(courseWeek(),1)+'</span>'+
