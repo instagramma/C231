@@ -6,7 +6,19 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.4.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.5  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.5 CANVAS BRIDGE: daily `canvas-sync` scheduled task reads Gabe's signed-in Canvas (no
+  tokens/credentials) and posts JSON to Supabase profile `canvas-feed`; app pulls it on load —
+  live deadlines merge into 📅 (☁-tagged, Canvas wins on conflicts), announcements strip on
+  Home, explicit STALE warning past 48h. Display-only: the feed never silently rewrites
+  nextQuiz or the verified schedule. Plus 📖 PACING card (Gabe's spec): each course week's
+  chapter must start AND finish that week — per-topic clean-% chips from live stats — and a
+  hard READINESS GATE before every checkpoint (≥80% clean on scope + scoped diag ≥80%).
+  Plus 🤷 "I don't know this yet" CHECKBOX on EVERY question (incl. written; Gabe's spec —
+  checkbox not button, so he still answers and the blind try is captured): third honest state,
+  unlearned ≠ guessed ≠ misconception. Implies guess semantics (excluded from clean accuracy,
+  stays in rotation) on EITHER outcome, is EXCLUDED from misconception priority (prescription
+  = 📖 Learn primer first), and listed separately in the report ("needs LEARN-first").
   v3.4.1 PAUSE/RESUME (Gabe hit "quit round" mid-diagnostic and thought he lost everything):
   every answer already saved instantly (v3.2 event log) — now the ROUND survives too. Snapshot
   after each answer (pausedDrill: ids+index+counters, cloud-synced, latest-ts merge), quit
@@ -364,6 +376,20 @@ function mergeRemote(remote){
   if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
   if (remote.pausedDrill && (!S.pausedDrill || (remote.pausedDrill.ts||0) > (S.pausedDrill.ts||0))) S.pausedDrill = remote.pausedDrill; // v3.4.1: latest pause wins — resume on any device
 }
+/* v3.5: pull the Canvas feed (written daily by the `canvas-sync` scheduled task via Chrome —
+   no tokens/credentials; the task reads Gabe's signed-in Canvas pages and posts JSON here). */
+async function canvasPull(){
+  if(!navigator.onLine) return;
+  try{
+    const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq.canvas-feed&select=data,updated_at",{headers:sbHeaders()});
+    if(!r.ok) return;
+    const rows = await r.json();
+    if(!rows.length || !rows[0].data) return;
+    S.canvasFeed = {...rows[0].data, _syncedAt: rows[0].updated_at};
+    safeStore.set("canvasFeed", S.canvasFeed);
+    if(S.view==="home") render();
+  }catch(e){}
+}
 async function cloudPull(){
   try {
     const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq."+SB_PROFILE+"&select=data", {headers:sbHeaders()});
@@ -484,7 +510,7 @@ function startDiag2(type){
   // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
   const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   // v3.2: misconception (confident-wrong) ranked above guessed-wrong; difficulty is MEASURED (qDiffM), not the static constant
-  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiffM(q); return n+Math.random(); };
+  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(s&&(s.dk||0)>0&&s.r===0)n+=1; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiffM(q); return n+Math.random(); }; // v3.5: dk excluded from misconception rank — it means LEARN first, not re-drill blind
   const pool=[];
   scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
   const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
@@ -805,6 +831,7 @@ const S = {
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
+  canvasFeed: safeStore.get("canvasFeed", null),   // v3.5: cached Canvas sync {courses:{chem231:{announcements[],deadlines[]}},fetched,_syncedAt} written daily by the canvas-sync task
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
@@ -845,9 +872,11 @@ function qDiffM(q){
   const w=n/(n+4);
   return Math.max(1,Math.min(3,Math.round((w*m+(1-w)*prior)*10)/10));
 }
-function logAttempt(q,ok,guessed,D){
+function logAttempt(q,ok,guessed,D,dk){
   const secs=D&&D._shownAt?Math.min(600,Math.round((Date.now()-D._shownAt)/1000)):0;
-  S.attempts.push({id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic});
+  const ev={id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic};
+  if(dk) ev.dk=1; // v3.5: "I don't know yet" — never learned ≠ guessed ≠ misconception
+  S.attempts.push(ev);
   if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
 }
 
@@ -979,14 +1008,57 @@ VIEWS.home = (v) => {
     {d:"2026-11-30",n:"LAB EXAM — wk of Nov 30",est:1},
     {d:"2026-12-15",n:"FINAL — Tue 11:10–1:40 · Rm 36-319 · comprehensive · required to pass",big:1},
   ];
-  const up=DL.filter(x=>x.d>=t);
+  // v3.5: merge in LIVE Canvas deadlines (daily canvas-sync task) — Canvas wins on date+name conflicts
+  const cf=S.canvasFeed, cfc=(cf&&cf.courses&&cf.courses.chem231)||null;
+  const CDL=((cfc&&cfc.deadlines)||[]).map(x=>({...x,cv:1}));
+  const normN=s=>(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim().slice(0,10);
+  const MDL=DL.filter(x=>!CDL.some(c=>c.d===x.d&&normN(c.n)===normN(x.n))).concat(CDL).sort((a,b)=>a.d<b.d?-1:1);
+  const up=MDL.filter(x=>x.d>=t);
   if(up.length){
     const dl=el("div",{class:"card"});
     dl.innerHTML='<span class="tag coral">📅 Deadlines</span>'+
-      up.slice(0,5).map(x=>{const n=daysTo(x.d);return '<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b class="mono" style="min-width:52px">'+x.d.slice(5).replace("-","/")+'</b><span style="flex:1">'+(x.big?'<b>'+x.n+'</b>':x.n)+(x.est?' <span class="muted">(~est.)</span>':'')+(x.note?'<br><span class="muted" style="font-size:.78rem">'+x.note+'</span>':'')+'</span><span class="tag '+(n<=3?'coral':'gold')+'">'+(n===0?'TODAY':'in '+n+'d')+'</span></div>';}).join("")+
-      (up.length>5?'<p class="muted" style="margin:4px 0 0">…+'+(up.length-5)+' more later — full list matches the verified course schedule</p>':'');
+      up.slice(0,6).map(x=>{const n=daysTo(x.d);return '<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b class="mono" style="min-width:52px">'+x.d.slice(5).replace("-","/")+'</b><span style="flex:1">'+(x.big?'<b>'+x.n+'</b>':x.n)+(x.cv?' <span class="tag teal" style="font-size:.6rem;padding:1px 6px">☁ canvas</span>':'')+(x.est?' <span class="muted">(~est.)</span>':'')+(x.note?'<br><span class="muted" style="font-size:.78rem">'+x.note+'</span>':'')+'</span><span class="tag '+(n<=3?'coral':'gold')+'">'+(n===0?'TODAY':'in '+n+'d')+'</span></div>';}).join("")+
+      (up.length>6?'<p class="muted" style="margin:4px 0 0">…+'+(up.length-6)+' more later</p>':'');
     v.appendChild(dl);
   }
+  // v3.5: Canvas announcements strip + staleness honesty
+  if(cfc){
+    const ageH=cf._syncedAt?Math.round((Date.now()-new Date(cf._syncedAt).getTime())/3600000):null;
+    const an=(cfc.announcements||[]).slice(0,3);
+    const ac=el("div",{class:"card"});
+    ac.innerHTML='<span class="tag violet">☁ Canvas'+(ageH!==null?(' · synced '+(ageH<1?'just now':ageH+'h ago')):'')+(ageH!==null&&ageH>48?' · <b style="color:var(--coral)">STALE — tap Run now on canvas-sync</b>':'')+'</span>'+
+      (an.length?an.map(a=>'<div style="margin:6px 0"><b class="mono" style="font-size:.72rem">'+(a.date||"")+'</b> <b>'+(a.title||"")+'</b>'+(a.summary?'<br><span class="muted" style="font-size:.82rem">'+a.summary+'</span>':'')+'</div>').join(""):'<p class="muted" style="margin:6px 0 0">No recent announcements.</p>');
+    v.appendChild(ac);
+  }
+  // v3.5: 📖 PACING — the APP's deadlines: cover each chapter within its course week
+  // (Gabe's spec: "this week we start Ch 2 and end Ch 2, even though the Ch 1 quiz is this week"),
+  // plus a hard READINESS GATE before every quiz/exam.
+  (function(){
+    const wk=Math.max(courseWeek(),1); const wkRow=SEMESTER.find(x=>x.wk===wk);
+    const cleanPct=k=>{let r=0,w=0,g=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=(s.r||0);w+=(s.w||0);g+=(s.gr||0);}}});const tt=r+w;return tt?Math.round(100*Math.max(0,r-g)/tt):null;};
+    const pc=el("div",{class:"card"});
+    let inner='<span class="tag gold">📖 Pacing · week '+wk+'</span>';
+    if(wkRow){
+      const end=new Date(wkRow.start+"T00:00:00"); end.setDate(end.getDate()+6);
+      const endStr=end.getFullYear()+"-"+String(end.getMonth()+1).padStart(2,"0")+"-"+String(end.getDate()).padStart(2,"0");
+      inner+='<p style="margin:6px 0 4px"><b>'+wkRow.ch+'</b> — start AND finish this week (by <b>'+fmtDay(endStr)+'</b>), even with other deadlines in the way.</p>';
+      inner+= wkRow.topics.length
+        ? '<div style="margin:4px 0">'+wkRow.topics.map(k=>{const p=cleanPct(k);const col=p===null?'#8a8a8a':(p>=75?'#2a9d8f':p>=55?'#e9c46a':'#e76f51');return '<span class="tag" style="background:'+col+';color:#fff;margin:2px 3px 2px 0">'+(TOPICS[k]?TOPICS[k].ico+" "+TOPICS[k].name:k)+' · '+(p===null?'not started':p+'% clean')+'</span>';}).join("")+'</div>'
+        : '<p class="muted" style="margin:2px 0">No app bank for this chapter yet — cover it in Klein + WileyPLUS; bank items land when the chapter starts.</p>';
+    }
+    const nxt=SEMESTER.find(x=>x.wk===wk+1);
+    if(nxt) inner+='<p class="muted" style="margin:4px 0 0;font-size:.8rem">Next week: '+nxt.ch+'</p>';
+    const cp=nextCheckpoint();
+    if(cp&&daysTo(cp.date)<=7&&daysTo(cp.date)>=0){
+      const scope=(cp.topics||[]).filter(k=>QUESTIONS.some(q=>q.topic===k));
+      const ps=scope.map(k=>cleanPct(k)).filter(x=>x!==null);
+      const avg=ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):null;
+      const lastScoped=S.diags.slice().reverse().find(d=>d.type==="scope");
+      const ready=(avg!==null&&avg>=80)&&!!lastScoped&&lastScoped.pct>=80;
+      inner+='<div class="why" style="margin-top:8px"><b>'+(ready?'🟢':'🔴')+' '+cp.name+' readiness · '+daysTo(cp.date)+'d out:</b> clean '+(avg===null?'—':avg+'%')+' across scope · last 🎯 scoped diag: '+(lastScoped?lastScoped.pct+'% ('+fmtDay(lastScoped.date)+')':'<b>none yet</b>')+'.<br>Gate: <b>≥80% clean</b> on scope AND <b>a scoped diagnostic ≥80%</b> by the night before. '+(ready?'✅ Cleared — maintain, don\'t cram.':'Not cleared yet — the 🎯 Scoped diagnostic is the fastest path.')+'</div>';
+    }
+    pc.innerHTML=inner; v.appendChild(pc);
+  })();
   // ---- v3.3: 📊 MEASURED — your numbers, front and center ----
   (function(){
     let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=(s.r||0);w+=(s.w||0);});
@@ -1178,7 +1250,7 @@ function startDrill(topic){
   // tier 2 = never seen, tier 1 = seen and right. Shuffle first so pick within a tier is random.
   const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   // v3.2: confident-wrong (a broken rule = misconception) outranks guessed-wrong (just unknown)
-  const need = q => { const s=S.qstats[q.id]; if(s&&(s.w-(s.gw||0))>0) return 4; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; };
+  const need = q => { const s=S.qstats[q.id]; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0) return 4; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; }; // v3.5: dk ≠ misconception
   pool = shuffle(pool).sort((a,b)=>need(b)-need(a));
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
   // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
@@ -1324,29 +1396,34 @@ VIEWS.drill = (v) => {
     '<div class="qprompt">'+q.prompt+'</div>';
   const fb = el("div");
   // v3.0: guessed checkbox + optional rationale — on every non-written question
-  let gk=null, rInp=null;
+  let gk=null, rInp=null, dkk=null;
   if(q.type!=="written"){
     const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 2px"});
     gk=el("input",{type:"checkbox",id:"gk"});
     const gl=el("label",{for:"gk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I guessed on this");
     rInp=el("input",{class:"answerbox wide",style:"flex:1;min-width:160px;font-size:.85em",placeholder:"(optional) why I chose this…"});
-    gRow.appendChild(gk); gRow.appendChild(gl); gRow.appendChild(rInp);
+    // v3.5: honest third state — never learned this. Tick it and STILL answer (your blind try is data too).
+    dkk=el("input",{type:"checkbox",id:"dkk"});
+    const dkl=el("label",{for:"dkk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🤷 I don't know this yet");
+    gRow.appendChild(gk); gRow.appendChild(gl); gRow.appendChild(dkk); gRow.appendChild(dkl); gRow.appendChild(rInp);
     c.appendChild(gRow);
   }
   const finish = (ok, revealHtml, wrText) => {
     D.answered=true;
-    const guessed = !!(gk&&gk.checked) || D._wrGuessed===true;
-    logAttempt(q,ok,guessed,D); // v3.2: immutable event — id, timestamp, correctness, guessed, seconds
+    const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
+    const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
+    logAttempt(q,ok,guessed,D,isDK); // v3.2 event — id, ts, correctness, guessed, seconds (+dk v3.5)
     snapshotDrill(D.i+1);       // v3.4.1: after this answer, the round resumes from the NEXT question
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
+    if(isDK) st.dk=(st.dk||0)+1; // v3.5: unlearned tag on EITHER outcome — a dk-right is still unlearned
     if(ok){st.r++;D.right++; if(guessed){ st.gr=(st.gr||0)+1; D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
     else{st.w++;D.wrong++;S.missed.push(q.id); if(guessed) st.gw=(st.gw||0)+1;}
     if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; } // v3.2: guessed-rights tallied per topic
     const rat=(rInp&&rInp.value.trim())||"";
     if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
-    D._wrGuessed=false;
+    D._wrGuessed=false; D._wrDK=false;
     save();
-    const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(guessed?"✓ Right — but flagged as a guess, so it stays in rotation":"✓ Right"):"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:""))+'</p>';
+    const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(isDK?"✓ Right — but marked 🤷 don't-know, so it counts as UNLEARNED and stays in rotation. Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" next.":guessed?"✓ Right — but flagged as a guess, so it stays in rotation":"✓ Right"):(isDK?"🤷 Don't know yet — honest data, not a failure. Stays in rotation; hit the 📖 Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" after this round, then re-drill.":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:"")))+'</p>';
     fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>');
     fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
     if(!ok)c.classList.add("shake");
@@ -1357,9 +1434,11 @@ VIEWS.drill = (v) => {
     const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;margin:8px 0 2px"});
     const wgk=el("input",{type:"checkbox",id:"wgk"});
     gRow.appendChild(wgk); gRow.appendChild(el("label",{for:"wgk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I'm not confident in this"));
+    const wdk=el("input",{type:"checkbox",id:"wdk"});
+    gRow.appendChild(wdk); gRow.appendChild(el("label",{for:"wdk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🤷 I don't know this yet")); // v3.5
     const sub=el("button",{class:"btn teal",style:"margin-top:8px",onclick:()=>{
       if(D.answered||!ta.value.trim())return;
-      D._wrGuessed=wgk.checked;
+      D._wrGuessed=wgk.checked; D._wrDK=wdk.checked;
       const box=el("div",{class:"why",style:"margin-top:10px"});
       box.innerHTML='<b>Model answer:</b><br>'+q.model+'<br><br><b>Check yourself against the rubric:</b><ul style="margin:6px 0 0 18px">'+q.rubric.map(r=>'<li>'+r+'</li>').join("")+'</ul><p style="margin-top:8px"><b>Honest call — did your answer hit ALL rubric points?</b></p>';
       const bar=el("div",{style:"display:flex;gap:8px;margin-top:8px"});
@@ -1725,6 +1804,8 @@ VIEWS.report = (v) => {
 // v3.0.1: include the v3.0 measurement layer in the export (guessed flags, diagnostics, written answers + rationales)
 (function(){ const g=Object.entries(S.qstats).filter(([id,s])=>(s.gr||0)+(s.gw||0)>0); if(!g.length) return "";
   return "Guessed-flagged: "+g.map(([id,s])=>"["+id+"] "+(s.gr||0)+" right-but-guessed / "+(s.gw||0)+" wrong-guessed").join(" · ")+"\n"; })()+
+(function(){ const k=Object.entries(S.qstats).filter(([id,s])=>(s.dk||0)>0); if(!k.length) return "";
+  return "Don't-know (unlearned) flagged: "+k.map(([id,s])=>"["+id+"] ×"+s.dk).join(" · ")+" — these need LEARN-first, not re-drilling\n"; })()+
 (function(){ const A=S.attempts||[]; if(!A.length) return "";
   const secs=A.filter(a=>a.d>0).map(a=>a.d).sort((a,b)=>a-b); const med=secs.length?secs[Math.floor(secs.length/2)]:0;
   const clean=A.filter(a=>a.ok&&!a.g).length;
@@ -1744,6 +1825,7 @@ VIEWS.report = (v) => {
 /* ================= BOOT ================= */
 render();
 cloudPull();
+canvasPull(); // v3.5
 /* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
 (function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
 </script>
