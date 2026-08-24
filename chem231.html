@@ -6,7 +6,12 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.3  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.4  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.4 (2026-08-24, two sessions merged): TUTORIAL-STANDARD SET (CHEM 231 chat: T-CH1-01…10 +
+  WR-CH1-101…105, real molecules incl. isonitriles/CHCl₃-CFCl₃, 📅 Deadlines card w/ verified
+  quiz time Thu 2:10 in lab) + CONSTITUTIONAL ISOMER SET (desktop chat: iso2…8 + WR-CH1-012 —
+  butane/isobutane, C₄H₁₀=2/C₅H₁₂=3 counting, ethanol/DME, same-molecule-drawn-differently
+  trap, constitutional-vs-stereo decision routine). Bank now 193 items.
   v3.3 LECTURE 1 (Ciesla Thu 8/20, from Gabe's transcript): +19 auto items + 5 written
   (WR-CH1-007…011) covering her emphases and named traps — lone-pair orbitals (sp²/sp³),
   σ/π overlap, bond angles + SO₂ trap (<120 not 109.5), C–halogen ALWAYS polar, the four
@@ -14,6 +19,12 @@
   bond-line implicit H. New 📝 Lecture Check mode (Exam tab): cold 24-item run → per-topic
   focus/strengthen/strength map. Transcript also CONFIRMS course uses steric-number model
   (water O = sp³ for this course; Klein fine print stands).
+  v3.3 (2026-08-24, Gabe's specs): TUTORIAL-STANDARD BANK — 15 items modeled on Ciesla's
+        Ch-1 tutorial (real molecules: vinyl chloride, isonitriles, CHCl3/CFCl3) + the official
+        quiz-scope topics not previously drilled (isomers, bonding patterns, sigma/pi, s-character,
+        orbitals/nodes, EPM, LDF branching, solubility, PE curve). Plus: 📅 DEADLINES card (real
+        due dates + countdowns, estimates marked ~) and 📊 MEASURED card (all-time & 7-day %,
+        per-topic bars, median time, FC clean days, latest diags) at the top of Home.
   v3.2 measurement patch (audit r3 findings 6,7 + Gabe's spec 08-20): EVENT LOG — every
   answer appends {id,ts,ok,g,d(seconds),mode,topic} to S.attempts (cap 5000, cross-device
   union-merge by id|ts — nothing overwritten). HONEST SCORING — accuracy separates clean
@@ -712,6 +723,44 @@ const QUESTIONS = [
 {id:"WR-CH1-011",topic:"bondline",type:"written",diff:2,prompt:"<b>Add every hydrogen:</b> for the bond-line structure below, list the number of hydrogens on EACH carbon, then give the molecular formula.<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>",
  model:"Count each carbon to 4 bonds: <b>C1</b>: double bond (2) → <b>2 H</b>. <b>C2</b>: double (2) + single to C3 (1) = 3 → <b>1 H</b>. <b>C3</b>: two singles → <b>2 H</b>. <b>C4</b>: one single → <b>3 H</b>. Total: <b>C₄H₈</b> (1-butene). Rule: H's on carbon are implicit; H's on N/O/S are always drawn.",
  rubric:["Every carbon brought to exactly 4 bonds","Correct per-carbon counts (2,1,2,3)","Correct formula C₄H₈"]},
+/* ---- v3.3 TUTORIAL-STANDARD SET — modeled on Ciesla's Ch-1 tutorial + official quiz scope ---- */
+{id:"T-CH1-01",topic:"lewis",type:"mc",diff:1,prompt:"Two compounds are <b>constitutional isomers</b>. Which MUST be true?",choices:["Same molecular formula, different connectivity of atoms","Same connectivity, different 3-D arrangement","Same properties, different formulas","They are the same compound drawn differently"],answer:0,why:"Constitutional isomers share a molecular formula but connect their atoms differently — and structure (connectivity), not formula, determines properties. (Same connectivity/different 3-D = stereoisomers.)"},
+{id:"T-CH1-02",topic:"lewis",type:"mc",diff:1,prompt:"Which bonding pattern is <b>WRONG</b> for a neutral atom in an organic molecule?",choices:["C — 4 bonds","N — 3 bonds + 1 lone pair","O — 2 bonds + 2 lone pairs","F — 2 bonds + 2 lone pairs"],answer:3,why:"Neutral halogens form 1 bond + 3 lone pairs. Memorize the neutral patterns: C=4 bonds · N=3+1LP · O=2+2LP · H=1 · halogen=1+3LP. Any deviation means a formal charge."},
+{id:"T-CH1-03",topic:"hybrid",type:"mc",diff:2,prompt:"Rank C–H bond strength: ethyne (HC≡CH), ethene (H₂C=CH₂), ethane (H₃C–CH₃).",choices:["ethyne > ethene > ethane","ethane > ethene > ethyne","ethene > ethyne > ethane","all equal — they're all C–H bonds"],answer:0,why:"More s-character = shorter, stronger bond. sp (50% s, ethyne) > sp² (33%, ethene) > sp³ (25%, ethane). s orbitals hold electrons closer to the nucleus."},
+{id:"T-CH1-04",topic:"hybrid",type:"mc",diff:1,prompt:"A C=C double bond consists of:",choices:["1 σ bond + 1 π bond","2 σ bonds","2 π bonds","1 σ + 2 π"],answer:0,why:"Every bond's FIRST connection is a σ (head-on overlap of hybridized orbitals). The second is a π — side-on overlap of unhybridized p orbitals. π is the weaker of the two."},
+{id:"T-CH1-05",topic:"hybrid",type:"mc",diff:2,prompt:"A p orbital has:",choices:["two lobes of opposite phase separated by a node","one spherical lobe, no nodes","two lobes of the same phase","a node only at infinite distance"],answer:0,why:"p orbitals are dumbbells: two lobes of opposite phase (+/−) with a node (zero electron density) at the nucleus. Bonding requires CONSTRUCTIVE overlap — same-phase lobes meeting."},
+{id:"T-CH1-06",topic:"polarity",type:"mc",diff:1,prompt:"On an electrostatic potential map of water, the <b>red</b> region sits on:",choices:["the oxygen (high electron density, δ−)","the hydrogens (δ+)","the O–H bond midpoints","nowhere — water is nonpolar"],answer:0,why:"EPM color code: red = electron-rich (δ−), blue = electron-poor (δ+). O is the most electronegative atom in water, so red concentrates there; the H end reads blue."},
+{id:"T-CH1-07",topic:"imf",type:"mc",diff:2,prompt:"Pentane and neopentane (2,2-dimethylpropane) are both C₅H₁₂. Which boils higher, and why?",choices:["Pentane — linear shape gives more surface contact for London forces","Neopentane — branching adds strain","They boil identically — same formula, same mass","Neopentane — spheres pack tighter"],answer:0,why:"Same mass → same-strength question comes down to CONTACT AREA. Linear pentane molecules touch along their whole length (more LDF); branched neopentane is ball-shaped with less contact. Branching LOWERS boiling point."},
+{id:"T-CH1-08",topic:"imf",type:"mc",diff:1,prompt:'"Like dissolves like": which pair actually mixes?',choices:["CH₃OH and H₂O — both hydrogen-bond","hexane and H₂O — both contain H","NaCl and hexane — opposites attract","CO₂ and H₂O — both contain oxygen"],answer:0,why:"Polar/H-bonding dissolves polar/H-bonding; nonpolar dissolves nonpolar. Methanol H-bonds with water. Hexane (nonpolar, LDF-only) can't pay the energy cost of breaking water's H-bond network."},
+{id:"T-CH1-09",topic:"imf",type:"mc",diff:2,prompt:"Why does oil NOT dissolve in water?",choices:["Mixing would break water's H-bonds but oil offers only weak LDF in return","Oil is denser than water","Oil molecules repel water electrostatically","Oil's covalent bonds can't break in water"],answer:0,why:"Solubility is an energy trade. Water gives up strong H-bonding interactions to make room; nonpolar oil can only repay with weak dispersion forces. Bad trade → no mixing. (No covalent bonds break in dissolving.)"},
+{id:"T-CH1-10",topic:"valence",type:"mc",diff:2,prompt:"On the potential-energy curve for H + H approaching, the bond length corresponds to:",choices:["the minimum of the curve — attraction and repulsion balanced","the point where PE = 0","the closest possible approach","where attraction is strongest"],answer:0,why:"Bonds form because energy is RELEASED as atoms approach (attraction between each nucleus and both electrons). Too close, nucleus–nucleus repulsion spikes. The PE minimum = most stable separation = bond length."},
+{id:"WR-CH1-101",topic:"lewis",type:"written",diff:3,prompt:"<b>Tutorial standard:</b> C₃H₉N has FOUR constitutional isomers. Describe (or draw in your notebook) all four — name the connectivity of each.<br><span class='muted'>Hint: move the N through the chain: end, middle, in-chain, fully branched.</span>",
+ model:"1) <b>CH₃CH₂CH₂–NH₂</b> (propan-1-amine: N on the end). 2) <b>(CH₃)₂CH–NH₂</b> (propan-2-amine: N on the middle carbon). 3) <b>CH₃–NH–CH₂CH₃</b> (N-methylethanamine: N inside the chain). 4) <b>(CH₃)₃N</b> (trimethylamine: N bonded to three CH₃). All are C₃H₉N; each N keeps 3 bonds + 1 lone pair.",
+ rubric:["All four connectivities found","Same formula C₃H₉N verified for each","N has 3 bonds + 1 lone pair in every isomer"]},
+{id:"WR-CH1-102",topic:"polarity",type:"written",diff:2,prompt:"<b>Tutorial standard:</b> label δ+ and δ− in each bond and justify: (a) Cl–P (b) C–Br (c) H–N.",
+ model:"(a) Cl is more electronegative than P → <b>Cl δ−, P δ+</b>. (b) <b>Br δ−, C δ+</b> — and remember: C bonded to ANY halogen counts as a polar bond even when ΔEN looks small (C–Br ΔEN ≈ 0.3). (c) N is more electronegative than H → <b>N δ−, H δ+</b> (this polarity is what enables hydrogen bonding).",
+ rubric:["δ− on the more electronegative atom in all three","C–halogen treated as polar despite small ΔEN","Reasoning references electronegativity, not memorization"]},
+{id:"WR-CH1-103",topic:"polarity",type:"written",diff:3,prompt:"<b>Tutorial standard:</b> CHCl₃ has a LARGER molecular dipole moment than CFCl₃. Use the 3-D (tetrahedral) structures and bond dipoles to explain why.",
+ model:"Both are tetrahedral. In <b>CHCl₃</b>, the three C–Cl dipoles sum to a net vector and the C–H bond adds almost no opposing dipole → large net dipole. In <b>CFCl₃</b>, the C–F bond is strongly polar in the OPPOSITE direction of the three C–Cl sum — F pulls against the chlorines, partially canceling → smaller net dipole. Molecular polarity is a VECTOR SUM: an opposing strong dipole shrinks the total.",
+ rubric:["Treats bond dipoles as vectors in 3-D","C–F opposes the C–Cl resultant in CFCl₃","Concludes partial cancellation → smaller net dipole"]},
+{id:"WR-CH1-104",topic:"hybrid",type:"written",diff:3,prompt:"<b>Tutorial standard (real molecule):</b> in tert-butyl isonitrile, (CH₃)₃C–N⁺≡C⁻ — (a) hybridization of the central C of the tert-butyl group, the N, and the terminal C; (b) which orbital holds the terminal carbon's lone pair; (c) predict the C–N–C angle.",
+ model:"(a) tert-butyl C: 4 σ bonds → <b>sp³</b>. N: 2 σ domains (C–N σ + N≡C σ), no lone pair on N⁺ → <b>sp</b>. Terminal C: 1 σ + 1 lone pair = 2 domains → <b>sp</b>. (b) A LOCALIZED lone pair lives in a HYBRID orbital matching its atom's hybridization → the terminal C's lone pair is in an <b>sp orbital</b>. (c) N is sp with no lone pairs → C–N–C = <b>180° (linear)</b>.",
+ rubric:["Hybridizations from domain counts (sp³ / sp / sp)","Lone pair placed in the atom's hybrid orbital (sp)","180° from sp nitrogen"]},
+{id:"WR-CH1-105",topic:"hybrid",type:"written",diff:3,prompt:"<b>Tutorial standard (real molecule):</b> in the isonitrile dihalide (CH₃)₃C–N=CCl₂ the N carries a lone pair — (a) hybridization of N; (b) which orbital holds N's lone pair; (c) predict the C–N=C angle.",
+ model:"(a) N has 3 domains: σ to C(CH₃)₃, σ+π to CCl₂ (the double bond counts once), and 1 lone pair → <b>sp²</b>. (b) The localized lone pair sits in an <b>sp² orbital</b> (lone pairs live in hybrid orbitals matching the atom's hybridization). (c) sp² base angle 120°, compressed slightly by the bulky lone pair → <b>a bit less than 120°</b>.",
+ rubric:["3 domains → sp² (double bond = one domain)","Lone pair in sp² hybrid orbital","<120° with lone-pair compression reasoning"]},
+
+/* ===== v3.4 CONSTITUTIONAL ISOMER SET (complements T-CH1-01 definition + WR-CH1-101 C₃H₉N) ===== */
+{id:"iso2",topic:"bondline",type:"mc",diff:1,prompt:"Both structures below are C₄H₁₀:<svg viewBox='0 0 260 90' width='240' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='12' y1='60' x2='38' y2='32'/><line x1='38' y1='32' x2='64' y2='60'/><line x1='64' y1='60' x2='90' y2='32'/><line x1='150' y1='62' x2='176' y2='34'/><line x1='176' y1='34' x2='202' y2='62'/><line x1='176' y1='34' x2='176' y2='8'/></g><g font-size='12' fill='currentColor'><text x='44' y='82'>A</text><text x='170' y='82'>B</text></g></svg>They are:",choices:["Constitutional isomers — same formula, different connectivity (butane vs isobutane)","The same molecule drawn differently","Stereoisomers","Not isomers — different formulas"],answer:0,why:"A = butane (4-carbon chain). B = isobutane/2-methylpropane (3-carbon chain + branch). Same C₄H₁₀, <b>different connectivity</b> → constitutional isomers. Different compounds, different boiling points."},
+{id:"iso8",topic:"bondline",type:"mc",diff:2,prompt:"Both structures below are C₅H₁₂:<svg viewBox='0 0 280 95' width='250' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='10' y1='60' x2='34' y2='34'/><line x1='34' y1='34' x2='58' y2='60'/><line x1='58' y1='60' x2='82' y2='34'/><line x1='82' y1='34' x2='106' y2='60'/><line x1='150' y1='30' x2='176' y2='56'/><line x1='176' y1='56' x2='202' y2='30'/><line x1='202' y1='30' x2='228' y2='56'/><line x1='228' y1='56' x2='228' y2='84'/></g><g font-size='12' fill='currentColor'><text x='52' y='84'>A</text><text x='185' y='84'>B</text></g></svg>They are:",choices:["The SAME molecule — both are an unbranched 5-carbon chain (pentane), just drawn with different kinks","Constitutional isomers","Stereoisomers","Different compounds entirely"],answer:0,why:"<b>Trap.</b> Trace the connectivity: both are C–C–C–C–C with no branches — the drawing's kinks mean nothing. Same connectivity = <b>same compound</b> (pentane). Before calling two drawings isomers, CHECK the connectivity, not the shape on paper."},
+{id:"iso3",topic:"lewis",type:"mc",diff:2,prompt:"cis- and trans-1,2-dichloroethene are:",choices:["STEREOisomers — same connectivity, different 3-D arrangement (NOT constitutional)","Constitutional isomers — the Cl's are in different places","The same compound","Not isomers — different formulas"],answer:0,why:"Every atom is bonded to the same partners in both — only the 3-D arrangement across the rigid C=C differs → <b>stereoisomers</b>. (In lecture 8/20 she said 'constitutional' then corrected herself to 'stereoisomers' — this exact distinction.) Constitutional requires DIFFERENT connectivity."},
+{id:"iso4",topic:"lewis",type:"num",diff:1,prompt:"How many constitutional isomers exist for C₄H₁₀?",answer:2,why:"<b>2</b>: butane (straight chain) and isobutane/2-methylpropane (branched). That's the whole set."},
+{id:"iso5",topic:"lewis",type:"num",diff:2,prompt:"How many constitutional isomers exist for C₅H₁₂?",answer:3,why:"<b>3</b>: pentane (straight), 2-methylbutane (one branch), and 2,2-dimethylpropane / neopentane (two methyls on the middle carbon). Systematic method: longest chain first, then shorten by one and place branches, never duplicating a connectivity."},
+{id:"iso6",topic:"lewis",type:"mc",diff:2,prompt:"Ethanol (CH₃CH₂–OH) and dimethyl ether (CH₃–O–CH₃) are both C₂H₆O. They are:",choices:["Constitutional isomers — and their boiling points differ by over 100 °C","The same compound","Stereoisomers","Resonance structures"],answer:0,why:"Same formula, different connectivity (O–H vs C–O–C) → constitutional isomers with different FUNCTIONAL GROUPS. Consequence: ethanol H-bonds (bp 78 °C); dimethyl ether can't (no O–H; bp −24 °C). Constitutional isomers can have wildly different properties — this pair is the classic exam example."},
+{id:"iso7",topic:"lewis",type:"mc",diff:1,prompt:"Which pair is NOT a pair of isomers at all?",choices:["CH₄ and C₂H₆ — different molecular formulas","Butane and isobutane","Ethanol and dimethyl ether","cis- and trans-2-butene"],answer:0,why:"Isomer = same molecular formula, full stop. CH₄ vs C₂H₆ are just different compounds. (Butane/isobutane and ethanol/DME = constitutional; cis/trans-2-butene = stereo.)"},
+{id:"WR-CH1-012",topic:"lewis",type:"written",diff:3,prompt:"<b>Classify with justification</b> — for each pair, write: constitutional isomers, stereoisomers, or same compound — plus ONE line of reasoning each.<br>(a) butane & 2-methylpropane &nbsp; (b) cis- & trans-2-butene &nbsp; (c) pentane drawn as a zigzag & pentane drawn with a U-bend",
+ model:"<b>(a) Constitutional isomers</b> — same C₄H₁₀, different connectivity (straight chain vs branched). <b>(b) Stereoisomers</b> — same connectivity everywhere; only the 3-D arrangement across the rigid C=C differs. <b>(c) Same compound</b> — connectivity identical (unbranched C₅ chain); a drawing's bends are not chemistry. Decision routine: 1) same formula? if no → not isomers. 2) same connectivity? if no → constitutional. 3) same connectivity, different 3-D → stereo.",
+ rubric:["All three classified correctly (constitutional / stereo / same)","Reasoning uses CONNECTIVITY, not drawing shape","States or implies the 3-step decision routine"]},
 ];
 /* fix f5 (answerOverride pattern demo): real answer is -1 */
 QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
@@ -897,6 +946,46 @@ VIEWS.mastery = (v) => {
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
   const t = todayStr();
+  // ---- v3.3: 📅 DEADLINES — real due dates, always visible (est. = confirm on Canvas) ----
+  const DL=[
+    {d:"2026-08-25",n:"EC Tutorial Ch 1 (WileyPLUS)",note:"extra credit — completion counts"},
+    {d:"2026-08-27",n:"Ch 1 QUIZ — in lab 2:10 PM",note:"10 Q (MC + short answer) · 25 min · 20 pts · solo, no AI",big:1},
+    {d:"2026-08-27",n:"Exp 1 melting point — same lab",note:"bring lab notebook; write-up walkthrough after"},
+    {d:"2026-08-28",n:"Drop deadline (partial refund)"},
+    {d:"2026-08-30",n:"Ch 2 WileyPLUS HW",note:"date est. — check Canvas",est:1},
+    {d:"2026-09-07",n:"Drop deadline (no record)"},
+    {d:"2026-09-15",n:"EXAM 1 — wk of Sep 14 (likely Thu 9/17)",note:"Ch 1–4 · lowest of 3 exams dropped",est:1,big:1},
+    {d:"2026-10-20",n:"EXAM 2 — wk of Oct 19",est:1,big:1},
+    {d:"2026-11-10",n:"EXAM 3 — wk of Nov 9",est:1,big:1},
+    {d:"2026-11-16",n:"Last day to withdraw (W)"},
+    {d:"2026-11-30",n:"LAB EXAM — wk of Nov 30",est:1},
+    {d:"2026-12-15",n:"FINAL — Tue 11:10–1:40 · Rm 36-319 · comprehensive · required to pass",big:1},
+  ];
+  const up=DL.filter(x=>x.d>=t);
+  if(up.length){
+    const dl=el("div",{class:"card"});
+    dl.innerHTML='<span class="tag coral">📅 Deadlines</span>'+
+      up.slice(0,5).map(x=>{const n=daysTo(x.d);return '<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b class="mono" style="min-width:52px">'+x.d.slice(5).replace("-","/")+'</b><span style="flex:1">'+(x.big?'<b>'+x.n+'</b>':x.n)+(x.est?' <span class="muted">(~est.)</span>':'')+(x.note?'<br><span class="muted" style="font-size:.78rem">'+x.note+'</span>':'')+'</span><span class="tag '+(n<=3?'coral':'gold')+'">'+(n===0?'TODAY':'in '+n+'d')+'</span></div>';}).join("")+
+      (up.length>5?'<p class="muted" style="margin:4px 0 0">…+'+(up.length-5)+' more later — full list matches the verified course schedule</p>':'');
+    v.appendChild(dl);
+  }
+  // ---- v3.3: 📊 MEASURED — your numbers, front and center ----
+  (function(){
+    let r=0,w=0; Object.values(S.qstats).forEach(s=>{r+=(s.r||0);w+=(s.w||0);});
+    const A=S.attempts||[]; if(!(r+w) && !A.length) return;
+    const wkAgo=Date.now()-7*86400000, A7=A.filter(a=>a.ts>=wkAgo);
+    const ok7=A7.filter(a=>a.ok).length;
+    const ds=A7.map(a=>a.d).filter(x=>x>0).sort((a,b)=>a-b); const med=ds.length?Math.round(ds[Math.floor(ds.length/2)]):null;
+    const per=Object.keys(TOPICS).map(k=>{let tr=0,tw=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){tr+=s.r;tw+=s.w;}}});const tot=tr+tw;return tot?{k,pct:Math.round(100*tr/tot)}:null;}).filter(Boolean);
+    const worst=per.slice().sort((a,b)=>a.pct-b.pct)[0];
+    const lastD=S.diags.slice(-2).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ");
+    const c=el("div",{class:"card cream"});
+    c.innerHTML='<span class="tag violet">📊 Measured</span>'+
+      '<p style="margin:6px 0 6px"><b>All-time '+(r+w?Math.round(100*r/(r+w)):0)+'%</b> ('+r+'✓ '+w+'✗) · <b>7-day '+(A7.length?Math.round(100*ok7/A7.length):0)+'%</b> ('+A7.length+' attempts'+(med?' · median '+med+'s':'')+')'+(lastD?' · diags '+lastD:'')+' · FC clean days '+new Set(S.fcMastery).size+'/2</p>'+
+      per.map(p=>'<div style="display:flex;align-items:center;gap:6px;margin:2px 0"><span style="min-width:150px;font-size:.75rem">'+TOPICS[p.k].ico+' '+TOPICS[p.k].name+'</span><div style="flex:1;height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden"><div style="width:'+p.pct+'%;height:8px;background:'+(p.pct>=75?'#2a9d8f':p.pct>=55?'#e9c46a':'#e76f51')+'"></div></div><b class="mono" style="min-width:38px;text-align:right;font-size:.75rem">'+p.pct+'%</b></div>').join("")+
+      (worst?'<p class="muted" style="margin:6px 0 0">Priority: <b>'+TOPICS[worst.k].name+'</b> — lowest at '+worst.pct+'%. Quiz weight: quizzes are 20% of the grade.</p>':'');
+    v.appendChild(c);
+  })();
   // v3.0: every-2-day diagnostic banner — ONE next action, checkpoint-aware
   const due = diagDue();
   if (due){
