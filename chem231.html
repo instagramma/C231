@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.4  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.4.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  v3.4.1 PAUSE/RESUME (Gabe hit "quit round" mid-diagnostic and thought he lost everything):
+  every answer already saved instantly (v3.2 event log) — now the ROUND survives too. Snapshot
+  after each answer (pausedDrill: ids+index+counters, cloud-synced, latest-ts merge), quit
+  button is now "⏸ pause — saved", Home shows a Resume card, finishing a round clears it.
   v3.4 (2026-08-24, two sessions merged): TUTORIAL-STANDARD SET (CHEM 231 chat: T-CH1-01…10 +
   WR-CH1-101…105, real molecules incl. isonitriles/CHCl₃-CFCl₃, 📅 Deadlines card w/ verified
   quiz time Thu 2:10 in lab) + CONSTITUTIONAL ISOMER SET (desktop chat: iso2…8 + WR-CH1-012 —
@@ -358,6 +362,7 @@ function mergeRemote(remote){
   (remote.attempts||[]).forEach(a=>{ if(!ak.has(a.id+"|"+a.ts)){ S.attempts.push(a); ak.add(a.id+"|"+a.ts); } });
   S.attempts.sort((a,b)=>a.ts-b.ts); if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
   if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
+  if (remote.pausedDrill && (!S.pausedDrill || (remote.pausedDrill.ts||0) > (S.pausedDrill.ts||0))) S.pausedDrill = remote.pausedDrill; // v3.4.1: latest pause wins — resume on any device
 }
 async function cloudPull(){
   try {
@@ -372,7 +377,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -799,11 +804,24 @@ const S = {
   nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","formal","polarity","hybrid","imf"]}), // v3.0: editable (Canvas gives ≥3 days notice)
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
+  pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); cloudPush(false); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); cloudPush(false); }
+/* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
+function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
+  if(idx>=D.queue.length){ S.pausedDrill=null; }
+  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", ts:Date.now()};
+  safeStore.set("pausedDrill", S.pausedDrill);
+}
+function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
+  const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
+  if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
+  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName};
+  go("drill");
+}
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -1015,6 +1033,16 @@ VIEWS.home = (v) => {
   // never issues an expired mission. Real deadlines live on Canvas; the app's job is
   // diagnostics + drills + written practice.
   if (t >= CLASS_START){
+    // v3.4.1: paused-round card — quitting/reloading never loses a round again
+    if(S.pausedDrill && S.pausedDrill.ids && S.pausedDrill.i < S.pausedDrill.ids.length){
+      const p=S.pausedDrill;
+      const rc=el("div",{class:"card cream"});
+      rc.innerHTML='<span class="tag coral">⏸ Paused round</span><h3 style="margin:6px 0">'+(p.scopeName||"Round")+' — '+p.i+'/'+p.ids.length+' answered ('+p.right+'✓ '+p.wrong+'✗)</h3><p class="muted" style="margin:0 0 8px">Nothing was lost — every answer you gave is already saved. Pick up exactly where you left off.</p>';
+      const rr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+      rr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeDrill()},"▶ Resume round"));
+      rr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedDrill=null;safeStore.set("pausedDrill",null);render();}},"discard"));
+      rc.appendChild(rr); v.appendChild(rc);
+    }
     const cp = nextCheckpoint(); const due = diagDue();
     const card = el("div",{class:"card teal"});
     card.innerHTML = '<span class="tag gold">Semester mode · week '+Math.max(courseWeek(),1)+'</span>'+
@@ -1227,6 +1255,7 @@ VIEWS.drill = (v) => {
   if (!S.drill){ go("practice"); return; }
   const D = S.drill;
   if (D.i>=D.queue.length){ // round over
+    if(S.pausedDrill){ S.pausedDrill=null; safeStore.set("pausedDrill",null); } // v3.4.1: finished = nothing to resume
     const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
     // v3.0: every-2-day diagnostics (cumulative / scoped) → record the run + honest gap map
     if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec") && D.byTopic){
@@ -1308,6 +1337,7 @@ VIEWS.drill = (v) => {
     D.answered=true;
     const guessed = !!(gk&&gk.checked) || D._wrGuessed===true;
     logAttempt(q,ok,guessed,D); // v3.2: immutable event — id, timestamp, correctness, guessed, seconds
+    snapshotDrill(D.i+1);       // v3.4.1: after this answer, the round resumes from the NEXT question
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
     if(ok){st.r++;D.right++; if(guessed){ st.gr=(st.gr||0)+1; D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
     else{st.w++;D.wrong++;S.missed.push(q.id); if(guessed) st.gw=(st.gw||0)+1;}
@@ -1368,7 +1398,7 @@ VIEWS.drill = (v) => {
   }
   c.appendChild(fb);
   v.appendChild(c);
-  v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="S.drill=null;render()">quit round</button>'));
+  v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="snapshotDrill(S.drill.i);S.drill=null;go(&quot;home&quot;)">⏸ pause round — saved, resume from Home</button>'));
 };
 
 /* ---- LEWIS LAB ---- */
