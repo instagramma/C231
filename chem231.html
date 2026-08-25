@@ -6,7 +6,29 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.13  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.15  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.15 (2026-08-25, Gabe: "is it possible to go back a question just to see what i answered
+        again? lol"): 👀 LOOK BACK inside a round. Every answer now writes a record to
+        D.log {id,idx,ok,guessed,dk,submitted answer,typed reasoning}, and a read-only replay
+        view walks it — the question, what you picked, right/wrong, the correct answer when
+        you missed, your reasoning at the time, and the explanation. Reachable mid-round
+        (button sits beside pause) and from the results screen ("Review my answers"), with
+        ← earlier / later → navigation.
+        STRICTLY READ-ONLY by design: it replays D.log and never re-renders answer inputs, so
+        a question can't be silently re-answered and the qstats / 🎲 / 🤷 flags can't be edited
+        after the fact. The log rides along in the pausedDrill snapshot, so look-back still
+        works after a pause+resume, on any device.
+  v3.14 (2026-08-25, Gabe mid-run at 2/6: "need to be able to pause here too! ensure there is
+        availability to pause!"): MASTERY CHECK NOW PAUSES. The FC mastery gate was the last
+        multi-step run with no exit — S.mastery lived only in memory, so navigating away or
+        reloading silently destroyed the run. Same contract as v3.4.1 drills: snapshotMastery()
+        after every verdict AND every advance, resumeMastery() from a Home card, cloud-synced
+        with latest-ts-wins so it resumes on any device. Two deliberate details: the `clean`
+        flag is snapshotted, so pausing can NEVER launder a miss (an already-not-clean run
+        resumes not-clean, and the Home card says so); and the paused-mastery card is separate
+        from the paused-drill card, so a drill and a mastery run can be paused simultaneously
+        without clobbering each other. Pause snapshots at the CURRENT question, so the one on
+        screen is re-served unanswered.
   v3.13 (2026-08-25, LECTURE 3 — Ciesla, Tue 8/25, Ch 2 part 1; built from Gabe's transcript +
         the Klein Ch-2 deck + the official Functional Groups table he uploaded):
         NEW TOPIC 🔑 FUNCTIONAL GROUPS (24 items) — she flagged this as the semester's
@@ -423,7 +445,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.13</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.15</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -476,6 +498,7 @@ function mergeRemote(remote){
   S.attempts.sort((a,b)=>a.ts-b.ts); if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
   if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
   if (remote.pausedDrill && (!S.pausedDrill || (remote.pausedDrill.ts||0) > (S.pausedDrill.ts||0))) S.pausedDrill = remote.pausedDrill; // v3.4.1: latest pause wins — resume on any device
+  if (remote.pausedMastery && (!S.pausedMastery || (remote.pausedMastery.ts||0) > (S.pausedMastery.ts||0))) S.pausedMastery = remote.pausedMastery; // v3.14: mastery pause syncs the same way
 }
 /* v3.5: pull the Canvas feed (written daily by the `canvas-sync` scheduled task via Chrome —
    no tokens/credentials; the task reads Gabe's signed-in Canvas pages and posts JSON here). */
@@ -504,7 +527,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -696,7 +719,7 @@ function startDiag2(type){
   const pool=[];
   scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
   const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
-  S.drill={queue:shuffle(pool).concat(wr), i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName};
+  S.drill={queue:shuffle(pool).concat(wr), i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName, log:[]};
   go("drill");
 }
 /* v3.3: Lecture Check — fixed cold deck of the Aug 20 lecture items (auto + written),
@@ -706,7 +729,7 @@ function startLectureCheck(){
   const wr=["WR-CH1-007","WR-CH1-008","WR-CH1-009","WR-CH1-010","WR-CH1-011"];
   const pool=QUESTIONS.filter(q=>ids.includes(q.id));
   const wrq=QUESTIONS.filter(q=>wr.includes(q.id));
-  S.drill={queue:shuffle(pool).concat(shuffle(wrq)), i:0, right:0, wrong:0, topic:"__lec", answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName:"Lecture check · Aug 20"};
+  S.drill={queue:shuffle(pool).concat(shuffle(wrq)), i:0, right:0, wrong:0, topic:"__lec", answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName:"Lecture check · Aug 20", log:[]};
   go("drill");
 }
 function editNextQuiz(){
@@ -1331,24 +1354,41 @@ const S = {
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
+  pausedMastery: safeStore.get("pausedMastery", null), // v3.14: same guarantee for the FC mastery gate {names,i,clean,ts} — Gabe hit 2/6 with no way out
   canvasFeed: safeStore.get("canvasFeed", null),   // v3.5: cached Canvas sync {courses:{chem231:{announcements[],deadlines[]}},fetched,_syncedAt} written daily by the canvas-sync task
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
   attView: {topic:"all",outcome:"all",limit:60,qid:null}, // v3.11: attempt-history browser filters (session-only, never persisted)
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); cloudPush(false); }
+function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); cloudPush(false); }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
-  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", ts:Date.now()};
+  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", log:D.log||[], ts:Date.now()};
   safeStore.set("pausedDrill", S.pausedDrill);
 }
 function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
   const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
-  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName};
+  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName, log:p.log||[]}; // v3.15: review history survives a pause
   go("drill");
+}
+/* v3.14: the FC mastery gate pauses too. It was the one multi-step run with no exit —
+   Gabe hit 2/6 and had no way to leave without silently losing the run. Same contract as
+   v3.4.1 drills: snapshot after every answer, resume from Home, on any device.
+   NOTE the `clean` flag is snapshotted, so pausing can never launder a miss — a run that
+   was already not-clean resumes not-clean. */
+function snapshotMastery(idx){ const M=S.mastery; if(!M||!M.queue) return;
+  if(idx>=M.queue.length){ S.pausedMastery=null; }
+  else S.pausedMastery={names:M.queue.map(s=>s.name), i:idx, clean:!!M.clean, ts:Date.now()};
+  safeStore.set("pausedMastery", S.pausedMastery);
+}
+function resumeMastery(){ const p=S.pausedMastery; if(!p) return;
+  const queue=(p.names||[]).map(n=>MASTERY_FC.find(s=>s.name===n)).filter(Boolean);
+  if(queue.length!==(p.names||[]).length || p.i>=queue.length){ S.pausedMastery=null; safeStore.set("pausedMastery",null); render(); return; }
+  S.mastery={queue, i:p.i, clean:p.clean!==false};
+  go("mastery");
 }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
@@ -1520,6 +1560,7 @@ VIEWS.mastery = (v) => {
   if (!M){ go("home"); return; }
   const mastered = new Set(S.fcMastery).size>=2;
   if (M.i>=M.queue.length){ // run over
+    if(S.pausedMastery){ S.pausedMastery=null; safeStore.set("pausedMastery",null); } // v3.14: finished = nothing to resume
     const c = el("div",{class:"card"+(M.clean?" teal":"")});
     if (M.clean){
       confetti();
@@ -1547,14 +1588,19 @@ VIEWS.mastery = (v) => {
     if ([b,l,f].some(x=>Number.isNaN(x))){ fb.innerHTML='<p class="muted">Fill all three boxes.</p>'; return; }
     const ok = b===sp.bonds && l===sp.lp && f===sp.fc;
     if (!ok) M.clean=false;
+    snapshotMastery(M.i); // v3.14: the verdict is banked before he can navigate away
     fb.innerHTML = ok
       ? '<p style="color:var(--ok);font-weight:700">✓ All three inputs right.</p>'
       : '<p style="color:var(--coral);font-weight:700">✗ Correct: '+sp.bonds+' bond(s), '+sp.lp+' LP, FC '+(sp.fc>0?"+":"")+sp.fc+'.</p><p class="muted">FC = '+VALENCE[sp.atom]+' − '+(2*sp.lp)+' (LP e⁻) − '+sp.bonds+' (bonds) = '+(sp.fc>0?"+":"")+sp.fc+'</p>';
-    btn.replaceWith(el("button",{class:"btn gold",onclick:()=>{M.i++; render();}},"Next →"));
+    btn.replaceWith(el("button",{class:"btn gold",onclick:()=>{M.i++; snapshotMastery(M.i); render();}},"Next →"));
   }},"Check all three");
   c.appendChild(btn); c.appendChild(fb);
   v.appendChild(c);
   v.appendChild(el("div",{class:"card cream"},'<p class="muted">Status: '+new Set(S.fcMastery).size+'/2 clean days'+(S.fcMastery.length?' ('+[...new Set(S.fcMastery)].join(", ")+')':'')+'. A single miss anywhere makes the run not-clean — that\'s the point.</p>'));
+  // v3.14: pause. Snapshots at the CURRENT question, so resuming re-serves it unanswered.
+  const pauseRow=el("div",{class:"center",style:"margin-top:4px"});
+  pauseRow.appendChild(el("button",{class:"btn ghost small",onclick:()=>{ snapshotMastery(M.i); S.mastery=null; go("home"); }},"⏸ pause — saved, resume from Home"));
+  v.appendChild(pauseRow);
 };
 
 /* ---- HOME ---- */
@@ -1681,6 +1727,17 @@ VIEWS.home = (v) => {
       rr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeDrill()},"▶ Resume round"));
       rr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedDrill=null;safeStore.set("pausedDrill",null);render();}},"discard"));
       rc.appendChild(rr); v.appendChild(rc);
+    }
+    // v3.14: paused MASTERY run — same guarantee, separate card (a mastery run and a drill
+    // can be paused at the same time without either clobbering the other).
+    if(S.pausedMastery && S.pausedMastery.names && S.pausedMastery.i < S.pausedMastery.names.length){
+      const pm=S.pausedMastery;
+      const mc=el("div",{class:"card cream"});
+      mc.innerHTML='<span class="tag coral">⏸ Paused mastery check</span><h3 style="margin:6px 0">⚖️ Formal-charge mastery — '+pm.i+'/'+pm.names.length+' done'+(pm.clean===false?' · <b>already not-clean</b>':' · clean so far')+'</h3><p class="muted" style="margin:0 0 8px">'+(pm.clean===false?'This run already has a miss, so it can\'t bank a clean day — finish it for the practice, or discard and start fresh.':'Still clean. Nothing was lost — pick up at species '+(pm.i+1)+'.')+'</p>';
+      const mr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+      mr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeMastery()},"▶ Resume mastery check"));
+      mr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedMastery=null;safeStore.set("pausedMastery",null);render();}},"discard"));
+      mc.appendChild(mr); v.appendChild(mc);
     }
     // v3.6: TODAY TILES (Gabe's ask — the daily tiles are back, semester-smart).
     // 📌 Cover = schedule-driven (this week's chapter; quiz-scope in final approach).
@@ -1892,7 +1949,7 @@ function startDrill(topic){
       pool = lead.concat(pool.filter(q=>!lead.includes(q)));
     }
   }
-  S.drill = {queue:pool.slice(0,SESSION_MAX), i:0, right:0, wrong:0, topic, answered:false};
+  S.drill = {queue:pool.slice(0,SESSION_MAX), i:0, right:0, wrong:0, topic, answered:false, log:[]}; // v3.15: log = per-answer record so you can look back
   go("drill");
 }
 const SESSION_MAX = 5; // v2.13: max questions per drill session (short sets, big bank, randomized)
@@ -1954,6 +2011,35 @@ VIEWS.exam = (v) => {
 VIEWS.drill = (v) => {
   if (!S.drill){ go("practice"); return; }
   const D = S.drill;
+  /* v3.15 LOOK BACK (Gabe: "is it possible to go back a question just to see what i answered
+     again?"). Strictly READ-ONLY — it replays what's already in D.log and never re-opens a
+     question for answering, so stats and the clean/guessed flags can't be edited after the
+     fact. Available mid-round and on the results screen. */
+  if (D.reviewIdx!==undefined && D.reviewIdx!==null && (D.log||[]).length){
+    const L=D.log, n=Math.max(0,Math.min(D.reviewIdx,L.length-1)), rec=L[n];
+    const q=QUESTIONS.find(x=>x.id===rec.id);
+    const exit=()=>{ D.reviewIdx=null; render(); };
+    v.appendChild(el("div",{class:"center",style:"margin-bottom:8px"},"")).appendChild(
+      el("button",{class:"btn teal",onclick:exit}, D.i>=D.queue.length ? "← back to results" : "← back to question "+(D.i+1)));
+    const c=el("div",{class:"card cream"});
+    c.innerHTML='<span class="tag violet">👀 Looking back · answer '+(n+1)+' of '+L.length+'</span>'+
+      '<p class="muted" style="margin:6px 0 0;font-size:.8rem">Read-only — you can\'t change an answer from here.</p>'+
+      '<div class="qprompt" style="margin-top:8px">'+(q?q.prompt:'<span class="muted">['+rec.id+'] not in the bank</span>')+'</div>'+
+      '<p style="margin:10px 0 4px"><b style="color:'+(rec.ok?"#2a9d8f":"#e76f51")+'">'+(rec.ok?"✓ you got this right":"✗ you got this wrong")+'</b>'+
+        (rec.dk?' <span class="tag violet">🤷 unlearned</span>':(rec.g?' <span class="tag gold">🎲 guessed</span>':''))+'</p>'+
+      (rec.ans?'<p style="margin:2px 0">You answered: <b class="mono">'+esc(rec.ans)+'</b></p>':'')+
+      (q&&q.type==="mc"&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String(q.choices[q.answer]))+'</b></p>':'')+
+      (q&&(q.type==="num"||q.type==="text")&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String(q.answer))+'</b></p>':'')+
+      (rec.note?'<div class="why" style="margin-top:8px"><b>Your reasoning at the time:</b> '+esc(rec.note)+'</div>':'')+
+      (q&&q.why?'<div class="why" style="margin-top:8px">'+q.why+'</div>':'');
+    v.appendChild(c);
+    const nav=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px"});
+    if(n>0) nav.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=n-1;render();}},"← earlier"));
+    if(n<L.length-1) nav.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=n+1;render();}},"later →"));
+    nav.appendChild(el("button",{class:"btn gold small",onclick:exit}, D.i>=D.queue.length?"back to results":"resume round"));
+    v.appendChild(nav);
+    return;
+  }
   if (D.i>=D.queue.length){ // round over
     if(S.pausedDrill){ S.pausedDrill=null; safeStore.set("pausedDrill",null); } // v3.4.1: finished = nothing to resume
     const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
@@ -1977,6 +2063,7 @@ VIEWS.drill = (v) => {
       const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
       if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>{S.drill=null;startDrill(rep.gaps[0]);}},"🔧 Repair "+nm(rep.gaps[0])+" now"));
       row.appendChild(el("button",{class:"btn gold",onclick:()=>go("report")},"📤 Send to Claude (written answers get graded)"));
+      if((D.log||[]).length) row.appendChild(el("button",{class:"btn ghost",onclick:()=>{D.reviewIdx=0; render();}},"👀 Review my answers"));
       row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go("home");}},"Done"));
       c.appendChild(row); v.appendChild(c); return;
     }
@@ -1997,6 +2084,7 @@ VIEWS.drill = (v) => {
       const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
       if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>go("learn")},"📖 Go to Learn"));
       row.appendChild(el("button",{class:"btn gold",onclick:()=>go("report")},"📤 Log this (send to Claude)"));
+      if((D.log||[]).length) row.appendChild(el("button",{class:"btn ghost",onclick:()=>{D.reviewIdx=0; render();}},"👀 Review my answers"));
       row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go(D.topic==="__eval"?"exam":"home");}},"Done"));
       // diagnostic still completes its Aug-18 plan day if passed
       if(D.topic==="__diag" && pct>=80){ const claim=TRACK.filter(x=>x.day<=todayStr()&&!S.doneDays.includes(x.day)&&x.topic==="diag").sort((a,b)=>a.day<b.day?-1:1)[0]; if(claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day))S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark diagnostic day done")); } }
@@ -2013,6 +2101,7 @@ VIEWS.drill = (v) => {
     const claim = TRACK.filter(x=>x.day<=todayStr() && !S.doneDays.includes(x.day) && x.topic===claimTopic).sort((a,b)=>a.day<b.day?-1:1)[0];
     if (pct>=80 && claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day)) S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark “"+claim.title+"” ("+fmtDay(claim.day)+") done")); }
     else if (pct>=80){ c.appendChild(el("p",{class:"muted",style:"margin:4px 0 8px"},"Good round — but it doesn't match an open mission day, so nothing auto-completes. (Honest manual ✓ lives in the Plan tab.)")); }
+    if((D.log||[]).length) row.appendChild(el("button",{class:"btn ghost",onclick:()=>{D.reviewIdx=0; render();}},"👀 Review my answers"));
     row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; render();}},"Another topic"));
     if (D.topic==="formal") row.appendChild(el("button",{class:"btn teal",onclick:()=>startMastery()},"⚖️ Mastery check (the real bar)"));
     c.appendChild(row); v.appendChild(c); return;
@@ -2048,6 +2137,8 @@ VIEWS.drill = (v) => {
     else{st.w++;D.wrong++;S.missed.push(q.id); if(guessed) st.gw=(st.gw||0)+1;}
     if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; } // v3.2: guessed-rights tallied per topic
     const rat=(rInp&&rInp.value.trim())||"";
+    // v3.15: keep a per-round record so "go back and see what I answered" is possible
+    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(wrText||rat||"").slice(0,400)});
     if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
     D._wrGuessed=false; D._wrDK=false;
     save();
@@ -2106,7 +2197,11 @@ VIEWS.drill = (v) => {
   const _rt=resTile(q.topic); if(_rt) c.appendChild(_rt); // v3.7 resources tile
   c.appendChild(fb);
   v.appendChild(c);
-  v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="snapshotDrill(S.drill.i);S.drill=null;go(&quot;home&quot;)">⏸ pause round — saved, resume from Home</button>'));
+  // v3.15: look-back sits next to pause — both are "get me out of this card safely" actions
+  const ctl=el("div",{class:"center",style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center"});
+  if((D.log||[]).length) ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=D.log.length-1; render();}},"👀 see my previous answers"));
+  ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{snapshotDrill(S.drill.i);S.drill=null;go("home");}},"⏸ pause round — saved, resume from Home"));
+  v.appendChild(ctl);
 };
 
 /* ---- LEWIS LAB ---- */
