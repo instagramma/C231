@@ -6,7 +6,56 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.6  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.11  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4 (new-bank) 08-25
+  v3.11 (2026-08-25, Gabe: "make an attempts part for this so i can see historically what/how
+        I did for each question including my checkboxes, explanation, etc"): 📜 ATTEMPT HISTORY.
+        The data already existed but was write-only — S.attempts (correctness, 🎲/🤷 flags,
+        seconds) and S.wrLog (typed rationales) were only ever read by the question selector
+        and the report export; he could never look at his own record. Now joined (on question
+        id + timestamps within 5s, since attempts store epoch ms and wrLog stores ISO) and
+        browsable: a filterable chronological feed (wrong-only · guessed · unlearned · with-my-
+        reasoning · by topic) and a per-question timeline showing the attempt trail oldest→
+        newest, so improvement on a single question is visible at a glance.
+        Also v3.11: logAttempt() now records WHAT he answered (ev.a), not just whether it was
+        right — the wrong choice he picked is usually the most diagnostic thing on the row.
+        Lives under Report (NAV_GROUP) so the nav stays at 7 tabs. Free-text reasoning is
+        escaped before it reaches innerHTML.
+  v3.10 (2026-08-25, from his 65% report): SO₂ SCAFFOLD (x3-so1…so6). His report showed the
+        same root cause twice — drew SO₂ LINEAR on WR-CH1-009, and picked "109.5, like water"
+        on l1g3. Both are the missing lone pair on S. Six items walk it: total e⁻ → S's 2
+        leftover electrons → 1 lone pair → steric number 3 → why CO₂ is linear but SO₂ bent
+        (group 4 vs group 6) → and that "bent" is a shape, not an angle (SN3 ~120 vs SN4
+        ~109.5). Same one-step-at-a-time shape as the f0→f2 formal-charge scaffold.
+        Also reworded WR-CH1-010 — he wrote "I'm not sure what you mean", and he was right,
+        the two-part instruction was buried. Now explicitly labelled Part 1 / Part 2.
+  v3.9 (2026-08-25, Gabe: "I get the same questions very often. Increase the bank. Do similar
+        questions too! more easy, more intermediate, more difficult, more very trivial"):
+        BANK 193 → 403 (+210). Difficulty scale extended to 0-3 (0 trivial · 1 easy ·
+        2 intermediate · 3 hard) and EVERY new item is explicitly tagged — previously 73%
+        of the bank had no diff at all and fell back to one flat per-topic default, so
+        "harder/easier" wasn't really a thing the app could express.
+        · PRELIMINARIES now drillable: p_atom/p_ptable/p_ions/p_bondtypes/p_formulas had
+          primers since v3.7 but ZERO questions. +56 items, mostly tier 0-1.
+        · formal charge 18 → 48 (weakest topic at 49%, and Ciesla's stated prerequisite for
+          Ch 2 resonance). New items target his two documented error modes by name: changing
+          the group number for an ion, and pair↔electron miscounts.
+        · resonance 5 → 19 and acid-base 12 → 36, ahead of Ch 2 (current) and Ch 3 (Aug 31).
+        · ANTI-REPEAT (the actual cause of the complaint): selection sorted on NEED alone, so
+          the same missed items led every single session. Now sorts on need − recencyPenalty()
+          (3 → 1.5 → 0.5 → 0 as an item ages 6h/24h/72h), and drill sets are re-picked by
+          spreadByDifficulty() to span tiers instead of clustering.
+        · Audited adversarially before shipping: 17 corrections applied, incl. one flat-wrong
+          answer (x2-ab10 labelled water the weaker acid) and a bad H–N≡C rationale.
+  v3.8 (2026-08-25, Gabe: "I need to have the electronegativities in the cheat sheet"): Cheat
+        Sheet's Electronegativity card now carries actual Wiley/Pauling numbers (F 4.0 · O 3.5 ·
+        N/Cl 3.0 · Br 2.8 · C/S/I 2.5 · P/H 2.1 · Li 1.0), not just the ranking. Restated the
+        ΔEN polarity cutoffs (<0.5 / 0.5–1.7 / >1.7) with the C–halogen-always-polar exception
+        pinned right under the table. Split Geometry/hybridization back out into its own card.
+  v3.7 (2026-08-24, Gabe's specs, merged onto v3.6): CHAPTERED LEARN — Learn is now its own
+        menu: chapters (incl. new 🌱 PRELIMINARIES with 5 pre-gen-chem primers) → topic list
+        (with live per-topic %) → full primer page; back buttons at every level. New primers for
+        Ch 2 (bondline, resonance) + Ch 3 (pKa, ARIO). 📚 RESOURCES TILE under every drill
+        question: Klein 5e section + Khan Academy + The Organic Chemistry Tutor links per topic.
   v3.6 TODAY TILES (Gabe: "tiles of what section to tackle today… a schedule of what to
   cover, and what to review because of my weaknesses/strengths"): 📌 COVER TODAY —
   schedule-driven (this week's chapter topics, unseen→lowest-clean first; flips to
@@ -438,6 +487,7 @@ const TRACK = [
   { day:"2026-08-18", topic:"diag",     title:"IMF warm-up + final diagnostic (before lecture!)" },
 ];
 const TOPICS = {
+  p_atom:{name:"Atoms & electrons",ico:"⚛️"}, p_ptable:{name:"Periodic table",ico:"🗺️"}, p_ions:{name:"Ions & charges",ico:"➕"}, p_bondtypes:{name:"Ionic vs covalent",ico:"🔗"}, p_formulas:{name:"Reading formulas",ico:"🔤"},
   valence:  { name:"Valence electrons",  ico:"🔢" },
   lewis:    { name:"Lewis structures",   ico:"🧩" },
   formal:   { name:"Formal charge",      ico:"⚡" },
@@ -480,9 +530,56 @@ function nextCheckpoint(){ // nearest future graded event: nextQuiz (if set & fu
   return fixed||null;
 }
 function daysTo(iso){ return Math.ceil((new Date(iso+"T00:00:00")-new Date())/86400000); }
-/* difficulty: explicit q.diff wins; else per-topic default (1 easy recall · 2 apply · 3 multi-step) */
-const DIFF_DEFAULT={valence:1,lewis:2,formal:2,polarity:2,hybrid:2,imf:2,resonance:3,acidbase1:2,acidbase2:3,bondline:2};
-function qDiff(q){ return q.diff || DIFF_DEFAULT[q.topic] || 2; }
+/* difficulty: explicit q.diff wins; else per-topic default.
+   v3.9: scale is now 0-3 — 0 trivial recall · 1 easy · 2 intermediate · 3 hard/multi-step.
+   Note `q.diff ?? default` (not ||) so an explicit diff:0 isn't silently treated as missing. */
+const DIFF_DEFAULT={p_atom:0,p_ptable:0,p_ions:1,p_bondtypes:1,p_formulas:1,valence:1,lewis:2,formal:2,polarity:2,hybrid:2,imf:2,resonance:3,acidbase1:2,acidbase2:3,bondline:2};
+function qDiff(q){ const d=(q.diff!==undefined&&q.diff!==null)?q.diff:DIFF_DEFAULT[q.topic]; return (d===undefined||d===null)?2:d; }
+/* v3.9 ANTI-REPEAT: how recently was this question served? Returns 0 (never/long ago) up to
+   1 (just served). Before v3.9 the selector sorted purely by NEED, so the same handful of
+   missed items topped the queue every single session — Gabe: "I get the same questions very
+   often." Need still leads; this only breaks ties among comparably-needed items so the
+   rotation actually moves through the bank. */
+function recencyPenalty(id){
+  const ev=(S.attempts||[]).filter(a=>a.id===id);
+  if(!ev.length) return 0;
+  const lastTs=Math.max(...ev.map(a=>a.ts||0));
+  const hrs=(Date.now()-lastTs)/3600000;
+  if(hrs>=72) return 0;          // 3+ days: fully back in rotation
+  if(hrs>=24) return 0.5;        // yesterday: mild damping
+  if(hrs>=6)  return 1.5;        // earlier today: noticeable damping
+  return 3;                      // within 6h: push hard to the back
+}
+/* v3.9: difficulty badge for the 0-3 scale. Tier 0 is trivial, so it gets a label rather
+   than zero dots (which would render as nothing and look like a bug). */
+function diffDots(d){
+  const t=Math.round(d);
+  if(t<=0) return '<span title="trivial recall">○ trivial</span>';
+  return "●".repeat(Math.min(3,t));
+}
+/* v3.9: pull the front `n` of an already-need-sorted pool so it SPANS difficulty tiers
+   instead of clustering (5 trivial items, or 5 brutal ones, are both bad sets). Takes a
+   generous candidate window off the front, buckets by tier, then round-robins easiest→
+   hardest, keeping need-order inside each bucket. Everything unpicked stays behind the
+   picks so the queue still has depth. */
+function spreadByDifficulty(pool, n){
+  if(pool.length<=n) return pool;
+  const window=pool.slice(0, Math.min(pool.length, n*4));
+  const rest=pool.slice(window.length);
+  const buckets={};
+  window.forEach(q=>{ const d=Math.round(qDiff(q)); (buckets[d]=buckets[d]||[]).push(q); });
+  const tiers=Object.keys(buckets).map(Number).sort((a,b)=>a-b);
+  if(tiers.length<2) return pool;
+  const picked=[];
+  let guard=0;
+  while(picked.length<n && guard++<200){
+    let moved=false;
+    for(const t of tiers){ if(buckets[t].length && picked.length<n){ picked.push(buckets[t].shift()); moved=true; } }
+    if(!moved) break;
+  }
+  const leftovers=tiers.flatMap(t=>buckets[t]);
+  return picked.concat(leftovers, rest);
+}
 /* the 2-day cadence: due when the last diagnostic of EITHER type is ≥2 days old; types alternate */
 function diagDue(){
   const cp=nextCheckpoint();
@@ -518,7 +615,7 @@ function startDiag2(type){
   // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
   const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   // v3.2: misconception (confident-wrong) ranked above guessed-wrong; difficulty is MEASURED (qDiffM), not the static constant
-  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(s&&(s.dk||0)>0&&s.r===0)n+=1; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiffM(q); return n+Math.random(); }; // v3.5: dk excluded from misconception rank — it means LEARN first, not re-drill blind
+  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(s&&(s.dk||0)>0&&s.r===0)n+=1; if(seen(q.id)===0)n+=2; if(type==="scope")n+=qDiffM(q); return n-recencyPenalty(q.id)+Math.random(); }; // v3.5: dk excluded from misconception rank — it means LEARN first, not re-drill blind. v3.9: recency penalty so diagnostics don't re-serve this morning's items.
   const pool=[];
   scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
   const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
@@ -753,10 +850,19 @@ const QUESTIONS = [
 {id:"WR-CH1-008",topic:"polarity",type:"written",diff:2,prompt:"<b>The C–Br trap:</b> ΔEN(C–Br) = 0.3, below the 0.5 cutoff — 'pure covalent' by the numbers. Is the C–Br bond polar? Explain what the ΔEN method misses.",
  model:"<b>Polar.</b> Course rule: carbon bonded to ANY halogen is always polar, regardless of ΔEN. The cutoff method oversimplifies: bond polarity is really <b>charge distribution over distance</b> — bromine is a much larger atom than carbon, so even a small EN difference produces a real dipole. (Related: C–Li at ΔEN 1.5 is drawn BOTH as ionic and polar covalent — it's a spectrum.)",
  rubric:["Answers polar despite the cutoff","States the C–halogen-always-polar rule","Mentions size / charge-over-distance as what ΔEN misses"]},
+/* ===== v3.10 SO₂ SCAFFOLD (2026-08-25, from his report: he drew SO₂ LINEAR on WR-CH1-009
+   and picked "109.5, like water" on l1g3 — same root cause, the lone pair on S is missing
+   from his model. These build it one step at a time, the same way f0→f2 scaffold FC. ===== */
+{id:"x3-so1",topic:"lewis",type:"num",diff:1,prompt:"SO₂ — total valence electrons? (S and O are both group 6)",answer:18,why:"<b>18</b> = 6 (S) + 6 + 6. Nothing to adjust — SO₂ is neutral, so no charge correction to the total."},
+{id:"x3-so2",topic:"lewis",type:"num",diff:2,prompt:"Sulfur brings 6 valence electrons to SO₂. In the O=S=O structure it uses 4 of them to make its two double bonds. How many of sulfur's own electrons are LEFT OVER?",answer:2,why:"<b>2.</b> 6 − 4 = 2. Those two leftover electrons don't disappear — they sit on sulfur as a lone pair. <b>This is the step that decides the shape of the whole molecule</b>, and it's the one that gets skipped."},
+{id:"x3-so3",topic:"hybrid",type:"num",diff:2,prompt:"Those 2 leftover electrons on sulfur in SO₂ make how many LONE PAIRS?",answer:1,why:"<b>1</b> — two electrons is one pair. So sulfur ends up with 2 bonded atoms + 1 lone pair."},
+{id:"x3-so4",topic:"hybrid",type:"num",diff:2,prompt:"SO₂: sulfur has 2 bonded atoms and 1 lone pair. What is its steric number (electron domains)?",answer:3,why:"<b>3</b> — each double bond counts as ONE domain, and the lone pair counts as one. 2 + 1 = 3 → sp² → trigonal planar electron geometry → <b>bent</b> molecular shape, angle just under 120°."},
+{id:"x3-so5",topic:"hybrid",type:"mc",diff:3,prompt:"CO₂ is linear but SO₂ is BENT. Both are O=X=O with two double bonds. What is the actual difference?",choices:["Sulfur has a lone pair (6 valence e⁻ − 4 bonding = 2 left); carbon has none (4 − 4 = 0)","Sulfur is heavier","CO₂'s bonds are stronger","SO₂ has more oxygens"],answer:0,why:"<b>Two electrons, and that's the whole story.</b> Carbon (group 4) spends all 4 of its valence electrons on the two double bonds → 2 domains → <b>linear</b>. Sulfur (group 6) spends 4 and has <b>2 left over</b> → a lone pair → 3 domains → <b>bent</b>. Same skeleton, different group number, different shape. If you ever draw SO₂ linear, this is the step you skipped."},
+{id:"x3-so6",topic:"hybrid",type:"mc",diff:3,prompt:"You've established SO₂ is bent. What is the O–S–O angle?",choices:["Just under 120°","104.5° — same as water","109.5°","180°"],answer:0,why:"<b>Just under 120°.</b> Bent is not one angle — it's a shape that several different steric numbers can produce. SO₂ is bent from <b>SN 3</b> (base 120°); water is bent from <b>SN 4</b> (base 109.5°). Both bent, ~15° apart. Reaching for water's number whenever you see 'bent' is the exact trap Ciesla called out — <b>the steric number sets the angle, not the shape word.</b>"},
 {id:"WR-CH1-009",topic:"lewis",type:"written",diff:3,prompt:"<b>SO₂ from scratch:</b> draw a Lewis structure for SO₂ (S and O are both group 6). Then give the electron geometry and the O–S–O bond angle, justified. (Two different valid structures exist — name both if you can.)",
  model:"<b>Structure 1 (minimized FC, expanded octet):</b> O=S=O with one lone pair on S — S holds 10 electrons, allowed because sulfur is period 3. <b>Structure 2:</b> O=S–O⁻ with S⁺ (octet kept, charges +1/−1). BOTH are valid and give the same answer: S has 2 bonded atoms + 1 lone pair → steric number <b>3</b> → sp², <b>trigonal planar electron geometry</b>, bent molecular shape → bond angle just <b>under 120°</b> (lone pair compression). NOT 109.5 — that's the H₂O pattern-match trap.",
  rubric:["Valid Lewis structure including the lone pair on S","Steric number 3 → trigonal planar (not tetrahedral)","Angle <120° with lone-pair justification — and not 109.5"]},
-{id:"WR-CH1-010",topic:"imf",type:"written",diff:2,prompt:"<b>Exam-wording drill:</b> molecule Y boils higher than molecule X (same formula; Y is polar, X is not). Write TWO explanations: (1) the one that LOSES points, (2) the full-credit version.",
+{id:"WR-CH1-010",topic:"imf",type:"written",diff:2,prompt:"<b>Exam-wording drill.</b> Setup: molecules X and Y have the SAME molecular formula. Y is polar, X is not. Y boils higher. An exam asks you to explain why.<br><br>Write your answer in two labelled parts:<br><b>Part 1 —</b> write the tempting answer that would LOSE marks, and say in one line why it's wrong.<br><b>Part 2 —</b> write the answer you'd actually hand in for full credit.<br><br>(The point is to practise spotting the losing phrasing so you don't write it under pressure.)",
  model:"<b>(1) Loses points:</b> 'Y's bonds are harder to break.' — wrong because phase changes never break covalent bonds. <b>(2) Full credit:</b> 'Y has a net dipole, so it has dipole–dipole forces in addition to dispersion; X's bond dipoles cancel, leaving dispersion only. Stronger INTERMOLECULAR forces require more energy to separate the molecules, so Y has the higher boiling point. The molecules themselves are unchanged.'",
  rubric:["Identifies 'breaking bonds' as the losing phrase","Full-credit version names the specific IMF difference","Links IMF strength → energy → boiling point, molecules intact"]},
 {id:"WR-CH1-011",topic:"bondline",type:"written",diff:2,prompt:"<b>Add every hydrogen:</b> for the bond-line structure below, list the number of hydrogens on EACH carbon, then give the molecular formula.<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>",
@@ -800,6 +906,256 @@ const QUESTIONS = [
 {id:"WR-CH1-012",topic:"lewis",type:"written",diff:3,prompt:"<b>Classify with justification</b> — for each pair, write: constitutional isomers, stereoisomers, or same compound — plus ONE line of reasoning each.<br>(a) butane & 2-methylpropane &nbsp; (b) cis- & trans-2-butene &nbsp; (c) pentane drawn as a zigzag & pentane drawn with a U-bend",
  model:"<b>(a) Constitutional isomers</b> — same C₄H₁₀, different connectivity (straight chain vs branched). <b>(b) Stereoisomers</b> — same connectivity everywhere; only the 3-D arrangement across the rigid C=C differs. <b>(c) Same compound</b> — connectivity identical (unbranched C₅ chain); a drawing's bends are not chemistry. Decision routine: 1) same formula? if no → not isomers. 2) same connectivity? if no → constitutional. 3) same connectivity, different 3-D → stereo.",
  rubric:["All three classified correctly (constitutional / stereo / same)","Reasoning uses CONNECTIVITY, not drawing shape","States or implies the 3-step decision routine"]},
+
+/* ================= v3.9 BANK EXPANSION (2026-08-25) =================
+   Gabe: "I get the same questions very often. Increase the bank. Do similar
+   questions too! more easy, more intermediate, more difficult, more very trivial."
+   +210 items, EVERY one explicitly difficulty-tagged on the new 0-3 scale:
+   0 = trivial recall · 1 = easy · 2 = intermediate · 3 = hard/multi-step.
+   Fills the 5 Preliminaries topics (which had ZERO questions despite having
+   primers), triples formal charge (weakest topic, 49%), and triples resonance
+   + acid-base ahead of Ch 2/Ch 3. Adversarially audited before shipping.
+   =================================================================== */
+/* ===== v3.9 EXPANSION — PRELIMINARIES (pre-gen-chem foundation, mostly diff 0-1) ===== */
+/* --- p_atom: atoms & electrons --- */
+{id:"x2-pa01",topic:"p_atom",type:"mc",diff:0,prompt:"Which particle carries a NEGATIVE charge?",choices:["Electron","Proton","Neutron","Nucleus"],answer:0,why:"<b>Electron</b> — negative, tiny, orbits outside the nucleus. Protons are positive, neutrons are neutral. Every single thing in organic chemistry is electrons moving; this is the particle you'll track all year."},
+{id:"x2-pa02",topic:"p_atom",type:"num",diff:0,prompt:"How many protons does a carbon atom have?",answer:6,why:"<b>6</b> — that's what makes it carbon. Atomic number = proton count = the element's identity. Change it and it stops being carbon."},
+{id:"x2-pa03",topic:"p_atom",type:"num",diff:0,prompt:"How many electrons does a NEUTRAL oxygen atom have?",answer:8,why:"<b>8</b>. Neutral means protons = electrons, and oxygen has 8 protons. Neutral atom → electron count = atomic number, always."},
+{id:"x2-pa04",topic:"p_atom",type:"mc",diff:0,prompt:"Where do the electrons sit?",choices:["In shells/orbitals around the nucleus","Inside the nucleus","Glued to the protons","Randomly scattered through the atom"],answer:0,why:"<b>Around</b> the nucleus, in shells. The nucleus (protons + neutrons) is a tiny dense core; the electrons occupy the huge space around it. Bonding happens out there, never in the nucleus."},
+{id:"x2-pa05",topic:"p_atom",type:"mc",diff:0,prompt:"'Valence electrons' means:",choices:["The electrons in the outermost shell","All the electrons in the atom","The electrons in the nucleus","The electrons an atom has lost"],answer:0,why:"<b>Outermost shell only.</b> Inner-shell electrons are locked away and never react. Valence electrons are the ones that bond, and they're the only ones you'll ever draw."},
+{id:"x2-pa06",topic:"p_atom",type:"num",diff:1,prompt:"Maximum number of electrons in the FIRST shell?",answer:2,why:"<b>2</b>. That's why hydrogen is 'full' at 2 electrons instead of 8 — it only has a first shell to fill. This is the whole reason H is the octet rule's exception."},
+{id:"x2-pa07",topic:"p_atom",type:"num",diff:1,prompt:"Maximum number of electrons in the SECOND shell?",answer:8,why:"<b>8</b>. This is where the octet rule comes from — C, N, O, F all fill their second shell at 8. 'Octet' literally just means 'the second shell is full'."},
+{id:"x2-pa08",topic:"p_atom",type:"mc",diff:1,prompt:"A neutral atom always has equal numbers of:",choices:["Protons and electrons","Protons and neutrons","Electrons and neutrons","All three"],answer:0,why:"<b>Protons = electrons</b> in anything neutral. + charges cancel − charges. Break that balance and you've made an ion — which is the next topic."},
+{id:"x2-pa09",topic:"p_atom",type:"num",diff:1,prompt:"A neutral atom has 15 protons. How many electrons does it have?",answer:15,why:"<b>15</b> — neutral means the counts match. (That element is phosphorus, by the way.)"},
+{id:"x2-pa10",topic:"p_atom",type:"mc",diff:1,prompt:"Why does organic chemistry care about the OUTER shell specifically?",choices:["That's where bonding and reactions happen","It holds the most electrons","It's closest to the nucleus","It contains the protons"],answer:0,why:"<b>Bonding happens in the outer shell.</b> Inner electrons are shielded and inert. Every Lewis structure, every curved arrow, every mechanism you'll draw involves only valence electrons."},
+{id:"x2-pa11",topic:"p_atom",type:"num",diff:2,prompt:"Neutral sulfur has 16 protons. How many electrons are in its OUTER shell? (shells fill 2, then 8, then the rest)",answer:6,why:"16 electrons total → 2 in shell 1, 8 in shell 2, leaving <b>6</b> in shell 3. Six valence electrons — same as oxygen, which is why S and O behave alike (both group 6)."},
+{id:"x2-pa12",topic:"p_atom",type:"mc",diff:2,prompt:"Two atoms have the same number of protons but different numbers of neutrons. They are:",choices:["Isotopes of the same element","Different elements","Ions of each other","Impossible"],answer:0,why:"<b>Isotopes</b> — same element (proton count fixed), different mass. Neutrons change mass and barely touch chemistry, so for bonding purposes you can ignore them. (One exception surfaces much later: swapping H for deuterium measurably slows certain reactions, which becomes evidence for mechanism.)"},
+
+/* --- p_ptable: reading the periodic table --- */
+{id:"x2-pt01",topic:"p_ptable",type:"num",diff:0,prompt:"How many valence electrons does an element in group 6 have? (using the 1-8 main-group numbering)",answer:6,why:"<b>6</b> — for main-group elements the group number IS the valence electron count. Group 6 → 6. This one shortcut replaces a lot of memorization."},
+{id:"x2-pt02",topic:"p_ptable",type:"num",diff:0,prompt:"How many valence electrons does nitrogen have?",answer:5,why:"<b>5</b> — nitrogen is group 5. And 5 valence electrons is exactly why N makes 3 bonds + 1 lone pair (3 bonds share 3 of them, the last 2 pair up)."},
+{id:"x2-pt03",topic:"p_ptable",type:"num",diff:1,prompt:"How many valence electrons does chlorine have?",answer:7,why:"<b>7</b> — group 7 (halogen). Needs just 1 more for an octet, which is why halogens make exactly 1 bond and carry 3 lone pairs."},
+{id:"x2-pt04",topic:"p_ptable",type:"num",diff:1,prompt:"How many valence electrons does phosphorus have?",answer:5,why:"<b>5</b> — group 5, directly under nitrogen. Same column = same valence count = similar bonding. P behaves like a bigger, softer N."},
+{id:"x2-pt05",topic:"p_ptable",type:"mc",diff:1,prompt:"The ROW (period) number tells you:",choices:["How many electron shells the atom has","How many valence electrons it has","Its charge","Its mass"],answer:0,why:"<b>Row = number of shells.</b> Column = valence electrons. Two different readings of the same table — mixing them up is a classic early mistake."},
+{id:"x2-pt06",topic:"p_ptable",type:"mc",diff:1,prompt:"Noble gases (group 8) barely react. Why?",choices:["Their outer shell is already full","They have no electrons","They're too heavy","They're always ions"],answer:0,why:"<b>Full outer shell</b> = nothing to gain by reacting. Everything else on the table is essentially trying to reach a noble-gas configuration — that's what the octet rule is chasing."},
+{id:"x2-pt07",topic:"p_ptable",type:"mc",diff:1,prompt:"Metals sit on the ___ of the periodic table and tend to ___ electrons.",choices:["left · lose","right · lose","left · gain","right · gain"],answer:0,why:"<b>Left, and they lose.</b> Metals hold their outer electrons loosely → they give them up → become cations (+). Nonmetals on the right grab electrons → anions (−)."},
+{id:"x2-pt08",topic:"p_ptable",type:"mc",diff:2,prompt:"Moving LEFT → RIGHT across a period, electronegativity:",choices:["Increases","Decreases","Stays flat","Increases then decreases"],answer:0,why:"<b>Increases.</b> More protons pulling on the same shell = tighter grip on electrons. That's why fluorine — last column before the unreactive noble gases — is the most electronegative element, while the left side is the least."},
+{id:"x2-pt09",topic:"p_ptable",type:"mc",diff:2,prompt:"Moving DOWN a group, electronegativity:",choices:["Decreases","Increases","Stays flat","Doubles each row"],answer:0,why:"<b>Decreases.</b> Each row adds a shell, so the outer electrons sit farther from the nucleus and are held more loosely. F > Cl > Br > I going down the halogens."},
+{id:"x2-pt10",topic:"p_ptable",type:"mc",diff:2,prompt:"Moving DOWN a group, atomic SIZE:",choices:["Increases — you're adding shells","Decreases","Stays the same","Depends on charge"],answer:0,why:"<b>Bigger going down.</b> More shells = bigger atom. This is why Br⁻ is more stable than F⁻ (charge spread over more volume) — the 'size' half of the ARIO Atom rule you'll meet in Chapter 3."},
+{id:"x2-pt11",topic:"p_ptable",type:"mc",diff:2,prompt:"Carbon, silicon and germanium are all in group 4. What do they share?",choices:["4 valence electrons each","The same number of shells","Identical electronegativity","The same mass"],answer:0,why:"<b>4 valence electrons.</b> Same column = same valence count = same bonding pattern (all three make 4 bonds). Column predicts chemistry; row predicts size."},
+{id:"x2-pt12",topic:"p_ptable",type:"num",diff:2,prompt:"An element in period 3, group 6. How many valence electrons? (that's sulfur)",answer:6,why:"<b>6</b> — the group number gives valence electrons regardless of the row. Period 3 only tells you it has 3 shells, not how many outer electrons."},
+
+/* --- p_ions: ions & charges --- */
+{id:"x2-pi01",topic:"p_ions",type:"mc",diff:0,prompt:"A CATION is:",choices:["A positively charged ion","A negatively charged ion","A neutral atom","A type of bond"],answer:0,why:"<b>Cation = positive</b> (lost electrons). Anion = negative (gained electrons). Memory hook: the 't' in cation looks like a + sign."},
+{id:"x2-pi02",topic:"p_ions",type:"mc",diff:0,prompt:"An ANION is:",choices:["A negatively charged ion","A positively charged ion","An uncharged atom","A metal"],answer:0,why:"<b>Anion = negative</b>, made by GAINING electrons. Extra electrons = extra negative charge. A-N-ion → A-Negative-ion."},
+{id:"x2-pi03",topic:"p_ions",type:"num",diff:1,prompt:"An atom LOSES one electron. What is its charge now? (enter like 1 or -1)",answer:1,why:"<b>+1</b>. Losing a negative leaves you net positive. Removing electrons drives charge UP; adding them drives it DOWN. Getting this direction backwards is the single most common ion mistake."},
+{id:"x2-pi04",topic:"p_ions",type:"num",diff:1,prompt:"An atom GAINS two electrons. What is its charge? (enter like 2 or -2)",answer:-2,why:"<b>−2</b>. Two extra negatives = net 2−. Oxygen does exactly this to become the oxide ion O²⁻."},
+{id:"x2-pi05",topic:"p_ions",type:"num",diff:1,prompt:"Sodium has 11 protons. Na⁺ has how many ELECTRONS?",answer:10,why:"<b>10</b>. The + means it lost one electron: 11 protons − 10 electrons = +1 net. Note the protons never changed — <b>ions are made by moving electrons, never protons</b>."},
+{id:"x2-pi06",topic:"p_ions",type:"mc",diff:1,prompt:"Why do atoms form ions at all?",choices:["To reach a full outer shell (noble-gas configuration)","To get heavier","To become metals","Randomly"],answer:0,why:"<b>Full outer shell.</b> Na has 1 lonely valence electron — dumping it leaves a full shell underneath. Cl has 7 — grabbing 1 completes the octet. Everything is chasing the noble-gas setup."},
+{id:"x2-pi07",topic:"p_ions",type:"mc",diff:1,prompt:"Group 1 metals (Na, K, Li) typically form ions with charge:",choices:["+1","−1","+2","−2"],answer:0,why:"<b>+1</b> — one valence electron to shed. The pattern splits by side: groups 1–3 LOSE electrons, so charge = group number (+1, +2, +3). Groups 5–7 GAIN, so charge = group number − 8 (−3, −2, −1). Left side goes positive, right side negative — never just read the group number straight across."},
+{id:"x2-pi08",topic:"p_ions",type:"mc",diff:1,prompt:"Group 7 halogens (F, Cl, Br, I) typically form ions with charge:",choices:["−1","+1","−7","+7"],answer:0,why:"<b>−1</b> — 7 valence electrons, need 1 more for an octet, so they gain exactly one. That's why you see Cl⁻, Br⁻, I⁻ constantly as leaving groups later on."},
+{id:"x2-pi09",topic:"p_ions",type:"num",diff:2,prompt:"An ion has 17 protons and 18 electrons. What is its charge? (enter like 1 or -1)",answer:-1,why:"<b>−1</b>: 17 positives vs 18 negatives → one extra negative. Formula: charge = protons − electrons = 17 − 18 = −1. (This is chloride, Cl⁻.)"},
+{id:"x2-pi10",topic:"p_ions",type:"num",diff:2,prompt:"Sulfur has 16 protons. How many electrons does S²⁻ have?",answer:18,why:"<b>18</b>. The 2− means it GAINED two electrons: 16 + 2 = 18. Charge = protons − electrons = 16 − 18 = −2. ✓"},
+{id:"x2-pi11",topic:"p_ions",type:"num",diff:2,prompt:"Magnesium has 12 protons. How many electrons does Mg²⁺ have?",answer:10,why:"<b>10</b>. The 2+ means it LOST two: 12 − 2 = 10. Positive charge → fewer electrons than protons. Always."},
+{id:"x2-pi12",topic:"p_ions",type:"mc",diff:2,prompt:"When you build a Lewis structure for an ion like OH⁻, the negative charge means you:",choices:["ADD one electron to your total valence-electron count","Subtract one from oxygen's group number","Add one proton","Ignore it"],answer:0,why:"<b>Add an electron to the TOTAL.</b> This is the exact distinction that trips people on formal charge: an ion's charge changes the total electron budget in step 1 — it <b>never</b> changes an atom's group number. Oxygen is group 6 in OH⁻, in H₂O, in everything."},
+
+/* --- p_bondtypes: ionic vs covalent --- */
+{id:"x2-pb01",topic:"p_bondtypes",type:"mc",diff:0,prompt:"A COVALENT bond is formed by:",choices:["Sharing electrons between two atoms","Transferring electrons from one atom to another","Magnetic attraction","Neutrons pairing up"],answer:0,why:"<b>Sharing.</b> Both atoms count the shared pair toward their own octet — that's the trick that lets everyone get to 8 without anyone actually owning 8. All of organic chemistry runs on covalent bonds."},
+{id:"x2-pb02",topic:"p_bondtypes",type:"mc",diff:0,prompt:"An IONIC bond is formed by:",choices:["Transferring electrons, then opposite charges attracting","Sharing electrons equally","Sharing electrons unequally","Overlapping nuclei"],answer:0,why:"<b>Transfer, then attraction.</b> One atom hands electrons over completely; the resulting + and − ions stick together electrostatically. Think NaCl, not CH₄."},
+{id:"x2-pb03",topic:"p_bondtypes",type:"num",diff:0,prompt:"How many electrons are in ONE single covalent bond?",answer:2,why:"<b>2</b> — one shared pair. A double bond is 4 electrons (2 pairs), a triple is 6 (3 pairs). This number does a lot of work in the formal-charge formula."},
+{id:"x2-pb04",topic:"p_bondtypes",type:"mc",diff:1,prompt:"Metal + nonmetal usually gives you a(n):",choices:["Ionic bond","Covalent bond","Hydrogen bond","No bond"],answer:0,why:"<b>Ionic.</b> Metals give electrons away, nonmetals take them — a big electronegativity gap means outright transfer. Nonmetal + nonmetal, by contrast, means sharing → covalent."},
+{id:"x2-pb05",topic:"p_bondtypes",type:"mc",diff:1,prompt:"NaCl (table salt) is held together by:",choices:["Ionic bonds","Covalent bonds","Hydrogen bonds","London dispersion only"],answer:0,why:"<b>Ionic.</b> Na (metal, EN 0.9) hands its electron to Cl (nonmetal, EN 3.0). ΔEN ≈ 2.1, well past the 1.7 ionic cutoff."},
+{id:"x2-pb06",topic:"p_bondtypes",type:"mc",diff:1,prompt:"CH₄ (methane) is held together by:",choices:["Covalent bonds","Ionic bonds","Metallic bonds","Hydrogen bonds"],answer:0,why:"<b>Covalent.</b> C (2.5) and H (2.1) are both nonmetals and close in EN — they share. Essentially every bond you draw this semester is covalent."},
+{id:"x2-pb07",topic:"p_bondtypes",type:"mc",diff:2,prompt:"Using ΔEN: a bond with a difference GREATER than 1.7 is classified as:",choices:["Ionic","Polar covalent","Pure covalent","Metallic"],answer:0,why:"<b>Ionic</b> (Wiley's cutoff). The full scale: ΔEN &lt; 0.5 pure covalent · 0.5–1.7 polar covalent · &gt; 1.7 ionic. It's a spectrum with arbitrary lines drawn on it, not three separate phenomena."},
+{id:"x2-pb08",topic:"p_bondtypes",type:"mc",diff:2,prompt:"A bond where electrons are shared but UNEQUALLY is called:",choices:["Polar covalent","Ionic","Pure covalent","Coordinate"],answer:0,why:"<b>Polar covalent</b> — still shared (so still covalent), but one atom hogs the density and gets a δ−. The middle of the spectrum, and where almost all interesting organic reactivity lives."},
+{id:"x2-pb09",topic:"p_bondtypes",type:"mc",diff:2,prompt:"Ciesla's standing exception: a carbon bonded to a HALOGEN is:",choices:["Always treated as a polar bond, whatever ΔEN says","Always pure covalent","Always ionic","Only polar if ΔEN > 1.7"],answer:0,why:"<b>Always polar.</b> C–Br has ΔEN ≈ 0.3, which the &lt;0.5 rule would call pure covalent — but it isn't, because polarity depends on charge distribution over DISTANCE and Br is a big atom. Her warning: you'll be handed EN values on an exam and start calculating. Don't. C–halogen = polar, done."},
+{id:"x2-pb10",topic:"p_bondtypes",type:"mc",diff:2,prompt:"Which type of bond does organic chemistry deal with almost exclusively?",choices:["Covalent","Ionic","Metallic","Nuclear"],answer:0,why:"<b>Covalent.</b> Carbon is right in the middle of the EN scale, so it shares rather than transfers. Ions show up (as reagents, intermediates and leaving groups) but the molecular skeleton is always covalent."},
+
+/* --- p_formulas: reading molecular formulas --- */
+{id:"x2-pf01",topic:"p_formulas",type:"num",diff:0,prompt:"How many hydrogen atoms are in CH₄?",answer:4,why:"<b>4</b> — the subscript after H. No subscript means 1 (so there's 1 carbon here)."},
+{id:"x2-pf02",topic:"p_formulas",type:"num",diff:0,prompt:"How many atoms TOTAL are in H₂O?",answer:3,why:"<b>3</b> — 2 hydrogens + 1 oxygen. 'Total atoms' means add every subscript up, don't just count the letters."},
+{id:"x2-pf03",topic:"p_formulas",type:"mc",diff:0,prompt:"In a formula, a subscript number tells you:",choices:["How many of that atom are present","The charge on that atom","How many bonds it makes","Its mass"],answer:0,why:"<b>A head count</b> of that element. C₂H₆ = 2 carbons, 6 hydrogens. Charges are written as superscripts instead (like O²⁻) — different position, different meaning."},
+{id:"x2-pf04",topic:"p_formulas",type:"num",diff:1,prompt:"How many hydrogen atoms are in C₂H₆ (ethane)?",answer:6,why:"<b>6</b>. Two carbons, each carrying 3 H's: 3 + 3 = 6. Each carbon's fourth bond is the C–C bond joining them, which holds no hydrogen."},
+{id:"x2-pf05",topic:"p_formulas",type:"num",diff:1,prompt:"How many oxygen atoms are in H₂SO₄?",answer:4,why:"<b>4</b> — the subscript on O. Reading formulas fluently matters because in a minute you'll be counting valence electrons from them."},
+{id:"x2-pf06",topic:"p_formulas",type:"num",diff:2,prompt:"Parentheses multiply everything inside. How many hydrogens are in (CH₃)₃N?",answer:9,why:"<b>9</b>. Three CH₃ groups × 3 H each = 9. The nitrogen has no H of its own here (it's using all three bonds to hold the methyls). This is trimethylamine."},
+{id:"x2-pf07",topic:"p_formulas",type:"num",diff:2,prompt:"How many CARBON atoms are in (CH₃)₂CHCH₃?",answer:4,why:"<b>4</b>: two from (CH₃)₂, one from the CH, one from the final CH₃. That's isobutane — same formula as butane (C₄H₁₀), different connectivity. Your first constitutional isomer."},
+{id:"x2-pf08",topic:"p_formulas",type:"num",diff:2,prompt:"How many atoms TOTAL are in C₂H₅OH (ethanol)?",answer:9,why:"<b>9</b>: 2 C + 6 H (five in C₂H₅, one in OH) + 1 O = 9. Written this way the formula hints at structure — the OH hanging off the end is the alcohol group."},
+{id:"x2-pf09",topic:"p_formulas",type:"num",diff:2,prompt:"How many hydrogens are in CH₃CH₂CH₂CH₃ (butane)?",answer:10,why:"<b>10</b>: 3 + 2 + 2 + 3. Condensed formulas like this are read left to right, each carbon carrying the H's written right after it."},
+{id:"x2-pf10",topic:"p_formulas",type:"num",diff:3,prompt:"How many hydrogens are in (CH₃CH₂)₂NH?",answer:11,why:"<b>11</b>: each CH₃CH₂ (ethyl) has 5 H, ×2 = 10, plus the 1 H on nitrogen = 11. Two things to track at once — the parenthesis multiplier AND the lone H outside it. This is diethylamine."},
+/* ===== v3.9 EXPANSION — CH 1 CORE, part A: valence · lewis · formal charge ===== */
+/* --- valence electrons --- */
+{id:"x2-v01",topic:"valence",type:"num",diff:0,prompt:"Valence electrons in hydrogen?",answer:1,why:"<b>1</b> — group 1, one electron, one bond. And it fills at 2, not 8, because it only has a first shell."},
+{id:"x2-v02",topic:"valence",type:"num",diff:0,prompt:"Valence electrons in fluorine?",answer:7,why:"<b>7</b> — group 7. One short of an octet → makes exactly 1 bond and carries 3 lone pairs. Every halogen behaves this way."},
+{id:"x2-v03",topic:"valence",type:"num",diff:0,prompt:"Valence electrons in nitrogen?",answer:5,why:"<b>5</b> — group 5. Three of them go into bonds, the remaining two pair up as a lone pair. Hence N's neutral pattern: 3 bonds + 1 LP."},
+{id:"x2-v04",topic:"valence",type:"num",diff:1,prompt:"Valence electrons in sulfur?",answer:6,why:"<b>6</b> — group 6, same column as oxygen. Neutral pattern mirrors O: 2 bonds + 2 lone pairs (though S can break the octet in ways O can't)."},
+{id:"x2-v05",topic:"valence",type:"num",diff:1,prompt:"Valence electrons in bromine?",answer:7,why:"<b>7</b> — group 7, just a bigger halogen than F or Cl. Column decides valence count; row only decides size."},
+{id:"x2-v06",topic:"valence",type:"num",diff:1,prompt:"TOTAL valence electrons in H₂O (add up every atom)?",answer:8,why:"<b>8</b>: O contributes 6, each H contributes 1 → 6 + 1 + 1 = 8. This total is step 1 of every Lewis structure — get it wrong and everything downstream is wrong."},
+{id:"x2-v07",topic:"valence",type:"num",diff:1,prompt:"TOTAL valence electrons in CH₄?",answer:8,why:"<b>8</b>: C gives 4, four H's give 1 each → 4 + 4 = 8. Exactly enough for four C–H single bonds (4 bonds × 2 e⁻)."},
+{id:"x2-v08",topic:"valence",type:"num",diff:2,prompt:"TOTAL valence electrons in CO₂?",answer:16,why:"<b>16</b>: C gives 4, each O gives 6 → 4 + 12 = 16. Those 16 build two C=O double bonds (8 e⁻) plus four lone pairs on the oxygens (8 e⁻)."},
+{id:"x2-v09",topic:"valence",type:"num",diff:2,prompt:"TOTAL valence electrons in NH₃?",answer:8,why:"<b>8</b>: N gives 5, three H's give 3 → 8. Three N–H bonds use 6, leaving 2 for nitrogen's lone pair."},
+{id:"x2-v10",topic:"valence",type:"num",diff:2,prompt:"TOTAL valence electrons in the HYDROXIDE ion, OH⁻?",answer:8,why:"<b>8</b>: O gives 6, H gives 1 = 7, then <b>+1 for the negative charge</b> = 8. Negative charge adds electrons to the total; positive charge subtracts them."},
+{id:"x2-v11",topic:"valence",type:"num",diff:2,prompt:"TOTAL valence electrons in the AMMONIUM ion, NH₄⁺?",answer:8,why:"<b>8</b>: N gives 5, four H's give 4 = 9, then <b>−1 for the positive charge</b> = 8. Read that again — the charge adjusts the TOTAL, not nitrogen's group number. N is still group 5 here."},
+{id:"x2-v12",topic:"valence",type:"num",diff:3,prompt:"TOTAL valence electrons in the CARBONATE ion, CO₃²⁻?",answer:24,why:"<b>24</b>: C gives 4, three O's give 18 = 22, then <b>+2 for the 2− charge</b> = 24. Two-electron adjustment for a 2− ion — the charge number is the number of electrons you add."},
+
+/* --- lewis structures --- */
+{id:"x2-l01",topic:"lewis",type:"num",diff:0,prompt:"How many bonds does a NEUTRAL carbon atom make?",answer:4,why:"<b>4</b>, always, with 0 lone pairs. Neutral carbon with anything other than 4 bonds is a drawing error — this is the single most useful sanity check you have."},
+{id:"x2-l02",topic:"lewis",type:"num",diff:0,prompt:"How many bonds does a NEUTRAL oxygen atom make?",answer:2,why:"<b>2 bonds + 2 lone pairs.</b> 6 valence electrons: 2 go into bonds, 4 sit as two pairs. Memorize the neutral patterns — C 4/0, N 3/1, O 2/2, halogen 1/3."},
+{id:"x2-l03",topic:"lewis",type:"num",diff:0,prompt:"How many LONE PAIRS does a neutral nitrogen atom carry?",answer:1,why:"<b>1</b>, alongside 3 bonds. That lone pair is nitrogen's whole personality — it's what makes amines basic and nucleophilic."},
+{id:"x2-l04",topic:"lewis",type:"num",diff:1,prompt:"How many LONE PAIRS does a neutral chlorine atom carry when bonded in a molecule?",answer:3,why:"<b>3</b>, plus its 1 bond. 7 valence electrons: 1 shared in the bond, 6 left as three pairs. Students routinely forget to draw these."},
+{id:"x2-l05",topic:"lewis",type:"mc",diff:1,prompt:"Hydrogen is NEVER the central atom in a Lewis structure because:",choices:["It can only make 1 bond, so it can't connect two things","It's too small","It has no electrons","It's always positive"],answer:0,why:"<b>1 bond only.</b> A central atom must link to at least two others; H physically can't. H is always on the outside — no exceptions."},
+{id:"x2-l06",topic:"lewis",type:"mc",diff:1,prompt:"In a Lewis structure, a line between two atoms represents:",choices:["2 shared electrons","1 electron","1 lone pair","An ionic attraction"],answer:0,why:"<b>2 electrons</b>, one shared pair. Every line = 2. This conversion is exactly where the formal-charge formula gets its 'number of bonds' term."},
+{id:"x2-l07",topic:"lewis",type:"num",diff:1,prompt:"A double bond contains how many electrons?",answer:4,why:"<b>4</b> — two shared pairs (1 σ + 1 π). Triple = 6. When counting electrons around an atom, a double bond contributes 4 to the shared total but counts as ONE domain for geometry."},
+{id:"x2-l08",topic:"lewis",type:"mc",diff:2,prompt:"You've drawn all single bonds and filled the outer atoms, but the central atom is 4 electrons short of an octet. You should:",choices:["Convert TWO neighboring lone pairs into bonds (making a triple bond, or two doubles)","Add 4 more electrons from nowhere","Move the central atom","Leave it — close enough"],answer:0,why:"<b>Short by 4 → convert 2 lone pairs.</b> The rule: (electrons short ÷ 2) = number of lone pairs to convert into bonds. Short by 2 → one double bond. Short by 4 → a triple, or two separate doubles. Sharing works because BOTH atoms count the same pair."},
+{id:"x2-l09",topic:"lewis",type:"mc",diff:2,prompt:"Why does converting a lone pair into a bond fix an electron-deficient central atom, when just rearranging lone pairs doesn't?",choices:["Shared electrons are counted by BOTH atoms toward their octets","It creates new electrons","It removes the deficiency by ignoring it","It changes the formal charge to zero"],answer:0,why:"<b>Both atoms count a shared pair.</b> A lone pair on oxygen counts only for oxygen; move it into a bond and now carbon counts it too — 2 electrons doing the work of 4. That double-counting is the entire reason multiple bonds exist."},
+{id:"x2-l10",topic:"lewis",type:"num",diff:2,prompt:"In CH₃OH (methanol), how many lone pairs are on the oxygen?",answer:2,why:"<b>2</b>. The O has 2 bonds (one to C, one to H) — that's the neutral oxygen pattern, so 2 lone pairs. Neutral O is always 2 bonds + 2 LP."},
+{id:"x2-l11",topic:"lewis",type:"num",diff:2,prompt:"In H₂C=O (formaldehyde), how many lone pairs are on the oxygen?",answer:2,why:"<b>2</b>. Still neutral oxygen, so still 2 LP — the double bond counts as O's 2 bonds' worth. Bonds and lone pairs always trade off to keep the octet at 8."},
+{id:"x2-l12",topic:"lewis",type:"mc",diff:2,prompt:"Which of these is a legal NEUTRAL structure?",choices:["N with 3 bonds and 1 lone pair","N with 4 bonds and 1 lone pair","N with 5 bonds","C with 3 bonds, no lone pair and no unpaired electron, uncharged"],answer:0,why:"<b>3 bonds + 1 LP</b> = neutral nitrogen (5 valence e⁻ accounted for). The others all fail: 4 bonds + 1 LP is <b>10 electrons</b>, over the octet — impossible for a second-row atom (real N⁺ is 4 bonds and <b>zero</b> lone pairs). 5 bonds is likewise over the octet. And carbon with only 3 bonds and 6 electrons has to be a carbocation, which carries a +1 — not neutral."},
+{id:"x2-l13",topic:"lewis",type:"mc",diff:3,prompt:"For the formula HCN, why is H–C≡N preferred over H–N≡C?",choices:["H–N≡C forces formal charges (N is +1, C is −1); H–C≡N leaves every atom neutral","H–N≡C breaks the octet rule","Nitrogen can't form a triple bond","They are equally acceptable"],answer:0,why:"Both satisfy octets — that's exactly why this is a good test. In H–N≡C, N has 4 bonds and 0 LP → FC = 5−0−4 = <b>+1</b>, and C has 3 bonds and 1 LP → FC = 4−2−3 = <b>−1</b>. In H–C≡N, carbon has 1+3 = 4 bonds (FC 0) and nitrogen has 3 bonds + 1 LP (FC 0) — <b>all neutral</b>, so it's the better structure. (H–N≡C is a real molecule, hydrogen isocyanide — just a higher-energy isomer.) Fewer formal charges wins."},
+{id:"x2-l14",topic:"lewis",type:"mc",diff:3,prompt:"Charge-separated CO₂ (drawn as ⁻O–C≡O⁺) satisfies every octet. Why is O=C=O still the accepted structure?",choices:["It achieves the same octets with every atom neutral","The charged one breaks the octet rule","Carbon can't make double bonds","They're equally correct"],answer:0,why:"<b>Minimize charge separation.</b> Both satisfy octets, but O=C=O gets there with no formal charges at all. When two structures both fill octets, the one with fewer charges is the better representation. Note this is a tie-breaker, not an absolute — some species (ozone, nitrate) have no charge-free option and must carry formal charges. You'll use this ranking constantly in resonance."},
+{id:"x2-l15",topic:"lewis",type:"num",diff:3,prompt:"In the nitrate ion NO₃⁻ (24 total valence electrons, N central with one N=O and two N–O⁻), how many bonds does the nitrogen have?",answer:4,why:"<b>4</b> — one double bond (counts as 2) plus two single bonds = 4 bonds total. That's why the nitrogen carries a <b>+1</b> formal charge: N with 4 bonds is always +1."},
+
+/* --- FORMAL CHARGE — heaviest expansion (weakest topic, gates Ch 2 resonance) --- */
+{id:"x2-f01",topic:"formal",type:"num",diff:0,prompt:"WARM-UP: how many ELECTRONS are in one lone pair?",answer:2,why:"<b>2.</b> A lone pair is a PAIR — two electrons, drawn as two dots. Two lone pairs = 4 electrons, three lone pairs = 6. The formal-charge formula wants ELECTRONS in that slot, so get this conversion right in both directions: don't enter 3 when you mean 3 pairs (that's 6), and don't enter 6 when there's only one pair (that's 2)."},
+{id:"x2-f02",topic:"formal",type:"num",diff:0,prompt:"WARM-UP: how many electrons are in THREE lone pairs?",answer:6,why:"<b>6</b> — three pairs × 2 electrons. Count pairs first, then double. Never eyeball it."},
+{id:"x2-f03",topic:"formal",type:"num",diff:0,prompt:"WARM-UP: in the formula FC = group# − (lone-pair e⁻) − (number of bonds), what number do you use for OXYGEN's group number?",answer:6,why:"<b>6</b>, every single time. Oxygen is group 6 in H₂O, in OH⁻, in H₃O⁺, in ozone — in everything. <b>An ion's charge NEVER changes an atom's group number.</b> It only changes the total electron budget when you're building the structure."},
+{id:"x2-f04",topic:"formal",type:"num",diff:0,prompt:"WARM-UP: what group number do you use for NITROGEN in the formal-charge formula, when the molecule is the ammonium ion NH₄⁺?",answer:5,why:"<b>5.</b> Still 5. The + charge on the ion does not demote nitrogen to group 4. This is the exact trap that has cost you points before: <b>group number is a property of the ELEMENT, not the molecule.</b>"},
+{id:"x2-f05",topic:"formal",type:"num",diff:1,prompt:"An oxygen atom has 2 bonds and 2 lone pairs. Formal charge? (enter like 0, 1, or -1)",answer:0,why:"FC = 6 − 4 − 2 = <b>0</b>. Group 6, two lone pairs = 4 electrons, 2 bonds. This is neutral oxygen's standard pattern — water, alcohols, ethers all look like this."},
+{id:"x2-f06",topic:"formal",type:"num",diff:1,prompt:"An oxygen atom has 1 bond and 3 lone pairs. Formal charge?",answer:-1,why:"FC = 6 − 6 − 1 = <b>−1</b>. Fewer bonds than the neutral pattern (2) → negative. This is the oxygen in hydroxide, OH⁻, and in every alkoxide you'll meet."},
+{id:"x2-f07",topic:"formal",type:"num",diff:1,prompt:"An oxygen atom has 3 bonds and 1 lone pair. Formal charge?",answer:1,why:"FC = 6 − 2 − 3 = <b>+1</b>. MORE bonds than neutral (2) → positive. That's the oxygen in hydronium H₃O⁺ — and note the lone-pair count dropped to 1 to make room for the extra bond."},
+{id:"x2-f08",topic:"formal",type:"num",diff:1,prompt:"A nitrogen atom has 4 bonds and 0 lone pairs. Formal charge?",answer:1,why:"FC = 5 − 0 − 4 = <b>+1</b>. Nitrogen's neutral pattern is 3 bonds; a fourth bond costs it the lone pair and makes it +1. Ammonium NH₄⁺, and every protonated amine."},
+{id:"x2-f09",topic:"formal",type:"num",diff:1,prompt:"A nitrogen atom has 2 bonds and 2 lone pairs. Formal charge?",answer:-1,why:"FC = 5 − 4 − 2 = <b>−1</b>. Fewer bonds than the neutral 3 → negative. This is an amide anion, and it's a very strong base."},
+{id:"x2-f10",topic:"formal",type:"num",diff:1,prompt:"A carbon atom has 3 bonds and 1 lone pair. Formal charge?",answer:-1,why:"FC = 4 − 2 − 3 = <b>−1</b>. A carbanion. <b>Careful here:</b> carbon with 3 bonds can be + OR −, and only the lone pair tells you which. Never guess carbon's sign from bond count alone."},
+{id:"x2-f11",topic:"formal",type:"num",diff:1,prompt:"A carbon atom has 3 bonds and 0 lone pairs. Formal charge?",answer:1,why:"FC = 4 − 0 − 3 = <b>+1</b>. A carbocation — same 3 bonds as the carbanion, opposite charge. <b>The lone pair is the whole difference.</b> This pair of questions is the reason 'more bonds = +' fails on carbon."},
+{id:"x2-f12",topic:"formal",type:"num",diff:2,prompt:"In H₃O⁺, what is the formal charge on the OXYGEN atom specifically?",answer:1,why:"O has 3 bonds and 1 lone pair: FC = 6 − 2 − 3 = <b>+1</b>. Group number stays 6 despite the ion's + charge. Notice the whole ion's charge (+1) sits on this one atom — the hydrogens are each 0."},
+{id:"x2-f13",topic:"formal",type:"num",diff:2,prompt:"In OH⁻, what is the formal charge on the OXYGEN atom specifically?",answer:-1,why:"O has 1 bond and 3 lone pairs: FC = 6 − 6 − 1 = <b>−1</b>. Watch the middle term — 3 lone pairs is <b>6 electrons</b>, not 3. Using 3 there gives you +2, which is the classic wrong answer."},
+{id:"x2-f14",topic:"formal",type:"num",diff:2,prompt:"In NH₄⁺, what is the formal charge on the NITROGEN atom specifically?",answer:1,why:"N has 4 bonds, 0 lone pairs: FC = 5 − 0 − 4 = <b>+1</b>. Group number is <b>5</b> — not 4. The ion being positive does not change nitrogen's group."},
+{id:"x2-f15",topic:"formal",type:"num",diff:2,prompt:"In NH₄⁺, what is the formal charge on each HYDROGEN atom?",answer:0,why:"Each H: FC = 1 − 0 − 1 = <b>0</b>. The hydrogens are neutral; all of the ion's charge lives on nitrogen. Formal charge is assigned <b>per atom</b>, and most atoms in a charged species are still 0."},
+{id:"x2-f16",topic:"formal",type:"num",diff:2,prompt:"In NH₄⁺, what do all the formal charges ADD UP to?",answer:1,why:"<b>+1</b> — N is +1, each H is 0, total +1. <b>The sum of formal charges always equals the overall charge on the species.</b> For a neutral molecule that sum is 0. This is your free check on every structure you draw."},
+{id:"x2-f17",topic:"formal",type:"num",diff:2,prompt:"In a NEUTRAL molecule like CH₃OH, what must all the formal charges add up to?",answer:0,why:"<b>0.</b> Neutral overall → charges sum to zero. If you compute the individual atoms and get anything else, you've made an arithmetic error or drawn the structure wrong."},
+{id:"x2-f18",topic:"formal",type:"mc",diff:2,prompt:"Formal charge is a property of:",choices:["A single ATOM within a structure","The whole molecule","The bond between two atoms","The lone pairs only"],answer:0,why:"<b>One atom at a time.</b> 'The formal charge of NH₄⁺' isn't quite a real question — the ion has an overall CHARGE of +1, and the nitrogen ATOM has a formal charge of +1. Compute per atom, then sum to check against the overall charge."},
+{id:"x2-f19",topic:"formal",type:"num",diff:2,prompt:"Ozone O₃ is bent, with the CENTRAL oxygen having 3 bonds and 1 lone pair. Formal charge on that central O?",answer:1,why:"FC = 6 − 2 − 3 = <b>+1</b>. One lone pair is <b>2 electrons</b>. If you plugged in 6 there you'd get −3, which is impossible for oxygen — a nonsense answer is itself a signal you miscounted the lone pairs."},
+{id:"x2-f20",topic:"formal",type:"num",diff:3,prompt:"Ozone O₃: the SINGLE-bonded terminal oxygen has 1 bond and 3 lone pairs. Its formal charge?",answer:-1,why:"FC = 6 − 6 − 1 = <b>−1</b>. Ozone's three oxygens are +1 (center), −1 (single-bonded end), 0 (double-bonded end) — summing to 0 ✓ for a neutral molecule. A neutral molecule can absolutely contain charged atoms as long as they cancel."},
+{id:"x2-f21",topic:"formal",type:"num",diff:3,prompt:"Ozone O₃: the DOUBLE-bonded terminal oxygen has 2 bonds and 2 lone pairs. Its formal charge?",answer:0,why:"FC = 6 − 4 − 2 = <b>0</b>. Neutral oxygen pattern. Together with the +1 center and −1 end, ozone sums to zero overall ✓."},
+{id:"x2-f22",topic:"formal",type:"num",diff:3,prompt:"In the nitrate ion NO₃⁻, the nitrogen has 4 bonds (one double, two single) and 0 lone pairs. Formal charge on N?",answer:1,why:"FC = 5 − 0 − 4 = <b>+1</b>. Group 5 even though the ion is negative — the ion's charge never touches the group number. (The two single-bonded oxygens are each −1, so the total is +1 −1 −1 = −1 ✓.)"},
+{id:"x2-f23",topic:"formal",type:"num",diff:3,prompt:"In the nitrate ion NO₃⁻, each SINGLE-bonded oxygen has 1 bond and 3 lone pairs. Formal charge on one of them?",answer:-1,why:"FC = 6 − 6 − 1 = <b>−1</b>. Two of these at −1, plus N at +1, plus the double-bonded O at 0 → sums to −1 ✓, matching the ion's charge."},
+{id:"x2-f24",topic:"formal",type:"mc",diff:3,prompt:"You compute a formal charge of −3 on an oxygen atom. What's the right response?",choices:["Recount — you almost certainly miscounted lone pairs or bonds","Accept it, oxygen can be −3","Change oxygen's group number","Add three protons"],answer:0,why:"<b>Recount.</b> Oxygen realistically runs −1, 0, or +1. An answer outside that range means an input error — usually lone pairs counted as pairs instead of electrons. <b>Use the plausible range as a built-in error detector.</b>"},
+{id:"x2-f25",topic:"formal",type:"mc",diff:3,prompt:"Which single input error most often flips a formal charge to the wrong sign?",choices:["Using the number of lone PAIRS instead of the number of lone-pair ELECTRONS","Forgetting the molecule is a liquid","Using the wrong temperature","Counting protons"],answer:0,why:"<b>Pairs vs electrons.</b> The formula wants ELECTRONS: 3 lone pairs = 6, not 3. Writing 3 there turns a −1 into a +2. Say 'pairs times two' out loud every time before you plug in."},
+{id:"x2-f26",topic:"formal",type:"num",diff:2,prompt:"A carbon atom has 4 bonds and 0 lone pairs. Formal charge?",answer:0,why:"FC = 4 − 0 − 4 = <b>0</b>. Standard neutral carbon — the overwhelming majority of carbons you'll ever draw. If a carbon in your structure isn't 4 bonds / 0 LP, it had better have a charge on it."},
+{id:"x2-f27",topic:"formal",type:"num",diff:2,prompt:"A boron atom (group 3) has 3 bonds and 0 lone pairs. Formal charge?",answer:0,why:"FC = 3 − 0 − 3 = <b>0</b>. Neutral boron is happy with only 6 electrons — an octet EXCEPTION. That empty orbital is why BF₃ is such a strong Lewis acid."},
+{id:"x2-f28",topic:"formal",type:"num",diff:3,prompt:"A boron atom has 4 bonds and 0 lone pairs (as in BF₄⁻). Formal charge?",answer:-1,why:"FC = 3 − 0 − 4 = <b>−1</b>. Group 3 with 4 bonds → negative. Boron runs the opposite direction from nitrogen because its group number is lower — which is exactly why you compute rather than memorize 'more bonds = +'."},
+{id:"x2-f29",topic:"formal",type:"num",diff:3,prompt:"In the cyanide ion, ⁻C≡N, the carbon has a triple bond and 1 lone pair. Formal charge on carbon?",answer:-1,why:"A triple bond is <b>3 bonds</b>, and 1 lone pair is 2 electrons: FC = 4 − 2 − 3 = <b>−1</b>. Counting the triple bond as 1 instead of 3 is a frequent slip — 'number of bonds' means the count of lines' worth of connections, not the number of neighbors."},
+{id:"x2-f30",topic:"formal",type:"num",diff:3,prompt:"In the cyanide ion ⁻C≡N, what is the formal charge on the NITROGEN?",answer:0,why:"N has a triple bond (3) and 1 lone pair (2 e⁻): FC = 5 − 2 − 3 = <b>0</b>. So cyanide's −1 sits entirely on carbon — which is precisely why cyanide attacks through carbon as a nucleophile."},
+/* ===== v3.9 EXPANSION — CH 1 CORE, part B: polarity · hybridization · IMF ===== */
+/* --- polarity & dipoles --- */
+{id:"x2-p01",topic:"polarity",type:"mc",diff:0,prompt:"Electronegativity means:",choices:["How strongly an atom pulls shared electrons toward itself","How many electrons an atom has","How big an atom is","How many bonds an atom makes"],answer:0,why:"<b>Pulling power</b> in a bond. High EN = greedy for the shared pair = ends up δ−. It's a tug-of-war rating, not an electron count."},
+{id:"x2-p02",topic:"polarity",type:"mc",diff:0,prompt:"In any polar bond, the δ− (partial negative) goes on:",choices:["The MORE electronegative atom","The LESS electronegative atom","The bigger atom","The one with more lone pairs"],answer:0,why:"<b>More electronegative gets δ−.</b> It wins the tug-of-war, so electron density piles up there. The other atom gets δ+ by default. One rule, every polar bond."},
+{id:"x2-p03",topic:"polarity",type:"mc",diff:0,prompt:"A bond between two IDENTICAL atoms (like the Cl–Cl in Cl₂) is:",choices:["Nonpolar — equal pull, no dipole","Polar — chlorine is electronegative","Ionic","Impossible"],answer:0,why:"<b>Nonpolar.</b> Identical atoms pull identically, so the pair sits dead center. Polarity requires a DIFFERENCE — an atom's own electronegativity is irrelevant if it's bonded to its twin."},
+{id:"x2-p04",topic:"polarity",type:"mc",diff:1,prompt:"In an N–H bond, which atom is δ−?",choices:["Nitrogen","Hydrogen","Neither","Both"],answer:0,why:"<b>Nitrogen</b> (EN 3.0) beats hydrogen (2.1), so N is δ− and H is δ+. That δ+ hydrogen is exactly what lets amines hydrogen-bond."},
+{id:"x2-p05",topic:"polarity",type:"mc",diff:1,prompt:"In a C–Li bond, which atom is δ−?",choices:["Carbon","Lithium","Neither","Both"],answer:0,why:"<b>Carbon</b> — this is the rare case where carbon is the more electronegative partner (C 2.5 vs Li 1.0). That δ− carbon makes organolithiums extremely strong nucleophiles and bases."},
+{id:"x2-p06",topic:"polarity",type:"num",diff:1,prompt:"Using Wiley's values (Cl 3.0, C 2.5), what is ΔEN for a C–Cl bond? (one decimal)",answer:0.5,tolerance:0.05,why:"<b>0.5</b> — sitting right on the pure/polar-covalent boundary. Classify it as polar: partly because 0.5 is where polar covalent begins, and partly because of Ciesla's standing C–halogen rule, which settles every borderline case of this kind in the same direction."},
+{id:"x2-p07",topic:"polarity",type:"num",diff:1,prompt:"Using Wiley's values (O 3.5, H 2.1), what is ΔEN for an O–H bond? (one decimal)",answer:1.4,tolerance:0.05,why:"<b>1.4</b> — between 0.5 and 1.7, so <b>polar covalent</b>. Strongly polar but still sharing, which is why water is a polar molecule rather than a salt."},
+{id:"x2-p08",topic:"polarity",type:"mc",diff:2,prompt:"Which bond is the MOST polar?",choices:["H–F","H–Cl","H–Br","H–I"],answer:0,why:"<b>H–F</b>. Going down the halogens EN drops (F 4.0 → I 2.5), so ΔEN with hydrogen shrinks: HF 1.9 > HCl 0.9 > HBr 0.7 > HI 0.4. Biggest gap = most polar bond. (HF's 1.9 technically clears the 1.7 'ionic' line — but HF is a genuine polar covalent molecule, not a salt. Those cutoffs are guidelines on a spectrum, not hard walls.)"},
+{id:"x2-p09",topic:"polarity",type:"mc",diff:2,prompt:"A molecule has polar bonds. Is the MOLECULE necessarily polar?",choices:["No — geometry can cancel the bond dipoles","Yes, always","Only if it has oxygen","Only if it's bent"],answer:0,why:"<b>No.</b> Bond polarity and molecular polarity are two different questions. CO₂ and CCl₄ both have very polar bonds and zero net dipole, because symmetry cancels the vectors. Geometry decides the second question."},
+{id:"x2-p10",topic:"polarity",type:"mc",diff:2,prompt:"Water is bent rather than linear. What does that do to its polarity?",choices:["Makes it polar — the two O–H dipoles add instead of cancelling","Makes it nonpolar","Nothing","Makes the bonds nonpolar"],answer:0,why:"<b>Bent → polar.</b> Both O–H dipoles point toward oxygen and, at 104.5°, partially reinforce rather than oppose. Straighten water out to 180° and it would be nonpolar — geometry is doing all the work."},
+{id:"x2-p11",topic:"polarity",type:"mc",diff:2,prompt:"NH₃ (trigonal pyramidal, one lone pair on N) is:",choices:["Polar — the lone pair breaks the symmetry","Nonpolar — three identical N–H bonds cancel","Ionic","Nonpolar because N is central"],answer:0,why:"<b>Polar.</b> Three N–H dipoles pointing 'up' toward N plus a lone pair on top — nothing balances it. Compare BF₃: also three bonds, but trigonal PLANAR with no lone pair, so it cancels and is nonpolar."},
+{id:"x2-p12",topic:"polarity",type:"mc",diff:2,prompt:"CH₄ (tetrahedral, four identical C–H bonds) is:",choices:["Nonpolar — symmetric, and C–H is barely polar anyway","Polar","Ionic","Polar because carbon is central"],answer:0,why:"<b>Nonpolar</b> twice over: C–H has a tiny ΔEN (0.4), and perfect tetrahedral symmetry cancels whatever little dipole exists. This is why hydrocarbons don't dissolve in water."},
+{id:"x2-p13",topic:"polarity",type:"mc",diff:3,prompt:"CCl₄ is nonpolar but CHCl₃ (chloroform) is polar. Why?",choices:["Swapping one Cl for H breaks the symmetry, so the dipoles no longer cancel","CHCl₃ has more chlorines","H is more electronegative than Cl","CCl₄ has no polar bonds"],answer:0,why:"<b>Symmetry broken.</b> Four identical C–Cl dipoles at tetrahedral angles sum to exactly zero. Replace one with a much weaker C–H and the vectors no longer cancel — a net dipole survives, pointing away from the H."},
+{id:"x2-p14",topic:"polarity",type:"mc",diff:3,prompt:"CFCl₃ is polar even though it's tetrahedral with four halogen-ish substituents. Why?",choices:["F and Cl have different electronegativities, so their dipoles differ in size and can't cancel","It isn't tetrahedral","Fluorine is nonpolar","Three Cl always cancel"],answer:0,why:"<b>Cancellation requires IDENTICAL substituents.</b> C–F (ΔEN 1.5) pulls harder than C–Cl (0.5), so the vectors are unequal and leave a net dipole. Symmetric SHAPE isn't enough — you need symmetric ATOMS too."},
+{id:"x2-p15",topic:"polarity",type:"mc",diff:3,prompt:"CO₂ is linear and nonpolar; SO₂ is bent and polar. Both are O=X=O. What's the difference?",choices:["SO₂'s sulfur has a lone pair, which bends it so the dipoles don't cancel","SO₂ has more oxygens","Sulfur isn't electronegative","CO₂'s bonds aren't polar"],answer:0,why:"<b>A lone pair on sulfur.</b> S has 3 electron domains (2 bonds + 1 LP) → bent, so the two S=O dipoles partially add. Carbon in CO₂ has only 2 domains → linear → exact cancellation. One lone pair is the entire difference in polarity."},
+{id:"x2-p16",topic:"polarity",type:"mc",diff:3,prompt:"Ciesla's stated rule: a carbon bonded to a halogen counts as a POLAR bond regardless of ΔEN. Applying HER rule, how do you classify C–Br (ΔEN 0.3)?",choices:["Polar — the C–halogen rule overrides the ΔEN cutoff","Pure covalent — 0.3 is below 0.5","Ionic","Not enough information"],answer:0,why:"<b>Polar.</b> This is her exact worked example. ΔEN 0.3 sits below the 0.5 cutoff, so the arithmetic alone says 'pure covalent' — and that's the trap. Her reasoning: ΔEN is a simplification, and a real bond dipole also depends on how the charge is spread over distance, which means atom size matters. Bromine is much larger than carbon. <b>Her instruction: when you see C–halogen on an exam, answer polar and don't start calculating.</b>"},
+
+/* --- hybridization & VSEPR --- */
+{id:"x2-h01",topic:"hybrid",type:"num",diff:0,prompt:"How many electron domains does an sp³ atom have?",answer:4,why:"<b>4</b>. Domain count IS the hybridization: 4 → sp³, 3 → sp², 2 → sp. Count domains first, everything else follows."},
+{id:"x2-h02",topic:"hybrid",type:"mc",diff:0,prompt:"When counting electron DOMAINS, a double bond counts as:",choices:["ONE domain","Two domains","Four domains","Half a domain"],answer:0,why:"<b>One.</b> A domain is a direction that electron density points, and both halves of a double bond point the same way. Counting a double bond as 2 domains is the fastest way to get every hybridization wrong."},
+{id:"x2-h03",topic:"hybrid",type:"mc",diff:0,prompt:"A LONE PAIR counts as:",choices:["One electron domain","Zero — only bonds count","Two domains","Half a domain"],answer:0,why:"<b>One domain.</b> Lone pairs take up space and push bonds around, so they count for hybridization and geometry. Forgetting them is why students call water sp² instead of sp³."},
+{id:"x2-h04",topic:"hybrid",type:"text",diff:1,prompt:"Hybridization of the oxygen in H₂O? (type like: sp3)",answer:"sp3",accept:["sp3","sp³"],why:"<b>sp³</b> — 2 bonds + 2 lone pairs = 4 domains. Electron geometry tetrahedral, but the SHAPE is bent because you only name the atom positions. Angle ~104.5°, squeezed below 109.5° by the lone pairs."},
+{id:"x2-h05",topic:"hybrid",type:"text",diff:1,prompt:"Hybridization of the nitrogen in NH₃?",answer:"sp3",accept:["sp3","sp³"],why:"<b>sp³</b> — 3 bonds + 1 lone pair = 4 domains. Shape is trigonal pyramidal, angle ~107° (one lone pair pushing down from 109.5°)."},
+{id:"x2-h06",topic:"hybrid",type:"text",diff:1,prompt:"Hybridization of each carbon in H₂C=CH₂ (ethene)?",answer:"sp2",accept:["sp2","sp²"],why:"<b>sp²</b> — each carbon has 2 H's plus the double bond = 3 domains. Trigonal planar, 120°, and the whole molecule is flat."},
+{id:"x2-h07",topic:"hybrid",type:"num",diff:1,prompt:"What bond angle goes with sp² hybridization (no lone pairs)?",answer:120,why:"<b>120°</b> — trigonal planar. sp³ → 109.5°, sp² → 120°, sp → 180°. Three numbers worth having cold."},
+{id:"x2-h08",topic:"hybrid",type:"num",diff:1,prompt:"What bond angle goes with sp hybridization?",answer:180,why:"<b>180°</b> — linear. Two domains push as far apart as possible, which is a straight line. Alkynes and nitriles are locally straight because of this."},
+{id:"x2-h09",topic:"hybrid",type:"mc",diff:2,prompt:"A double bond consists of:",choices:["1 sigma (σ) + 1 pi (π) bond","2 sigma bonds","2 pi bonds","1 sigma only"],answer:0,why:"<b>1 σ + 1 π.</b> The σ is the head-on overlap; the π is the sideways p-orbital overlap above and below. A triple bond is 1 σ + 2 π. Rotation is locked because rotating would break the π overlap."},
+{id:"x2-h10",topic:"hybrid",type:"num",diff:2,prompt:"How many σ (sigma) bonds are in a TRIPLE bond?",answer:1,why:"<b>1</b> σ plus 2 π. Every bond between two atoms — single, double or triple — contains exactly one sigma. The extras are always pi."},
+{id:"x2-h11",topic:"hybrid",type:"mc",diff:2,prompt:"Why can't you rotate around a C=C double bond?",choices:["Rotating would break the sideways π overlap","The atoms are too heavy","The sigma bond is too strong","You can rotate it freely"],answer:0,why:"<b>π overlap would break.</b> The p orbitals must stay parallel to overlap; twisting destroys that. This locked rotation is what makes cis/trans isomers possible — single bonds spin freely, double bonds don't."},
+{id:"x2-h12",topic:"hybrid",type:"text",diff:2,prompt:"Hybridization of the carbon in CH₃⁺ (a carbocation, 3 bonds, no lone pair)?",answer:"sp2",accept:["sp2","sp²"],why:"<b>sp²</b> — only 3 domains (no lone pair to add a fourth). Trigonal planar with an EMPTY p orbital sticking up perpendicular. That empty p orbital is where nucleophiles attack."},
+{id:"x2-h13",topic:"hybrid",type:"mc",diff:2,prompt:"SO₂ has a bent shape. What's the bond angle?",choices:["Slightly less than 120°","Exactly 120°","109.5°","180°"],answer:0,why:"<b>Just under 120°.</b> Sulfur has 3 domains (2 bonds + 1 LP) → sp², base angle 120° — then the lone pair squeezes it slightly. Ciesla's warning: students reflexively answer 109.5° here by pattern-matching to water. Get the geometry first, THEN the angle."},
+{id:"x2-h14",topic:"hybrid",type:"mc",diff:3,prompt:"Which has the SMALLER bond angle: H₂O or NH₃?",choices:["H₂O (~104.5°) — two lone pairs squeeze harder than one","NH₃ (~107°)","They're identical","Neither has lone pairs"],answer:0,why:"<b>Water.</b> Both are sp³ (base 109.5°), but lone pairs are fatter than bonds and compress the remaining angles. Two lone pairs (H₂O) squeeze more than one (NH₃): 104.5° &lt; 107° &lt; 109.5°."},
+{id:"x2-h15",topic:"hybrid",type:"text",diff:3,prompt:"In CH₃–C≡N, what is the hybridization of the NITROGEN?",answer:"sp",accept:["sp"],why:"<b>sp</b> — the triple bond is 1 domain and the lone pair is another = 2 domains. Easy to miss the lone pair on a terminal nitrogen; it still counts. Linear geometry through the C≡N."},
+{id:"x2-h16",topic:"hybrid",type:"mc",diff:3,prompt:"An sp-hybridized carbon holds its electrons more tightly than sp³. Why?",choices:["sp has 50% s-character, and s orbitals sit closer to the nucleus","sp has more electrons","sp is bigger","It doesn't — sp³ holds tighter"],answer:0,why:"<b>s-character.</b> sp = 50% s, sp² = 33%, sp³ = 25%. More s-character means electrons ride closer to the nucleus, held tighter. This is the 'O' in ARIO and it's why terminal alkynes (pKa ~25) are far more acidic than alkanes (~50)."},
+{id:"x2-h17",topic:"hybrid",type:"num",diff:3,prompt:"What PERCENTAGE s-character does an sp² orbital have? (enter a number)",answer:33,tolerance:1,why:"<b>~33%</b> — one s mixed with two p's, so s is 1/3 of the mix. sp = 50%, sp² = 33%, sp³ = 25%. More s-character → shorter, stronger bonds and more stable anions."},
+{id:"x2-h18",topic:"hybrid",type:"mc",diff:3,prompt:"Electron geometry vs molecular shape — what's the difference?",choices:["Electron geometry counts lone pairs as positions; molecular shape names only where the ATOMS are","They're the same thing","Shape counts lone pairs, geometry doesn't","Neither counts lone pairs"],answer:0,why:"<b>Lone pairs are invisible in the SHAPE name.</b> Water: electron geometry tetrahedral (4 domains), molecular shape bent (2 atoms attached). Exam questions ask for one or the other specifically — read which one they want."},
+
+/* --- intermolecular forces --- */
+{id:"x2-i01",topic:"imf",type:"mc",diff:0,prompt:"Intermolecular forces act:",choices:["BETWEEN separate molecules","Inside a molecule, between bonded atoms","Only in ionic compounds","Only in gases"],answer:0,why:"<b>Between molecules</b> — 'inter' = between. Intramolecular forces are the covalent bonds inside. Boiling separates molecules from each other, so boiling point tracks INTERmolecular strength."},
+{id:"x2-i02",topic:"imf",type:"mc",diff:0,prompt:"Which molecules have London dispersion forces?",choices:["All of them","Only nonpolar ones","Only polar ones","Only ones with hydrogen"],answer:0,why:"<b>Every molecule.</b> Dispersion comes from momentary electron-cloud fluctuations, which everything has. It's the floor, not a special case — for nonpolar molecules it's just the ONLY force present."},
+{id:"x2-i03",topic:"imf",type:"mc",diff:1,prompt:"Rank IMF strength, strongest first:",choices:["Hydrogen bonding > dipole–dipole > London dispersion","London > dipole–dipole > hydrogen bonding","Dipole–dipole > hydrogen bonding > London","All equal"],answer:0,why:"<b>H-bonding > dipole–dipole > dispersion.</b> Worth a caveat: dispersion scales with size, so a very large nonpolar molecule can out-boil a small polar one. The ranking is per-interaction, not per-molecule."},
+{id:"x2-i04",topic:"imf",type:"mc",diff:1,prompt:"Hydrogen bonding requires an H bonded directly to:",choices:["N, O, or F","Any atom","Carbon","A metal"],answer:0,why:"<b>N, O, or F only.</b> Both halves matter: a δ+ H on N/O/F, plus a lone pair on another N/O/F to accept it. C–H hydrogens never qualify — carbon isn't electronegative enough to polarize them."},
+{id:"x2-i05",topic:"imf",type:"mc",diff:1,prompt:"Can two molecules of CH₃OCH₃ (dimethyl ether) hydrogen-bond TO EACH OTHER?",choices:["No — it has lone pairs to accept, but no H on O to donate","Yes — it has oxygen","Yes — it has hydrogens","Only when cold"],answer:0,why:"<b>No.</b> All its H's are on carbon, so it has no donor. It can ACCEPT an H-bond from water (its O has lone pairs), but ether-to-ether H-bonding is impossible. That's why dimethyl ether boils at −24°C while ethanol — same formula — boils at +78°C."},
+{id:"x2-i06",topic:"imf",type:"mc",diff:2,prompt:"Which boils higher: CH₃CH₂OH (ethanol) or CH₃CH₂CH₃ (propane)?",choices:["Ethanol — it hydrogen-bonds","Propane — it's heavier","Same","Neither boils"],answer:0,why:"<b>Ethanol</b> (78°C vs −42°C), despite similar size. The OH group donates AND accepts hydrogen bonds; propane has only dispersion. An OH group is worth a huge boiling-point jump."},
+{id:"x2-i07",topic:"imf",type:"mc",diff:2,prompt:"Which boils higher: pentane (C₅H₁₂) or methane (CH₄)? Both are nonpolar.",choices:["Pentane — bigger electron cloud, stronger dispersion","Methane","Same — both nonpolar","Neither"],answer:0,why:"<b>Pentane</b> (36°C vs −162°C). Both have dispersion ONLY, but dispersion scales with surface area and electron count. Bigger nonpolar molecule = stronger dispersion = higher boiling point."},
+{id:"x2-i08",topic:"imf",type:"mc",diff:2,prompt:"Which dissolves better in water: NaCl or hexane (C₆H₁₄)?",choices:["NaCl — 'like dissolves like', and water is polar","Hexane","Both equally","Neither"],answer:0,why:"<b>NaCl.</b> Water is polar and stabilizes ions well. Hexane is nonpolar and can't compete with water's hydrogen-bond network, so it separates into a layer. Like dissolves like."},
+{id:"x2-i09",topic:"imf",type:"mc",diff:2,prompt:"Branched isomers boil LOWER than straight-chain ones. Why?",choices:["Branching makes the molecule more spherical, reducing contact surface for dispersion","Branching adds polarity","Branching removes hydrogens","They actually boil higher"],answer:0,why:"<b>Less surface contact.</b> Dispersion needs molecules to lie against each other; a compact branched blob touches less than an extended chain. Pentane boils at 36°C, its fully branched isomer neopentane at 9.5°C — same formula."},
+{id:"x2-i10",topic:"imf",type:"mc",diff:3,prompt:"An exam asks why molecule Y boils higher than X. Which answer LOSES points?",choices:["'Because Y has stronger bonds that take more energy to break'","'Because Y hydrogen-bonds and X only has dispersion'","'Because Y's intermolecular forces are stronger'","'Because Y needs more energy to separate its molecules'"],answer:0,why:"<b>'Breaking bonds' is the losing phrase.</b> Boiling does NOT break covalent bonds — the molecules stay completely intact, they just separate from each other. Say 'overcoming intermolecular forces', never 'breaking bonds'. Ciesla flagged this exact wording."},
+{id:"x2-i11",topic:"imf",type:"mc",diff:3,prompt:"HF has stronger hydrogen bonds than H₂O, yet water boils higher (100°C vs 20°C). Why?",choices:["Water can form more H-bonds per molecule — 2 donors and 2 acceptors","HF doesn't really H-bond","Water is heavier","The data is wrong"],answer:0,why:"<b>Count, not just strength.</b> Water has 2 O–H donors and 2 lone pairs → up to 4 H-bonds each, building a 3D network. HF has 1 donor and 3 lone pairs, so it's limited to chains. Total network beats per-bond strength."},
+{id:"x2-i12",topic:"imf",type:"mc",diff:3,prompt:"Two molecules have identical formulas; one is polar and one isn't. Which has the higher boiling point, and what's the full-credit reason?",choices:["The polar one — it has dipole–dipole forces on top of dispersion, so more energy is needed to overcome them","The nonpolar one — fewer forces to fight","Same — identical formulas mean identical boiling points","Can't be determined"],answer:0,why:"<b>Polar boils higher.</b> Full-credit structure: name the specific IMF difference (dipole–dipole plus dispersion vs dispersion alone) → link it to energy required → state that molecules separate INTACT. Naming the force is what earns the marks."},
+/* ===== v3.9 EXPANSION — CH 2 (bond-line · resonance) + CH 3 (pKa · ARIO) ===== */
+/* --- bond-line drawings & functional groups --- */
+{id:"x2-b01",topic:"bondline",type:"mc",diff:0,prompt:"In a bond-line (skeletal) drawing, each corner or line END represents:",choices:["A carbon atom","A hydrogen atom","A lone pair","A bond"],answer:0,why:"<b>Carbon.</b> Vertices and endpoints are carbons, drawn invisibly to keep structures fast to sketch. The zigzag exists so you can count carbons at a glance."},
+{id:"x2-b02",topic:"bondline",type:"mc",diff:0,prompt:"In bond-line drawings, hydrogens on carbon are:",choices:["Not drawn — you infer them from carbon's 4 bonds","Always drawn","Drawn only on the ends","Ignored entirely, they don't exist"],answer:0,why:"<b>Implied, not absent.</b> Every carbon has 4 bonds; whatever isn't drawn is hydrogen. A corner with 2 drawn bonds silently carries 2 H's. They're still there — just not written."},
+{id:"x2-b03",topic:"bondline",type:"num",diff:1,prompt:"A bond-line zigzag has 5 vertices/endpoints total. How many carbons?",answer:5,why:"<b>5</b> — one per vertex or endpoint. Counting carbons in a skeletal drawing is just counting corners, including both ends of the chain."},
+{id:"x2-b04",topic:"bondline",type:"num",diff:1,prompt:"In a bond-line drawing, a carbon at a corner shows 2 drawn bonds. How many hydrogens does it carry?",answer:2,why:"<b>2.</b> Carbon needs 4 total; 2 are drawn, so 2 are implied hydrogens. This subtraction is the whole skill: 4 minus what's drawn."},
+{id:"x2-b05",topic:"bondline",type:"num",diff:1,prompt:"A carbon at the END of a chain is joined to the rest by ONE single bond. How many hydrogens?",answer:3,why:"<b>3</b> — it's a CH₃ group. 4 − 1 = 3 implied. Careful though: this holds for a SINGLE bond ending. If the chain ends in a double bond it's =CH₂ (2 H), and a terminal alkyne is ≡CH (1 H) — always subtract the full bond order."},
+{id:"x2-b06",topic:"bondline",type:"mc",diff:1,prompt:"Which atoms ARE always drawn explicitly in bond-line structures?",choices:["Heteroatoms (O, N, S, halogens) and any H attached to them","Only carbon","Nothing — everything is implied","Only hydrogen"],answer:0,why:"<b>Heteroatoms and their hydrogens.</b> You write O, N, Cl, and you write the H in an O–H or N–H. Only carbon and its hydrogens get hidden — because only those are predictable."},
+{id:"x2-b07",topic:"bondline",type:"mc",diff:2,prompt:"An –OH group attached to a carbon chain is a(n):",choices:["Alcohol","Ether","Aldehyde","Carboxylic acid"],answer:0,why:"<b>Alcohol.</b> C–O–C is an ether, –CHO an aldehyde, –COOH a carboxylic acid. Functional group recognition needs to become instant — it's how you'll predict reactivity all year."},
+{id:"x2-b08",topic:"bondline",type:"mc",diff:2,prompt:"A carbon double-bonded to O and also bonded to OH is a(n):",choices:["Carboxylic acid","Ketone","Aldehyde","Ester"],answer:0,why:"<b>Carboxylic acid</b> (–COOH). Ketone is C=O flanked by two carbons; aldehyde is C=O with at least one H; ester is C=O with an O–R. The atoms attached to the carbonyl carbon determine which is which."},
+{id:"x2-b09",topic:"bondline",type:"mc",diff:2,prompt:"What distinguishes an AMIDE from an AMINE?",choices:["An amide's nitrogen is attached to a C=O; an amine's is not","Amides have no nitrogen","Amines have oxygen","Nothing — same group"],answer:0,why:"<b>The adjacent carbonyl.</b> Amine = N on ordinary carbons (basic, nucleophilic). Amide = N next to C=O (barely basic, because the lone pair is delocalized into the carbonyl). One neighboring atom, completely different chemistry."},
+{id:"x2-b10",topic:"bondline",type:"num",diff:2,prompt:"Cyclohexane is drawn as a plain hexagon. How many hydrogens does it have in total?",answer:12,why:"<b>12</b>. Six corners = 6 carbons, each with 2 drawn bonds to neighbors → 2 H each → 12. Formula C₆H₁₂."},
+{id:"x2-b11",topic:"bondline",type:"mc",diff:3,prompt:"A carbon in a bond-line drawing is connected to TWO neighbors — one by a double bond, one by a single bond. How many hydrogens does it carry?",choices:["1","2","3","0"],answer:0,why:"<b>1.</b> Count bond ORDER, not neighbors: the double bond is worth 2, the single is worth 1, so 3 of carbon's 4 are used → 1 H. Counting 'two neighbors, so 2 bonds' is the trap — it would wrongly give you 2 H."},
+{id:"x2-b12",topic:"bondline",type:"num",diff:3,prompt:"Benzene is a hexagon with three alternating double bonds. How many hydrogens total?",answer:6,why:"<b>6</b> — one per carbon. Take any carbon: 2 σ bonds to its ring neighbours, and it's part of exactly one double bond, adding 1 more bond's worth → 3 of its 4 used → 1 H. Six carbons, six hydrogens: C₆H₆."},
+{id:"x2-b13",topic:"bondline",type:"mc",diff:3,prompt:"Why do organic chemists use bond-line drawings instead of writing every atom?",choices:["Speed and clarity — the skeleton and functional groups are visible instantly","They're required by law","They contain more information","To hide the hydrogens"],answer:0,why:"<b>Speed and pattern recognition.</b> You'll draw thousands of structures; skeletal form makes the reactive parts (the heteroatoms and π bonds you actually write) jump out from the inert carbon frame. Ciesla will expect fluency here fast."},
+
+/* --- resonance (was badly under-covered: 5 items) --- */
+{id:"x2-r01",topic:"resonance",type:"mc",diff:1,prompt:"Resonance structures differ from each other by:",choices:["The position of ELECTRONS only — never atoms","The position of atoms","Temperature","Their molecular formula"],answer:0,why:"<b>Electrons move, atoms stay put.</b> If you moved an atom you drew a different molecule (an isomer), not a resonance structure. This is the single hardest rule to hold onto and the most commonly broken."},
+{id:"x2-r02",topic:"resonance",type:"mc",diff:1,prompt:"The real molecule is best described as:",choices:["A single hybrid — a weighted average of all the structures","Flipping rapidly between the structures","Whichever structure you drew first","One structure at a time, chosen randomly"],answer:0,why:"<b>One unchanging hybrid.</b> The molecule is NOT oscillating. The multiple drawings are a limitation of our notation — a single line can't show a bond that's really 1.5. Classic analogy: a mule isn't a horse some days and a donkey others."},
+{id:"x2-r03",topic:"resonance",type:"mc",diff:1,prompt:"Curved arrows in resonance show:",choices:["Movement of electron pairs","Movement of atoms","Movement of the whole molecule","Heat flow"],answer:0,why:"<b>Electron pairs.</b> The tail sits on the electron source (a lone pair or a π bond), the head points where they land. Every arrow you draw all year means exactly this."},
+{id:"x2-r04",topic:"resonance",type:"mc",diff:2,prompt:"Which electrons can move in resonance?",choices:["Lone pairs and π (pi) electrons","σ (sigma) bond electrons","Core electrons","Any electrons at all"],answer:0,why:"<b>Lone pairs and π electrons only.</b> Sigma bonds are the molecular skeleton — move those and the molecule falls apart. If you find yourself moving a single bond, stop: that's an atom-moving error in disguise."},
+{id:"x2-r05",topic:"resonance",type:"mc",diff:2,prompt:"For resonance to happen, the participating orbitals must be:",choices:["Parallel/aligned so p orbitals can overlap","Perpendicular","Far apart","Filled"],answer:0,why:"<b>Aligned p orbitals.</b> Delocalization requires overlap, and overlap requires parallel orbitals — which is why resonance-stabilized systems are flat. Twist the system and the resonance shuts off."},
+{id:"x2-r06",topic:"resonance",type:"mc",diff:2,prompt:"Which resonance structure contributes MOST to the hybrid?",choices:["The one with full octets and the least charge separation","The one with the most formal charges","The one drawn first","The one with the fewest atoms"],answer:0,why:"Ranking order: <b>full octets first</b>, then minimal charge separation, then negative charge on the more electronegative atom. Equivalent structures (like acetate's two) contribute equally."},
+{id:"x2-r07",topic:"resonance",type:"mc",diff:2,prompt:"Between two structures that both have full octets, which is better?",choices:["The one where the negative charge sits on the MORE electronegative atom","The one with charge on carbon","The one with more charges","They're always equal"],answer:0,why:"<b>Negative charge belongs on the electronegative atom.</b> O holds a − better than C or N does. Same logic in reverse for positive charge — it prefers the less electronegative atom."},
+{id:"x2-r08",topic:"resonance",type:"mc",diff:2,prompt:"Why is the acetate ion (CH₃COO⁻) more stable than an alkoxide (CH₃CH₂O⁻)?",choices:["Acetate's negative charge is delocalized over two oxygens by resonance","Acetate is bigger","Alkoxide has no oxygen","They're equally stable"],answer:0,why:"<b>Spread charge is stable charge.</b> Acetate has two equivalent resonance structures sharing the − across both oxygens; the alkoxide's charge is stuck on one atom. That difference is worth ~11 pKa units (acetic acid ~5 vs ethanol ~16)."},
+{id:"x2-r09",topic:"resonance",type:"num",diff:2,prompt:"How many EQUIVALENT resonance structures does the acetate ion CH₃COO⁻ have?",answer:2,why:"<b>2</b> — the double bond and the negative charge swap between the two oxygens. Because they're identical in every way, they contribute equally, making both C–O bonds exactly 1.5 in the real molecule."},
+{id:"x2-r10",topic:"resonance",type:"mc",diff:3,prompt:"You draw a resonance structure and carbon ends up with 5 bonds. What happened?",choices:["An illegal structure — second-row atoms can never exceed an octet","That's fine for carbon","You need to add a lone pair","Carbon can hold 10 electrons"],answer:0,why:"<b>Never legal.</b> C, N, O and F max out at 8 electrons — no expanded octets in the second row. Five bonds on carbon means you pushed electrons IN without pushing any OUT. Every arrow onto a full atom needs a companion arrow off it."},
+{id:"x2-r11",topic:"resonance",type:"mc",diff:3,prompt:"Which is NOT a valid resonance structure of the other?",choices:["Two structures where an H has moved from one atom to another","Two structures where a lone pair became a π bond","Two structures where a π bond became a lone pair","Two structures where a π bond shifted along a chain"],answer:0,why:"<b>Moving hydrogen breaks the rule.</b> An H is an atom — relocate it and you've drawn a tautomer or an isomer, which is a genuinely different compound. Only electrons may move."},
+{id:"x2-r12",topic:"resonance",type:"num",diff:3,prompt:"In the carbonate ion CO₃²⁻, how many equivalent resonance structures are there?",answer:3,why:"<b>3</b> — the C=O can be to any of the three oxygens. The real ion has three identical C–O bonds of order 1.33, with the 2− charge spread evenly. Symmetry like this is a strong stability signal."},
+{id:"x2-r13",topic:"resonance",type:"mc",diff:3,prompt:"An amide's nitrogen is much less basic than an amine's. Resonance explains this because:",choices:["The N lone pair is delocalized into the C=O, so it isn't available to grab a proton","Amides have no lone pair","Nitrogen is more electronegative in amides","Amides are ionic"],answer:0,why:"<b>A delocalized lone pair is a busy lone pair.</b> It's donated into the adjacent carbonyl, so it can't act as a base. This is why proteins (chains of amides) have stable, flat, non-basic backbones — and why that C–N bond can't rotate freely."},
+{id:"x2-r14",topic:"resonance",type:"mc",diff:3,prompt:"Ciesla said Chapter 2 resonance depends on a Chapter 1 skill. Which one?",choices:["Reliable formal charge and lone-pair placement","Balancing equations","Gas laws","Naming compounds"],answer:0,why:"<b>Formal charge + lone pairs.</b> Every resonance structure you draw has to have its charges reassigned, and if you can't place lone pairs correctly you can't track where charge went. She named this as the prerequisite — it's why formal charge is worth over-drilling now."},
+
+/* --- acid/base: pKa --- */
+{id:"x2-ab01",topic:"acidbase1",type:"mc",diff:0,prompt:"A LOWER pKa means:",choices:["A stronger acid","A weaker acid","A stronger base","Nothing about strength"],answer:0,why:"<b>Lower pKa = stronger acid.</b> It's a logarithmic scale running backwards from intuition. HCl at −7 is enormously stronger than water at 15.7 — and each unit is a factor of 10."},
+{id:"x2-ab02",topic:"acidbase1",type:"mc",diff:0,prompt:"A Brønsted acid is a:",choices:["Proton (H⁺) donor","Proton acceptor","Electron donor","Electron acceptor"],answer:0,why:"<b>Proton donor</b>; the base is the acceptor. (Lewis definitions flip to electron pairs — same reactions, different lens. Ochem uses both.)"},
+{id:"x2-ab03",topic:"acidbase1",type:"text",diff:1,prompt:"What is the conjugate base of HCl? (type a formula, e.g. NH2-)",answer:"cl-",accept:["cl-","cl−","chloride"],why:"<b>Cl⁻.</b> Remove one H⁺ and you have the conjugate base. Conjugate pairs differ by exactly one proton, never more."},
+{id:"x2-ab04",topic:"acidbase1",type:"text",diff:1,prompt:"What is the conjugate ACID of NH₃? (type a formula)",answer:"nh4+",accept:["nh4+","nh4","ammonium"],why:"<b>NH₄⁺.</b> Conjugate acid = add a proton. Note the charge goes UP by one when you add H⁺ — neutral NH₃ becomes +1."},
+{id:"x2-ab05",topic:"acidbase1",type:"mc",diff:1,prompt:"Which is the strongest acid?",choices:["HCl (pKa −7)","Acetic acid (pKa 5)","Water (pKa 15.7)","Ethanol (pKa 16)"],answer:0,why:"<b>HCl</b>, by a colossal margin — pKa −7 vs 5 is twelve orders of magnitude. Lowest pKa wins, and negative pKa values mean very strong acids."},
+{id:"x2-ab06",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of a carboxylic acid (RCOOH)?",answer:5,tolerance:1,why:"<b>~5.</b> A number worth having cold. Carboxylic acids are the most acidic of the common neutral functional groups you'll meet this semester, thanks to resonance stabilization of the carboxylate. (Sulfonic acids are stronger still, but they mostly show up as catalysts rather than as the compounds you're ranking.)"},
+{id:"x2-ab07",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of water?",answer:15.7,tolerance:0.5,why:"<b>15.7.</b> The reference point in the middle of the ladder. Alcohols sit right beside it (~16), which is why hydroxide and alkoxides are comparably strong bases."},
+{id:"x2-ab08",topic:"acidbase1",type:"mc",diff:2,prompt:"An acid-base equilibrium favors:",choices:["The side with the WEAKER acid (higher pKa)","The side with the stronger acid","Neither — always 50/50","The left side always"],answer:0,why:"<b>Weaker acid wins.</b> Reactions run downhill toward stability, and the weaker acid is the more stable species. Compare the pKa on each side and the bigger number tells you where the equilibrium sits."},
+{id:"x2-ab09",topic:"acidbase1",type:"mc",diff:2,prompt:"The stronger the acid, its conjugate base is:",choices:["Weaker (more stable)","Stronger","Unchanged","Also strong"],answer:0,why:"<b>Inverse relationship.</b> A strong acid gives up its proton readily precisely because the resulting anion is stable — and a stable anion is a weak base. Cl⁻ (from HCl) is a terrible base; NH₂⁻ (from NH₃, pKa 38) is ferocious."},
+{id:"x2-ab10",topic:"acidbase1",type:"mc",diff:3,prompt:"Will hydroxide (⁻OH) deprotonate a terminal alkyne (pKa ~25)?",choices:["No — the product side would hold the STRONGER acid (water, 15.7), so equilibrium favors the reactants","Yes, easily","Yes, but slowly","Only when heated"],answer:0,why:"<b>No.</b> Write the reaction out: alkyne (pKa 25) + ⁻OH → acetylide + H₂O (pKa 15.7). Water is the <b>stronger</b> acid (lower pKa), and equilibrium always favors the side with the WEAKER acid — that's the reactant side here, by about 9 pKa units. To deprotonate the alkyne you need a base whose conjugate acid has pKa above 25: NaNH₂ works, because NH₃ is 38."},
+{id:"x2-ab11",topic:"acidbase1",type:"num",diff:3,prompt:"Roughly what is the pKa of a terminal alkyne (HC≡C–R)?",answer:25,tolerance:2,why:"<b>~25.</b> Far more acidic than an alkane (~50) purely because of orbital s-character: the acetylide's lone pair sits in an sp orbital, close to the nucleus. That's the 'O' in ARIO."},
+{id:"x2-ab12",topic:"acidbase1",type:"mc",diff:3,prompt:"Ethanol has pKa ~16 and acetic acid ~5. Both have an O–H. Why an 11-unit gap?",choices:["Acetate's charge is delocalized over two oxygens by resonance; ethoxide's isn't","Acetic acid has more hydrogens","Ethanol has no oxygen","Acetic acid is bigger"],answer:0,why:"<b>Resonance in the conjugate base.</b> Stability of the ANION is what sets acidity — always look at what's left after the proton leaves. 11 pKa units means acetic acid is ~100 billion times more acidic."},
+
+/* --- acid/base: ARIO ranking --- */
+{id:"x2-ac01",topic:"acidbase2",type:"mc",diff:1,prompt:"ARIO ranks conjugate-base stability. What do the letters stand for, in priority order?",choices:["Atom, Resonance, Induction, Orbital","Acid, Reaction, Ion, Oxygen","Atom, Radius, Ionic, Orbital","Anion, Resonance, Ionization, Octet"],answer:0,why:"<b>A</b>tom > <b>R</b>esonance > <b>I</b>nduction > <b>O</b>rbital. Check them in that order and stop at the first one that distinguishes your two species — earlier factors override later ones."},
+{id:"x2-ac02",topic:"acidbase2",type:"mc",diff:1,prompt:"Under 'A' (Atom), what do you compare when the charged atoms are in the same ROW?",choices:["Electronegativity — more EN holds the − charge better","Size","Mass","Number of bonds"],answer:0,why:"<b>Electronegativity across a row.</b> F⁻ > OH⁻ > NH₂⁻ > CH₃⁻ in stability, so HF is the strongest of those acids. Down a COLUMN you switch to size instead."},
+{id:"x2-ac03",topic:"acidbase2",type:"mc",diff:2,prompt:"Under 'A' (Atom), what do you compare going DOWN a column?",choices:["Size — bigger atoms spread charge over more volume","Electronegativity","Mass number","Color"],answer:0,why:"<b>Size wins down a column</b>, and it overrides electronegativity. F is more electronegative than I, yet HI is the far stronger acid because I⁻ is huge and dilutes the charge beautifully."},
+{id:"x2-ac04",topic:"acidbase2",type:"mc",diff:2,prompt:"HBr is a stronger acid than HF, even though F is much more electronegative. Why?",choices:["Br⁻ is far larger, spreading the negative charge over more volume","F doesn't hold charge","HBr has resonance","HF is a gas"],answer:0,why:"<b>Size beats electronegativity down a column.</b> HF pKa 3.2 vs HBr pKa −9 — twelve orders of magnitude apart. Two sub-rules live inside 'A' and you have to know which axis you're moving along."},
+{id:"x2-ac05",topic:"acidbase2",type:"mc",diff:2,prompt:"Rank acidity: HF vs H₂O vs NH₃",choices:["HF > H₂O > NH₃","NH₃ > H₂O > HF","H₂O > HF > NH₃","All equal"],answer:0,why:"<b>Same row → electronegativity.</b> F > O > N, so F⁻ is the most stable conjugate base and HF is the strongest acid. pKa: 3.2 vs 15.7 vs 38."},
+{id:"x2-ac06",topic:"acidbase2",type:"mc",diff:2,prompt:"Under 'I' (Induction), adding electronegative atoms NEAR the charge does what?",choices:["Stabilizes it — they pull electron density away through the σ bonds","Destabilizes it","Nothing","Only matters for cations"],answer:0,why:"<b>Stabilizes.</b> Nearby EN atoms siphon off some of the negative charge through the sigma framework. It's a through-bond pull, and it weakens fast with distance."},
+{id:"x2-ac07",topic:"acidbase2",type:"mc",diff:2,prompt:"Trifluoroacetic acid (CF₃COOH, pKa 0.5) is far stronger than acetic acid (CH₃COOH, pKa 5). Which ARIO factor explains it?",choices:["Induction — three fluorines pull density away from the carboxylate","Resonance","Orbital","Atom"],answer:0,why:"<b>Induction.</b> Both have identical resonance; the only difference is the three electron-withdrawing F's stabilizing the anion. Worth ~4.5 pKa units, which is over 30,000× more acidic."},
+{id:"x2-ac08",topic:"acidbase2",type:"mc",diff:3,prompt:"Two anions: one is resonance-stabilized on nitrogen, the other is localized on oxygen. Which ARIO factor decides, and which wins?",choices:["Atom beats Resonance — but you must check whether the atoms actually differ first","Resonance always beats Atom","They're equal","Orbital decides"],answer:0,why:"<b>A outranks R.</b> When the charge-bearing atoms differ, settle that first; only if the atoms are the same do you move on to resonance. The order isn't decorative — it's a strict priority chain, and skipping to R is a common error."},
+{id:"x2-ac09",topic:"acidbase2",type:"mc",diff:3,prompt:"Under 'O' (Orbital), which carbanion is most stable?",choices:["sp (50% s-character) — electrons sit closest to the nucleus","sp³ (25% s)","sp² (33% s)","They're identical"],answer:0,why:"<b>sp is most stable.</b> More s-character = electron density closer to the positive nucleus = better stabilized. This is why terminal alkynes (pKa 25) crush alkanes (pKa 50) on acidity."},
+{id:"x2-ac10",topic:"acidbase2",type:"mc",diff:3,prompt:"Induction gets weaker as the electronegative atom moves further from the charge. Roughly how fast?",choices:["Sharply — it's essentially gone after 3 or so bonds","Not at all","It gets stronger","It doubles per bond"],answer:0,why:"<b>Drops off fast.</b> Induction travels through σ bonds and dies within a few bonds. A Cl on the alpha carbon matters a lot; the same Cl four carbons away barely registers. Resonance, by contrast, reaches as far as the conjugated system does."},
+{id:"x2-ac11",topic:"acidbase2",type:"mc",diff:3,prompt:"Phenol (pKa 10) is much more acidic than cyclohexanol (pKa 16). Which factor?",choices:["Resonance — phenoxide delocalizes the charge into the ring","Induction","Orbital","Atom"],answer:0,why:"<b>Resonance.</b> Both put a − on oxygen (same Atom), but phenoxide spreads it into the aromatic ring across several structures. Cyclohexanol's alkoxide is stuck. Same atom → move to R."},
+{id:"x2-ac12",topic:"acidbase2",type:"mc",diff:3,prompt:"What's the single question to ask when ranking acidity?",choices:["Which conjugate base is more stable?","Which acid is bigger?","Which has more hydrogens?","Which is more polar?"],answer:0,why:"<b>Always look at the conjugate base.</b> Acidity is decided by what's left AFTER the proton leaves. Deprotonate both, compare the anions with ARIO, and the more stable anion came from the stronger acid. Never try to rank the acids directly."},
 ];
 /* fix f5 (answerOverride pattern demo): real answer is -1 */
 QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
@@ -843,6 +1199,7 @@ const S = {
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
+  attView: {topic:"all",outcome:"all",limit:60,qid:null}, // v3.11: attempt-history browser filters (session-only, never persisted)
 };
 function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); cloudPush(false); }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
@@ -878,12 +1235,18 @@ function qDiffM(q){
   const m1=med(ev), m2=med((S.attempts||[]).filter(a=>a.t===q.topic));
   let m=1+2*miss+guess+((m1&&m2&&m1>m2*1.5)?0.5:0);
   const w=n/(n+4);
-  return Math.max(1,Math.min(3,Math.round((w*m+(1-w)*prior)*10)/10));
+  // v3.9: floor is 0, not 1 — the scale gained a trivial tier, and a diff:0 item you always
+  // get right instantly should be allowed to measure as trivial rather than being pinned at 1.
+  return Math.max(0,Math.min(3,Math.round((w*m+(1-w)*prior)*10)/10));
 }
-function logAttempt(q,ok,guessed,D,dk){
+function logAttempt(q,ok,guessed,D,dk,ans){
   const secs=D&&D._shownAt?Math.min(600,Math.round((Date.now()-D._shownAt)/1000)):0;
   const ev={id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic};
   if(dk) ev.dk=1; // v3.5: "I don't know yet" — never learned ≠ guessed ≠ misconception
+  // v3.11: record WHAT he actually answered, not just whether it was right. Without this the
+  // history can say "✗ on l1g3" but never "you picked 109.5° like water" — and the wrong answer
+  // he chose is usually the most diagnostic thing on the row.
+  if(ans!==undefined&&ans!==null&&String(ans).length) ev.a=String(ans).slice(0,120);
   S.attempts.push(ev);
   if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
 }
@@ -907,7 +1270,46 @@ const EXAM1 = "./exam1-practice.pdf";
    free, verified video/lesson links (Khan Academy, The Organic Chemistry Tutor). You can't
    answer what you were never taught — this is the input side the drills assumed. ---- */
 const OCT_ALLINONE = "https://www.youtube.com/watch?v=PeY_sihSh8E"; // OCT: Lewis, formal charge, geometry, polarity — one video
+/* v3.7: per-topic study resources — Klein 5e section + Khan Academy + The Organic Chemistry Tutor (search-style links: never 404). */
+const RESOURCES={
+ valence:{klein:"Klein 5e §1.2–1.3",ka:[["Counting valence electrons","https://www.khanacademy.org/search?page_search_query=counting%20valence%20electrons"]],oct:[["Valence electrons","https://www.youtube.com/results?search_query=organic+chemistry+tutor+valence+electrons"]]},
+ lewis:{klein:"Klein 5e §1.2–1.3",ka:[["Lewis diagrams","https://www.khanacademy.org/search?page_search_query=lewis%20diagrams"],["Constitutional isomers","https://www.khanacademy.org/search?page_search_query=constitutional%20isomers"]],oct:[["Lewis structures","https://www.youtube.com/results?search_query=organic+chemistry+tutor+lewis+structures"]]},
+ formal:{klein:"Klein 5e §1.4",ka:[["Formal charge","https://www.khanacademy.org/search?page_search_query=formal%20charge"]],oct:[["Formal charges","https://www.youtube.com/results?search_query=organic+chemistry+tutor+formal+charge"]]},
+ polarity:{klein:"Klein 5e §1.5 · §1.11",ka:[["Bond polarity","https://www.khanacademy.org/search?page_search_query=electronegativity%20and%20bond%20polarity"],["Molecular polarity","https://www.khanacademy.org/search?page_search_query=molecular%20polarity"]],oct:[["Polar & nonpolar","https://www.youtube.com/results?search_query=organic+chemistry+tutor+polar+and+nonpolar+molecules"]]},
+ hybrid:{klein:"Klein 5e §1.6–1.10",ka:[["Hybridization","https://www.khanacademy.org/search?page_search_query=sp3%20hybridization"],["VSEPR","https://www.khanacademy.org/search?page_search_query=vsepr"]],oct:[["Hybridization","https://www.youtube.com/results?search_query=organic+chemistry+tutor+hybridization"],["σ & π bonds","https://www.youtube.com/results?search_query=organic+chemistry+tutor+sigma+and+pi+bonds"]]},
+ imf:{klein:"Klein 5e §1.12–1.13",ka:[["Intermolecular forces","https://www.khanacademy.org/search?page_search_query=intermolecular%20forces"]],oct:[["IMFs & boiling point","https://www.youtube.com/results?search_query=organic+chemistry+tutor+intermolecular+forces"]]},
+ bondline:{klein:"Klein 5e §2.1–2.4",ka:[["Bond-line structures","https://www.khanacademy.org/search?page_search_query=bond%20line%20structures"]],oct:[["Skeletal structures","https://www.youtube.com/results?search_query=organic+chemistry+tutor+skeletal+structures+bond+line"]]},
+ resonance:{klein:"Klein 5e §2.7–2.12",ka:[["Resonance","https://www.khanacademy.org/search?page_search_query=resonance%20structures"]],oct:[["Resonance structures","https://www.youtube.com/results?search_query=organic+chemistry+tutor+resonance+structures"]]},
+ acidbase1:{klein:"Klein 5e §3.1–3.3",ka:[["Acid–base & pKa","https://www.khanacademy.org/search?page_search_query=pka%20acid%20base"]],oct:[["Acids & bases + pKa","https://www.youtube.com/results?search_query=organic+chemistry+tutor+acids+and+bases+pka"]]},
+ acidbase2:{klein:"Klein 5e §3.4",ka:[["Conjugate-base stability","https://www.khanacademy.org/search?page_search_query=acid%20strength%20conjugate%20base"]],oct:[["Ranking acidity (ARIO)","https://www.youtube.com/results?search_query=organic+chemistry+tutor+ranking+acidity"]]},
+ p_atom:{klein:"any gen-chem text, 'atomic structure'",ka:[["Atomic structure","https://www.khanacademy.org/search?page_search_query=atomic%20structure%20protons%20neutrons%20electrons"]],oct:[["Atoms basics","https://www.youtube.com/results?search_query=organic+chemistry+tutor+protons+neutrons+electrons"]]},
+ p_ptable:{klein:"gen-chem, 'periodic table groups'",ka:[["Periodic table","https://www.khanacademy.org/search?page_search_query=periodic%20table%20groups%20periods"]],oct:[["Periodic table","https://www.youtube.com/results?search_query=organic+chemistry+tutor+periodic+table"]]},
+ p_ions:{klein:"gen-chem, 'ions'",ka:[["Ions","https://www.khanacademy.org/search?page_search_query=ions%20cations%20anions"]],oct:[["Ions","https://www.youtube.com/results?search_query=organic+chemistry+tutor+ions+cations+anions"]]},
+ p_bondtypes:{klein:"gen-chem, 'ionic vs covalent'",ka:[["Ionic vs covalent","https://www.khanacademy.org/search?page_search_query=ionic%20and%20covalent%20bonds"]],oct:[["Bond types","https://www.youtube.com/results?search_query=organic+chemistry+tutor+ionic+and+covalent+bonds"]]},
+ p_formulas:{klein:"gen-chem, 'chemical formulas'",ka:[["Molecular formulas","https://www.khanacademy.org/search?page_search_query=molecular%20and%20empirical%20formulas"]],oct:[["Formulas","https://www.youtube.com/results?search_query=organic+chemistry+tutor+molecular+formula"]]},
+};
+function resTile(topic){
+  const r=RESOURCES[topic]; if(!r) return null;
+  const d=el("details",{style:"margin-top:12px;border:2px solid rgba(0,0,0,.12);border-radius:10px;padding:8px 12px;background:rgba(0,0,0,.025)"});
+  d.innerHTML='<summary style="cursor:pointer;font-size:.85rem;font-weight:800">📚 Stuck? Book section + videos for this topic</summary>'+
+    '<div style="font-size:.85rem;margin-top:8px;line-height:1.7"><div>📖 <b>'+r.klein+'</b></div>'+
+    '<div>🎓 Khan Academy: '+r.ka.map(x=>'<a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+'</a>').join(" · ")+'</div>'+
+    '<div>▶️ Organic Chemistry Tutor: '+r.oct.map(x=>'<a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+'</a>').join(" · ")+'</div></div>';
+  return d;
+}
 const LESSONS = {
+  /* v3.7 — Preliminaries (Chapter 0: the pre-gen-chem foundation) */
+  p_atom:{primer:"An atom = protons (+, fixed per element — the atomic number IS the element), neutrons (no charge), and electrons (−, the only players in chemistry). Electrons live in shells; only the OUTERMOST shell (valence electrons) does bonding. Everything in this course is about what those outer electrons are doing.",klein:"any gen-chem review — 'atomic structure'",links:[]},
+  p_ptable:{primer:"The periodic table is a cheat sheet, not a poster. COLUMN (group) number = valence electrons for main groups: group 1 → 1, group 4 (C) → 4, group 5 (N) → 5, group 6 (O) → 6, group 7 (halogens: F/Cl/Br/I) → 7. ROW (period) = number of shells. Left side = metals (give electrons away), right side = nonmetals (share or take). Organic chem lives almost entirely in C, H, N, O + halogens.",klein:"gen-chem — 'groups & periods'",links:[]},
+  p_ions:{primer:"An ion is an atom/molecule whose electrons ≠ protons. LOSE an electron → positive CATION (Na⁺). GAIN one → negative ANION (Cl⁻). Charge is written top-right. Key convention you'll use constantly: a superscript + means one electron MISSING from the total count; a − means one EXTRA. That's why NH₄⁺ has 8 valence electrons to place, not 9.",klein:"gen-chem — 'ions'",links:[]},
+  p_bondtypes:{primer:"Two ways atoms stick: IONIC — one atom fully takes electrons from the other, then the + and − attract (metal + nonmetal, like NaCl). COVALENT — atoms SHARE electron pairs (nonmetal + nonmetal). Organic chemistry is covalent chemistry: C, H, N, O sharing pairs. A single shared pair = single bond; two = double; three = triple. Unequal sharing = 'polar covalent' — the bridge topic to Chapter 1.",klein:"gen-chem — 'ionic vs covalent'",links:[]},
+  p_formulas:{primer:"Reading formulas: subscripts count atoms (C₂H₆ = 2 C + 6 H). Parentheses multiply: (CH₃)₃N = 3 CH₃ groups on one N. Condensed formulas read left-to-right as connectivity: CH₃CH₂OH means C–C–O–H chain with H's filling carbon to 4 bonds. One formula can be MANY different molecules (isomers) — which is why structure, not formula, is what organic chemistry cares about.",klein:"gen-chem — 'formulas'",links:[]},
+  /* v3.7 — Chapter 2 & 3 primers (banks already exist; now they teach too) */
+  bondline:{primer:"Bond-line (skeletal) notation: every line-end and corner is a CARBON; hydrogens on carbon are NOT drawn — mentally add H until each C has 4 bonds. Heteroatoms (N, O, S, halogens) ARE drawn, WITH their H's (write O–H, N–H explicitly). To read one: walk the skeleton, count each carbon's drawn bonds, fill the rest with invisible H's. To draw one: zigzag the carbon chain, drop the C's and H's, keep everything else.",klein:"Klein 5e §2.1–2.4",links:[]},
+  resonance:{primer:"Resonance = one molecule whose true electron distribution needs several drawings to describe. ONLY ELECTRONS MOVE — lone pairs and π bonds — never atoms, never σ bonds. Curved arrow = 2 electrons moving from tail (a lone pair or π bond) to head. The real molecule is the weighted AVERAGE (hybrid) of all structures — it does NOT flip between them. Ciesla's prereq warning: you must be able to place lone pairs and formal charges reliably first, because every resonance arrow bookkeeps them.",klein:"Klein 5e §2.7–2.12",links:[]},
+  acidbase1:{primer:"Brønsted: acid donates H⁺, base accepts it (needs a lone pair). Every acid-base reaction is a competition: equilibrium favors the side with the WEAKER acid. pKa measures acid strength — LOWER pKa = stronger acid. Ballpark values worth knowing: HCl ≈ −7, H₃O⁺ ≈ −1.7, carboxylic acids ≈ 5, H₂O ≈ 15.7, alcohols ≈ 16, terminal alkynes ≈ 25, amines(N–H) ≈ 38, alkanes ≈ 50.",klein:"Klein 5e §3.1–3.3",links:[]},
+  acidbase2:{primer:"No pKa table? Compare the CONJUGATE BASES — whichever is more stabilized came from the stronger acid. Check in order, A-R-I-O: Atom (which atom holds the − charge: more electronegative or larger = more stable), Resonance (delocalized charge = more stable), Induction (nearby electronegative atoms pull charge away = more stable), Orbital (charge in an sp orbital = more stable than sp³). Atom beats Resonance beats Induction beats Orbital when they conflict.",klein:"Klein 5e §3.4",links:[]},
+
   valence: { primer:"Valence electrons are the outer-shell electrons an atom brings to bonding — and for the main-group atoms you'll use, the count equals the group number: H 1, C 4, N 5, O 6, halogens 7. This one number drives everything downstream (how many bonds an atom wants, its formal charge, the whole Lewis structure). Memorize C/N/O/H cold — you'll use them every single problem.",
     klein:"Klein 5e §1.2–1.3 (atomic structure, electron configuration)",
     links:[{l:"Khan Academy — chemical bonds (valence, Lewis)",u:"https://www.khanacademy.org/science/chemistry/chemical-bonds"},{l:"The Organic Chemistry Tutor — intro video",u:OCT_ALLINONE}] },
@@ -928,7 +1330,7 @@ const LESSONS = {
     links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
 };
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
-const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice"}; // active-tab highlight for sub-views
+const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice",attempts:"report"}; // active-tab highlight for sub-views (v3.11: attempts lives under Report — nav stays at 7 tabs)
 function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
   // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
@@ -1313,7 +1715,13 @@ function startDrill(topic){
   const seen = id => (S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   // v3.2: confident-wrong (a broken rule = misconception) outranks guessed-wrong (just unknown)
   const need = q => { const s=S.qstats[q.id]; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0) return 4; if(s&&s.w>0) return 3; if(s&&(s.gr||0)>0&&s.r<=(s.gr||0)) return 3; if(seen(q.id)===0) return 2; return 1; }; // v3.5: dk ≠ misconception
-  pool = shuffle(pool).sort((a,b)=>need(b)-need(a));
+  /* v3.9 ANTI-REPEAT + DIFFICULTY SPREAD.
+     Was: sort by need alone → the same few missed items led EVERY session ("I get the same
+     questions very often"). Now the sort key is need − recency, so a question served in the
+     last few hours drops behind equally-needy ones and the rotation actually advances.
+     Then the top slice is re-picked to span difficulty tiers rather than clustering. */
+  pool = shuffle(pool).sort((a,b)=>(need(b)-recencyPenalty(b.id))-(need(a)-recencyPenalty(a.id)));
+  pool = spreadByDifficulty(pool, SESSION_MAX);
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
   // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
   if (topic==="formal"){
@@ -1454,7 +1862,7 @@ VIEWS.drill = (v) => {
   const q = D.queue[D.i];
   if(D._shownQ!==q.id+":"+D.i){ D._shownQ=q.id+":"+D.i; D._shownAt=Date.now(); } // v3.2: start the answer clock (survives re-renders of same card)
   const c = el("div",{class:"card"});
-  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+"●".repeat(Math.round(qDiffM(q)))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+diffDots(qDiffM(q))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
     '<div class="qprompt">'+q.prompt+'</div>';
   const fb = el("div");
   // v3.0: guessed checkbox + optional rationale — on every non-written question
@@ -1470,11 +1878,11 @@ VIEWS.drill = (v) => {
     gRow.appendChild(gk); gRow.appendChild(gl); gRow.appendChild(dkk); gRow.appendChild(dkl); gRow.appendChild(rInp);
     c.appendChild(gRow);
   }
-  const finish = (ok, revealHtml, wrText) => {
+  const finish = (ok, revealHtml, wrText, submitted) => {
     D.answered=true;
     const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
     const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
-    logAttempt(q,ok,guessed,D,isDK); // v3.2 event — id, ts, correctness, guessed, seconds (+dk v3.5)
+    logAttempt(q,ok,guessed,D,isDK,submitted); // v3.2 event — id, ts, correctness, guessed, seconds (+dk v3.5, +submitted answer v3.11)
     snapshotDrill(D.i+1);       // v3.4.1: after this answer, the round resumes from the NEXT question
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
     if(isDK) st.dk=(st.dk||0)+1; // v3.5: unlearned tag on EITHER outcome — a dk-right is still unlearned
@@ -1519,7 +1927,7 @@ VIEWS.drill = (v) => {
         const ok=o.i===q.answer;
         e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
         if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
-        finish(ok,"");
+        finish(ok,"",undefined,o.txt); // v3.11: pass the choice he actually clicked into the history
       }},o.txt));
     });
     c.appendChild(ch);
@@ -1531,12 +1939,13 @@ VIEWS.drill = (v) => {
       if(!val)return;
       if(q.type==="num"){ const n=parseFloat(val.replace("−","-")); const tol=q.tolerance||0; ok=Math.abs(n-q.answer)<=tol; }
       else { const norm=s=>s.toLowerCase().replace(/[\s−]/g,"-").replace(/-+/g,"-").replace(/[^a-z0-9+\-]/g,""); const acc=(q.accept||[String(q.answer)]).map(norm); ok=acc.includes(norm(val)); }
-      finish(ok,"<b class='mono'>"+q.answer+"</b>");
+      finish(ok,"<b class='mono'>"+q.answer+"</b>",undefined,val); // v3.11: record what he typed
     }},"Check");
     inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub.click();});
     const row=el("div"); row.appendChild(inp); row.appendChild(sub); c.appendChild(row);
     setTimeout(()=>inp.focus(),50);
   }
+  const _rt=resTile(q.topic); if(_rt) c.appendChild(_rt); // v3.7 resources tile
   c.appendChild(fb);
   v.appendChild(c);
   v.appendChild(el("div",{class:"center"},'<button class="btn ghost small" onclick="snapshotDrill(S.drill.i);S.drill=null;go(&quot;home&quot;)">⏸ pause round — saved, resume from Home</button>'));
@@ -1783,22 +2192,53 @@ function runAudit(wrap){
 
 /* ---- CHEAT SHEET ---- */
 VIEWS.learn = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">📖 Learn first · then drill</span><h2>Concepts before questions</h2><p class="muted">You can\'t answer what you were never taught. Each prereq topic below: a plain-language primer, the Klein 5e section to read in your WileyPLUS eText, and free videos (Khan Academy · The Organic Chemistry Tutor). Read/watch, then hit Drill on that topic. The drill\'s "why" after each answer reinforces it.</p>'));
-  const order=[["valence","🔢 Valence electrons"],["lewis","🧩 Lewis structures"],["formal","⚡ Formal charge"],["polarity","🧭 Polarity + dipoles"],["hybrid","📐 Hybridization + VSEPR"],["imf","🧲 Intermolecular forces"]];
-  order.forEach(([k,title])=>{
-    const L=LESSONS[k]; if(!L) return;
+  /* v3.7: chaptered Learn — Chapters menu → topic list → primer. Back buttons at every level. */
+  const CH=[
+    {id:"prelim",ico:"🌱",name:"Preliminaries",sub:"The pre-gen-chem foundation — start here if anything feels shaky",topics:["p_atom","p_ptable","p_ions","p_bondtypes","p_formulas"]},
+    {id:"ch1",ico:"⚗️",name:"Chapter 1 — General Chemistry Review",sub:"The quiz-scope six · Klein Ch 1 · Quiz Thu 8/27",topics:["valence","lewis","formal","polarity","hybrid","imf"]},
+    {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Bond-line + resonance · course-current THIS week",topics:["bondline","resonance"]},
+    {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"pKa + ARIO · starts week of Aug 31",topics:["acidbase1","acidbase2"]},
+  ];
+  const tName=k=>(TOPICS[k]?(TOPICS[k].ico+" "+TOPICS[k].name):k);
+  const tStat=k=>{ let r=0,w=0; QUESTIONS.forEach(q=>{ if(q.topic===k){const s=S.qstats[q.id]; if(s){r+=s.r;w+=s.w;}} }); const tot=r+w; return tot?Math.round(100*r/tot)+"%":null; };
+  const back=(label,fn)=>el("button",{class:"btn ghost small",style:"margin-bottom:10px",onclick:fn},"← "+label);
+  const ch=CH.find(c=>c.id===S.learnCh);
+  // ---- level 3: one topic's primer ----
+  if(ch && S.learnTopic){
+    const k=S.learnTopic, L=LESSONS[k];
+    v.appendChild(back(ch.name, ()=>{S.learnTopic=null; render();}));
     const c=el("div",{class:"card cream"});
-    c.innerHTML='<h3 style="margin-bottom:6px">'+title+'</h3>'+
-      '<p style="margin:0 0 8px">'+L.primer+'</p>'+
-      '<p class="muted" style="margin:0 0 8px">📕 Read: <b>'+L.klein+'</b> (WileyPLUS eText → Course Resources)</p>'+
-      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-      L.links.map(x=>'<a href="'+x.u+'" target="_blank" rel="noopener" class="btn ghost" style="text-decoration:none;font-size:.8rem">▶ '+x.l+'</a>').join("")+
-      '</div>';
-    const drill=el("button",{class:"btn teal",style:"margin-top:10px",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"Now drill "+title.replace(/^\S+\s/,"")+" →");
-    c.appendChild(drill);
+    c.innerHTML='<span class="tag violet">'+ch.ico+' '+ch.name+'</span><h2 style="margin:6px 0">'+tName(k)+'</h2>'+
+      (L?'<p style="margin:0 0 10px">'+L.primer+'</p><p class="muted" style="margin:0 0 8px">📕 Read: <b>'+L.klein+'</b>'+(ch.id!=="prelim"?' (WileyPLUS eText → Course Resources)':'')+'</p>':'<p class="muted">Primer coming — use the videos below, then drill.</p>');
+    const rt=resTile(k); if(rt){ rt.open=true; c.appendChild(rt); }
+    if(QUESTIONS.some(q=>q.topic===k&&q.type!=="written")) c.appendChild(el("button",{class:"btn teal",style:"margin-top:12px",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"Now drill it →"));
+    v.appendChild(c);
+    v.appendChild(back("All chapters", ()=>{S.learnTopic=null;S.learnCh=null; render();}));
+    return;
+  }
+  // ---- level 2: a chapter's topic list ----
+  if(ch){
+    v.appendChild(back("All chapters", ()=>{S.learnCh=null; render();}));
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">'+ch.ico+' Learn</span><h2>'+ch.name+'</h2><p class="muted">'+ch.sub+'. Pick a topic — primer first, then drill.</p>'));
+    ch.topics.forEach(k=>{
+      const c=el("div",{class:"card cream"}); const st=tStat(k); const L=LESSONS[k];
+      c.innerHTML='<div style="display:flex;align-items:center;gap:8px"><h3 style="flex:1;margin:0">'+tName(k)+'</h3>'+(st?'<span class="tag gold">'+st+'</span>':'<span class="tag violet">new</span>')+'</div>'+
+        (L?'<p class="muted" style="margin:6px 0 8px;font-size:.85rem">'+L.primer.split(". ")[0]+'.</p>':'');
+      c.appendChild(el("button",{class:"btn",onclick:()=>{S.learnTopic=k; render();}},"📖 Open"));
+      v.appendChild(c);
+    });
+    return;
+  }
+  // ---- level 1: chapters menu ----
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">📖 Learn</span><h2>Pick your chapter</h2><p class="muted">Concepts before questions. Each chapter holds its topics; each topic: a plain-language primer, the Klein 5e section, and free videos (Khan Academy · The Organic Chemistry Tutor).</p>'));
+  CH.forEach(c0=>{
+    const done=c0.topics.filter(k=>{const s=tStat(k); return s&&parseInt(s)>=75;}).length;
+    const c=el("div",{class:"card cream"});
+    c.innerHTML='<div style="display:flex;align-items:center;gap:8px"><h3 style="flex:1;margin:0">'+c0.ico+' '+c0.name+'</h3><span class="tag gold">'+done+'/'+c0.topics.length+' ≥75%</span></div><p class="muted" style="margin:6px 0 8px;font-size:.85rem">'+c0.sub+'</p>';
+    c.appendChild(el("button",{class:"btn teal",onclick:()=>{S.learnCh=c0.id; render();}},"Open chapter →"));
     v.appendChild(c);
   });
-  v.appendChild(el("div",{class:"card"},'<p class="muted">Note: links open the free public lessons. Klein 5e sections are in your own WileyPLUS eText (Inclusive Access) — Course Resources → WileyPLUS eTextbook. Bring a specific chapter here to Claude when you want problems built from it.</p>'));
+  v.appendChild(el("div",{class:"card"},'<p class="muted">Klein 5e sections live in your WileyPLUS eText (Canvas → Course Resources). Bring any chapter to Claude to get problems built from it.</p>'));
 };
 VIEWS.cheat = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole gen-chem bridge on one page</h2>'));
@@ -1818,8 +2258,18 @@ VIEWS.cheat = (v) => {
     '<p class="muted"><b>"Valence" = the atom\'s own group number, always</b> (O is 6 in every molecule — an ion\'s charge changes the total e⁻ budget in step 1, never this number). Count lone pairs fresh from the octet each time: fewer bonds → more LPs. For octet-keeping atoms like O and N: more bonds than the neutral pattern → +, fewer → −. <b>Carbon breaks that shortcut:</b> C⁺ (3 bonds, 0 LP) and C⁻ (3 bonds, 1 LP) have the SAME bond count — the lone pair decides the sign. When lone pairs are uncertain, run the full formula.</p>'+
     '<p class="muted">Sight-read shortcuts: N with 4 bonds = +1 · O with 3 bonds = +1 · O with 1 bond = −1 · C with 3 bonds + 1 LP = −1 · C with 3 bonds + 0 LP = +1.</p>'));
   v.appendChild(el("div",{class:"card"},
-    '<h3>Electronegativity & geometry</h3>'+
-    '<p class="mono center" style="margin:6px 0">F &gt; O &gt; N ≈ Cl &gt; Br &gt; C ≈ H</p>'+
+    '<h3>Electronegativity (Wiley/Pauling values — what your homework uses)</h3>'+
+    '<table class="cheat"><tr><th>Element</th><th>EN</th></tr>'+
+    '<tr><td class="mono">F</td><td>4.0</td></tr><tr><td class="mono">O</td><td>3.5</td></tr>'+
+    '<tr><td class="mono">N</td><td>3.0</td></tr><tr><td class="mono">Cl</td><td>3.0</td></tr>'+
+    '<tr><td class="mono">Br</td><td>2.8</td></tr><tr><td class="mono">C</td><td>2.5</td></tr>'+
+    '<tr><td class="mono">S</td><td>2.5</td></tr><tr><td class="mono">I</td><td>2.5</td></tr>'+
+    '<tr><td class="mono">P</td><td>2.1</td></tr><tr><td class="mono">H</td><td>2.1</td></tr>'+
+    '<tr><td class="mono">Li</td><td>1.0</td></tr></table>'+
+    '<p class="mono center" style="margin:8px 0">Order: F &gt; O &gt; N ≈ Cl &gt; Br &gt; C ≈ S ≈ I &gt; P ≈ H &gt; Li</p>'+
+    '<p class="muted">Bond polarity from ΔEN (Wiley\'s cutoffs): &lt;0.5 pure covalent · 0.5–1.7 polar covalent · &gt;1.7 ionic. <b>Standing exception:</b> C bonded to ANY halogen counts as polar regardless of ΔEN (C–Br ΔEN ≈ 0.3 but it\'s still polar — atom size matters, not just the number). C–Li also doesn\'t behave — treat it as borderline ionic/polar covalent, not pure covalent.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<h3>Geometry & hybridization</h3>'+
     '<table class="cheat"><tr><th>Domains</th><th>Hybrid</th><th>Shape (no LP)</th><th>Angle</th></tr>'+
     '<tr><td>4</td><td class="mono">sp³</td><td>tetrahedral</td><td>109.5°</td></tr>'+
     '<tr><td>3</td><td class="mono">sp²</td><td>trigonal planar</td><td>120°</td></tr>'+
@@ -1843,6 +2293,124 @@ VIEWS.cheat = (v) => {
 };
 
 /* ---- REPORT ---- */
+/* ---- ATTEMPT HISTORY (v3.11) ----
+   Gabe: "make an attempts part for this so i can see historically what/how I did for each
+   question including my checkboxes, explanation, etc."
+   The data already existed but was write-only — S.attempts (every answer: correctness,
+   🎲/🤷 flags, seconds) and S.wrLog (typed rationales) were only ever read by the selector
+   and the report export. This joins them and makes them browsable. Two levels: a filterable
+   chronological feed, and a per-question timeline showing whether he's actually improving. */
+/* v3.11: his typed reasoning is free text and goes into innerHTML — escape it. */
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function attemptRows(){
+  // join attempts ↔ wrLog. attempts store ts as epoch ms, wrLog as ISO string, both written
+  // in the same finish() call — so match on (question id, timestamps within 5s).
+  const notes=(S.wrLog||[]).map(w=>({id:w.id,t:Date.parse(w.ts)||0,text:w.text,kind:w.kind}));
+  return (S.attempts||[]).map(a=>{
+    const n=notes.find(x=>x.id===a.id&&Math.abs(x.t-a.ts)<5000);
+    return {...a, note:n?n.text:null, noteKind:n?n.kind:null};
+  }).sort((x,y)=>y.ts-x.ts);
+}
+function fmtWhen(ts){
+  const d=new Date(ts), now=new Date();
+  const sameDay=d.toDateString()===now.toDateString();
+  const y=new Date(now.getTime()-86400000).toDateString()===d.toDateString();
+  const hm=d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+  return sameDay?("Today "+hm):y?("Yesterday "+hm):(d.toLocaleDateString([], {month:"short",day:"numeric"})+" "+hm);
+}
+function attFlags(a){
+  let s="";
+  if(a.dk) s+=' <span class="tag violet" title="marked: I don\'t know this yet">🤷 unlearned</span>';
+  else if(a.g) s+=' <span class="tag gold" title="marked: I guessed">🎲 guessed</span>';
+  if(a.d) s+=' <span class="muted" style="font-size:.78rem">'+a.d+'s</span>';
+  return s;
+}
+VIEWS.attempts = (v) => {
+  const F=S.attView||(S.attView={topic:"all",outcome:"all",limit:60,qid:null});
+  const all=attemptRows();
+  const back=(label,fn)=>el("button",{class:"btn ghost small",style:"margin-bottom:10px",onclick:fn},"← "+label);
+
+  /* ---- level 2: one question's full timeline ---- */
+  if(F.qid){
+    const q=QUESTIONS.find(x=>x.id===F.qid);
+    const rows=all.filter(a=>a.id===F.qid).sort((a,b)=>a.ts-b.ts); // oldest→newest: read it as a trend
+    v.appendChild(back("All attempts",()=>{F.qid=null;render();}));
+    const head=el("div",{class:"card"});
+    head.innerHTML='<span class="tag violet">'+(q?(TOPICS[q.topic]?.name||q.topic):"unknown topic")+' · '+F.qid+'</span>'+
+      '<div class="qprompt" style="margin-top:6px">'+(q?q.prompt:'<span class="muted">This question is no longer in the bank.</span>')+'</div>'+
+      (rows.length?'<p class="muted" style="margin:8px 0 0">Attempt trail (oldest → newest): '+rows.map(a=>a.ok?'<b style="color:#2a9d8f">✓</b>':'<b style="color:#e76f51">✗</b>').join(" ")+
+        ' · '+rows.filter(a=>a.ok).length+'/'+rows.length+' right</p>':'');
+    v.appendChild(head);
+    if(!rows.length) v.appendChild(el("div",{class:"card cream"},'<p class="muted">No attempts recorded for this question yet.</p>'));
+    rows.slice().reverse().forEach(a=>{
+      const c=el("div",{class:"card cream"});
+      c.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        '<b style="color:'+(a.ok?"#2a9d8f":"#e76f51")+'">'+(a.ok?"✓ right":"✗ wrong")+'</b>'+
+        '<span class="muted" style="font-size:.82rem">'+fmtWhen(a.ts)+'</span>'+attFlags(a)+'</div>'+
+        (a.a?'<p style="margin:6px 0 0;font-size:.9rem">You answered: <b class="mono">'+esc(a.a)+'</b></p>':'')+
+        (a.note?'<div class="why" style="margin-top:6px"><b>Your reasoning:</b> '+esc(a.note)+'</div>':'');
+      v.appendChild(c);
+    });
+    if(q&&q.why) v.appendChild(el("div",{class:"card"},'<h3>The explanation</h3><div class="why">'+q.why+'</div>'));
+    if(q&&q.type!=="written") v.appendChild(el("div",{class:"center"},"")).appendChild(el("button",{class:"btn teal",onclick:()=>{F.qid=null;startDrill(q.topic);}},"Drill this topic again →"));
+    return;
+  }
+
+  /* ---- level 1: the feed ---- */
+  v.appendChild(back("Report",()=>go("report")));
+  if(!all.length){
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">📜 Attempts</span><h2>No attempts recorded yet</h2><p class="muted">Answer some questions and every one lands here — what you picked, whether you flagged it as a guess or as unlearned, how long it took, and any reasoning you typed.</p>'));
+    return;
+  }
+  let rows=all;
+  if(F.topic!=="all") rows=rows.filter(a=>a.t===F.topic);
+  if(F.outcome==="wrong") rows=rows.filter(a=>!a.ok);
+  else if(F.outcome==="guessed") rows=rows.filter(a=>a.g&&!a.dk);
+  else if(F.outcome==="dk") rows=rows.filter(a=>a.dk);
+  else if(F.outcome==="noted") rows=rows.filter(a=>a.note);
+
+  const head=el("div",{class:"card"});
+  const rt=all.filter(a=>a.ok).length;
+  head.innerHTML='<span class="tag violet">📜 Attempts</span><h2>Every answer you\'ve given</h2>'+
+    '<p class="muted">'+all.length+' attempts on record · '+rt+' right ('+Math.round(100*rt/all.length)+'%) · '+
+    all.filter(a=>a.g&&!a.dk).length+' flagged 🎲 guessed · '+all.filter(a=>a.dk).length+' flagged 🤷 unlearned · '+
+    all.filter(a=>a.note).length+' with your reasoning saved. Tap any row to see that question\'s full history.</p>';
+  v.appendChild(head);
+
+  // filters
+  const fc=el("div",{class:"card cream"});
+  fc.innerHTML='<p class="muted" style="margin:0 0 6px;font-size:.82rem"><b>Show:</b></p>';
+  const oRow=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"});
+  [["all","Everything"],["wrong","✗ Wrong only"],["guessed","🎲 Guessed"],["dk","🤷 Unlearned"],["noted","✍️ With my reasoning"]].forEach(([k,lab])=>{
+    oRow.appendChild(el("button",{class:"btn small"+(F.outcome===k?"":" ghost"),onclick:()=>{F.outcome=k;F.limit=60;render();}},lab));
+  });
+  fc.appendChild(oRow);
+  const tRow=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap"});
+  const topicsSeen=[...new Set(all.map(a=>a.t))].filter(t=>TOPICS[t]);
+  tRow.appendChild(el("button",{class:"btn small"+(F.topic==="all"?"":" ghost"),onclick:()=>{F.topic="all";F.limit=60;render();}},"All topics"));
+  topicsSeen.forEach(t=>tRow.appendChild(el("button",{class:"btn small"+(F.topic===t?"":" ghost"),onclick:()=>{F.topic=t;F.limit=60;render();}},(TOPICS[t].ico||"")+" "+TOPICS[t].name)));
+  fc.appendChild(tRow);
+  v.appendChild(fc);
+
+  if(!rows.length){ v.appendChild(el("div",{class:"card cream"},'<p class="muted">Nothing matches that filter.</p>')); return; }
+  v.appendChild(el("p",{class:"muted",style:"margin:2px 0 8px;font-size:.82rem"},"Showing "+Math.min(F.limit,rows.length)+" of "+rows.length+" · newest first"));
+
+  rows.slice(0,F.limit).forEach(a=>{
+    const q=QUESTIONS.find(x=>x.id===a.id);
+    const c=el("div",{class:"card cream",style:"cursor:pointer"});
+    c.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">'+
+      '<b style="color:'+(a.ok?"#2a9d8f":"#e76f51")+'">'+(a.ok?"✓":"✗")+'</b>'+
+      '<span class="tag gold" style="font-size:.7rem">'+(TOPICS[a.t]?(TOPICS[a.t].ico+" "+TOPICS[a.t].name):a.t)+'</span>'+
+      '<span class="muted" style="font-size:.8rem">'+fmtWhen(a.ts)+'</span>'+attFlags(a)+'</div>'+
+      '<div style="font-size:.9rem;line-height:1.4">'+(q?esc(q.prompt.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim()).slice(0,120):'<span class="muted">['+a.id+'] no longer in the bank</span>')+'</div>'+
+      (a.a?'<p class="muted" style="margin:4px 0 0;font-size:.82rem">You answered: <b class="mono">'+esc(a.a).slice(0,90)+'</b></p>':'')+
+      (a.note?'<p class="muted" style="margin:4px 0 0;font-size:.82rem">✍️ "'+esc(a.note).slice(0,110)+'"</p>':'');
+    c.addEventListener("click",()=>{F.qid=a.id;render();});
+    v.appendChild(c);
+  });
+  if(rows.length>F.limit) v.appendChild(el("div",{class:"center"},"")).appendChild(el("button",{class:"btn ghost",onclick:()=>{F.limit+=60;render();}},"Show 60 more"));
+};
+
 VIEWS.report = (v) => {
   const a=accuracy();
   const perTopic = Object.entries(TOPICS).map(([k,t])=>{
@@ -1875,6 +2443,15 @@ VIEWS.report = (v) => {
 (S.diags.length?("Diagnostics: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"CUM ":"SCOPE ")+d.pct+"% ("+d.date+(d.scope?", "+d.scope:"")+")").join(" · ")+"\n"):"")+
 ((S.wrLog||[]).length?("Written answers & rationales (last 8, for Claude's process-grading):\n"+S.wrLog.slice(-8).map(w=>"  ["+w.id+"] "+(w.ok?"self-✓":"self-✗")+(w.guessed?" (guessed)":"")+" — \""+String(w.text).slice(0,160)+"\"").join("\n")+"\n"):"")+
 "Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
+  // v3.11: attempt-history entry point, above the export — it's the thing he'll open most.
+  const hist=el("div",{class:"card"});
+  const nA=(S.attempts||[]).length, nN=(S.wrLog||[]).length;
+  hist.innerHTML='<span class="tag violet">📜 History</span><h2>Attempt history</h2>'+
+    '<p class="muted" style="margin-bottom:10px">Every answer you\'ve given, newest first — what you picked, your 🎲 guessed / 🤷 unlearned flags, how long it took, and any reasoning you typed. Tap a question to see its whole trail and whether you\'re actually improving on it.'+
+    (nA?' <b>'+nA+'</b> attempts · <b>'+nN+'</b> with your reasoning saved.':'')+'</p>';
+  hist.appendChild(el("button",{class:"btn violet",onclick:()=>{S.attView={topic:"all",outcome:"all",limit:60,qid:null};go("attempts");}},"Open attempt history →"));
+  v.appendChild(hist);
+
   const c=el("div",{class:"card"});
   c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
   const ta=el("textarea",{class:"report",readonly:"readonly"}); ta.value=txt; c.appendChild(ta);

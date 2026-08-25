@@ -6,7 +6,20 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.10  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4 (new-bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.11  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4 (new-bank) 08-25
+  v3.11 (2026-08-25, Gabe: "make an attempts part for this so i can see historically what/how
+        I did for each question including my checkboxes, explanation, etc"): 📜 ATTEMPT HISTORY.
+        The data already existed but was write-only — S.attempts (correctness, 🎲/🤷 flags,
+        seconds) and S.wrLog (typed rationales) were only ever read by the question selector
+        and the report export; he could never look at his own record. Now joined (on question
+        id + timestamps within 5s, since attempts store epoch ms and wrLog stores ISO) and
+        browsable: a filterable chronological feed (wrong-only · guessed · unlearned · with-my-
+        reasoning · by topic) and a per-question timeline showing the attempt trail oldest→
+        newest, so improvement on a single question is visible at a glance.
+        Also v3.11: logAttempt() now records WHAT he answered (ev.a), not just whether it was
+        right — the wrong choice he picked is usually the most diagnostic thing on the row.
+        Lives under Report (NAV_GROUP) so the nav stays at 7 tabs. Free-text reasoning is
+        escaped before it reaches innerHTML.
   v3.10 (2026-08-25, from his 65% report): SO₂ SCAFFOLD (x3-so1…so6). His report showed the
         same root cause twice — drew SO₂ LINEAR on WR-CH1-009, and picked "109.5, like water"
         on l1g3. Both are the missing lone pair on S. Six items walk it: total e⁻ → S's 2
@@ -1186,6 +1199,7 @@ const S = {
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
+  attView: {topic:"all",outcome:"all",limit:60,qid:null}, // v3.11: attempt-history browser filters (session-only, never persisted)
 };
 function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); cloudPush(false); }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
@@ -1225,10 +1239,14 @@ function qDiffM(q){
   // get right instantly should be allowed to measure as trivial rather than being pinned at 1.
   return Math.max(0,Math.min(3,Math.round((w*m+(1-w)*prior)*10)/10));
 }
-function logAttempt(q,ok,guessed,D,dk){
+function logAttempt(q,ok,guessed,D,dk,ans){
   const secs=D&&D._shownAt?Math.min(600,Math.round((Date.now()-D._shownAt)/1000)):0;
   const ev={id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic};
   if(dk) ev.dk=1; // v3.5: "I don't know yet" — never learned ≠ guessed ≠ misconception
+  // v3.11: record WHAT he actually answered, not just whether it was right. Without this the
+  // history can say "✗ on l1g3" but never "you picked 109.5° like water" — and the wrong answer
+  // he chose is usually the most diagnostic thing on the row.
+  if(ans!==undefined&&ans!==null&&String(ans).length) ev.a=String(ans).slice(0,120);
   S.attempts.push(ev);
   if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
 }
@@ -1312,7 +1330,7 @@ const LESSONS = {
     links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
 };
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
-const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice"}; // active-tab highlight for sub-views
+const NAV_GROUP={lab:"practice",drill:"practice",mastery:"practice",attempts:"report"}; // active-tab highlight for sub-views (v3.11: attempts lives under Report — nav stays at 7 tabs)
 function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
   // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
@@ -1860,11 +1878,11 @@ VIEWS.drill = (v) => {
     gRow.appendChild(gk); gRow.appendChild(gl); gRow.appendChild(dkk); gRow.appendChild(dkl); gRow.appendChild(rInp);
     c.appendChild(gRow);
   }
-  const finish = (ok, revealHtml, wrText) => {
+  const finish = (ok, revealHtml, wrText, submitted) => {
     D.answered=true;
     const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
     const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
-    logAttempt(q,ok,guessed,D,isDK); // v3.2 event — id, ts, correctness, guessed, seconds (+dk v3.5)
+    logAttempt(q,ok,guessed,D,isDK,submitted); // v3.2 event — id, ts, correctness, guessed, seconds (+dk v3.5, +submitted answer v3.11)
     snapshotDrill(D.i+1);       // v3.4.1: after this answer, the round resumes from the NEXT question
     const st=S.qstats[q.id]||(S.qstats[q.id]={r:0,w:0});
     if(isDK) st.dk=(st.dk||0)+1; // v3.5: unlearned tag on EITHER outcome — a dk-right is still unlearned
@@ -1909,7 +1927,7 @@ VIEWS.drill = (v) => {
         const ok=o.i===q.answer;
         e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
         if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
-        finish(ok,"");
+        finish(ok,"",undefined,o.txt); // v3.11: pass the choice he actually clicked into the history
       }},o.txt));
     });
     c.appendChild(ch);
@@ -1921,7 +1939,7 @@ VIEWS.drill = (v) => {
       if(!val)return;
       if(q.type==="num"){ const n=parseFloat(val.replace("−","-")); const tol=q.tolerance||0; ok=Math.abs(n-q.answer)<=tol; }
       else { const norm=s=>s.toLowerCase().replace(/[\s−]/g,"-").replace(/-+/g,"-").replace(/[^a-z0-9+\-]/g,""); const acc=(q.accept||[String(q.answer)]).map(norm); ok=acc.includes(norm(val)); }
-      finish(ok,"<b class='mono'>"+q.answer+"</b>");
+      finish(ok,"<b class='mono'>"+q.answer+"</b>",undefined,val); // v3.11: record what he typed
     }},"Check");
     inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub.click();});
     const row=el("div"); row.appendChild(inp); row.appendChild(sub); c.appendChild(row);
@@ -2275,6 +2293,124 @@ VIEWS.cheat = (v) => {
 };
 
 /* ---- REPORT ---- */
+/* ---- ATTEMPT HISTORY (v3.11) ----
+   Gabe: "make an attempts part for this so i can see historically what/how I did for each
+   question including my checkboxes, explanation, etc."
+   The data already existed but was write-only — S.attempts (every answer: correctness,
+   🎲/🤷 flags, seconds) and S.wrLog (typed rationales) were only ever read by the selector
+   and the report export. This joins them and makes them browsable. Two levels: a filterable
+   chronological feed, and a per-question timeline showing whether he's actually improving. */
+/* v3.11: his typed reasoning is free text and goes into innerHTML — escape it. */
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function attemptRows(){
+  // join attempts ↔ wrLog. attempts store ts as epoch ms, wrLog as ISO string, both written
+  // in the same finish() call — so match on (question id, timestamps within 5s).
+  const notes=(S.wrLog||[]).map(w=>({id:w.id,t:Date.parse(w.ts)||0,text:w.text,kind:w.kind}));
+  return (S.attempts||[]).map(a=>{
+    const n=notes.find(x=>x.id===a.id&&Math.abs(x.t-a.ts)<5000);
+    return {...a, note:n?n.text:null, noteKind:n?n.kind:null};
+  }).sort((x,y)=>y.ts-x.ts);
+}
+function fmtWhen(ts){
+  const d=new Date(ts), now=new Date();
+  const sameDay=d.toDateString()===now.toDateString();
+  const y=new Date(now.getTime()-86400000).toDateString()===d.toDateString();
+  const hm=d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+  return sameDay?("Today "+hm):y?("Yesterday "+hm):(d.toLocaleDateString([], {month:"short",day:"numeric"})+" "+hm);
+}
+function attFlags(a){
+  let s="";
+  if(a.dk) s+=' <span class="tag violet" title="marked: I don\'t know this yet">🤷 unlearned</span>';
+  else if(a.g) s+=' <span class="tag gold" title="marked: I guessed">🎲 guessed</span>';
+  if(a.d) s+=' <span class="muted" style="font-size:.78rem">'+a.d+'s</span>';
+  return s;
+}
+VIEWS.attempts = (v) => {
+  const F=S.attView||(S.attView={topic:"all",outcome:"all",limit:60,qid:null});
+  const all=attemptRows();
+  const back=(label,fn)=>el("button",{class:"btn ghost small",style:"margin-bottom:10px",onclick:fn},"← "+label);
+
+  /* ---- level 2: one question's full timeline ---- */
+  if(F.qid){
+    const q=QUESTIONS.find(x=>x.id===F.qid);
+    const rows=all.filter(a=>a.id===F.qid).sort((a,b)=>a.ts-b.ts); // oldest→newest: read it as a trend
+    v.appendChild(back("All attempts",()=>{F.qid=null;render();}));
+    const head=el("div",{class:"card"});
+    head.innerHTML='<span class="tag violet">'+(q?(TOPICS[q.topic]?.name||q.topic):"unknown topic")+' · '+F.qid+'</span>'+
+      '<div class="qprompt" style="margin-top:6px">'+(q?q.prompt:'<span class="muted">This question is no longer in the bank.</span>')+'</div>'+
+      (rows.length?'<p class="muted" style="margin:8px 0 0">Attempt trail (oldest → newest): '+rows.map(a=>a.ok?'<b style="color:#2a9d8f">✓</b>':'<b style="color:#e76f51">✗</b>').join(" ")+
+        ' · '+rows.filter(a=>a.ok).length+'/'+rows.length+' right</p>':'');
+    v.appendChild(head);
+    if(!rows.length) v.appendChild(el("div",{class:"card cream"},'<p class="muted">No attempts recorded for this question yet.</p>'));
+    rows.slice().reverse().forEach(a=>{
+      const c=el("div",{class:"card cream"});
+      c.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        '<b style="color:'+(a.ok?"#2a9d8f":"#e76f51")+'">'+(a.ok?"✓ right":"✗ wrong")+'</b>'+
+        '<span class="muted" style="font-size:.82rem">'+fmtWhen(a.ts)+'</span>'+attFlags(a)+'</div>'+
+        (a.a?'<p style="margin:6px 0 0;font-size:.9rem">You answered: <b class="mono">'+esc(a.a)+'</b></p>':'')+
+        (a.note?'<div class="why" style="margin-top:6px"><b>Your reasoning:</b> '+esc(a.note)+'</div>':'');
+      v.appendChild(c);
+    });
+    if(q&&q.why) v.appendChild(el("div",{class:"card"},'<h3>The explanation</h3><div class="why">'+q.why+'</div>'));
+    if(q&&q.type!=="written") v.appendChild(el("div",{class:"center"},"")).appendChild(el("button",{class:"btn teal",onclick:()=>{F.qid=null;startDrill(q.topic);}},"Drill this topic again →"));
+    return;
+  }
+
+  /* ---- level 1: the feed ---- */
+  v.appendChild(back("Report",()=>go("report")));
+  if(!all.length){
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">📜 Attempts</span><h2>No attempts recorded yet</h2><p class="muted">Answer some questions and every one lands here — what you picked, whether you flagged it as a guess or as unlearned, how long it took, and any reasoning you typed.</p>'));
+    return;
+  }
+  let rows=all;
+  if(F.topic!=="all") rows=rows.filter(a=>a.t===F.topic);
+  if(F.outcome==="wrong") rows=rows.filter(a=>!a.ok);
+  else if(F.outcome==="guessed") rows=rows.filter(a=>a.g&&!a.dk);
+  else if(F.outcome==="dk") rows=rows.filter(a=>a.dk);
+  else if(F.outcome==="noted") rows=rows.filter(a=>a.note);
+
+  const head=el("div",{class:"card"});
+  const rt=all.filter(a=>a.ok).length;
+  head.innerHTML='<span class="tag violet">📜 Attempts</span><h2>Every answer you\'ve given</h2>'+
+    '<p class="muted">'+all.length+' attempts on record · '+rt+' right ('+Math.round(100*rt/all.length)+'%) · '+
+    all.filter(a=>a.g&&!a.dk).length+' flagged 🎲 guessed · '+all.filter(a=>a.dk).length+' flagged 🤷 unlearned · '+
+    all.filter(a=>a.note).length+' with your reasoning saved. Tap any row to see that question\'s full history.</p>';
+  v.appendChild(head);
+
+  // filters
+  const fc=el("div",{class:"card cream"});
+  fc.innerHTML='<p class="muted" style="margin:0 0 6px;font-size:.82rem"><b>Show:</b></p>';
+  const oRow=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"});
+  [["all","Everything"],["wrong","✗ Wrong only"],["guessed","🎲 Guessed"],["dk","🤷 Unlearned"],["noted","✍️ With my reasoning"]].forEach(([k,lab])=>{
+    oRow.appendChild(el("button",{class:"btn small"+(F.outcome===k?"":" ghost"),onclick:()=>{F.outcome=k;F.limit=60;render();}},lab));
+  });
+  fc.appendChild(oRow);
+  const tRow=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap"});
+  const topicsSeen=[...new Set(all.map(a=>a.t))].filter(t=>TOPICS[t]);
+  tRow.appendChild(el("button",{class:"btn small"+(F.topic==="all"?"":" ghost"),onclick:()=>{F.topic="all";F.limit=60;render();}},"All topics"));
+  topicsSeen.forEach(t=>tRow.appendChild(el("button",{class:"btn small"+(F.topic===t?"":" ghost"),onclick:()=>{F.topic=t;F.limit=60;render();}},(TOPICS[t].ico||"")+" "+TOPICS[t].name)));
+  fc.appendChild(tRow);
+  v.appendChild(fc);
+
+  if(!rows.length){ v.appendChild(el("div",{class:"card cream"},'<p class="muted">Nothing matches that filter.</p>')); return; }
+  v.appendChild(el("p",{class:"muted",style:"margin:2px 0 8px;font-size:.82rem"},"Showing "+Math.min(F.limit,rows.length)+" of "+rows.length+" · newest first"));
+
+  rows.slice(0,F.limit).forEach(a=>{
+    const q=QUESTIONS.find(x=>x.id===a.id);
+    const c=el("div",{class:"card cream",style:"cursor:pointer"});
+    c.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">'+
+      '<b style="color:'+(a.ok?"#2a9d8f":"#e76f51")+'">'+(a.ok?"✓":"✗")+'</b>'+
+      '<span class="tag gold" style="font-size:.7rem">'+(TOPICS[a.t]?(TOPICS[a.t].ico+" "+TOPICS[a.t].name):a.t)+'</span>'+
+      '<span class="muted" style="font-size:.8rem">'+fmtWhen(a.ts)+'</span>'+attFlags(a)+'</div>'+
+      '<div style="font-size:.9rem;line-height:1.4">'+(q?esc(q.prompt.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim()).slice(0,120):'<span class="muted">['+a.id+'] no longer in the bank</span>')+'</div>'+
+      (a.a?'<p class="muted" style="margin:4px 0 0;font-size:.82rem">You answered: <b class="mono">'+esc(a.a).slice(0,90)+'</b></p>':'')+
+      (a.note?'<p class="muted" style="margin:4px 0 0;font-size:.82rem">✍️ "'+esc(a.note).slice(0,110)+'"</p>':'');
+    c.addEventListener("click",()=>{F.qid=a.id;render();});
+    v.appendChild(c);
+  });
+  if(rows.length>F.limit) v.appendChild(el("div",{class:"center"},"")).appendChild(el("button",{class:"btn ghost",onclick:()=>{F.limit+=60;render();}},"Show 60 more"));
+};
+
 VIEWS.report = (v) => {
   const a=accuracy();
   const perTopic = Object.entries(TOPICS).map(([k,t])=>{
@@ -2307,6 +2443,15 @@ VIEWS.report = (v) => {
 (S.diags.length?("Diagnostics: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"CUM ":"SCOPE ")+d.pct+"% ("+d.date+(d.scope?", "+d.scope:"")+")").join(" · ")+"\n"):"")+
 ((S.wrLog||[]).length?("Written answers & rationales (last 8, for Claude's process-grading):\n"+S.wrLog.slice(-8).map(w=>"  ["+w.id+"] "+(w.ok?"self-✓":"self-✗")+(w.guessed?" (guessed)":"")+" — \""+String(w.text).slice(0,160)+"\"").join("\n")+"\n"):"")+
 "Storage: "+(safeStore.persistent?"persistent":"SESSION-ONLY (progress not saved!)")+"\n";
+  // v3.11: attempt-history entry point, above the export — it's the thing he'll open most.
+  const hist=el("div",{class:"card"});
+  const nA=(S.attempts||[]).length, nN=(S.wrLog||[]).length;
+  hist.innerHTML='<span class="tag violet">📜 History</span><h2>Attempt history</h2>'+
+    '<p class="muted" style="margin-bottom:10px">Every answer you\'ve given, newest first — what you picked, your 🎲 guessed / 🤷 unlearned flags, how long it took, and any reasoning you typed. Tap a question to see its whole trail and whether you\'re actually improving on it.'+
+    (nA?' <b>'+nA+'</b> attempts · <b>'+nN+'</b> with your reasoning saved.':'')+'</p>';
+  hist.appendChild(el("button",{class:"btn violet",onclick:()=>{S.attView={topic:"all",outcome:"all",limit:60,qid:null};go("attempts");}},"Open attempt history →"));
+  v.appendChild(hist);
+
   const c=el("div",{class:"card"});
   c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
   const ta=el("textarea",{class:"report",readonly:"readonly"}); ta.value=txt; c.appendChild(ta);
