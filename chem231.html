@@ -6,7 +6,18 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.11  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4 (new-bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.12  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4 (new-bank) 08-25
+  v3.12 (2026-08-25, Gabe: "alot of topics for my class is missing from this learn section…
+        We need week 2 and the chapters, and their topics etc. as well as their book source,
+        khan source, and ochemtutor source"): LEARN = FULL COURSE MAP through Exam 1.
+        +7 primers with Klein/KA/OCT sources: Ch1 gains 🌀 Orbitals & σ/π (nodes, PE curve,
+        VB theory, s-character — the quiz-scope items with no Learn home) + 🧬 Constitutional
+        isomers (3-step routine); Ch2 gains ↪️ Curved arrows (§2.10-2.13); Ch3 gains
+        🤝 Lewis acids/bases (nucleophile/electrophile birth); NEW Ch4 chapter (alkane naming,
+        Newman/conformations, cyclohexane chairs — read-ahead, flagged as such). Learn-only
+        topics (no bank items yet) show primer+sources, no drill button — honest by design.
+        Plus: VERSION BADGE in the header (next to ⌂ Menu) — ends the "am I on the latest?"
+        cache confusion; if Claude names a newer version than the badge, refresh the page.
   v3.11 (2026-08-25, Gabe: "make an attempts part for this so i can see historically what/how
         I did for each question including my checkboxes, explanation, etc"): 📜 ATTEMPT HISTORY.
         The data already existed but was write-only — S.attempts (correctness, 🎲/🤷 flags,
@@ -379,7 +390,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.12</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -488,6 +499,9 @@ const TRACK = [
 ];
 const TOPICS = {
   p_atom:{name:"Atoms & electrons",ico:"⚛️"}, p_ptable:{name:"Periodic table",ico:"🗺️"}, p_ions:{name:"Ions & charges",ico:"➕"}, p_bondtypes:{name:"Ionic vs covalent",ico:"🔗"}, p_formulas:{name:"Reading formulas",ico:"🔤"},
+  /* v3.12 learn-expansion topics (some learn-only until bank items land) */
+  orbitals:{name:"Orbitals & σ/π",ico:"🌀"}, isomers:{name:"Constitutional isomers",ico:"🧬"}, arrows:{name:"Curved arrows",ico:"↪️"}, lewisab:{name:"Lewis acids & bases",ico:"🤝"},
+  alkanes:{name:"Alkane naming",ico:"🏷️"}, conform:{name:"Conformations & Newman",ico:"🔄"}, chair:{name:"Cyclohexane chairs",ico:"🪑"},
   valence:  { name:"Valence electrons",  ico:"🔢" },
   lewis:    { name:"Lewis structures",   ico:"🧩" },
   formal:   { name:"Formal charge",      ico:"⚡" },
@@ -1272,6 +1286,14 @@ const EXAM1 = "./exam1-practice.pdf";
 const OCT_ALLINONE = "https://www.youtube.com/watch?v=PeY_sihSh8E"; // OCT: Lewis, formal charge, geometry, polarity — one video
 /* v3.7: per-topic study resources — Klein 5e section + Khan Academy + The Organic Chemistry Tutor (search-style links: never 404). */
 const RESOURCES={
+ /* v3.12 learn-expansion topics */
+ orbitals:{klein:"Klein 5e §1.6–1.10",ka:[["Atomic orbitals & nodes","https://www.khanacademy.org/search?page_search_query=atomic%20orbitals%20nodes"],["Sigma and pi bonds","https://www.khanacademy.org/search?page_search_query=sigma%20and%20pi%20bonds"]],oct:[["Sigma & pi bonds","https://www.youtube.com/results?search_query=organic+chemistry+tutor+sigma+and+pi+bonds"],["Orbitals & hybridization","https://www.youtube.com/results?search_query=organic+chemistry+tutor+hybridization+orbitals"]]},
+ isomers:{klein:"Klein 5e §1.2",ka:[["Constitutional isomers","https://www.khanacademy.org/search?page_search_query=constitutional%20isomers"]],oct:[["Constitutional isomers","https://www.youtube.com/results?search_query=organic+chemistry+tutor+constitutional+isomers"]]},
+ arrows:{klein:"Klein 5e §2.10–2.13",ka:[["Curved arrows","https://www.khanacademy.org/search?page_search_query=curved%20arrow%20conventions"],["Resonance structures","https://www.khanacademy.org/search?page_search_query=resonance%20structures"]],oct:[["Curved arrows & resonance","https://www.youtube.com/results?search_query=organic+chemistry+tutor+curved+arrows+resonance"]]},
+ lewisab:{klein:"Klein 5e §3.8–3.9",ka:[["Lewis acids and bases","https://www.khanacademy.org/search?page_search_query=lewis%20acids%20and%20bases"]],oct:[["Lewis acids & bases","https://www.youtube.com/results?search_query=organic+chemistry+tutor+lewis+acids+and+bases"]]},
+ alkanes:{klein:"Klein 5e §4.1–4.3",ka:[["Alkane nomenclature","https://www.khanacademy.org/search?page_search_query=alkane%20nomenclature%20iupac"]],oct:[["Naming alkanes","https://www.youtube.com/results?search_query=organic+chemistry+tutor+naming+alkanes+iupac"]]},
+ conform:{klein:"Klein 5e §4.7–4.10",ka:[["Newman projections","https://www.khanacademy.org/search?page_search_query=newman%20projections"]],oct:[["Newman projections","https://www.youtube.com/results?search_query=organic+chemistry+tutor+newman+projections"]]},
+ chair:{klein:"Klein 5e §4.11–4.14",ka:[["Chair conformations","https://www.khanacademy.org/search?page_search_query=chair%20conformation%20cyclohexane"]],oct:[["Chair conformations","https://www.youtube.com/results?search_query=organic+chemistry+tutor+chair+conformations"]]},
  valence:{klein:"Klein 5e §1.2–1.3",ka:[["Counting valence electrons","https://www.khanacademy.org/search?page_search_query=counting%20valence%20electrons"]],oct:[["Valence electrons","https://www.youtube.com/results?search_query=organic+chemistry+tutor+valence+electrons"]]},
  lewis:{klein:"Klein 5e §1.2–1.3",ka:[["Lewis diagrams","https://www.khanacademy.org/search?page_search_query=lewis%20diagrams"],["Constitutional isomers","https://www.khanacademy.org/search?page_search_query=constitutional%20isomers"]],oct:[["Lewis structures","https://www.youtube.com/results?search_query=organic+chemistry+tutor+lewis+structures"]]},
  formal:{klein:"Klein 5e §1.4",ka:[["Formal charge","https://www.khanacademy.org/search?page_search_query=formal%20charge"]],oct:[["Formal charges","https://www.youtube.com/results?search_query=organic+chemistry+tutor+formal+charge"]]},
@@ -1308,6 +1330,17 @@ const LESSONS = {
   bondline:{primer:"Bond-line (skeletal) notation: every line-end and corner is a CARBON; hydrogens on carbon are NOT drawn — mentally add H until each C has 4 bonds. Heteroatoms (N, O, S, halogens) ARE drawn, WITH their H's (write O–H, N–H explicitly). To read one: walk the skeleton, count each carbon's drawn bonds, fill the rest with invisible H's. To draw one: zigzag the carbon chain, drop the C's and H's, keep everything else.",klein:"Klein 5e §2.1–2.4",links:[]},
   resonance:{primer:"Resonance = one molecule whose true electron distribution needs several drawings to describe. ONLY ELECTRONS MOVE — lone pairs and π bonds — never atoms, never σ bonds. Curved arrow = 2 electrons moving from tail (a lone pair or π bond) to head. The real molecule is the weighted AVERAGE (hybrid) of all structures — it does NOT flip between them. Ciesla's prereq warning: you must be able to place lone pairs and formal charges reliably first, because every resonance arrow bookkeeps them.",klein:"Klein 5e §2.7–2.12",links:[]},
   acidbase1:{primer:"Brønsted: acid donates H⁺, base accepts it (needs a lone pair). Every acid-base reaction is a competition: equilibrium favors the side with the WEAKER acid. pKa measures acid strength — LOWER pKa = stronger acid. Ballpark values worth knowing: HCl ≈ −7, H₃O⁺ ≈ −1.7, carboxylic acids ≈ 5, H₂O ≈ 15.7, alcohols ≈ 16, terminal alkynes ≈ 25, amines(N–H) ≈ 38, alkanes ≈ 50.",klein:"Klein 5e §3.1–3.3",links:[]},
+  /* ===== v3.12 LEARN EXPANSION (Gabe: "alot of topics for my class is missing from this
+     learn section… We need week 2 and the chapters, and their topics etc. as well as their
+     book source, khan source, and ochemtutor source") — 7 new primers below. Some are
+     LEARN-ONLY for now (no drill button appears until bank items exist for that key). ===== */
+  orbitals:{primer:"Where bonds actually come from. (1) ATOMIC ORBITALS: s is a sphere, p is a dumbbell with two colored LOBES (phases) and a NODE — a zero-electron plane — between them. More nodes = higher energy. (2) BOND FORMATION: two atoms approach and energy DROPS as orbitals overlap, bottoms out at the ideal bond length, then shoots up if you squeeze closer (nuclei repel). That potential-energy curve's minimum IS the bond — its depth is the bond strength. (3) VALENCE BOND THEORY: a σ (sigma) bond is head-on overlap along the axis between nuclei — every single bond is one σ. A π (pi) bond is SIDEWAYS overlap of parallel p orbitals, above and below the axis — it's what a double bond adds (1σ+1π; triple = 1σ+2π), it's weaker than σ, and it locks rotation. (4) s-CHARACTER: sp (50% s) holds electrons closest to the nucleus → shorter, stronger bonds than sp² (33%) than sp³ (25%). That one trend explains bond strength/length AND (in Ch 3) why alkyne C–H is acidic.",klein:"Klein 5e §1.6–1.10 (atomic orbitals, VB theory, σ/π, hybridization)"},
+  isomers:{primer:"CONSTITUTIONAL ISOMERS: same molecular formula, DIFFERENT connectivity — who is bonded to whom. C₄H₁₀ is butane (straight chain) or isobutane (branched): same atoms, different skeleton, genuinely different compounds with different boiling points. The 3-step decision routine for any pair of structures: (1) same molecular formula? If no → not isomers at all. (2) Same connectivity? If no → constitutional isomers. (3) Same connectivity but different 3-D arrangement → stereoisomers (Ch 5, later). Trap to kill now: two drawings that LOOK different but have identical connectivity (a chain drawn bent vs straight) are the SAME compound, not isomers. Trace the skeleton atom by atom; never judge by shape on the page.",klein:"Klein 5e §1.2 (constitutional isomers; more in Ch 4)"},
+  arrows:{primer:"THE skill of Ch 2 — and of the whole course. A curved arrow shows ELECTRON-PAIR movement, never atoms: the TAIL sits on the electron source (a lone pair or a π bond — never a σ bond, never an atom name), the HEAD points where the pair lands. Rules that never break: (1) only lone pairs and π electrons move; (2) second-row atoms (C,N,O) can NEVER exceed an octet — if an arrow pushes electrons INTO a full atom, a second arrow must push electrons OFF it; (3) each arrow moves exactly 2 electrons. For resonance: draw the arrow(s) on structure A and they generate structure B — then reassign formal charges (this is why FC has to be automatic first; Ciesla said exactly this). Practice reading arrows aloud: 'this lone pair becomes a π bond; that π bond becomes a lone pair on oxygen.'",klein:"Klein 5e §2.10–2.13 (curved arrows, drawing resonance)"},
+  lewisab:{primer:"Second definition of acid/base, bigger than the first. BRØNSTED: acid donates H⁺, base accepts it. LEWIS: acid accepts an ELECTRON PAIR, base donates one. Every Brønsted base is a Lewis base (the lone pair that grabs H⁺ is the donated pair), but Lewis is wider: BF₃ has no H at all, yet its empty p orbital hungrily accepts a lone pair → textbook Lewis acid. Translation table for ochem: Lewis base = NUCLEOPHILE (electron-rich, attacks δ+), Lewis acid = ELECTROPHILE (electron-poor, gets attacked). Those two words run every mechanism from Ch 6 on — this section is where they're born.",klein:"Klein 5e §3.8–3.9 (Lewis acids & bases)"},
+  alkanes:{primer:"Naming, so you can talk about molecules. The IUPAC recipe: (1) find the LONGEST continuous carbon chain — that's the parent (meth-1, eth-2, prop-3, but-4, pent-5, hex-6, hept-7, oct-8); (2) number the chain from the end giving substituents the LOWEST locants; (3) name substituents as -yl groups (methyl, ethyl, isopropyl, tert-butyl); (4) alphabetize them (ignore di-/tri- prefixes when alphabetizing); (5) assemble: locants-prefix-parent. 2-methylbutane, 2,3-dimethylhexane. The classifications that matter later: 1°/2°/3°/4° carbon = how many OTHER carbons it touches — this vocabulary powers carbocation stability, radical stability, and substitution all semester.",klein:"Klein 5e §4.1–4.3 (nomenclature)"},
+  conform:{primer:"Same molecule, rotating. Single (σ) bonds spin freely, so one molecule flickers through infinite CONFORMATIONS — same connectivity, NOT isomers you can bottle. The NEWMAN PROJECTION looks straight down one C–C bond: front carbon = a dot with 3 bonds, back carbon = a circle with 3 bonds. STAGGERED (front bonds bisect back bonds, 60° apart) = lowest energy; ECLIPSED (bonds aligned) = highest. For butane's C2–C3 bond, staggered splits again: ANTI (the two methyls 180° apart — global minimum) beats GAUCHE (methyls 60° apart — small steric penalty). Energy costs worth memorizing: each H/H eclipse ≈ 4 kJ/mol; gauche CH₃/CH₃ ≈ 3.8 kJ/mol.",klein:"Klein 5e §4.7–4.10 (conformations, Newman projections)"},
+  chair:{primer:"Cyclohexane isn't flat — it puckers into the CHAIR, which puts every angle at ~111° and every bond staggered: essentially strain-free. Each carbon carries one AXIAL H (points straight up or down, alternating around the ring) and one EQUATORIAL H (points outward around the ring's waist). RING FLIP: the chair inverts through a boat, and every axial becomes equatorial and vice versa (up/down character is what's preserved). The exam question that never dies: a substituent is HAPPIER EQUATORIAL — axial groups suffer 1,3-diaxial crowding with the two axial H's on their side. Bigger group → bigger preference (tert-butyl essentially locks the ring). Drawing clean chairs takes physical practice — do 20 of them on paper before this chapter starts.",klein:"Klein 5e §4.11–4.14 (cyclohexane, chair conformations, ring flips)"},
   acidbase2:{primer:"No pKa table? Compare the CONJUGATE BASES — whichever is more stabilized came from the stronger acid. Check in order, A-R-I-O: Atom (which atom holds the − charge: more electronegative or larger = more stable), Resonance (delocalized charge = more stable), Induction (nearby electronegative atoms pull charge away = more stable), Orbital (charge in an sp orbital = more stable than sp³). Atom beats Resonance beats Induction beats Orbital when they conflict.",klein:"Klein 5e §3.4",links:[]},
 
   valence: { primer:"Valence electrons are the outer-shell electrons an atom brings to bonding — and for the main-group atoms you'll use, the count equals the group number: H 1, C 4, N 5, O 6, halogens 7. This one number drives everything downstream (how many bonds an atom wants, its formal charge, the whole Lewis structure). Memorize C/N/O/H cold — you'll use them every single problem.",
@@ -2193,11 +2226,15 @@ function runAudit(wrap){
 /* ---- CHEAT SHEET ---- */
 VIEWS.learn = (v) => {
   /* v3.7: chaptered Learn — Chapters menu → topic list → primer. Back buttons at every level. */
+  /* v3.12: full course map — every chapter the semester covers through Exam 1, each topic
+     carrying its Klein section + Khan Academy + Organic Chemistry Tutor sources (resTile).
+     Topics without bank items yet show no drill button — primer + sources only, honestly. */
   const CH=[
     {id:"prelim",ico:"🌱",name:"Preliminaries",sub:"The pre-gen-chem foundation — start here if anything feels shaky",topics:["p_atom","p_ptable","p_ions","p_bondtypes","p_formulas"]},
-    {id:"ch1",ico:"⚗️",name:"Chapter 1 — General Chemistry Review",sub:"The quiz-scope six · Klein Ch 1 · Quiz Thu 8/27",topics:["valence","lewis","formal","polarity","hybrid","imf"]},
-    {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Bond-line + resonance · course-current THIS week",topics:["bondline","resonance"]},
-    {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"pKa + ARIO · starts week of Aug 31",topics:["acidbase1","acidbase2"]},
+    {id:"ch1",ico:"⚗️",name:"Chapter 1 — General Chemistry Review",sub:"Week 1 · Klein Ch 1 · QUIZ THU 8/27 — full quiz scope incl. orbitals & isomers",topics:["valence","lewis","formal","polarity","hybrid","imf","orbitals","isomers"]},
+    {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Week 2 (NOW, finish by Aug 30) · bond-line, resonance, curved arrows",topics:["bondline","resonance","arrows"]},
+    {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"Week 3 (starts Aug 31) · pKa ladder, ARIO, Lewis acids/bases",topics:["acidbase1","acidbase2","lewisab"]},
+    {id:"ch4",ico:"⛰️",name:"Chapter 4 — Alkanes & Cycloalkanes",sub:"Week 4 (starts Sep 7) · read ahead only if Ch 1–3 are solid · Exam 1 covers Ch 1–4 (~Sep 15)",topics:["alkanes","conform","chair"]},
   ];
   const tName=k=>(TOPICS[k]?(TOPICS[k].ico+" "+TOPICS[k].name):k);
   const tStat=k=>{ let r=0,w=0; QUESTIONS.forEach(q=>{ if(q.topic===k){const s=S.qstats[q.id]; if(s){r+=s.r;w+=s.w;}} }); const tot=r+w; return tot?Math.round(100*r/tot)+"%":null; };
