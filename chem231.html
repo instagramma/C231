@@ -6,7 +6,16 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.12  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4 (new-bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.12.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.12.1 AUDIT R5 REPAIRS (desktop session; all five actionable findings): x2-ab04 no
+  longer accepts charge-less "nh4"; x2-h04 requalified to the steric-number model with the
+  Klein/Wiley fine print (the h4/hx5 fix had not propagated to the new bank); x2-l01 "always
+  4 bonds" scoped to this unit's closed-shell molecules; x2-ac01 ARIO marked "in general" +
+  Klein's sp-carbanion exception; x2-i12 gains the comparable-shape condition. ROTATION:
+  recency penalties rescaled BELOW need-gaps (0.9/0.45/0.2 — need strictly leads again),
+  excludeRecentRounds() sits the last 2 rounds' questions out via the event log (no new
+  state), spreadByDifficulty() now buckets on MEASURED qDiffM and refuses exact-twin
+  concept families (CONCEPT_FAMILY map) in one set.
   v3.12 (2026-08-25, Gabe: "alot of topics for my class is missing from this learn section…
         We need week 2 and the chapters, and their topics etc. as well as their book source,
         khan source, and ochemtutor source"): LEARN = FULL COURSE MAP through Exam 1.
@@ -555,15 +564,32 @@ function qDiff(q){ const d=(q.diff!==undefined&&q.diff!==null)?q.diff:DIFF_DEFAU
    often." Need still leads; this only breaks ties among comparably-needed items so the
    rotation actually moves through the bank. */
 function recencyPenalty(id){
+  // v3.12.1 (audit r5 F2): the old penalties (3 / 1.5) CROSSED need levels — a recent
+  // confident-wrong (need 4) scored below an untouched mastered item. Need gaps are 1,
+  // so every penalty now stays under 1: need strictly leads, recency only orders within it.
   const ev=(S.attempts||[]).filter(a=>a.id===id);
   if(!ev.length) return 0;
   const lastTs=Math.max(...ev.map(a=>a.ts||0));
   const hrs=(Date.now()-lastTs)/3600000;
   if(hrs>=72) return 0;          // 3+ days: fully back in rotation
-  if(hrs>=24) return 0.5;        // yesterday: mild damping
-  if(hrs>=6)  return 1.5;        // earlier today: noticeable damping
-  return 3;                      // within 6h: push hard to the back
+  if(hrs>=24) return 0.2;        // yesterday: mild damping
+  if(hrs>=6)  return 0.45;       // earlier today: noticeable damping
+  return 0.9;                    // within 6h: strongest damping, but never outranks need
 }
+/* v3.12.1 (audit r5 F2): hard exclusion of the last two rounds' questions, derived from the
+   event log (last 10 attempts ≈ 2 rounds of 5) — no new state, survives reload, syncs
+   cross-device. Only applied when the pool can afford it. */
+function excludeRecentRounds(pool, need){
+  // adaptive window: exclude as much recent history as the pool can afford (up to ~6 rounds).
+  // Big pools (38+) → a question sits out ~5-6 rounds; small pools self-limit via the guard.
+  const K=Math.min(30, Math.max(10, pool.length - need*2));
+  const recent=new Set((S.attempts||[]).slice(-K).map(a=>a.id));
+  const filtered=pool.filter(q=>!recent.has(q.id));
+  return filtered.length>=need ? filtered : pool;
+}
+/* v3.12.1 (audit r5 F5): exact-twin questions (same fact, different id) must not co-occur
+   in one short set — the recency system sees them as unrelated. */
+const CONCEPT_FAMILY={v5:"ve-co2","x2-v08":"ve-co2",v6:"ve-nh3","x2-v09":"ve-nh3",v9:"ve-oh","x2-v10":"ve-oh",r5:"res-major","x2-r06":"res-major",b3:"acid-hfw","x2-ac05":"acid-hfw"};
 /* v3.9: difficulty badge for the 0-3 scale. Tier 0 is trivial, so it gets a label rather
    than zero dots (which would render as nothing and look like a bug). */
 function diffDots(d){
@@ -581,14 +607,20 @@ function spreadByDifficulty(pool, n){
   const window=pool.slice(0, Math.min(pool.length, n*4));
   const rest=pool.slice(window.length);
   const buckets={};
-  window.forEach(q=>{ const d=Math.round(qDiff(q)); (buckets[d]=buckets[d]||[]).push(q); });
+  // v3.12.1 (audit r5 F6): spread on MEASURED difficulty (qDiffM), same value the badge shows
+  window.forEach(q=>{ const d=Math.round(qDiffM(q)); (buckets[d]=buckets[d]||[]).push(q); });
   const tiers=Object.keys(buckets).map(Number).sort((a,b)=>a-b);
   if(tiers.length<2) return pool;
-  const picked=[];
+  const picked=[]; const fams=new Set();
   let guard=0;
   while(picked.length<n && guard++<200){
     let moved=false;
-    for(const t of tiers){ if(buckets[t].length && picked.length<n){ picked.push(buckets[t].shift()); moved=true; } }
+    for(const t of tiers){
+      if(picked.length>=n) break;
+      // v3.12.1 (audit r5 F5): skip exact-twin concept families already in this set
+      while(buckets[t].length && CONCEPT_FAMILY[buckets[t][0].id] && fams.has(CONCEPT_FAMILY[buckets[t][0].id])) buckets[t].shift();
+      if(buckets[t].length){ const q=buckets[t].shift(); picked.push(q); if(CONCEPT_FAMILY[q.id]) fams.add(CONCEPT_FAMILY[q.id]); moved=true; }
+    }
     if(!moved) break;
   }
   const leftovers=tiers.flatMap(t=>buckets[t]);
@@ -1012,7 +1044,7 @@ const QUESTIONS = [
 {id:"x2-v12",topic:"valence",type:"num",diff:3,prompt:"TOTAL valence electrons in the CARBONATE ion, CO₃²⁻?",answer:24,why:"<b>24</b>: C gives 4, three O's give 18 = 22, then <b>+2 for the 2− charge</b> = 24. Two-electron adjustment for a 2− ion — the charge number is the number of electrons you add."},
 
 /* --- lewis structures --- */
-{id:"x2-l01",topic:"lewis",type:"num",diff:0,prompt:"How many bonds does a NEUTRAL carbon atom make?",answer:4,why:"<b>4</b>, always, with 0 lone pairs. Neutral carbon with anything other than 4 bonds is a drawing error — this is the single most useful sanity check you have."},
+{id:"x2-l01",topic:"lewis",type:"num",diff:0,prompt:"In this unit's stable, octet-satisfied molecules: how many bonds does a NEUTRAL carbon make?",answer:4,why:"<b>4</b>, with 0 lone pairs — the default pattern for every closed-shell neutral carbon in Ch 1–4, and your single most useful sanity check. <i>(Real exceptions — carbenes, radicals — exist and arrive later in the course; if a neutral C in THIS unit isn't showing 4 bonds, treat it as a drawing error.)</i>"},
 {id:"x2-l02",topic:"lewis",type:"num",diff:0,prompt:"How many bonds does a NEUTRAL oxygen atom make?",answer:2,why:"<b>2 bonds + 2 lone pairs.</b> 6 valence electrons: 2 go into bonds, 4 sit as two pairs. Memorize the neutral patterns — C 4/0, N 3/1, O 2/2, halogen 1/3."},
 {id:"x2-l03",topic:"lewis",type:"num",diff:0,prompt:"How many LONE PAIRS does a neutral nitrogen atom carry?",answer:1,why:"<b>1</b>, alongside 3 bonds. That lone pair is nitrogen's whole personality — it's what makes amines basic and nucleophilic."},
 {id:"x2-l04",topic:"lewis",type:"num",diff:1,prompt:"How many LONE PAIRS does a neutral chlorine atom carry when bonded in a molecule?",answer:3,why:"<b>3</b>, plus its 1 bond. 7 valence electrons: 1 shared in the bond, 6 left as three pairs. Students routinely forget to draw these."},
@@ -1082,7 +1114,7 @@ const QUESTIONS = [
 {id:"x2-h01",topic:"hybrid",type:"num",diff:0,prompt:"How many electron domains does an sp³ atom have?",answer:4,why:"<b>4</b>. Domain count IS the hybridization: 4 → sp³, 3 → sp², 2 → sp. Count domains first, everything else follows."},
 {id:"x2-h02",topic:"hybrid",type:"mc",diff:0,prompt:"When counting electron DOMAINS, a double bond counts as:",choices:["ONE domain","Two domains","Four domains","Half a domain"],answer:0,why:"<b>One.</b> A domain is a direction that electron density points, and both halves of a double bond point the same way. Counting a double bond as 2 domains is the fastest way to get every hybridization wrong."},
 {id:"x2-h03",topic:"hybrid",type:"mc",diff:0,prompt:"A LONE PAIR counts as:",choices:["One electron domain","Zero — only bonds count","Two domains","Half a domain"],answer:0,why:"<b>One domain.</b> Lone pairs take up space and push bonds around, so they count for hybridization and geometry. Forgetting them is why students call water sp² instead of sp³."},
-{id:"x2-h04",topic:"hybrid",type:"text",diff:1,prompt:"Hybridization of the oxygen in H₂O? (type like: sp3)",answer:"sp3",accept:["sp3","sp³"],why:"<b>sp³</b> — 2 bonds + 2 lone pairs = 4 domains. Electron geometry tetrahedral, but the SHAPE is bent because you only name the atom positions. Angle ~104.5°, squeezed below 109.5° by the lone pairs."},
+{id:"x2-h04",topic:"hybrid",type:"text",diff:1,prompt:"Using the steric-number/VSEPR model (Ciesla's course model): what hybridization is ASSIGNED to the oxygen in H₂O? (type like: sp3)",answer:"sp3",accept:["sp3","sp³"],why:"<b>sp³</b> in the course model — 2 bonds + 2 lone pairs = 4 domains. Electron geometry tetrahedral, SHAPE bent (~104.5°, squeezed by the lone pairs). <i>Fine print (Klein/Wiley §1.11): experiment puts at least one lone pair in a p orbital — water's O is not literally sp³; VSEPR is the first approximation. Know both layers.</i>"},
 {id:"x2-h05",topic:"hybrid",type:"text",diff:1,prompt:"Hybridization of the nitrogen in NH₃?",answer:"sp3",accept:["sp3","sp³"],why:"<b>sp³</b> — 3 bonds + 1 lone pair = 4 domains. Shape is trigonal pyramidal, angle ~107° (one lone pair pushing down from 109.5°)."},
 {id:"x2-h06",topic:"hybrid",type:"text",diff:1,prompt:"Hybridization of each carbon in H₂C=CH₂ (ethene)?",answer:"sp2",accept:["sp2","sp²"],why:"<b>sp²</b> — each carbon has 2 H's plus the double bond = 3 domains. Trigonal planar, 120°, and the whole molecule is flat."},
 {id:"x2-h07",topic:"hybrid",type:"num",diff:1,prompt:"What bond angle goes with sp² hybridization (no lone pairs)?",answer:120,why:"<b>120°</b> — trigonal planar. sp³ → 109.5°, sp² → 120°, sp → 180°. Three numbers worth having cold."},
@@ -1110,7 +1142,7 @@ const QUESTIONS = [
 {id:"x2-i09",topic:"imf",type:"mc",diff:2,prompt:"Branched isomers boil LOWER than straight-chain ones. Why?",choices:["Branching makes the molecule more spherical, reducing contact surface for dispersion","Branching adds polarity","Branching removes hydrogens","They actually boil higher"],answer:0,why:"<b>Less surface contact.</b> Dispersion needs molecules to lie against each other; a compact branched blob touches less than an extended chain. Pentane boils at 36°C, its fully branched isomer neopentane at 9.5°C — same formula."},
 {id:"x2-i10",topic:"imf",type:"mc",diff:3,prompt:"An exam asks why molecule Y boils higher than X. Which answer LOSES points?",choices:["'Because Y has stronger bonds that take more energy to break'","'Because Y hydrogen-bonds and X only has dispersion'","'Because Y's intermolecular forces are stronger'","'Because Y needs more energy to separate its molecules'"],answer:0,why:"<b>'Breaking bonds' is the losing phrase.</b> Boiling does NOT break covalent bonds — the molecules stay completely intact, they just separate from each other. Say 'overcoming intermolecular forces', never 'breaking bonds'. Ciesla flagged this exact wording."},
 {id:"x2-i11",topic:"imf",type:"mc",diff:3,prompt:"HF has stronger hydrogen bonds than H₂O, yet water boils higher (100°C vs 20°C). Why?",choices:["Water can form more H-bonds per molecule — 2 donors and 2 acceptors","HF doesn't really H-bond","Water is heavier","The data is wrong"],answer:0,why:"<b>Count, not just strength.</b> Water has 2 O–H donors and 2 lone pairs → up to 4 H-bonds each, building a 3D network. HF has 1 donor and 3 lone pairs, so it's limited to chains. Total network beats per-bond strength."},
-{id:"x2-i12",topic:"imf",type:"mc",diff:3,prompt:"Two molecules have identical formulas; one is polar and one isn't. Which has the higher boiling point, and what's the full-credit reason?",choices:["The polar one — it has dipole–dipole forces on top of dispersion, so more energy is needed to overcome them","The nonpolar one — fewer forces to fight","Same — identical formulas mean identical boiling points","Can't be determined"],answer:0,why:"<b>Polar boils higher.</b> Full-credit structure: name the specific IMF difference (dipole–dipole plus dispersion vs dispersion alone) → link it to energy required → state that molecules separate INTACT. Naming the force is what earns the marks."},
+{id:"x2-i12",topic:"imf",type:"mc",diff:3,prompt:"Two molecules of identical formula AND comparable shape (think cis- vs trans-1,2-dichloroethene — her example); one is polar, one isn't. Which boils higher, and what's the full-credit reason?",choices:["The polar one — it has dipole–dipole forces on top of dispersion, so more energy is needed to overcome them","The nonpolar one — fewer forces to fight","Same — identical formulas mean identical boiling points","Can't be determined"],answer:0,why:"<b>Polar boils higher.</b> Full-credit structure: name the specific IMF difference (dipole–dipole plus dispersion vs dispersion alone) → link it to energy required → state that molecules separate INTACT. Naming the force is what earns the marks."},
 /* ===== v3.9 EXPANSION — CH 2 (bond-line · resonance) + CH 3 (pKa · ARIO) ===== */
 /* --- bond-line drawings & functional groups --- */
 {id:"x2-b01",topic:"bondline",type:"mc",diff:0,prompt:"In a bond-line (skeletal) drawing, each corner or line END represents:",choices:["A carbon atom","A hydrogen atom","A lone pair","A bond"],answer:0,why:"<b>Carbon.</b> Vertices and endpoints are carbons, drawn invisibly to keep structures fast to sketch. The zigzag exists so you can count carbons at a glance."},
@@ -1147,7 +1179,7 @@ const QUESTIONS = [
 {id:"x2-ab01",topic:"acidbase1",type:"mc",diff:0,prompt:"A LOWER pKa means:",choices:["A stronger acid","A weaker acid","A stronger base","Nothing about strength"],answer:0,why:"<b>Lower pKa = stronger acid.</b> It's a logarithmic scale running backwards from intuition. HCl at −7 is enormously stronger than water at 15.7 — and each unit is a factor of 10."},
 {id:"x2-ab02",topic:"acidbase1",type:"mc",diff:0,prompt:"A Brønsted acid is a:",choices:["Proton (H⁺) donor","Proton acceptor","Electron donor","Electron acceptor"],answer:0,why:"<b>Proton donor</b>; the base is the acceptor. (Lewis definitions flip to electron pairs — same reactions, different lens. Ochem uses both.)"},
 {id:"x2-ab03",topic:"acidbase1",type:"text",diff:1,prompt:"What is the conjugate base of HCl? (type a formula, e.g. NH2-)",answer:"cl-",accept:["cl-","cl−","chloride"],why:"<b>Cl⁻.</b> Remove one H⁺ and you have the conjugate base. Conjugate pairs differ by exactly one proton, never more."},
-{id:"x2-ab04",topic:"acidbase1",type:"text",diff:1,prompt:"What is the conjugate ACID of NH₃? (type a formula)",answer:"nh4+",accept:["nh4+","nh4","ammonium"],why:"<b>NH₄⁺.</b> Conjugate acid = add a proton. Note the charge goes UP by one when you add H⁺ — neutral NH₃ becomes +1."},
+{id:"x2-ab04",topic:"acidbase1",type:"text",diff:1,prompt:"What is the conjugate ACID of NH₃? (type the formula WITH its charge, like: xy2+)",answer:"nh4+",accept:["nh4+","ammonium"],why:"<b>NH₄⁺.</b> Conjugate acid = add a proton. The charge goes UP by one when you add H⁺ — neutral NH₃ becomes +1. <b>NH₄ without the + is wrong</b>: charge bookkeeping IS the answer. (audit r5: charge-less 'nh4' no longer accepted)"},
 {id:"x2-ab05",topic:"acidbase1",type:"mc",diff:1,prompt:"Which is the strongest acid?",choices:["HCl (pKa −7)","Acetic acid (pKa 5)","Water (pKa 15.7)","Ethanol (pKa 16)"],answer:0,why:"<b>HCl</b>, by a colossal margin — pKa −7 vs 5 is twelve orders of magnitude. Lowest pKa wins, and negative pKa values mean very strong acids."},
 {id:"x2-ab06",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of a carboxylic acid (RCOOH)?",answer:5,tolerance:1,why:"<b>~5.</b> A number worth having cold. Carboxylic acids are the most acidic of the common neutral functional groups you'll meet this semester, thanks to resonance stabilization of the carboxylate. (Sulfonic acids are stronger still, but they mostly show up as catalysts rather than as the compounds you're ranking.)"},
 {id:"x2-ab07",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of water?",answer:15.7,tolerance:0.5,why:"<b>15.7.</b> The reference point in the middle of the ladder. Alcohols sit right beside it (~16), which is why hydroxide and alkoxides are comparably strong bases."},
@@ -1158,7 +1190,7 @@ const QUESTIONS = [
 {id:"x2-ab12",topic:"acidbase1",type:"mc",diff:3,prompt:"Ethanol has pKa ~16 and acetic acid ~5. Both have an O–H. Why an 11-unit gap?",choices:["Acetate's charge is delocalized over two oxygens by resonance; ethoxide's isn't","Acetic acid has more hydrogens","Ethanol has no oxygen","Acetic acid is bigger"],answer:0,why:"<b>Resonance in the conjugate base.</b> Stability of the ANION is what sets acidity — always look at what's left after the proton leaves. 11 pKa units means acetic acid is ~100 billion times more acidic."},
 
 /* --- acid/base: ARIO ranking --- */
-{id:"x2-ac01",topic:"acidbase2",type:"mc",diff:1,prompt:"ARIO ranks conjugate-base stability. What do the letters stand for, in priority order?",choices:["Atom, Resonance, Induction, Orbital","Acid, Reaction, Ion, Oxygen","Atom, Radius, Ionic, Orbital","Anion, Resonance, Ionization, Octet"],answer:0,why:"<b>A</b>tom > <b>R</b>esonance > <b>I</b>nduction > <b>O</b>rbital. Check them in that order and stop at the first one that distinguishes your two species — earlier factors override later ones."},
+{id:"x2-ac01",topic:"acidbase2",type:"mc",diff:1,prompt:"ARIO ranks conjugate-base stability. What do the letters stand for, in priority order?",choices:["Atom, Resonance, Induction, Orbital","Acid, Reaction, Ion, Oxygen","Atom, Radius, Ionic, Orbital","Anion, Resonance, Ionization, Octet"],answer:0,why:"<b>A</b>tom > <b>R</b>esonance > <b>I</b>nduction > <b>O</b>rbital — check in that order and stop at the first factor that distinguishes your species. <i>This ordering holds 'in general' (Klein's words), not absolutely: his named exception is an sp carbanion (HC≡C⁻) being MORE stable than an sp³ nitrogen anion — Orbital beating Atom. Learn the rule AND that exception.</i>"},
 {id:"x2-ac02",topic:"acidbase2",type:"mc",diff:1,prompt:"Under 'A' (Atom), what do you compare when the charged atoms are in the same ROW?",choices:["Electronegativity — more EN holds the − charge better","Size","Mass","Number of bonds"],answer:0,why:"<b>Electronegativity across a row.</b> F⁻ > OH⁻ > NH₂⁻ > CH₃⁻ in stability, so HF is the strongest of those acids. Down a COLUMN you switch to size instead."},
 {id:"x2-ac03",topic:"acidbase2",type:"mc",diff:2,prompt:"Under 'A' (Atom), what do you compare going DOWN a column?",choices:["Size — bigger atoms spread charge over more volume","Electronegativity","Mass number","Color"],answer:0,why:"<b>Size wins down a column</b>, and it overrides electronegativity. F is more electronegative than I, yet HI is the far stronger acid because I⁻ is huge and dilutes the charge beautifully."},
 {id:"x2-ac04",topic:"acidbase2",type:"mc",diff:2,prompt:"HBr is a stronger acid than HF, even though F is much more electronegative. Why?",choices:["Br⁻ is far larger, spreading the negative charge over more volume","F doesn't hold charge","HBr has resonance","HF is a gas"],answer:0,why:"<b>Size beats electronegativity down a column.</b> HF pKa 3.2 vs HBr pKa −9 — twelve orders of magnitude apart. Two sub-rules live inside 'A' and you have to know which axis you're moving along."},
@@ -1753,6 +1785,7 @@ function startDrill(topic){
      questions very often"). Now the sort key is need − recency, so a question served in the
      last few hours drops behind equally-needy ones and the rotation actually advances.
      Then the top slice is re-picked to span difficulty tiers rather than clustering. */
+  pool = excludeRecentRounds(pool, SESSION_MAX); // v3.12.1 (audit r5 F2): last 2 rounds' questions sit out when the pool can afford it
   pool = shuffle(pool).sort((a,b)=>(need(b)-recencyPenalty(b.id))-(need(a)-recencyPenalty(a.id)));
   pool = spreadByDifficulty(pool, SESSION_MAX);
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
