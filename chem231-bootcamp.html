@@ -6,7 +6,22 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.15  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.16  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.16 (2026-08-25, Gabe: "app should give me a chance to mastery check each topic. not just
+        the one for the day"): MASTERY CHECKS FOR EVERY TOPIC. Formal charge had the only real
+        mastery gate; every other topic could only ever show a drill %, which the 08-11 audit
+        explicitly said must never count as mastery. Now each topic gets the same bar —
+        MASTERY_N=6 cold questions sampled across difficulty tiers (tier-0 trivia excluded, so
+        mastery can't be won on recall), CLEAN = all right first try with nothing flagged 🎲 or
+        🤷, and 2 clean runs on DIFFERENT days = mastered. Runs through the normal drill engine
+        via S.drill.masteryTopic, so it inherits pause (v3.14), look-back (v3.15), every
+        question type and the event log at zero extra cost.
+        MASTERY_FC is untouched — formal charge keeps its bespoke labelled bonds/LP/FC input
+        format, because the external audit specified exactly that. New masteryDays {topic:[dates]}
+        store, cloud-merged per topic by union; a boot migration folds the existing fcMastery
+        dates in, and formal-charge clean days keep writing to BOTH keys so the report export
+        and other sessions stay correct. Practice tab now lists every topic with its clean-day
+        count, and says plainly when a topic has too few non-trivial questions to be checked yet.
   v3.15 (2026-08-25, Gabe: "is it possible to go back a question just to see what i answered
         again? lol"): 👀 LOOK BACK inside a round. Every answer now writes a record to
         D.log {id,idx,ok,guessed,dk,submitted answer,typed reasoning}, and a read-only replay
@@ -445,7 +460,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.15</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.16</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -478,6 +493,7 @@ function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY,
 function mergeRemote(remote){
   if (!remote) return;
   ["doneDays","molDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
+  if(remote.masteryDays){ const md=S.masteryDays||{}; Object.keys(remote.masteryDays).forEach(k=>{ md[k]=[...new Set([...(remote.masteryDays[k]||[]), ...(md[k]||[])])]; }); S.masteryDays=md; } // v3.16: union per topic
   if (remote.lastEval && (!S.lastEval || remote.lastEval.date > S.lastEval.date)) S.lastEval = remote.lastEval;
   const seenM = new Set(S.missed);
   (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
@@ -527,7 +543,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery},
+      data: {doneDays:S.doneDays, qstats:S.qstats, missed:S.missed, molDone:S.molDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -1348,6 +1364,7 @@ const S = {
   molDone:  safeStore.get("molDone", []),
   visits:   safeStore.get("visits", []),
   fcMastery: safeStore.get("fcMastery", []),  // dates of CLEAN 6/6 mastery-check runs; 2 distinct days = mastered
+  masteryDays: safeStore.get("masteryDays", {}), // v3.16: {topicKey:[dates]} — the same bar, now for EVERY topic. formal stays mirrored to fcMastery for back-compat.
   lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
   diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
   nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","formal","polarity","hybrid","imf"]}), // v3.0: editable (Canvas gives ≥3 days notice)
@@ -1361,7 +1378,7 @@ const S = {
   lab: null,     // lab session state
   attView: {topic:"all",outcome:"all",limit:60,qid:null}, // v3.11: attempt-history browser filters (session-only, never persisted)
 };
-function save(){ safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); cloudPush(false); }
+function save(){ safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); cloudPush(false); }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
@@ -1391,6 +1408,11 @@ function resumeMastery(){ const p=S.pausedMastery; if(!p) return;
   go("mastery");
 }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+/* v3.16: one-time migration — his existing formal-charge clean days move into the general
+   store. fcMastery stays populated too (the report export and other sessions still read it). */
+(function migrateMastery(){ S.masteryDays=S.masteryDays||{};
+  if((S.fcMastery||[]).length){ const cur=S.masteryDays.formal||[]; S.masteryDays.formal=[...new Set([...cur, ...S.fcMastery])]; }
+})();
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
 /* ================= HELPERS ================= */
@@ -1543,6 +1565,44 @@ const VIEWS = {};
    Six species, cold, inputs labeled: bonds → lone pairs → FC for the key atom.
    A run is CLEAN only if all 18 inputs are right first try. Two clean runs on
    two different days = mastered. Draw each one on paper BEFORE answering. */
+/* ================= v3.16 — MASTERY CHECK FOR EVERY TOPIC =================
+   Gabe: "app should give me a chance to mastery check each topic. not just the one for
+   the day." Formal charge already had a bespoke gate (MASTERY_FC — labelled bonds/LP/FC
+   inputs, kept exactly as-is because the external audit specified that format). Every
+   OTHER topic now gets the same BAR, built from the bank:
+     · 6 cold questions sampled across difficulty tiers — trivial (tier 0) items excluded,
+       because mastery shouldn't be provable on recall alone
+     · CLEAN = every one right FIRST TRY, with nothing flagged 🎲 guessed or 🤷 unlearned
+     · 2 clean runs on DIFFERENT days = mastered
+   It runs through the normal drill engine (S.drill.masteryTopic), so it inherits pause,
+   look-back, every question type and the event log for free. Standing rule, unchanged:
+   drill percentages never count as mastery — only a clean run does. */
+const MASTERY_N = 6;
+function masteryDaysFor(topic){
+  if(topic==="formal"){ return [...new Set([...(S.fcMastery||[]), ...((S.masteryDays||{}).formal||[])])]; }
+  return [...new Set(((S.masteryDays||{})[topic])||[])];
+}
+function masteryPoolFor(topic){
+  return QUESTIONS.filter(q=>q.topic===topic && q.type!=="written" && qDiff(q)>=1);
+}
+function masteryEligible(topic){ return masteryPoolFor(topic).length>=MASTERY_N; }
+function bankMasteryDay(topic){
+  const t=todayStr();
+  S.masteryDays=S.masteryDays||{};
+  const arr=S.masteryDays[topic]||(S.masteryDays[topic]=[]);
+  if(!arr.includes(t)) arr.push(t);
+  if(topic==="formal" && !S.fcMastery.includes(t)) S.fcMastery.push(t); // keep the legacy key honest
+  save();
+  return masteryDaysFor(topic).length;
+}
+function startTopicMastery(topic){
+  const pool=masteryPoolFor(topic);
+  if(pool.length<MASTERY_N){ alert("Not enough non-trivial questions in "+((TOPICS[topic]||{}).name||topic)+" yet for a mastery check."); return; }
+  const queue=spreadByDifficulty(shuffle(pool), MASTERY_N).slice(0,MASTERY_N);
+  S.drill={queue, i:0, right:0, wrong:0, topic, answered:false, cold:true, guessedRight:0,
+           masteryTopic:topic, scopeName:"Mastery check · "+((TOPICS[topic]||{}).name||topic), log:[]};
+  go("drill");
+}
 const MASTERY_FC = [
   {name:"OH⁻ (hydroxide)",      atom:"O", bonds:1, lp:3, fc:-1},
   {name:"H₃O⁺ (hydronium)",     atom:"O", bonds:3, lp:1, fc:1},
@@ -1972,6 +2032,28 @@ VIEWS.practice = (v) => {
   m.innerHTML='<h3>'+(new Set(S.fcMastery).size>=2?"🏅":"⚖️")+' Formal-Charge Mastery Check</h3><p class="muted" style="margin:4px 0 8px">The real bar for formal charge: 6 species, inputs labeled, all-first-try = a clean day; 2 clean days = mastered. <b>'+new Set(S.fcMastery).size+'/2 clean days.</b></p>';
   m.appendChild(el("button",{class:"btn gold",onclick:()=>startMastery()},"Run mastery check →"));
   v.appendChild(m);
+
+  /* v3.16: every OTHER topic gets the same bar. Ordered course-first (what he's being
+     assessed on), then preliminaries, then read-ahead — and topics with no bank items yet
+     are listed honestly as unavailable rather than hidden. */
+  const ORDER=["valence","lewis","polarity","hybrid","imf","orbitals","isomers","bondline","fgroups","resonance","arrows","acidbase1","acidbase2","lewisab","p_atom","p_ptable","p_ions","p_bondtypes","p_formulas","alkanes","conform","chair"];
+  const hub=el("div",{class:"card"});
+  const doneCount=ORDER.filter(k=>masteryDaysFor(k).length>=2).length + (masteryDaysFor("formal").length>=2?1:0);
+  hub.innerHTML='<span class="tag violet">⚖️ The real bar</span><h3>Mastery checks — every topic</h3>'+
+    '<p class="muted" style="margin:4px 0 8px">Same rule as formal charge: <b>'+MASTERY_N+' cold questions, every one right first try, nothing flagged 🎲 or 🤷</b> = one clean day. Two clean days on <b>different</b> days = mastered. Drill % never counts. <b>'+doneCount+' topic'+(doneCount===1?'':'s')+' mastered so far.</b></p>';
+  v.appendChild(hub);
+  ORDER.forEach(k=>{
+    if(!TOPICS[k]) return;
+    const days=masteryDaysFor(k).length, ok=masteryEligible(k);
+    const card=el("div",{class:"card cream"});
+    card.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<b style="flex:1">'+(days>=2?"🏅 ":"")+(TOPICS[k].ico||"")+' '+TOPICS[k].name+'</b>'+
+      '<span class="tag '+(days>=2?'gold':'violet')+'">'+days+'/2 clean days</span></div>'+
+      (days===1?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">One clean day banked ('+masteryDaysFor(k).join(", ")+'). Come back on a later day for the second.</p>':'')+
+      (!ok?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">Not enough non-trivial questions in the bank yet — bring this chapter to Claude and it gets built.</p>':'');
+    if(ok) card.appendChild(el("button",{class:"btn "+(days>=2?"ghost":"teal"),style:"margin-top:8px",onclick:()=>startTopicMastery(k)},days>=2?"Re-run check":"Run mastery check →"));
+    v.appendChild(card);
+  });
 };
 VIEWS.exam = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">📊 Exam · find your gaps</span><h2>Where am I? What do I study first?</h2><p class="muted">Two levels. The in-app <b>Evaluator</b> gives an instant per-topic gap map. The <b>full written exams</b> (blank-page — the true test) you do on paper, then send to Claude for a scored, ranked study plan.</p>'));
@@ -2088,6 +2170,32 @@ VIEWS.drill = (v) => {
       row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go(D.topic==="__eval"?"exam":"home");}},"Done"));
       // diagnostic still completes its Aug-18 plan day if passed
       if(D.topic==="__diag" && pct>=80){ const claim=TRACK.filter(x=>x.day<=todayStr()&&!S.doneDays.includes(x.day)&&x.topic==="diag").sort((a,b)=>a.day<b.day?-1:1)[0]; if(claim){ row.appendChild(el("button",{class:"btn gold",onclick:()=>{ if(!S.doneDays.includes(claim.day))S.doneDays.push(claim.day); save(); S.drill=null; go("home"); }},"✓ Mark diagnostic day done")); } }
+      c.appendChild(row); v.appendChild(c); return;
+    }
+    /* v3.16: a mastery round is judged on a stricter bar than a drill — every answer right
+       on the FIRST try, and nothing flagged guessed or unlearned. */
+    if (D.masteryTopic){
+      const L=D.log||[];
+      const clean = L.length===D.queue.length && L.every(r=>r.ok && !r.g && !r.dk);
+      const nm=(TOPICS[D.masteryTopic]||{}).name||D.masteryTopic;
+      const c=el("div",{class:"card"+(clean?" teal":"")});
+      if(clean){
+        confetti();
+        const days=bankMasteryDay(D.masteryTopic);
+        c.innerHTML='<span class="tag gold">CLEAN RUN — '+D.queue.length+'/'+D.queue.length+', no guesses</span>'+
+          '<h2>'+(days>=2?"🏅 "+nm+" MASTERED. Two clean days on record ("+masteryDaysFor(D.masteryTopic).join(", ")+").":"Clean day 1 banked for "+nm+" ("+todayStr()+"). One more clean run on a DIFFERENT day and it's mastered.")+'</h2>'+
+          '<p class="muted">Drill percentages never count as mastery — only this does.</p>';
+      } else {
+        const missed=L.filter(r=>!r.ok).length, flagged=L.filter(r=>r.ok&&(r.g||r.dk)).length;
+        c.innerHTML='<span class="tag coral">Not clean</span><h2>'+nm+' — '+D.right+'/'+D.queue.length+', run not clean</h2>'+
+          '<p style="margin:8px 0">'+(missed?missed+' missed. ':'')+(flagged?flagged+' right but flagged 🎲/🤷 — a guess isn\'t mastery, which is the point. ':'')+
+          'No shame, real data. Read the explanations below, then come back on a later day — clean days have to be on <b>different</b> days, so cramming two in a row can\'t fake it.</p>'+
+          '<p class="muted">'+masteryDaysFor(D.masteryTopic).length+'/2 clean days on '+nm+'.</p>';
+      }
+      const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
+      if(L.length) row.appendChild(el("button",{class:"btn ghost",onclick:()=>{D.reviewIdx=0; render();}},"👀 Review my answers"));
+      row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; go("practice");}},"Done"));
+      if(!clean) row.appendChild(el("button",{class:"btn ghost",onclick:()=>{S.drill=null; startDrill(D.masteryTopic);}},"Drill this topic"));
       c.appendChild(row); v.appendChild(c); return;
     }
     if (pct>=80) confetti();
