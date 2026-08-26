@@ -1,0 +1,152 @@
+{
+  "batchId": "2026-08-25-bonding-polarity-hybridization",
+  "reportedUse": ["quiz", "exam"],
+  "sourcePolicy": "Immutable full screenshots; app viewports exclude completed source controls.",
+  "items": [
+    {
+      "exactId": "EXACT-MIX-20260825-01",
+      "sourceFile": "exact-01-acetylcholine-formal-charges.png",
+      "sha256": "373faeab97d8edc187341efb41268c37cfb30949ee4c9eb02c3eb5f2fbc3f7a8",
+      "sourcePixels": [1618, 1164],
+      "displayViewport": [135, 420, 735, 330],
+      "responseMode": "charge dropdown grid",
+      "answer": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0, "f": 0, "g": 1}
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-02",
+      "sourceFile": "exact-02-potassium-ethoxide-structure.png",
+      "sha256": "605489e70441c634f37f518e161dcf6716cc38c6a45218ae742a6c99e6668730",
+      "sourcePixels": [1586, 1144],
+      "responseMode": "image multiple choice",
+      "answerIndex": 4,
+      "answer": "CH3CH2O- and K+ shown as separated ions; O has three lone pairs"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-03",
+      "sourceFile": "exact-03-electrophilic-carbons.png",
+      "sha256": "a4ad2ba9529935bd670e5ec803cdd1c06298953e21e29b57a8c2abc1f02e6df1",
+      "sourcePixels": [1630, 838],
+      "displayViewport": [115, 285, 540, 225],
+      "responseMode": "select exactly two",
+      "answer": ["B", "E"]
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-04",
+      "sourceFile": "exact-04-epichlorohydrin-partial-charges.png",
+      "sha256": "f5d105109b4fd6c2a5634544f01585765ac19105ec98dbe56f20fd0ff761bf9e",
+      "sourcePixels": [1618, 1196],
+      "responseMode": "image multiple choice",
+      "answerIndex": 0,
+      "answer": "O and Cl delta-minus; each carbon directly bonded to them delta-plus"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-05",
+      "sourceFile": "exact-05-sigma-pi-rotation-blanks.png",
+      "sha256": "c9559d0dfa6668a44ab26df56f219a2d31d479d82bd558ead26075ba2536ec55",
+      "sourcePixels": [1546, 586],
+      "displayViewport": [45, 160, 500, 215],
+      "responseMode": "inline dropdown blanks",
+      "answer": ["does not", "occurs", "does", "is not"]
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-06",
+      "sourceFile": "exact-06-hybridization-carbonyl-alkene.png",
+      "sha256": "99f2ed2414f51b025e02d41d3cb15752409b093353e58fea0f308f78943f0c57",
+      "sourcePixels": [1368, 862],
+      "displayViewport": [80, 35, 820, 675],
+      "responseMode": "inline dropdown blanks",
+      "answer": ["sp3", "sp2", "sp2", "sp2"]
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-07",
+      "sourceFile": "exact-07-bond-length-order.png",
+      "sha256": "c449db79a87d68bb355dc97261837e51869a127f70d458ea8b7a8f3abb718a6b",
+      "sourcePixels": [1078, 568],
+      "displayViewport": [65, 25, 610, 430],
+      "responseMode": "inline dropdown blanks",
+      "answer": {"shortest": "c", "longest": "a"}
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-08",
+      "sourceFile": "exact-08-carbocation-carbanion-geometry.png",
+      "sha256": "3c872695ecb370b9a9297fb997a78203ba6c5f255a5368d5ae8beea58674d70c",
+      "sourcePixels": [1624, 492],
+      "displayViewport": [65, 20, 470, 190],
+      "responseMode": "text multiple choice",
+      "answerIndex": 1
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-09",
+      "sourceFile": "exact-09-ammonia-ammonium-vsepr.png",
+      "sha256": "c3fd1f180f9d3eafa786ff43b2dde8f0b6379337cecccec882ea90e9d199fbe9",
+      "sourcePixels": [1640, 846],
+      "displayViewport": [90, 205, 1260, 380],
+      "responseMode": "mixed numeric and dropdown blanks",
+      "answer": [3, "one", "trigonal pyramidal", "107 degrees", 4, "no", "tetrahedral", "109.5 degrees", "increase"]
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-10",
+      "sourceFile": "exact-10-dipole-chcl3.png",
+      "sha256": "c3008c1c78ac5990f332f279756b4d736ebd3eaf376e8283f6cf0dd027f88d69",
+      "sourcePixels": [1554, 716],
+      "responseMode": "image multiple choice",
+      "answer": "toward the three-chlorine side"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-11",
+      "sourceFile": "exact-11-dipole-dimethyl-ether.png",
+      "sha256": "2ca4887aa943fa64a9b01f5fb22bf5c0acaef112a4f0a54ee7e698f44d45a98c",
+      "sourcePixels": [1514, 562],
+      "responseMode": "image multiple choice",
+      "answer": "toward oxygen"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-12",
+      "sourceFile": "exact-12-dipole-ammonia.png",
+      "sha256": "a0990dece5ac70c54806697968379bbbb1f4be745c6412bf6e76a2bfa15c2998",
+      "sourcePixels": [1532, 574],
+      "responseMode": "image multiple choice",
+      "answer": "toward nitrogen and the lone-pair side"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-13",
+      "sourceFile": "exact-13-dipole-ccl2br2.png",
+      "sha256": "9214d02a405cd5c3971f4422fb36ff700c3e4c647687121cbc30dd6636b5bdde",
+      "sourcePixels": [1618, 868],
+      "responseMode": "image multiple choice",
+      "answer": "toward the two-chlorine side"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-14",
+      "sourceFile": "exact-14-dipole-cis-dichloroethene.png",
+      "sha256": "c0c30b274777f419aaa88f90d1d0f69736a05511036be9f372a8485c92c28b00",
+      "sourcePixels": [1512, 848],
+      "responseMode": "image multiple choice",
+      "answer": "toward the side bearing both chlorine atoms"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-15",
+      "sourceFile": "exact-15-dipole-trans-dichloroethene.png",
+      "sha256": "8fd16ae6652057ed34dda91d8e7788a64f8501fc5abd679e2bcd5ba024c9bc7d",
+      "sourcePixels": [1524, 844],
+      "responseMode": "image multiple choice",
+      "answer": "no molecular dipole"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-16",
+      "sourceFile": "exact-16-dipole-11-dichloroethene.png",
+      "sha256": "3a0a8dd7fb0e86c43265ff47e5e4913c2391919ba6de8e6dbd2735c99c8d522e",
+      "sourcePixels": [1564, 838],
+      "responseMode": "image multiple choice",
+      "answer": "toward the CCl2 side"
+    },
+    {
+      "exactId": "EXACT-MIX-20260825-17",
+      "sourceFile": "exact-17-dipole-tetrachloroethene.png",
+      "sha256": "b4d95335bee85fcb7891a9ec34abdbd11514f0537a0cb63dccfd103f20c2bea7",
+      "sourcePixels": [1474, 802],
+      "responseMode": "image multiple choice",
+      "answer": "no molecular dipole"
+    }
+  ]
+}
