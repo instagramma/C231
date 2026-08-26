@@ -6,7 +6,32 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.22  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.24  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.24 (2026-08-26, Gabe: "Quiz and exam readiness … should be updated based on my
+        performance/explanation and understanding. And your analysis directly from you should
+        also be posted and up to date"): CLAUDE'S ASSESSMENT LAYER. The gate is mechanical and
+        can't see WHY a topic is weak, that a right answer was flagged as a guess, or that a
+        typed rationale showed correct reasoning. CLAUDE_ASSESSMENT now carries an overall read,
+        a per-CHECKPOINT verdict (rendered inside each readiness card), and a per-TOPIC level +
+        explanation (rendered collapsed in Practice, where he chooses what to drill).
+        Written from his 8/25 report, its written rationales, the handwritten tutorial Q2, the
+        SO₂ answers and Ciesla's stated scope. HONESTY: it's authored, not computed — every
+        block shows the date it was written and what it was written from, and past 4 days the
+        badge flips to STALE with a prompt to send a fresh report. It never pretends to be live.
+  v3.23 (2026-08-26, Gabe, three asks): (1) "Practice section in the app must be per chapter
+        btw" — Practice is now chaptered like Learn, course-current chapter first, and each
+        topic gets ONE row carrying its drill progress AND its mastery status AND a jump to its
+        primer, replacing the old flat pill-row + separate flat mastery list. The chapter map
+        moved out of VIEWS.learn into a shared CHAPTERS const so Learn and Practice can no
+        longer drift apart. (2) "I need to see readiness for each quiz, exam somewhere in the
+        app" — new READINESS BOARD at the top of 📊 Exam: every checkpoint (next quiz, Exam 1-3,
+        Final), each with a 🟢/🟡/🔴 light, clean-% across its own scope, topics mastered,
+        the latest scoped diagnostic, and a named list of what is BLOCKING the gate. Scope for
+        the cumulative exams is derived from SEMESTER by date; scope topics the bank can't test
+        yet are named explicitly rather than quietly dropped from the average. (3) Filed the
+        course artifacts he'd uploaded but that were never saved to iCloud — Ch 2 slides, the
+        official Functional Groups table, the syllabus, Ciesla's welcome email, his submitted
+        Exp-1 worksheet, and his handwritten lecture notes.
   v3.22 (2026-08-25, Gabe: eleven screenshots forming ten exact questions):
         BONDS + H-BONDING + HYBRIDIZATION + DIPOLES INTAKE. Eleven immutable screenshots
         preserve two-number σ/π counting, exact-three checkbox selection, typed valence,
@@ -513,7 +538,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.22</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.24</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2273,47 +2298,212 @@ function startDrill(topic){
 const SESSION_MAX = 5; // v2.13: max questions per drill session (short sets, big bank, randomized)
 // v2.12: Practice hub — Lewis Lab, topic drills, and the Mastery Check all live here
 // (Lewis Lab is a practice MODE, not a peer tab — this fixes the confusing nav).
+/* v3.23: ONE chapter map, used by both Learn and Practice (Gabe: "Practice section in the
+   app must be per chapter btw"). Previously the chapter structure lived inside VIEWS.learn
+   and Practice was a flat pill row, so the two views could drift apart. Single source now. */
+const CHAPTERS=[
+  {id:"prelim",ico:"🌱",name:"Preliminaries",sub:"The pre-gen-chem foundation — start here if anything feels shaky",topics:["p_atom","p_ptable","p_ions","p_bondtypes","p_formulas"]},
+  {id:"ch1",ico:"⚗️",name:"Chapter 1 — General Chemistry Review",sub:"Week 1 · Klein Ch 1 · QUIZ THU 8/27 — full quiz scope incl. orbitals & isomers",topics:["valence","lewis","formal","polarity","hybrid","imf","orbitals","isomers"]},
+  {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Week 2 (NOW, finish by Aug 30) · bond-line, functional groups, resonance, curved arrows",topics:["bondline","fgroups","resonance","arrows"]},
+  {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"Week 3 (starts Aug 31) · pKa ladder, ARIO, Lewis acids/bases",topics:["acidbase1","acidbase2","lewisab"]},
+  {id:"ch4",ico:"⛰️",name:"Chapter 4 — Alkanes & Cycloalkanes",sub:"Week 4 (starts Sep 7) · read ahead only if Ch 1–3 are solid · Exam 1 covers Ch 1–4 (~Sep 15)",topics:["alkanes","conform","chair"]},
+];
+/* which chapter is course-current right now, so Practice can lead with it */
+function currentChapterId(){
+  const wk=Math.max(courseWeek(),1);
+  return wk<=1?"ch1":wk===2?"ch2":wk===3?"ch3":"ch4";
+}
 VIEWS.practice = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Three hands-on modes. New to a topic? Read its primer in 📖 Learn first, then practice it here.</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Organised by chapter, same as 📖 Learn. Each topic has two modes: <b>Drill</b> (quick rounds, explains every answer) and <b>Mastery check</b> (the real bar — 6 cold questions, all right first try, nothing guessed).</p>'));
+
   const lab=el("div",{class:"card cream"});
-  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked targets, including four exact-source structures. Six-step method enforced (count → central → predict → build → audit); the final check verifies the full molecular graph and formal charges.</p>';
+  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked targets, including exact-source structures. Six-step method enforced (count → central → predict → build → audit); the final check verifies the full molecular graph and formal charges.</p>';
   lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
   v.appendChild(lab);
-  v.appendChild(el("div",{class:"card"},'<h3>🎯 Drill a topic</h3><p class="muted">Quick generation rounds; each answer explains the why.</p>'));
-  const pr=el("div",{class:"pill-row"});
-  Object.entries(TOPICS).forEach(([k,t])=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"); if(!qs.length)return;
-    const done=qs.filter(q=>S.qstats[q.id]?.r).length;
-    pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>")); });
-  pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
-  v.appendChild(pr);
-  const m=el("div",{class:"card"});
-  m.innerHTML='<h3>'+(new Set(S.fcMastery).size>=2?"🏅":"⚖️")+' Formal-Charge Mastery Check</h3><p class="muted" style="margin:4px 0 8px">The real bar for formal charge: 6 species, inputs labeled, all-first-try = a clean day; 2 clean days = mastered. <b>'+new Set(S.fcMastery).size+'/2 clean days.</b></p>';
-  m.appendChild(el("button",{class:"btn gold",onclick:()=>startMastery()},"Run mastery check →"));
-  v.appendChild(m);
 
-  /* v3.16: every OTHER topic gets the same bar. Ordered course-first (what he's being
-     assessed on), then preliminaries, then read-ahead — and topics with no bank items yet
-     are listed honestly as unavailable rather than hidden. */
-  const ORDER=["valence","lewis","polarity","hybrid","imf","orbitals","isomers","bondline","fgroups","resonance","arrows","acidbase1","acidbase2","lewisab","p_atom","p_ptable","p_ions","p_bondtypes","p_formulas","alkanes","conform","chair"];
-  const hub=el("div",{class:"card"});
-  const doneCount=ORDER.filter(k=>masteryDaysFor(k).length>=2).length + (masteryDaysFor("formal").length>=2?1:0);
-  hub.innerHTML='<span class="tag violet">⚖️ The real bar</span><h3>Mastery checks — every topic</h3>'+
-    '<p class="muted" style="margin:4px 0 8px">Same rule as formal charge: <b>'+MASTERY_N+' cold questions, every one right first try, nothing flagged 🎲 or 🤷</b> = one clean day. Two clean days on <b>different</b> days = mastered. Drill % never counts. <b>'+doneCount+' topic'+(doneCount===1?'':'s')+' mastered so far.</b></p>';
-  v.appendChild(hub);
-  ORDER.forEach(k=>{
-    if(!TOPICS[k]) return;
-    const days=masteryDaysFor(k).length, ok=masteryEligible(k);
-    const card=el("div",{class:"card cream"});
-    card.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
-      '<b style="flex:1">'+(days>=2?"🏅 ":"")+(TOPICS[k].ico||"")+' '+TOPICS[k].name+'</b>'+
-      '<span class="tag '+(days>=2?'gold':'violet')+'">'+days+'/2 clean days</span></div>'+
-      (days===1?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">One clean day banked ('+masteryDaysFor(k).join(", ")+'). Come back on a later day for the second.</p>':'')+
-      (!ok?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">Not enough non-trivial questions in the bank yet — bring this chapter to Claude and it gets built.</p>':'');
-    if(ok) card.appendChild(el("button",{class:"btn "+(days>=2?"ghost":"teal"),style:"margin-top:8px",onclick:()=>startTopicMastery(k)},days>=2?"Re-run check":"Run mastery check →"));
-    v.appendChild(card);
+  const missedN=[...new Set(S.missed)].length;
+  if(missedN){
+    const mr=el("div",{class:"card cream"});
+    mr.innerHTML='<h3>🔥 Review what you missed</h3><p class="muted" style="margin:4px 0 8px">'+missedN+' question'+(missedN===1?'':'s')+' you got wrong or flagged shaky, across every chapter.</p>';
+    mr.appendChild(el("button",{class:"btn coral",onclick:()=>startDrill("__missed")},"Review missed ("+missedN+") →"));
+    v.appendChild(mr);
+  }
+
+  /* v3.23: PER-CHAPTER. Course-current chapter leads; each topic gets one row carrying both
+     its drill progress and its mastery status, instead of two separate flat lists. */
+  const cur=currentChapterId();
+  const chapters=[...CHAPTERS].sort((a,b)=>(a.id===cur?-1:0)-(b.id===cur?-1:0));
+  const totalMastered=CHAPTERS.flatMap(c=>c.topics).filter(k=>masteryDaysFor(k).length>=2).length;
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">⚖️ The real bar</span><h3>Mastery: '+totalMastered+' topic'+(totalMastered===1?'':'s')+' mastered</h3><p class="muted" style="margin:4px 0 0">A mastery check is <b>'+MASTERY_N+' cold questions, every one right first try, nothing flagged 🎲 or 🤷</b> = one clean day. Two clean days on <b>different</b> days = mastered. Drill % never counts.</p>'));
+
+  chapters.forEach(ch=>{
+    const isCur=ch.id===cur;
+    const head=el("div",{class:"card"+(isCur?" teal":"")});
+    const chTopics=ch.topics.filter(k=>TOPICS[k]);
+    const mastered=chTopics.filter(k=>masteryDaysFor(k).length>=2).length;
+    head.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<h3 style="flex:1;margin:0">'+ch.ico+' '+ch.name+'</h3>'+
+      (isCur?'<span class="tag gold">course-current</span>':'')+
+      '<span class="tag violet">'+mastered+'/'+chTopics.length+' mastered</span></div>'+
+      '<p class="'+(isCur?'':'muted')+'" style="margin:6px 0 0;font-size:.85rem'+(isCur?';opacity:.92':'')+'">'+ch.sub+'</p>';
+    v.appendChild(head);
+
+    chTopics.forEach(k=>{
+      const t=TOPICS[k];
+      const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written");
+      const seen=qs.filter(q=>S.qstats[q.id]?.r).length;
+      const days=masteryDaysFor(k).length, canMaster=masteryEligible(k);
+      const row=el("div",{class:"card cream"});
+      row.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+        '<b style="flex:1">'+(days>=2?"🏅 ":"")+(t.ico||"")+' '+t.name+'</b>'+
+        (qs.length?'<span class="muted mono" style="font-size:.78rem">'+seen+'/'+qs.length+' seen</span>':'')+
+        '<span class="tag '+(days>=2?'gold':'violet')+'" style="font-size:.66rem">'+days+'/2 clean</span></div>'+
+        (days===1?'<p class="muted" style="margin:5px 0 0;font-size:.78rem">One clean day banked ('+masteryDaysFor(k).join(", ")+') — the second has to be a different day.</p>':'')+
+        (!qs.length?'<p class="muted" style="margin:5px 0 0;font-size:.78rem">No questions in the bank yet — read the primer in 📖 Learn; bring this chapter to Claude and it gets built.</p>':'')+
+        /* v3.24: Claude's per-topic read, where he's actually choosing what to drill */
+        (function(){ const a=(CLAUDE_ASSESSMENT.topics||{})[k]; if(!a) return "";
+          const L=LEVEL_STYLE[a.level]||{ico:"•",label:a.level};
+          return '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem"><b>'+L.ico+' Claude: '+L.label+'</b> — tap for why</summary><div class="why" style="margin-top:6px">'+a.note+'<p class="muted" style="margin:6px 0 0;font-size:.75rem">Written '+CLAUDE_ASSESSMENT.updated+'.</p></div></details>'; })();
+      if(qs.length){
+        const br=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"});
+        br.appendChild(el("button",{class:"btn small",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"🎯 Drill"));
+        if(k==="formal") br.appendChild(el("button",{class:"btn gold small",onclick:()=>startMastery()},"⚖️ Mastery check"));
+        else if(canMaster) br.appendChild(el("button",{class:"btn "+(days>=2?"ghost":"gold")+" small",onclick:()=>startTopicMastery(k)},days>=2?"⚖️ Re-run check":"⚖️ Mastery check"));
+        br.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.learnCh=ch.id;S.learnTopic=k;go("learn");}},"📖 Primer"));
+        row.appendChild(br);
+      } else {
+        row.appendChild(el("button",{class:"btn ghost small",style:"margin-top:8px",onclick:()=>{S.learnCh=ch.id;S.learnTopic=k;go("learn");}},"📖 Read the primer"));
+      }
+      v.appendChild(row);
+    });
   });
 };
+/* ================= v3.24 — CLAUDE'S ASSESSMENT LAYER =================
+   Gabe: "Quiz and exam readiness … should be updated based on my performance/explanation and
+   understanding. And your analysis directly from you should also be posted and up to date."
+   The numbers alone can't see WHY a topic is weak, or that a right answer was flagged as a
+   guess, or that a written rationale showed correct reasoning. This is the judgment layer —
+   written by Claude from his reports, written answers, handwritten work and lecture context.
+   HONESTY CONSTRAINT: this is authored, not computed. It cannot refresh itself. Every block
+   carries the date it was written and the evidence it was written from, and the UI says
+   plainly when it's going stale so it never masquerades as live data. Claude rewrites it each
+   session that gets a fresh report. */
+const CLAUDE_ASSESSMENT = {
+  updated: "2026-08-26",
+  basis: "your 8/25 report (99✓/51✗, 66% raw · 59% clean), the written rationales in it, your handwritten tutorial Q2, the SO₂ answers, and Ciesla's stated quiz scope",
+  overall: "You are not behind on understanding — you're behind on RELIABILITY. Your written rationales are consistently better than your click-accuracy: on the C–Br trap you named the exception correctly and in full, and your bond-line hydrogen count (2,1,2,3 → C₄H₈) was right with clean reasoning. That's not a student who doesn't know the material. The gap is that under a 25-minute clock you re-derive things you should be reading off cold, and you flag a lot of correct answers as guesses — which is honest, and it tells me the knowledge is there but not yet automatic.",
+  checkpoints: {
+    "Ch 1 Quiz": {
+      verdict: "Ready on most of the scope, one real hole.",
+      note: "Six of the eight scope topics are in decent shape. <b>Formal charge is the exception and it's the one she flagged as the Ch-2 prerequisite</b> — at 49% it's not a rounding error, it's a coin flip. The good news: the root cause is known and narrow (you change the group number for ions, and you slip on pairs-vs-electrons), not a broad misunderstanding. One clean mastery day is banked; a second clean day before Thursday is the single highest-value thing you can do. Second priority is geometry-from-steric-number — the SO₂ answers showed you reaching for water's 109.5° whenever you see 'bent'."
+    },
+    "Exam 1": {
+      verdict: "Too early to judge — but the shape is predictable.",
+      note: "Covers Ch 1–4, and she said it's the most foundational of the three exams. Whatever is unreliable at the Ch-1 quiz compounds here, because Ch 2 resonance sits directly on formal charge and Ch 3 acid–base sits on resonance. Fixing formal charge now is not just quiz points — it's the load-bearing wall for the next three chapters."
+    }
+  },
+  topics: {
+    formal:   {level:"gap",     note:"The formula itself is stable — you've reproduced it correctly many times. Two specific input errors cause the misses: (1) changing the GROUP NUMBER for a charged species (N is 5 in NH₄⁺, always), and (2) pairs-vs-electrons slips in both directions. Both are now scaffolded in the bank. This is a drill-to-automatic problem, not a comprehension problem."},
+    hybrid:   {level:"shaky",   note:"You know steric number drives geometry, but 'bent' triggers 109.5° reflexively. SO₂ is bent from SN 3 (~120°), water from SN 4 (109.5°). You also drew SO₂ linear once, which is the missing lone pair on sulfur — the x3-so scaffold walks exactly that."},
+    imf:      {level:"shaky",   note:"63%, and the misses cluster on exam WORDING rather than the chemistry — 'breaking bonds' loses points; phase changes separate intact molecules. You get the H-bonding logic right when you explain it in prose."},
+    lewis:    {level:"shaky",   note:"64%. Structures come out right more often than the formal charges you assign to them, which points back at the same root cause rather than at Lewis itself."},
+    polarity: {level:"solid",   note:"74%, and your handwritten Q2 was 3/3 with electronegativity values written next to each atom. You have the C–halogen exception internalised — that's the one Ciesla says trips people up."},
+    valence:  {level:"solid",   note:"80%. Reliable. Don't spend quiz-prep time here."},
+    bondline: {level:"building",note:"New this week. Your hydrogen-counting rationale was correct and well-reasoned. The rules to drill are mechanical: triple bonds never zigzag, one substituent goes straight up, lone pairs on O/N are required in this course."},
+    fgroups:  {level:"new",     note:"Introduced 8/25. She called it the semester's highest-stakes memorization. Not on Thursday's quiz — but start the flashcards now, because it compounds."}
+  }
+};
+function assessmentAgeDays(){ return Math.max(0, Math.round((new Date()-new Date(CLAUDE_ASSESSMENT.updated+"T00:00:00"))/86400000)); }
+function assessmentFreshness(){ const d=assessmentAgeDays(); return d<=1?{tag:"fresh",cls:"gold"}:d<=4?{tag:d+"d old",cls:"violet"}:{tag:"STALE ("+d+"d) — send Claude a new report",cls:"coral"}; }
+const LEVEL_STYLE={gap:{ico:"🔴",label:"gap"},shaky:{ico:"🟡",label:"shaky"},solid:{ico:"🟢",label:"solid"},building:{ico:"🔵",label:"building"},new:{ico:"⚪",label:"just introduced"}};
+
+/* ================= v3.23 — READINESS FOR EVERY CHECKPOINT =================
+   Gabe: "I need to see readiness for each quiz, exam somewhere in the app." Readiness
+   already existed but only for the NEXT checkpoint, only inside 7 days, buried in a Plan
+   card. Now every graded milestone gets a row, computed from the same gate:
+     · CLEAN % across the checkpoint's scope topics (guessed-rights don't count)
+     · how many scope topics are MASTERED (2 clean days)
+     · the most recent scoped diagnostic
+   Gate (unchanged): ≥80% clean on scope AND a scoped diagnostic ≥80%. Topics the bank
+   can't test yet are NAMED, never silently dropped from the average. */
+function topicCleanPct(k){
+  let r=0,w=0,g=0;
+  QUESTIONS.forEach(q=>{ if(q.topic===k){ const s=S.qstats[q.id]; if(s){ r+=(s.r||0); w+=(s.w||0); g+=(s.gr||0); } } });
+  const tt=r+w; return tt?Math.round(100*Math.max(0,r-g)/tt):null;
+}
+function scopeForCheckpoint(cp){
+  if(cp.topics&&cp.topics.length) return cp.topics.slice();
+  // null scope = cumulative: everything the course has introduced on or before that date
+  const out=[];
+  SEMESTER.forEach(w=>{ if(w.start && w.start<=cp.date) out.push(...(w.topics||[])); });
+  return [...new Set(out)];
+}
+function readinessFor(cp){
+  const scope=scopeForCheckpoint(cp);
+  const testable=scope.filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
+  const untestable=scope.filter(k=>!testable.includes(k));
+  const pcts=testable.map(topicCleanPct).filter(x=>x!==null);
+  const avg=pcts.length?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):null;
+  const untouched=testable.filter(k=>topicCleanPct(k)===null);
+  const mastered=testable.filter(k=>masteryDaysFor(k).length>=2);
+  const weakest=testable.filter(k=>topicCleanPct(k)!==null).sort((a,b)=>topicCleanPct(a)-topicCleanPct(b)).slice(0,3);
+  const lastScoped=S.diags.slice().reverse().find(d=>d.type==="scope");
+  const diagOK=!!lastScoped&&lastScoped.pct>=80;
+  const cleanOK=avg!==null&&avg>=80;
+  const ready=cleanOK&&diagOK&&!untouched.length;
+  const d=daysTo(cp.date);
+  return {scope,testable,untestable,untouched,avg,mastered,weakest,lastScoped,diagOK,cleanOK,ready,days:d};
+}
+function allCheckpoints(){
+  const list=[];
+  if(S.nextQuiz&&S.nextQuiz.date) list.push({name:S.nextQuiz.name,date:S.nextQuiz.date,topics:S.nextQuiz.topics||null,kind:"quiz"});
+  CHECKPOINTS.forEach(c=>list.push({name:c.name,date:c.date,topics:c.topics,kind:/final/i.test(c.name)?"final":"exam"}));
+  return list.sort((a,b)=>a.date<b.date?-1:1);
+}
 VIEWS.exam = (v) => {
+  /* v3.23: readiness board — every quiz/exam/final, not just the next one */
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">🚦 Readiness</span><h2>Am I ready — for each one?</h2><p class="muted">Two layers. <b>The gate</b> is mechanical: ≥80% clean across a checkpoint\'s scope AND a scoped diagnostic ≥80%, with no scope topic untouched (clean % excludes anything you got right but flagged 🎲). <b>Claude\'s read</b> is judgment — written from your reports, your typed rationales and your handwritten work, which the numbers can\'t see.</p>'));
+  (function(){
+    const f=assessmentFreshness();
+    const c=el("div",{class:"card"+(assessmentAgeDays()<=4?" cream":"")});
+    c.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="flex:1;margin:0">🧠 Claude\'s overall read</h3><span class="tag '+f.cls+'">'+f.tag+'</span></div>'+
+      '<p class="muted" style="margin:6px 0 8px;font-size:.8rem">Written '+CLAUDE_ASSESSMENT.updated+', from '+esc(CLAUDE_ASSESSMENT.basis)+'.</p>'+
+      '<p style="margin:0">'+CLAUDE_ASSESSMENT.overall+'</p>'+
+      (assessmentAgeDays()>4?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>This is going stale.</b> It can\'t update itself — paste a fresh report into the chat (📤 Report tab) and Claude rewrites it.</p>':'');
+    v.appendChild(c);
+  })();
+  allCheckpoints().forEach(cp=>{
+    const R=readinessFor(cp);
+    const past=R.days<0;
+    const light=past?"⚪":R.ready?"🟢":(R.avg!==null&&R.avg>=65)?"🟡":"🔴";
+    const card=el("div",{class:"card"+(R.ready&&!past?" teal":"")});
+    const when=past?("passed · "+fmtDay(cp.date)):(R.days===0?"TODAY":R.days+" day"+(R.days===1?"":"s")+" out · "+fmtDay(cp.date));
+    card.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<h3 style="flex:1;margin:0">'+light+' '+cp.name+'</h3>'+
+      '<span class="tag '+(R.days<=7&&!past?"coral":"violet")+'">'+when+'</span></div>'+
+      '<p style="margin:8px 0 4px'+(R.ready&&!past?';opacity:.92':'')+'"><b>Clean across scope: '+(R.avg===null?"— (no reps yet)":R.avg+"%")+'</b>'+
+        ' · '+R.mastered.length+'/'+R.testable.length+' topics mastered'+
+        ' · scoped diagnostic: '+(R.lastScoped?R.lastScoped.pct+"% ("+fmtDay(R.lastScoped.date)+")":"<b>none yet</b>")+'</p>'+
+      '<p class="'+(R.ready&&!past?'':'muted')+'" style="margin:4px 0 0;font-size:.85rem">'+
+        (past?'Done — kept here for the record.':
+         R.ready?'✅ Gate cleared. Maintain, don\'t cram.':
+         '<b>Blocking:</b> '+[ (!R.cleanOK?(R.avg===null?'no reps on this scope yet':'clean % is '+R.avg+', needs 80'):null),
+                               (!R.diagOK?'no scoped diagnostic ≥80% yet':null),
+                               (R.untouched.length?R.untouched.length+' scope topic'+(R.untouched.length===1?'':'s')+' never attempted':null)
+                             ].filter(Boolean).join(' · '))+'</p>'+
+      (!past&&R.weakest.length?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">Weakest in scope: '+R.weakest.map(k=>(TOPICS[k]?.ico||"")+" "+(TOPICS[k]?.name||k)+" "+(topicCleanPct(k))+"%").join(" · ")+'</p>':'')+
+      (R.untestable.length?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">⚠️ Not testable in the app yet (study from Klein/Canvas): '+R.untestable.map(k=>TOPICS[k]?.name||k).join(", ")+'</p>':'')+
+      (function(){ const a=CLAUDE_ASSESSMENT.checkpoints[cp.name]; if(!a||past) return "";
+        const f=assessmentFreshness();
+        return '<div class="why" style="margin-top:10px"><b>🧠 Claude\'s read — '+CLAUDE_ASSESSMENT.updated+' <span class="tag '+f.cls+'" style="font-size:.6rem">'+f.tag+'</span></b><br><b>'+esc(a.verdict)+'</b><br>'+a.note+'</div>'; })();
+    if(!past){
+      const row=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"});
+      row.appendChild(el("button",{class:"btn coral small",onclick:()=>startDiag2("scope")},"🎯 Scoped diagnostic"));
+      if(R.weakest.length) row.appendChild(el("button",{class:"btn small",onclick:()=>startDrill(R.weakest[0])},"Drill weakest: "+(TOPICS[R.weakest[0]]?.name||R.weakest[0])));
+      card.appendChild(row);
+    }
+    v.appendChild(card);
+  });
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">📊 Exam · find your gaps</span><h2>Where am I? What do I study first?</h2><p class="muted">Two levels. The in-app <b>Evaluator</b> gives an instant per-topic gap map. The <b>full written exams</b> (blank-page — the true test) you do on paper, then send to Claude for a scored, ranked study plan.</p>'));
   if (S.lastEval){ const nm=k=>TOPICS[k]?.name||k; const e=S.lastEval;
     const card=el("div",{class:"card"+(e.gaps.length?"":" teal")});
@@ -2946,13 +3136,7 @@ VIEWS.learn = (v) => {
   /* v3.12: full course map — every chapter the semester covers through Exam 1, each topic
      carrying its Klein section + Khan Academy + Organic Chemistry Tutor sources (resTile).
      Topics without bank items yet show no drill button — primer + sources only, honestly. */
-  const CH=[
-    {id:"prelim",ico:"🌱",name:"Preliminaries",sub:"The pre-gen-chem foundation — start here if anything feels shaky",topics:["p_atom","p_ptable","p_ions","p_bondtypes","p_formulas"]},
-    {id:"ch1",ico:"⚗️",name:"Chapter 1 — General Chemistry Review",sub:"Week 1 · Klein Ch 1 · QUIZ THU 8/27 — full quiz scope incl. orbitals & isomers",topics:["valence","lewis","formal","polarity","hybrid","imf","orbitals","isomers"]},
-    {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Week 2 (NOW, finish by Aug 30) · bond-line, functional groups, resonance, curved arrows",topics:["bondline","fgroups","resonance","arrows"]},
-    {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"Week 3 (starts Aug 31) · pKa ladder, ARIO, Lewis acids/bases",topics:["acidbase1","acidbase2","lewisab"]},
-    {id:"ch4",ico:"⛰️",name:"Chapter 4 — Alkanes & Cycloalkanes",sub:"Week 4 (starts Sep 7) · read ahead only if Ch 1–3 are solid · Exam 1 covers Ch 1–4 (~Sep 15)",topics:["alkanes","conform","chair"]},
-  ];
+  const CH=CHAPTERS;
   const tName=k=>(TOPICS[k]?(TOPICS[k].ico+" "+TOPICS[k].name):k);
   const tStat=k=>{ let r=0,w=0; QUESTIONS.forEach(q=>{ if(q.topic===k){const s=S.qstats[q.id]; if(s){r+=s.r;w+=s.w;}} }); const tot=r+w; return tot?Math.round(100*r/tot)+"%":null; };
   const back=(label,fn)=>el("button",{class:"btn ghost small",style:"margin-bottom:10px",onclick:fn},"← "+label);
