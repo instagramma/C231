@@ -1,0 +1,120 @@
+{
+  "batchId": "2026-08-25-dipoles-imf-polar-bonds",
+  "reportedUse": ["quiz", "exam"],
+  "sourcePolicy": "Immutable full screenshots; production viewports exclude selected controls and correctness banners.",
+  "items": [
+    {
+      "exactId": "EXACT-DPI-20260825-01",
+      "sourceFile": "exact-01-diphenyl-ether-dipole-yes-no.png",
+      "sha256": "43755040c54901e5be1b0b695f63cb1706304ac9614f8961eea183827cfe3156",
+      "sourcePixels": [1560, 994],
+      "displayViewport": [560, 405, 490, 305],
+      "responseMode": "yes/no multiple choice",
+      "answer": "yes"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-02",
+      "sourceFile": "exact-02-diphenyl-ether-dipole-direction.png",
+      "sha256": "1d0d52b504db71fcd03d8e41f15dc780ce34dea7f6b4614b03cdae967f0fa216",
+      "sourcePixels": [936, 946],
+      "responseMode": "image multiple choice",
+      "answerIndex": 3,
+      "answer": "toward O along the C-O-C bisector"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-03",
+      "sourceFile": "exact-03-ether-branching-boiling-point.png",
+      "sha256": "0d3574f31e141b0ad066fd88d77155ae89a0035fa1349c0bef8a827bfaedbbb2",
+      "sourcePixels": [982, 720],
+      "displayViewport": [35, 300, 420, 125],
+      "responseMode": "text multiple choice",
+      "answerIndex": 1,
+      "answer": "second compound; less branched and greater surface area"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-04",
+      "sourceFile": "exact-04-cyclopentane-cyclohexane-boiling-point.png",
+      "sha256": "59dc84d79e04f1ebc327b1e13553fe6ad0ac1161967490a7f873cb7742a69363",
+      "sourcePixels": [952, 340],
+      "displayViewport": [35, 55, 230, 95],
+      "responseMode": "text multiple choice",
+      "answerIndex": 1,
+      "answer": "cyclohexane; higher molecular weight"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-05",
+      "sourceFile": "exact-05-ether-alcohol-boiling-point.png",
+      "sha256": "cbc1c498f4573263ff5237f9c7c22bae88d279dd83aa36d14d5bba1ed7cedbc1",
+      "sourcePixels": [966, 452],
+      "displayViewport": [45, 135, 430, 105],
+      "responseMode": "text multiple choice",
+      "answerIndex": 0,
+      "answer": "second compound; more hydrogen bonding"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-06",
+      "sourceFile": "exact-06-butanol-tert-butanol-boiling-point.png",
+      "sha256": "ac2b2b0ad4e5dbc6a271e6f255c0d5b49a73ab7f3f42aa876bee13fbf0958e4d",
+      "sourcePixels": [936, 420],
+      "displayViewport": [25, 45, 380, 105],
+      "responseMode": "text multiple choice",
+      "answerIndex": 2,
+      "answer": "first compound; less branched"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-07",
+      "sourceFile": "exact-07-epichlorohydrin-products-boiling-point.png",
+      "sha256": "e2ec198b6b4259f0cd64b46f96939d85cf9d72849ae7f698a7aa3e1507527e24",
+      "sourcePixels": [1040, 488],
+      "displayViewport": [55, 80, 840, 220],
+      "responseMode": "text multiple choice",
+      "answerIndex": 3,
+      "answer": "compound 4; fewer hydrogen-bonding interactions"
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-08",
+      "sourceFile": "exact-08-hbr-partial-charges.png",
+      "sha256": "080cbc4f45bb301c7cfb1b6fbaac89404ea66fd2a4d70f0f480492a56188bf41",
+      "sourcePixels": [968, 312],
+      "displayViewport": [25, 92, 115, 68],
+      "responseMode": "typed blanks",
+      "answer": {"deltaPlus": "1", "deltaMinus": "2"}
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-09",
+      "sourceFile": "exact-09-water-partial-charges.png",
+      "sha256": "48d063e9a1b3a112c7e9f6b438fffe565cc8b3adaeb7f61b2e746d2f07db2089",
+      "sourcePixels": [984, 344],
+      "displayViewport": [25, 98, 125, 70],
+      "responseMode": "typed blanks",
+      "answer": {"deltaPlus": "1,3", "deltaMinus": "2"}
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-10",
+      "sourceFile": "exact-10-methanol-partial-charges.png",
+      "sha256": "bd8b97dbacd4dbc29448c33728e768b73b9f5e777287fa8dfcbf449a2781aa37",
+      "sourcePixels": [1036, 482],
+      "displayViewport": [35, 112, 180, 150],
+      "responseMode": "typed blanks",
+      "answer": {"deltaPlus": "2,6", "deltaMinus": "5"}
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-11",
+      "sourceFile": "exact-11-brcl-fcl-ionic-character-blanks.png",
+      "sha256": "25f447eaac3f9ead4ae831165208e47c3353a442afff8d0a957eb6a7c7fae4ab",
+      "sourcePixels": [998, 194],
+      "displayViewport": [25, 20, 950, 75],
+      "responseMode": "inline dropdown blanks",
+      "answer": ["FCl", "electronegativity", "greater", "electronegativity"]
+    },
+    {
+      "exactId": "EXACT-DPI-20260825-12",
+      "sourceFile": "exact-12-acetonitrile-lewis-structure.png",
+      "sha256": "0c6e166bc912c8ca20759c645692b8e58ce12c330c356c4bb1090529a606dfde",
+      "sourcePixels": [1028, 552],
+      "responseMode": "image multiple choice plus checked Lewis Lab reconstruction",
+      "answerIndex": 0,
+      "answer": "CH3-C triple-bond N with one lone pair on N"
+    }
+  ]
+}
