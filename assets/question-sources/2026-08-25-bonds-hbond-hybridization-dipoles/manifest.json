@@ -1,0 +1,104 @@
+{
+  "batchId": "2026-08-25-bonds-hbond-hybridization-dipoles",
+  "reportedUse": ["quiz", "exam"],
+  "sourcePolicy": "Immutable full screenshots; production viewports exclude selected controls while retaining numbered structures and dipole-arrow choices.",
+  "items": [
+    {
+      "exactId": "EXACT-BHD-20260825-01",
+      "sourceFile": "exact-01-sigma-pi-count.png",
+      "sha256": "b250b9122a9e8bc16568c3395de691430fef4068ef0f62efad624d3500bbe570",
+      "sourcePixels": [716, 280],
+      "displayViewport": [20, 55, 530, 135],
+      "responseMode": "two typed numeric blanks",
+      "answer": {"sigma": 16, "pi": 3}
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-02",
+      "sourceFile": "exact-02-pure-compound-hbonding.png",
+      "sha256": "d74fb5a71823508604fa413bd60e3aae7983828daca43be947f36c40b935a4af",
+      "sourcePixels": [984, 348],
+      "responseMode": "select exactly three checkboxes",
+      "answer": ["CH3NH2", "CH3CH2OH", "NH3"]
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-03",
+      "sourceFile": "exact-03-ch2clx-valence.png",
+      "sha256": "42930445cf3c401e20743651d01dcb7ca8aede0f3cbf15714ef91567cbe28190",
+      "sourcePixels": [636, 172],
+      "responseMode": "typed numeric blank",
+      "answer": 2
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-04",
+      "sourceFile": "exact-04-enyne-carbon-hybridization.png",
+      "sha256": "8ff04e897a3584ddda9afb61d2df0cc8f278d3af3780da897542c72b7705722e",
+      "sourcePixels": [950, 420],
+      "displayViewport": [345, 15, 300, 205],
+      "responseMode": "three typed atom lists plus three geometry dropdowns",
+      "answer": ["0", "N/A", "3,4", "trigonal planar", "1,2,5,6", "linear"]
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-05",
+      "sourceFile": "exact-05-nicotine-nitrogen-hybridization.png",
+      "sha256": "292b5f4394261904a63eb1daaec9e76f4f6bf0dc854f0babd525ea57baeaabe7",
+      "sourcePixels": [948, 498],
+      "displayViewport": [330, 50, 400, 280],
+      "responseMode": "two typed hybridization codes plus two geometry dropdowns",
+      "answer": [2, "bent", 3, "trigonal pyramidal"]
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-06",
+      "sourceFiles": [
+        {
+          "sourceFile": "exact-06-caffeine-lone-pairs-main.png",
+          "sha256": "7b9f5b4fc28be793a7389ea550c3ce50e04390f30556b1149a891c72d520700c",
+          "sourcePixels": [980, 1154]
+        },
+        {
+          "sourceFile": "exact-06b-caffeine-lone-pairs-continuation.png",
+          "sha256": "cf5152e283284c291f36e99d170013ee87513cd419a3cc75a3e0662144ffd7c2",
+          "sourcePixels": [994, 1144]
+        }
+      ],
+      "displayViewport": [310, 40, 400, 360],
+      "responseMode": "three typed atom lists",
+      "answer": {"oneLonePair": "1,3,7,9", "twoLonePairs": "10,15", "threeLonePairs": "0"}
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-07",
+      "sourceFile": "exact-07-ortho-dichlorobenzene-dipole.png",
+      "sha256": "9062935192017dc55655e8c4ae5903de3fe7581a69a4682b3a1dd2bb9f3b15b4",
+      "sourcePixels": [952, 1272],
+      "responseMode": "four image choices",
+      "answerIndex": 3,
+      "answer": "toward the bisector between the adjacent chlorines"
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-08",
+      "sourceFile": "exact-08-meta-dichlorobenzene-dipole.png",
+      "sha256": "8498ec5bf1df8b5390b4d6dacadc346acb539236c8a3658f417cd9a769abcb5e",
+      "sourcePixels": [974, 1278],
+      "responseMode": "four image choices",
+      "answerIndex": 0,
+      "answer": "toward the bisector between the meta chlorines"
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-09",
+      "sourceFile": "exact-09-para-dichlorobenzene-dipole.png",
+      "sha256": "7ae50557001e66e1f79095878dfc656b90dbee07209ba598a964fe2f856612da",
+      "sourcePixels": [970, 1244],
+      "responseMode": "four image choices",
+      "answerIndex": 0,
+      "answer": "no molecular dipole moment"
+    },
+    {
+      "exactId": "EXACT-BHD-20260825-10",
+      "sourceFile": "exact-10-para-chlorobromobenzene-dipole.png",
+      "sha256": "7ab6e3ee33e5394d309d4612fb39410d061548c738ba01e744bfd8e22db18dd2",
+      "sourcePixels": [988, 1284],
+      "responseMode": "four image choices",
+      "answerIndex": 0,
+      "answer": "toward chlorine"
+    }
+  ]
+}
