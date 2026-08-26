@@ -1,0 +1,116 @@
+{
+  "batchId": "2026-08-25-lewis-formal-charge",
+  "reportedUse": ["quiz", "exam"],
+  "sourcePolicy": "Immutable full screenshots; app viewports hide completed answers and selected controls.",
+  "items": [
+    {
+      "exactId": "EXACT-DRAW-20260825-01",
+      "sourceFile": "exact-01-draw-ch3oh.png",
+      "sha256": "ce0f90e73dbf17f755b4256de20c639dee39979ad30f81d8dde1662a9f35efbc",
+      "sourcePixels": [1948, 698],
+      "prompt": "Draw a Lewis structure for the following compound: CH3OH",
+      "drawingTarget": "CH3OH",
+      "answer": "CH3-O-H; three C-H bonds; two lone pairs on O; all formal charges 0"
+    },
+    {
+      "exactId": "EXACT-DRAW-20260825-02",
+      "sourceFile": "exact-02-draw-ch2chbr.png",
+      "sha256": "39b0e06eaefd37d15a2564a0d5be71ea28a0f5e0d47029fbb4f9fd18066b4f64",
+      "sourcePixels": [1906, 862],
+      "prompt": "Draw a Lewis structure for the following compound: CH2CHBr",
+      "drawingTarget": "C2H3Br",
+      "answer": "H2C=CH-Br; three lone pairs on Br; all formal charges 0"
+    },
+    {
+      "exactId": "EXACT-DRAW-20260825-03",
+      "sourceFile": "exact-03-draw-hcn.png",
+      "sha256": "4470700d09454c3437aa1825cfa9f2354dc7dabd39e3a4a582fb1239a2b3a6d5",
+      "sourcePixels": [2004, 1040],
+      "prompt": "Draw a Lewis structure for HCN (hydrogen cyanide).",
+      "drawingTarget": "HCN",
+      "answer": "H-C≡N; one lone pair on N; all formal charges 0"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-01",
+      "sourceFile": "exact-04-alh4-charge.png",
+      "sha256": "7370c15b7b436bb2b4e026a9f9bf841449815bae5dfc5e66865b230f35061238",
+      "sourcePixels": [1914, 1084],
+      "displayViewport": [135, 0, 650, 310],
+      "prompt": "Identify any missing formal charges in AlH4.",
+      "answer": {"Al": -1},
+      "drawingTarget": "AlH4-"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-02",
+      "sourceFile": "exact-05-h3o-charge.png",
+      "sha256": "efb8d88d98ea7de4a37be38d8e06244d66cdd2e52ebb7f4fbec675f674a224a0",
+      "sourcePixels": [1926, 994],
+      "displayViewport": [160, 40, 520, 300],
+      "prompt": "Identify any missing formal charges in H3O.",
+      "answer": {"O": 1},
+      "drawingTarget": "H3O+"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-03",
+      "sourceFile": "exact-06-protonated-formaldehyde.png",
+      "sha256": "e60b29cd93d3eef774853a37dddf40b70a2e9c9c25b5216470aa8b6d63e90331",
+      "sourcePixels": [1064, 500],
+      "displayViewport": [120, 35, 520, 290],
+      "prompt": "Identify any missing formal charges in protonated formaldehyde.",
+      "answer": {"O": 1, "C": 0},
+      "drawingTarget": "CH3O+"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-04",
+      "sourceFile": "exact-07-methyl-anion.png",
+      "sha256": "41408ccb2b51d4a04abbd4caaa353cd9c0dae841dccd30aa984dc66e34aea3b9",
+      "sourcePixels": [1024, 422],
+      "displayViewport": [65, 40, 500, 270],
+      "prompt": "Identify any missing formal charges on CH3 with one carbon lone pair.",
+      "answer": {"C": -1},
+      "drawingTarget": "CH3-"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-05",
+      "sourceFile": "exact-08-methyl-cation.png",
+      "sha256": "e9c3f59a6fc55095afdfc5b5c6218ec87802f2608b949076456587e1ec5b4127",
+      "sourcePixels": [986, 388],
+      "displayViewport": [35, 35, 500, 240],
+      "prompt": "Identify any missing formal charges on three-bond carbon with no lone pair.",
+      "answer": {"C": 1},
+      "drawingTarget": "CH3+"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-06",
+      "sourceFile": "exact-09-alcl5-labeled.png",
+      "sha256": "811a9298f705beb9071eaa5561bfbfc9884def903fbd2748de728b399ccf5e87",
+      "sourcePixels": [1070, 974],
+      "displayViewport": [65, 40, 650, 620],
+      "prompt": "Use labels a-c to identify the formal charges in the shown AlCl5 connectivity.",
+      "answer": {"a": -1, "b": 1, "c": 0},
+      "drawingTarget": "AlCl5"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-07",
+      "sourceFile": "exact-10-glycine-zwitterion.png",
+      "sha256": "d8053e8a703e32c35874694a81cc358dc97a35b5ab4237882b4dd123b2c25d7b",
+      "sourcePixels": [1308, 826],
+      "displayViewport": [70, 25, 1000, 600],
+      "prompt": "Use labels a-d to identify the formal charges in the shown glycine structure.",
+      "answer": {"a": 1, "b": 0, "c": 0, "d": -1},
+      "drawingTarget": "glycine-zwitterion"
+    },
+    {
+      "exactId": "EXACT-FC-20260825-08",
+      "sourceFile": "exact-11-nh2-minus-structure.png",
+      "sha256": "e790d10822b427f24bfa81994e80a851b22d033edc1c6f9365b1e0051df9aedf",
+      "sourcePixels": [1900, 758],
+      "promptViewport": [45, 25, 900, 75],
+      "optionViewports": [[140, 180, 250, 125], [140, 315, 250, 130], [140, 452, 250, 105], [140, 560, 250, 130]],
+      "prompt": "Identify the correct structure for NH2-.",
+      "answerIndex": 1,
+      "answer": "Two N-H single bonds, two lone pairs on N, and a -1 formal charge on N.",
+      "drawingTarget": "NH2-"
+    }
+  ]
+}
