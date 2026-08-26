@@ -1,0 +1,87 @@
+{
+  "batchId": "2026-08-25-dipoles-bond-types-angles",
+  "reportedUse": ["quiz", "exam"],
+  "sourcePolicy": "Immutable full screenshots; production prompts and controls are reconstructed without displaying selected source answers.",
+  "items": [
+    {
+      "exactId": "EXACT-DBA-20260825-01",
+      "sourceFile": "exact-01-ch4-molecular-dipole.png",
+      "sha256": "7717f0e56126ca44e16f7c02b648742c6af85d4bf1a0ee464b2c8505843f9788",
+      "sourcePixels": [822, 108],
+      "responseMode": "yes/no dropdown",
+      "answer": "No"
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-02",
+      "sourceFile": "exact-02-co2-molecular-dipole.png",
+      "sha256": "c8d4627e5e6f451d65daddce966df633953e98643e7915e2a6f64e0212d85527",
+      "sourcePixels": [594, 90],
+      "responseMode": "yes/no dropdown",
+      "answer": "No"
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-03",
+      "sourceFile": "exact-03-ccl4-molecular-dipole.png",
+      "sha256": "b507f312d24d0f949ab37b2e901add3419343cdb73da0e80b0eb53e06b7175d5",
+      "sourcePixels": [560, 72],
+      "responseMode": "yes/no dropdown",
+      "answer": "No"
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-04",
+      "sourceFile": "exact-04-naoh-bond-classification.png",
+      "sha256": "d54ebe8a06cb314e22c552b4abe9a3e1f765b2da14a9fa85b1e3cf5fec4b9671",
+      "sourcePixels": [642, 152],
+      "responseMode": "two inline dropdown blanks",
+      "answer": ["ionic", "polar covalent"]
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-05",
+      "sourceFile": "exact-05-methanol-bond-classification.png",
+      "sha256": "57bf0a998d9ae17cb3d92890e5bddbda1d60b40787f9d9cf3bd09d45fb03bf85",
+      "sourcePixels": [842, 154],
+      "responseMode": "three inline dropdown blanks",
+      "answer": ["polar covalent", "polar covalent", "covalent"]
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-06",
+      "sourceFile": "exact-06-co-bond-dipole-direction.png",
+      "sha256": "448cb74f57d5724aa880c4881a74ac7abdad42f5fcdd6e3631ac1f42d394e1f8",
+      "sourcePixels": [954, 172],
+      "responseMode": "typed letter",
+      "answer": "a"
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-07",
+      "sourceFile": "exact-07-ethylene-bond-angles.png",
+      "sha256": "214f6bf4e76af606a54cb4a278b9233108479892c184c33d39a53c641f347bca",
+      "sourcePixels": [486, 112],
+      "responseMode": "bond-angle dropdown",
+      "answer": "120°"
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-08",
+      "sourceFile": "exact-08-acetylene-bond-angles.png",
+      "sha256": "331c9f15815b857485419204168d55bb8b4cc3151d53beb4083625249ff5401d",
+      "sourcePixels": [378, 96],
+      "responseMode": "bond-angle dropdown",
+      "answer": "180°"
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-09",
+      "sourceFile": "exact-09-dimethyl-ether-bond-angles.png",
+      "sha256": "dd2459c2484f8099c9fcafa6c58b5a53ba77e81bd59554ac38b180522de85a44",
+      "sourcePixels": [800, 136],
+      "responseMode": "two inline bond-angle dropdowns",
+      "answer": ["109.5°", "less than 109.5°"]
+    },
+    {
+      "exactId": "EXACT-DBA-20260825-10",
+      "sourceFile": "exact-10-acetonitrile-bond-angles.png",
+      "sha256": "649f244ccda939c5d378da42a584bd9d6c3b1e3a1258679a39d44dbeaaf6cf36",
+      "sourcePixels": [844, 128],
+      "responseMode": "bond-angle dropdown plus typed numeric blank",
+      "answer": ["109.5°", 180]
+    }
+  ]
+}
