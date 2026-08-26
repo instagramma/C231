@@ -1,0 +1,111 @@
+{
+  "batchId": "2026-08-25-constitutional-isomers",
+  "reportedUse": ["quiz", "exam"],
+  "exactPrompt": "Determine whether the two structures shown represent the same compound, constitutional isomers, or unrelated compounds.",
+  "exactChoices": [
+    "Same compound",
+    "Constitutional isomers",
+    "Unrelated compounds"
+  ],
+  "sourcePolicy": "Immutable full screenshots; app display crops are non-destructive SVG viewports that hide the selected answer.",
+  "items": [
+    {
+      "appQuestionId": "EXACT-ISO-20260825-01",
+      "sourceFile": "exact-01-same-compound.png",
+      "sha256": "010a6ff5b3ecfb0eb4dfc2695839e87c2fdee823c31b3fb22c94e9c8c9e894ab",
+      "sourcePixels": [2042, 964],
+      "displayViewport": [175, 350, 770, 315],
+      "selectedAnswerIndex": 0,
+      "classification": "Same compound",
+      "leftStructure": "CH3-CH(CH3)-CH(Cl)-CH3, drawn vertically/branched",
+      "rightStructure": "CH3-CH(CH3)-CH(Cl)-CH3, drawn as a horizontal chain",
+      "formulaLeft": "C5H11Cl",
+      "formulaRight": "C5H11Cl",
+      "verification": "Same formula and same connectivity; only the page orientation differs."
+    },
+    {
+      "appQuestionId": "EXACT-ISO-20260825-02",
+      "sourceFile": "exact-02-constitutional-isomers.png",
+      "sha256": "b9bc86e2a4101a627f739d4b568fe8e76315cb36f7929ab901163a2f00783935",
+      "sourcePixels": [1968, 602],
+      "displayViewport": [105, 85, 900, 245],
+      "selectedAnswerIndex": 1,
+      "classification": "Constitutional isomers",
+      "leftStructure": "1-butanol, CH3CH2CH2CH2OH",
+      "rightStructure": "diethyl ether, CH3CH2OCH2CH3",
+      "formulaLeft": "C4H10O",
+      "formulaRight": "C4H10O",
+      "verification": "Same formula, but alcohol O-H connectivity versus ether C-O-C connectivity."
+    },
+    {
+      "appQuestionId": "EXACT-ISO-20260825-03",
+      "sourceFile": "exact-03-unrelated-compounds.png",
+      "sha256": "e36655b61b1e8285c41952c2e84cae2dd41a6011d5a98810d017191b4e6af65f",
+      "sourcePixels": [2000, 638],
+      "displayViewport": [115, 105, 850, 220],
+      "selectedAnswerIndex": 2,
+      "classification": "Unrelated compounds",
+      "leftStructure": "propylene oxide (methyloxirane)",
+      "rightStructure": "1-propanol, CH3CH2CH2OH",
+      "formulaLeft": "C3H6O",
+      "formulaRight": "C3H8O",
+      "verification": "The formulas differ by H2, so they are not isomers."
+    },
+    {
+      "appQuestionId": "EXACT-ISO-20260825-04",
+      "sourceFile": "exact-04-same-compound.png",
+      "sha256": "910be4bb01da07981a07d502f1b8772f67ecffa54b215789c7665447dd26d5cb",
+      "sourcePixels": [1882, 666],
+      "displayViewport": [140, 115, 930, 355],
+      "selectedAnswerIndex": 0,
+      "classification": "Same compound",
+      "leftStructure": "3-methylpentane drawn with a five-carbon horizontal chain",
+      "rightStructure": "3-methylpentane traced through a bent five-carbon chain",
+      "formulaLeft": "C6H14",
+      "formulaRight": "C6H14",
+      "verification": "Both central carbons connect to one methyl group, two ethyl groups, and H."
+    },
+    {
+      "appQuestionId": "EXACT-ISO-20260825-05",
+      "sourceFile": "exact-05-constitutional-isomers.png",
+      "sha256": "53a0462bcb517cfca73b4309b90943e2904c202cdf8f13160ee340eef294c687",
+      "sourcePixels": [1850, 712],
+      "displayViewport": [30, 110, 900, 305],
+      "selectedAnswerIndex": 1,
+      "classification": "Constitutional isomers",
+      "leftStructure": "1,2-dibromobutane, BrCH2CHBrCH2CH3",
+      "rightStructure": "1,2-dibromo-2-methylpropane, BrCH2C(Br)(CH3)2",
+      "formulaLeft": "C4H8Br2",
+      "formulaRight": "C4H8Br2",
+      "verification": "Same formula, but the carbon skeleton and bromine-bearing carbon connectivity differ."
+    },
+    {
+      "appQuestionId": "EXACT-ISO-20260825-06",
+      "sourceFile": "exact-06-constitutional-isomers.png",
+      "sha256": "cb8ffe4b604818b1e6900e8b0dbc38e0bc3c57590547c7b9c041d07188aabc26",
+      "sourcePixels": [1894, 648],
+      "displayViewport": [55, 125, 760, 225],
+      "selectedAnswerIndex": 1,
+      "classification": "Constitutional isomers",
+      "leftStructure": "tetrahydrofuran (a five-membered cyclic ether)",
+      "rightStructure": "2-butanone, CH3COCH2CH3",
+      "formulaLeft": "C4H8O",
+      "formulaRight": "C4H8O",
+      "verification": "Same formula, but cyclic-ether connectivity versus ketone connectivity."
+    }
+  ],
+  "similarAppQuestionIds": [
+    "SIM-ISO-20260825-01",
+    "SIM-ISO-20260825-02",
+    "SIM-ISO-20260825-03",
+    "SIM-ISO-20260825-04",
+    "SIM-ISO-20260825-05",
+    "SIM-ISO-20260825-06",
+    "SIM-ISO-20260825-07",
+    "SIM-ISO-20260825-08",
+    "SIM-ISO-20260825-09",
+    "SIM-ISO-20260825-10",
+    "SIM-ISO-20260825-11",
+    "SIM-ISO-20260825-12"
+  ]
+}
