@@ -6,7 +6,60 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.16  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.22  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.22 (2026-08-25, Gabe: eleven screenshots forming ten exact questions):
+        BONDS + H-BONDING + HYBRIDIZATION + DIPOLES INTAKE. Eleven immutable screenshots
+        preserve two-number σ/π counting, exact-three checkbox selection, typed valence,
+        mixed atom-list/geometry grids, nicotine N states, a two-screenshot caffeine lone-pair
+        problem, and four image-choice substituted-benzene dipoles. +10 exact +10 transfer.
+        Bank 554→574; Lewis Lab remains 20; 67 immutable PNGs across six source folders.
+  v3.21 (2026-08-25, Gabe: ten more exact Wiley screenshots):
+        DIPOLES + BOND TYPES + BOND ANGLES INTAKE. Ten immutable screenshots preserve
+        the original Yes/No dropdown, inline bond-classification dropdowns, typed direction
+        letter, bond-angle dropdowns, and mixed dropdown/numeric response. Exact coverage:
+        CH4/CO2/CCl4 molecular dipoles; NaOH/CH3OH bond types; C–O dipole direction; and
+        C2H4/C2H2/CH3OCH3/CH3CN angles. +10 exact +10 new-molecule transfer items.
+        Bank 534→554; Lewis Lab remains 20; 56 immutable source PNGs across five folders.
+  v3.20 (2026-08-25, Gabe: twelve more exact Wiley screenshots):
+        DIPOLES + PHYSICAL PROPERTIES + POLAR-BOND INTAKE. Twelve immutable screenshots
+        preserve the original yes/no, direction-image, ordinary MC, typed atom-number, inline
+        dropdown, and Lewis image-choice actions. Exact coverage: diphenyl ether polarity and
+        dipole direction; five boiling-point comparisons separating molecular weight, hydrogen
+        bonding, surface area, and branching; HBr/H2O/CH3OH partial charges; BrCl-vs-FCl ionic
+        character; and the CH3CN Lewis structure. +12 exact +10 transfer items. CH3CN is also
+        Lewis Lab target 20, so the exact recognition item has a blank-page graph check.
+        Bank 512→534; 46 immutable source PNGs across four dated intake folders.
+  v3.19 (2026-08-25, Gabe: "Also drop down fill in the blank answers or not drop down"):
+        MIXED RESPONSE ENGINE + exact bonding/polarity batch. Seventeen additional immutable
+        screenshots cover acetylcholine FC, ionic ethoxide, electrophilic carbons, partial
+        charges, sigma/pi rotation, hybridization, bond length, ion geometry, NH3→NH4+ VSEPR,
+        and eight molecular-dipole directions. Inputs preserve the assessed action: image MC,
+        select-exactly-N checkboxes, all-dropdown charge grids, and inline mixed blanks where
+        numeric entries and dropdowns coexist. New `blanks` renderer grades every placeholder
+        together; new `multiSelect` renderer enforces the requested number of choices.
+        +17 exact items +12 new-molecule transfer items. Bank 483→512. Full sources hashed in
+        a third dated intake folder; selected source answers remain outside displayed viewports.
+  v3.18 (2026-08-25, Gabe: "need to also make sure claude has drawing function to check"):
+        CHECKED DRAWING BANK + exact formal-charge batch. Eleven immutable source screenshots
+        preserved with hashes. The three exact draw prompts (CH3OH, CH2CHBr, HCN) live in Lewis
+        Lab; CH3OH/HCN were already drawable and now carry exact-source IDs, while CH2CHBr is
+        new. Six additional charged targets + glycine zwitterion + AlCl5 let the same pad verify
+        the formal-charge structures, not just quiz them by dropdown.
+        Audit upgraded from formula/octet checks to full target-graph isomorphism: element,
+        bond order, lone pairs, connectivity, and role-specific FC must all match, so glycine's
+        neutral carbonyl O and −1 single-bond O cannot be swapped. Eight exact auto items + four
+        contrast/transfer items use a new multi-charge input type; every source-based item links
+        directly to its checked drawing target. Bank 471→483; Lewis Lab targets 10→19.
+  v3.17 (2026-08-25, Gabe: "these are questions we will get on the quiz and the exam. Need
+        to get these exact questions plus similar!"): EXACT-QUESTION INTAKE. Six immutable
+        source screenshots are preserved under assets/question-sources with SHA-256 hashes and
+        a machine-readable manifest. The bank shows a non-destructive viewport of each exact
+        structure (the screenshot's selected answer stays below the viewport, so it cannot leak)
+        and renders the original three choices through the normal shuffled-choice engine.
+        +12 transfer items use new molecules but the same formula → connectivity → classification
+        routine. The existing isomer items were moved out of lewis/bondline into the dedicated
+        isomers topic; that topic is now in Ch 1, Quiz 1, Exam 1, difficulty defaults, Learn,
+        Practice, diagnostics, and mastery checks. Bank intake is appendable by dated batch.
   v3.16 (2026-08-25, Gabe: "app should give me a chance to mastery check each topic. not just
         the one for the day"): MASTERY CHECKS FOR EVERY TOPIC. Formal charge had the only real
         mastery gate; every other topic could only ever show a drill %, which the 08-11 audit
@@ -460,7 +513,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.16</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.22</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -593,13 +646,13 @@ const TOPICS = {
    + written syllabus (weights: HW10/Lab15/Quiz20/Exams35/Final20; 3 exams lowest dropped;
    ≤11 quizzes lowest dropped, ≥3 days notice — hence the editable nextQuiz). */
 const SEMESTER = [ // courseWeek -> topics INTRODUCED that week (app-bank keys only)
-  {wk:1,  start:"2026-08-17", ch:"Ch 1 (gen-chem review)", topics:["valence","lewis","formal","polarity","hybrid","imf"]},
+  {wk:1,  start:"2026-08-17", ch:"Ch 1 (gen-chem review)", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf"]},
   {wk:2,  start:"2026-08-24", ch:"Ch 2 (molecular representation)", topics:["bondline","fgroups","resonance"]}, // v3.13: fgroups introduced in lecture 3 (Tue 8/25)
   {wk:3,  start:"2026-08-31", ch:"Ch 3 (acids/bases)", topics:["acidbase1","acidbase2"]},
   {wk:4,  start:"2026-09-07", ch:"Ch 4 (alkanes/cycloalkanes)", topics:[]}, // bank items TBD (future version)
 ];
 const CHECKPOINTS = [ // fixed, from the verified schedule; quizzes come via S.nextQuiz
-  {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","formal","polarity","hybrid","imf","bondline","resonance","acidbase1","acidbase2"]},
+  {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf","bondline","resonance","acidbase1","acidbase2"]},
   {name:"Exam 2",   date:"2026-10-20", topics:null}, // null = cumulative at that date
   {name:"Exam 3",   date:"2026-11-10", topics:null},
   {name:"Final (comprehensive)", date:"2026-12-15", topics:null},
@@ -620,7 +673,7 @@ function daysTo(iso){ return Math.ceil((new Date(iso+"T00:00:00")-new Date())/86
 /* difficulty: explicit q.diff wins; else per-topic default.
    v3.9: scale is now 0-3 — 0 trivial recall · 1 easy · 2 intermediate · 3 hard/multi-step.
    Note `q.diff ?? default` (not ||) so an explicit diff:0 isn't silently treated as missing. */
-const DIFF_DEFAULT={p_atom:0,p_ptable:0,p_ions:1,p_bondtypes:1,p_formulas:1,valence:1,lewis:2,formal:2,polarity:2,hybrid:2,imf:2,resonance:3,acidbase1:2,acidbase2:3,bondline:2,fgroups:1};
+const DIFF_DEFAULT={p_atom:0,p_ptable:0,p_ions:1,p_bondtypes:1,p_formulas:1,valence:1,lewis:2,isomers:2,formal:2,polarity:2,hybrid:2,imf:2,resonance:3,acidbase1:2,acidbase2:3,bondline:2,fgroups:1};
 function qDiff(q){ const d=(q.diff!==undefined&&q.diff!==null)?q.diff:DIFF_DEFAULT[q.topic]; return (d===undefined||d===null)?2:d; }
 /* v3.9 ANTI-REPEAT: how recently was this question served? Returns 0 (never/long ago) up to
    1 (just served). Before v3.9 the selector sorted purely by NEED, so the same handful of
@@ -659,7 +712,11 @@ const CONCEPT_FAMILY={v5:"ve-co2","x2-v08":"ve-co2",v6:"ve-nh3","x2-v09":"ve-nh3
   fg16:"amine-amide",fg17:"amine-amide",
   bl04:"triple-linear",bl05:"triple-linear",bl20:"triple-linear",
   bl06:"peak-valley",bl07:"peak-valley",
-  bl13:"alkyne-h",bl14:"alkyne-h"};
+  bl13:"alkyne-h",bl14:"alkyne-h",
+  /* v3.17: don't place a source item beside its closest transfer twin in one five-item set */
+  iso6:"alcohol-ether-isomers","EXACT-ISO-20260825-02":"alcohol-ether-isomers",
+  "EXACT-ISO-20260825-04":"3-methylpentane-same","SIM-ISO-20260825-10":"3-methylpentane-same",
+  "EXACT-ISO-20260825-05":"dibromobutane-connectivity","SIM-ISO-20260825-07":"dibromobutane-connectivity"};
 /* v3.9: difficulty badge for the 0-3 scale. Tier 0 is trivial, so it gets a label rather
    than zero dots (which would render as nothing and look like a bug). */
 function diffDots(d){
@@ -760,8 +817,33 @@ function editNextQuiz(){
 const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
 
+/* v3.17 exact-question intake. Full screenshots stay immutable on disk. sourceShot() uses an
+   SVG viewBox as a non-destructive crop, hiding the already-selected answer while preserving
+   the exact uploaded structure pixels. structurePair() gives transfer items a consistent visual
+   card without pretending a condensed formula is the original screenshot. */
+const ISO_SOURCE="./assets/question-sources/2026-08-25-constitutional-isomers/";
+const FC_SOURCE="./assets/question-sources/2026-08-25-lewis-formal-charge/";
+const BOND_SOURCE="./assets/question-sources/2026-08-25-bonding-polarity-hybridization/";
+const DPI_SOURCE="./assets/question-sources/2026-08-25-dipoles-imf-polar-bonds/";
+const DBA_SOURCE="./assets/question-sources/2026-08-25-dipoles-bond-types-angles/";
+const BHD_SOURCE="./assets/question-sources/2026-08-25-bonds-hbond-hybridization-dipoles/";
+const ISOMER_PROMPT="Determine whether the two structures shown represent the same compound, constitutional isomers, or unrelated compounds.";
+const ISOMER_CHOICES=["Same compound","Constitutional isomers","Unrelated compounds"];
+function sourceShotFrom(base,file,fullW,fullH,x,y,w,h,alt){
+  return '<svg viewBox="'+[x,y,w,h].join(" ")+'" role="img" aria-label="'+alt+'" style="display:block;width:min(100%,'+w+'px);margin:10px 0 4px;border:1px solid #ddd;border-radius:8px;background:#fff"><image href="'+base+file+'" width="'+fullW+'" height="'+fullH+'"/></svg>';
+}
+function sourceShot(file,fullW,fullH,x,y,w,h,alt){ return sourceShotFrom(ISO_SOURCE,file,fullW,fullH,x,y,w,h,alt); }
+function fcShot(file,fullW,fullH,x,y,w,h,alt){ return sourceShotFrom(FC_SOURCE,file,fullW,fullH,x,y,w,h,alt); }
+function bondShot(file,fullW,fullH,x,y,w,h,alt){ return sourceShotFrom(BOND_SOURCE,file,fullW,fullH,x,y,w,h,alt); }
+function dpiShot(file,fullW,fullH,x,y,w,h,alt){ return sourceShotFrom(DPI_SOURCE,file,fullW,fullH,x,y,w,h,alt); }
+function bhdShot(file,fullW,fullH,x,y,w,h,alt){ return sourceShotFrom(BHD_SOURCE,file,fullW,fullH,x,y,w,h,alt); }
+function chargeLabel(n){ return n===0?"no charge":(n>0?"+":"−")+Math.abs(n); }
+function structurePair(left,right){
+  return '<div role="img" aria-label="Pair of condensed structural formulas" style="display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center;margin:12px 0;padding:12px;border:1.5px solid #d8d2c4;border-radius:10px;background:#fff"><div class="mono" style="text-align:center;font-size:1.02rem;overflow-wrap:anywhere">'+left+'</div><b>and</b><div class="mono" style="text-align:center;font-size:1.02rem;overflow-wrap:anywhere">'+right+'</div></div>';
+}
+
 /* ================= QUESTION BANK =================
-   schema: {id, topic, type:"num"|"mc"|"text", prompt, answer, choices?, why}
+   schema: {id, topic, type:"num"|"mc"|"text"|"multi"|"blanks"|"multiSelect"|"written", prompt, answer|fields, choices?, why}
    Add course-specific banks below this array when the syllabus lands. */
 const QUESTIONS = [
 /* --- valence electrons (feeds lewis) --- */
@@ -985,7 +1067,7 @@ const QUESTIONS = [
  model:"Count each carbon to 4 bonds: <b>C1</b>: double bond (2) → <b>2 H</b>. <b>C2</b>: double (2) + single to C3 (1) = 3 → <b>1 H</b>. <b>C3</b>: two singles → <b>2 H</b>. <b>C4</b>: one single → <b>3 H</b>. Total: <b>C₄H₈</b> (1-butene). Rule: H's on carbon are implicit; H's on N/O/S are always drawn.",
  rubric:["Every carbon brought to exactly 4 bonds","Correct per-carbon counts (2,1,2,3)","Correct formula C₄H₈"]},
 /* ---- v3.3 TUTORIAL-STANDARD SET — modeled on Ciesla's Ch-1 tutorial + official quiz scope ---- */
-{id:"T-CH1-01",topic:"lewis",type:"mc",diff:1,prompt:"Two compounds are <b>constitutional isomers</b>. Which MUST be true?",choices:["Same molecular formula, different connectivity of atoms","Same connectivity, different 3-D arrangement","Same properties, different formulas","They are the same compound drawn differently"],answer:0,why:"Constitutional isomers share a molecular formula but connect their atoms differently — and structure (connectivity), not formula, determines properties. (Same connectivity/different 3-D = stereoisomers.)"},
+{id:"T-CH1-01",topic:"isomers",type:"mc",diff:1,prompt:"Two compounds are <b>constitutional isomers</b>. Which MUST be true?",choices:["Same molecular formula, different connectivity of atoms","Same connectivity, different 3-D arrangement","Same properties, different formulas","They are the same compound drawn differently"],answer:0,why:"Constitutional isomers share a molecular formula but connect their atoms differently — and structure (connectivity), not formula, determines properties. (Same connectivity/different 3-D = stereoisomers.)"},
 {id:"T-CH1-02",topic:"lewis",type:"mc",diff:1,prompt:"Which bonding pattern is <b>WRONG</b> for a neutral atom in an organic molecule?",choices:["C — 4 bonds","N — 3 bonds + 1 lone pair","O — 2 bonds + 2 lone pairs","F — 2 bonds + 2 lone pairs"],answer:3,why:"Neutral halogens form 1 bond + 3 lone pairs. Memorize the neutral patterns: C=4 bonds · N=3+1LP · O=2+2LP · H=1 · halogen=1+3LP. Any deviation means a formal charge."},
 {id:"T-CH1-03",topic:"hybrid",type:"mc",diff:2,prompt:"Rank C–H bond strength: ethyne (HC≡CH), ethene (H₂C=CH₂), ethane (H₃C–CH₃).",choices:["ethyne > ethene > ethane","ethane > ethene > ethyne","ethene > ethyne > ethane","all equal — they're all C–H bonds"],answer:0,why:"More s-character = shorter, stronger bond. sp (50% s, ethyne) > sp² (33%, ethene) > sp³ (25%, ethane). s orbitals hold electrons closer to the nucleus."},
 {id:"T-CH1-04",topic:"hybrid",type:"mc",diff:1,prompt:"A C=C double bond consists of:",choices:["1 σ bond + 1 π bond","2 σ bonds","2 π bonds","1 σ + 2 π"],answer:0,why:"Every bond's FIRST connection is a σ (head-on overlap of hybridized orbitals). The second is a π — side-on overlap of unhybridized p orbitals. π is the weaker of the two."},
@@ -1012,16 +1094,174 @@ const QUESTIONS = [
  rubric:["3 domains → sp² (double bond = one domain)","Lone pair in sp² hybrid orbital","<120° with lone-pair compression reasoning"]},
 
 /* ===== v3.4 CONSTITUTIONAL ISOMER SET (complements T-CH1-01 definition + WR-CH1-101 C₃H₉N) ===== */
-{id:"iso2",topic:"bondline",type:"mc",diff:1,prompt:"Both structures below are C₄H₁₀:<svg viewBox='0 0 260 90' width='240' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='12' y1='60' x2='38' y2='32'/><line x1='38' y1='32' x2='64' y2='60'/><line x1='64' y1='60' x2='90' y2='32'/><line x1='150' y1='62' x2='176' y2='34'/><line x1='176' y1='34' x2='202' y2='62'/><line x1='176' y1='34' x2='176' y2='8'/></g><g font-size='12' fill='currentColor'><text x='44' y='82'>A</text><text x='170' y='82'>B</text></g></svg>They are:",choices:["Constitutional isomers — same formula, different connectivity (butane vs isobutane)","The same molecule drawn differently","Stereoisomers","Not isomers — different formulas"],answer:0,why:"A = butane (4-carbon chain). B = isobutane/2-methylpropane (3-carbon chain + branch). Same C₄H₁₀, <b>different connectivity</b> → constitutional isomers. Different compounds, different boiling points."},
-{id:"iso8",topic:"bondline",type:"mc",diff:2,prompt:"Both structures below are C₅H₁₂:<svg viewBox='0 0 280 95' width='250' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='10' y1='60' x2='34' y2='34'/><line x1='34' y1='34' x2='58' y2='60'/><line x1='58' y1='60' x2='82' y2='34'/><line x1='82' y1='34' x2='106' y2='60'/><line x1='150' y1='30' x2='176' y2='56'/><line x1='176' y1='56' x2='202' y2='30'/><line x1='202' y1='30' x2='228' y2='56'/><line x1='228' y1='56' x2='228' y2='84'/></g><g font-size='12' fill='currentColor'><text x='52' y='84'>A</text><text x='185' y='84'>B</text></g></svg>They are:",choices:["The SAME molecule — both are an unbranched 5-carbon chain (pentane), just drawn with different kinks","Constitutional isomers","Stereoisomers","Different compounds entirely"],answer:0,why:"<b>Trap.</b> Trace the connectivity: both are C–C–C–C–C with no branches — the drawing's kinks mean nothing. Same connectivity = <b>same compound</b> (pentane). Before calling two drawings isomers, CHECK the connectivity, not the shape on paper."},
-{id:"iso3",topic:"lewis",type:"mc",diff:2,prompt:"cis- and trans-1,2-dichloroethene are:",choices:["STEREOisomers — same connectivity, different 3-D arrangement (NOT constitutional)","Constitutional isomers — the Cl's are in different places","The same compound","Not isomers — different formulas"],answer:0,why:"Every atom is bonded to the same partners in both — only the 3-D arrangement across the rigid C=C differs → <b>stereoisomers</b>. (In lecture 8/20 she said 'constitutional' then corrected herself to 'stereoisomers' — this exact distinction.) Constitutional requires DIFFERENT connectivity."},
-{id:"iso4",topic:"lewis",type:"num",diff:1,prompt:"How many constitutional isomers exist for C₄H₁₀?",answer:2,why:"<b>2</b>: butane (straight chain) and isobutane/2-methylpropane (branched). That's the whole set."},
-{id:"iso5",topic:"lewis",type:"num",diff:2,prompt:"How many constitutional isomers exist for C₅H₁₂?",answer:3,why:"<b>3</b>: pentane (straight), 2-methylbutane (one branch), and 2,2-dimethylpropane / neopentane (two methyls on the middle carbon). Systematic method: longest chain first, then shorten by one and place branches, never duplicating a connectivity."},
-{id:"iso6",topic:"lewis",type:"mc",diff:2,prompt:"Ethanol (CH₃CH₂–OH) and dimethyl ether (CH₃–O–CH₃) are both C₂H₆O. They are:",choices:["Constitutional isomers — and their boiling points differ by over 100 °C","The same compound","Stereoisomers","Resonance structures"],answer:0,why:"Same formula, different connectivity (O–H vs C–O–C) → constitutional isomers with different FUNCTIONAL GROUPS. Consequence: ethanol H-bonds (bp 78 °C); dimethyl ether can't (no O–H; bp −24 °C). Constitutional isomers can have wildly different properties — this pair is the classic exam example."},
-{id:"iso7",topic:"lewis",type:"mc",diff:1,prompt:"Which pair is NOT a pair of isomers at all?",choices:["CH₄ and C₂H₆ — different molecular formulas","Butane and isobutane","Ethanol and dimethyl ether","cis- and trans-2-butene"],answer:0,why:"Isomer = same molecular formula, full stop. CH₄ vs C₂H₆ are just different compounds. (Butane/isobutane and ethanol/DME = constitutional; cis/trans-2-butene = stereo.)"},
-{id:"WR-CH1-012",topic:"lewis",type:"written",diff:3,prompt:"<b>Classify with justification</b> — for each pair, write: constitutional isomers, stereoisomers, or same compound — plus ONE line of reasoning each.<br>(a) butane & 2-methylpropane &nbsp; (b) cis- & trans-2-butene &nbsp; (c) pentane drawn as a zigzag & pentane drawn with a U-bend",
+{id:"iso2",topic:"isomers",type:"mc",diff:1,prompt:"Both structures below are C₄H₁₀:<svg viewBox='0 0 260 90' width='240' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='12' y1='60' x2='38' y2='32'/><line x1='38' y1='32' x2='64' y2='60'/><line x1='64' y1='60' x2='90' y2='32'/><line x1='150' y1='62' x2='176' y2='34'/><line x1='176' y1='34' x2='202' y2='62'/><line x1='176' y1='34' x2='176' y2='8'/></g><g font-size='12' fill='currentColor'><text x='44' y='82'>A</text><text x='170' y='82'>B</text></g></svg>They are:",choices:["Constitutional isomers — same formula, different connectivity (butane vs isobutane)","The same molecule drawn differently","Stereoisomers","Not isomers — different formulas"],answer:0,why:"A = butane (4-carbon chain). B = isobutane/2-methylpropane (3-carbon chain + branch). Same C₄H₁₀, <b>different connectivity</b> → constitutional isomers. Different compounds, different boiling points."},
+{id:"iso8",topic:"isomers",type:"mc",diff:2,prompt:"Both structures below are C₅H₁₂:<svg viewBox='0 0 280 95' width='250' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='10' y1='60' x2='34' y2='34'/><line x1='34' y1='34' x2='58' y2='60'/><line x1='58' y1='60' x2='82' y2='34'/><line x1='82' y1='34' x2='106' y2='60'/><line x1='150' y1='30' x2='176' y2='56'/><line x1='176' y1='56' x2='202' y2='30'/><line x1='202' y1='30' x2='228' y2='56'/><line x1='228' y1='56' x2='228' y2='84'/></g><g font-size='12' fill='currentColor'><text x='52' y='84'>A</text><text x='185' y='84'>B</text></g></svg>They are:",choices:["The SAME molecule — both are an unbranched 5-carbon chain (pentane), just drawn with different kinks","Constitutional isomers","Stereoisomers","Different compounds entirely"],answer:0,why:"<b>Trap.</b> Trace the connectivity: both are C–C–C–C–C with no branches — the drawing's kinks mean nothing. Same connectivity = <b>same compound</b> (pentane). Before calling two drawings isomers, CHECK the connectivity, not the shape on paper."},
+{id:"iso3",topic:"isomers",type:"mc",diff:2,prompt:"cis- and trans-1,2-dichloroethene are:",choices:["STEREOisomers — same connectivity, different 3-D arrangement (NOT constitutional)","Constitutional isomers — the Cl's are in different places","The same compound","Not isomers — different formulas"],answer:0,why:"Every atom is bonded to the same partners in both — only the 3-D arrangement across the rigid C=C differs → <b>stereoisomers</b>. (In lecture 8/20 she said 'constitutional' then corrected herself to 'stereoisomers' — this exact distinction.) Constitutional requires DIFFERENT connectivity."},
+{id:"iso4",topic:"isomers",type:"num",diff:1,prompt:"How many constitutional isomers exist for C₄H₁₀?",answer:2,why:"<b>2</b>: butane (straight chain) and isobutane/2-methylpropane (branched). That's the whole set."},
+{id:"iso5",topic:"isomers",type:"num",diff:2,prompt:"How many constitutional isomers exist for C₅H₁₂?",answer:3,why:"<b>3</b>: pentane (straight), 2-methylbutane (one branch), and 2,2-dimethylpropane / neopentane (two methyls on the middle carbon). Systematic method: longest chain first, then shorten by one and place branches, never duplicating a connectivity."},
+{id:"iso6",topic:"isomers",type:"mc",diff:2,prompt:"Ethanol (CH₃CH₂–OH) and dimethyl ether (CH₃–O–CH₃) are both C₂H₆O. They are:",choices:["Constitutional isomers — and their boiling points differ by over 100 °C","The same compound","Stereoisomers","Resonance structures"],answer:0,why:"Same formula, different connectivity (O–H vs C–O–C) → constitutional isomers with different FUNCTIONAL GROUPS. Consequence: ethanol H-bonds (bp 78 °C); dimethyl ether can't (no O–H; bp −24 °C). Constitutional isomers can have wildly different properties — this pair is the classic exam example."},
+{id:"iso7",topic:"isomers",type:"mc",diff:1,prompt:"Which pair is NOT a pair of isomers at all?",choices:["CH₄ and C₂H₆ — different molecular formulas","Butane and isobutane","Ethanol and dimethyl ether","cis- and trans-2-butene"],answer:0,why:"Isomer = same molecular formula, full stop. CH₄ vs C₂H₆ are just different compounds. (Butane/isobutane and ethanol/DME = constitutional; cis/trans-2-butene = stereo.)"},
+{id:"WR-CH1-012",topic:"isomers",type:"written",diff:3,prompt:"<b>Classify with justification</b> — for each pair, write: constitutional isomers, stereoisomers, or same compound — plus ONE line of reasoning each.<br>(a) butane & 2-methylpropane &nbsp; (b) cis- & trans-2-butene &nbsp; (c) pentane drawn as a zigzag & pentane drawn with a U-bend",
  model:"<b>(a) Constitutional isomers</b> — same C₄H₁₀, different connectivity (straight chain vs branched). <b>(b) Stereoisomers</b> — same connectivity everywhere; only the 3-D arrangement across the rigid C=C differs. <b>(c) Same compound</b> — connectivity identical (unbranched C₅ chain); a drawing's bends are not chemistry. Decision routine: 1) same formula? if no → not isomers. 2) same connectivity? if no → constitutional. 3) same connectivity, different 3-D → stereo.",
  rubric:["All three classified correctly (constitutional / stereo / same)","Reasoning uses CONNECTIVITY, not drawing shape","States or implies the 3-step decision routine"]},
+
+/* ===== v3.17 EXACT QUIZ/EXAM IMAGE BATCH + TRANSFER SET (Gabe upload, 2026-08-25) =====
+   The full screenshots and their hashes live in assets/question-sources/.../manifest.json.
+   sourceShot() hides the already-selected answer without modifying the source PNG. */
+{id:"EXACT-ISO-20260825-01",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+sourceShot("exact-01-same-compound.png",2042,964,175,350,770,315,"Two drawings of a chlorinated five-carbon structure"),choices:ISOMER_CHOICES,answer:0,why:"<b>Same compound.</b> Both drawings are CH₃–CH(CH₃)–CH(Cl)–CH₃ (C₅H₁₁Cl). Trace neighbors instead of the page shape: the same two middle carbons carry the methyl branch and Cl in both drawings. Only the orientation changed."},
+{id:"EXACT-ISO-20260825-02",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+sourceShot("exact-02-constitutional-isomers.png",1968,602,105,85,900,245,"1-butanol and diethyl ether structures"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Both are C₄H₁₀O, but the left is 1-butanol (C–C–C–C–O–H) and the right is diethyl ether (C–C–O–C–C). Same formula, different O connectivity."},
+{id:"EXACT-ISO-20260825-03",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+sourceShot("exact-03-unrelated-compounds.png",2000,638,115,105,850,220,"Propylene oxide and 1-propanol structures"),choices:ISOMER_CHOICES,answer:2,why:"<b>Unrelated compounds for this classification.</b> Propylene oxide is C₃H₆O; 1-propanol is C₃H₈O. Different molecular formulas means they cannot be isomers. Stop at formula before comparing connectivity."},
+{id:"EXACT-ISO-20260825-04",topic:"isomers",type:"mc",diff:3,prompt:ISOMER_PROMPT+sourceShot("exact-04-same-compound.png",1882,666,140,115,930,355,"Two drawings of 3-methylpentane"),choices:ISOMER_CHOICES,answer:0,why:"<b>Same compound.</b> In both drawings the branching carbon is bonded to H, one CH₃ group, and two CH₂CH₃ groups: 3-methylpentane, C₆H₁₄. Choosing a different-looking chain through the same graph does not change connectivity."},
+{id:"EXACT-ISO-20260825-05",topic:"isomers",type:"mc",diff:3,prompt:ISOMER_PROMPT+sourceShot("exact-05-constitutional-isomers.png",1850,712,30,110,900,305,"Two dibrominated four-carbon structures"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Both are C₄H₈Br₂. The left is BrCH₂–CHBr–CH₂–CH₃ (1,2-dibromobutane); the right is BrCH₂–C(Br)(CH₃)₂ (1,2-dibromo-2-methylpropane). Same atom count, different carbon skeleton/connectivity."},
+{id:"EXACT-ISO-20260825-06",topic:"isomers",type:"mc",diff:3,prompt:ISOMER_PROMPT+sourceShot("exact-06-constitutional-isomers.png",1894,648,55,125,760,225,"Tetrahydrofuran and 2-butanone structures"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Tetrahydrofuran and 2-butanone are both C₄H₈O. In one, O is part of a five-membered cyclic ether; in the other, O is double-bonded in a ketone. Same formula, different connectivity."},
+
+/* Similar transfer items: new molecules, same three-choice classification. */
+{id:"SIM-ISO-20260825-01",topic:"isomers",type:"mc",diff:1,prompt:ISOMER_PROMPT+structurePair("CH₃–CH(CH₃)–CH₂–CH₃","CH₃–CH₂–CH(CH₃)–CH₃"),choices:ISOMER_CHOICES,answer:0,why:"<b>Same compound.</b> Read the second formula from right to left: both are 2-methylbutane, C₅H₁₂. Reversing the direction used to write a chain does not change which atoms are bonded."},
+{id:"SIM-ISO-20260825-02",topic:"isomers",type:"mc",diff:1,prompt:ISOMER_PROMPT+structurePair("CH₃–CH₂–CH₂–OH","CH₃–CH(OH)–CH₃"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Both are C₃H₈O, but the OH is on an end carbon in 1-propanol and on the middle carbon in 2-propanol. Same formula, different connectivity."},
+{id:"SIM-ISO-20260825-03",topic:"isomers",type:"mc",diff:1,prompt:ISOMER_PROMPT+structurePair("cyclobutane (four-carbon ring)","CH₃–CH₂–CH₂–CH₃"),choices:ISOMER_CHOICES,answer:2,why:"<b>Unrelated compounds for this classification.</b> Cyclobutane is C₄H₈; butane is C₄H₁₀. A ring removes two hydrogens, so the formulas differ and the pair cannot be isomers."},
+{id:"SIM-ISO-20260825-04",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+structurePair("C(CH₃)₄","CH₃–C(CH₃)₂–CH₃"),choices:ISOMER_CHOICES,answer:0,why:"<b>Same compound.</b> Both notations show one central carbon bonded to four CH₃ groups: 2,2-dimethylpropane (neopentane), C₅H₁₂."},
+{id:"SIM-ISO-20260825-05",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+structurePair("CH₃–CH₂–CH₂–CHO","CH₃–CO–CH₂–CH₃"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Butanal and 2-butanone are both C₄H₈O, but one has a terminal aldehyde carbonyl and the other has an internal ketone carbonyl."},
+{id:"SIM-ISO-20260825-06",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+structurePair("tetrahydrofuran (C₄H₈O)","CH₃–CH₂–CH₂–CH₂–OH"),choices:ISOMER_CHOICES,answer:2,why:"<b>Unrelated compounds for this classification.</b> Tetrahydrofuran is C₄H₈O; 1-butanol is C₄H₁₀O. The formulas differ by H₂, so they are not isomers."},
+{id:"SIM-ISO-20260825-07",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+structurePair("BrCH₂–CHBr–CH₂–CH₃","CH₃–CH₂–CHBr–CH₂Br"),choices:ISOMER_CHOICES,answer:0,why:"<b>Same compound.</b> Reading the second structure from right to left gives the first exactly: 1,2-dibromobutane. Same formula and same connectivity."},
+{id:"SIM-ISO-20260825-08",topic:"isomers",type:"mc",diff:2,prompt:ISOMER_PROMPT+structurePair("CH₃–CH₂–CH₂–CH₂Br","CH₃–CHBr–CH₂–CH₃"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Both are C₄H₉Br, but Br is attached to C1 in 1-bromobutane and C2 in 2-bromobutane. Different atom-to-atom connectivity."},
+{id:"SIM-ISO-20260825-09",topic:"isomers",type:"mc",diff:1,prompt:ISOMER_PROMPT+structurePair("BrCH₂–CHBr–CH₂–CH₃","ClCH₂–CHCl–CH₂–CH₃"),choices:ISOMER_CHOICES,answer:2,why:"<b>Unrelated compounds.</b> One formula is C₄H₈Br₂ and the other is C₄H₈Cl₂. Replacing Br with Cl changes the molecular formula, so they are not isomers."},
+{id:"SIM-ISO-20260825-10",topic:"isomers",type:"mc",diff:3,prompt:ISOMER_PROMPT+structurePair("CH₃CH₂–CH(CH₃)–CH₂CH₃","CH₃–CH(CH₂CH₃)–CH₂CH₃"),choices:ISOMER_CHOICES,answer:0,why:"<b>Same compound.</b> In each notation the central CH is attached to one methyl group and two ethyl groups: 3-methylpentane, C₆H₁₄. The apparent main chain is a drawing choice, not new connectivity."},
+{id:"SIM-ISO-20260825-11",topic:"isomers",type:"mc",diff:3,prompt:ISOMER_PROMPT+structurePair("CH₃CH₂CH₂COOH","CH₃COOCH₂CH₃"),choices:ISOMER_CHOICES,answer:1,why:"<b>Constitutional isomers.</b> Butanoic acid and ethyl acetate are both C₄H₈O₂. The first has a carboxylic-acid –C(=O)OH group; the second has an ester –C(=O)O– linkage."},
+{id:"SIM-ISO-20260825-12",topic:"isomers",type:"mc",diff:1,prompt:ISOMER_PROMPT+structurePair("cyclopropane (C₃H₆)","CH₃–CO–CH₃ (C₃H₆O)"),choices:ISOMER_CHOICES,answer:2,why:"<b>Unrelated compounds.</b> Propanone contains oxygen and cyclopropane does not: C₃H₆O versus C₃H₆. Different formulas means not isomers."},
+
+/* ===== v3.18 EXACT LEWIS / FORMAL-CHARGE IMAGE BATCH (Gabe upload, 2026-08-25) =====
+   Exact drawing prompts 01-03 are first-class checked targets in Lewis Lab. The eight
+   auto-graded items below preserve the original structure pixels, and every one also links
+   to the corresponding drawing target for reconstruction practice. */
+{id:"EXACT-FC-20260825-01",topic:"formal",type:"num",diff:2,drawMol:"AlH4-",prompt:"Identify the missing formal charge on Al in the structure below. Enter −1, 0, or +1."+fcShot("exact-04-alh4-charge.png",1914,1084,135,0,650,310,"Al bonded to four hydrogen atoms"),answer:-1,why:"<b>Al is −1.</b> Aluminum has 3 valence electrons, 0 nonbonding electrons, and 4 bond orders: FC = 3 − 0 − 4 = <b>−1</b>. The whole species is AlH₄⁻."},
+{id:"EXACT-FC-20260825-02",topic:"formal",type:"num",diff:1,drawMol:"H3O+",prompt:"Identify the missing formal charge on O in the structure below. Enter −1, 0, or +1."+fcShot("exact-05-h3o-charge.png",1926,994,160,40,520,300,"Oxygen bonded to three hydrogens with one lone pair"),answer:1,why:"<b>O is +1.</b> FC = 6 − 2 nonbonding electrons − 3 bond orders = <b>+1</b>. This is hydronium, H₃O⁺."},
+{id:"EXACT-FC-20260825-03",topic:"formal",type:"multi",diff:2,drawMol:"CH3O+",prompt:"Identify the missing formal charges in protonated formaldehyde."+fcShot("exact-06-protonated-formaldehyde.png",1064,500,120,35,520,290,"Protonated formaldehyde with a carbon-oxygen double bond and an oxygen-hydrogen bond"),fields:[{label:"Charge on O",answer:1},{label:"Charge on C",answer:0}],why:"The oxygen has 3 bond orders and 1 lone pair: FC = 6 − 2 − 3 = <b>+1</b>. Carbon has 4 bond orders and no lone pairs: FC = 4 − 0 − 4 = <b>0</b>."},
+{id:"EXACT-FC-20260825-04",topic:"formal",type:"num",diff:1,drawMol:"CH3-",prompt:"Identify the missing formal charge on carbon in the structure below. Enter −1, 0, or +1."+fcShot("exact-07-methyl-anion.png",1024,422,65,40,500,270,"Carbon bonded to three hydrogens with one lone pair"),answer:-1,why:"A 3-bond carbon <i>with</i> one lone pair has FC = 4 − 2 − 3 = <b>−1</b>. This is CH₃⁻, the methyl anion."},
+{id:"EXACT-FC-20260825-05",topic:"formal",type:"num",diff:1,drawMol:"CH3+",prompt:"Identify the missing formal charge on carbon in the structure below. Enter −1, 0, or +1."+fcShot("exact-08-methyl-cation.png",986,388,35,35,500,240,"Carbon bonded to three hydrogens with no lone pair"),answer:1,why:"A 3-bond carbon with <i>no</i> lone pair has FC = 4 − 0 − 3 = <b>+1</b>. This is CH₃⁺, the methyl cation. It has only six electrons around carbon."},
+{id:"EXACT-FC-20260825-06",topic:"formal",type:"multi",diff:3,drawMol:"AlCl5",prompt:"Use the labels in the exact structure to identify the formal charges."+fcShot("exact-09-alcl5-labeled.png",1070,974,65,40,650,620,"An aluminum-chlorine structure with labeled aluminum a, bridging chlorine b, and terminal chlorine c"),fields:[{label:"Charge on boxed atom a (Al)",answer:-1},{label:"Charge on boxed atom b (bridging Cl)",answer:1},{label:"Charge on boxed atom c (terminal Cl)",answer:0}],why:"<b>a = −1, b = +1, c = 0.</b> Al has four bonds: 3 − 4 = −1. The bridging Cl has two bonds and two lone pairs: 7 − 4 − 2 = +1. The terminal Cl has one bond and three lone pairs: 7 − 6 − 1 = 0."},
+{id:"EXACT-FC-20260825-07",topic:"formal",type:"multi",diff:3,drawMol:"glycine-zwitterion",prompt:"Use the labels in the exact glycine structure to identify the formal charges."+fcShot("exact-10-glycine-zwitterion.png",1308,826,70,25,1000,600,"Glycine zwitterion with labeled nitrogen, carbonyl oxygen, carbonyl carbon, and single-bond oxygen"),fields:[{label:"Charge on atom a (N)",answer:1},{label:"Charge on atom b (C=O oxygen)",answer:0},{label:"Charge on atom c (carbonyl C)",answer:0},{label:"Charge on atom d (single-bond O)",answer:-1}],why:"<b>a = +1, b = 0, c = 0, d = −1.</b> Four-bond N is +1. Double-bond O with two lone pairs is neutral. Four-bond-order carbon is neutral. Single-bond O with three lone pairs is −1. The + and − charges cancel in the zwitterion."},
+{id:"EXACT-FC-20260825-08",topic:"formal",type:"mc",diff:2,drawMol:"NH2-",prompt:"Identify the correct Lewis structure for NH₂⁻."+fcShot("exact-11-nh2-minus-structure.png",1900,758,45,25,900,75,"Identify the correct Lewis structure for the amide ion NH2 minus"),choices:[fcShot("exact-11-nh2-minus-structure.png",1900,758,140,180,250,125,"Option with one lone pair on nitrogen"),fcShot("exact-11-nh2-minus-structure.png",1900,758,140,315,250,130,"Option with two lone pairs on nitrogen"),fcShot("exact-11-nh2-minus-structure.png",1900,758,140,452,250,105,"Option with no lone pairs on nitrogen"),fcShot("exact-11-nh2-minus-structure.png",1900,758,140,560,250,130,"Option with three lone pairs on nitrogen")],choiceLabels:["one lone pair on N","two lone pairs on N","no lone pairs on N","three lone pairs on N"],answer:1,why:"The correct structure has <b>two N–H single bonds, two lone pairs on N, and −1 on N</b>. FC = 5 − 4 − 2 = −1, and N has a full octet."},
+
+/* Transfer set: compare the same atom with different lone-pair/bond environments. */
+{id:"SIM-FC-20260825-01",topic:"formal",type:"multi",diff:1,prompt:"Contrast oxygen in hydronium and water.",fields:[{label:"O in H₃O⁺: 3 bonds, 1 lone pair",answer:1},{label:"O in H₂O: 2 bonds, 2 lone pairs",answer:0}],why:"Hydronium O: 6 − 2 − 3 = <b>+1</b>. Water O: 6 − 4 − 2 = <b>0</b>. Adding a bond while losing a lone pair moves oxygen one unit positive."},
+{id:"SIM-FC-20260825-02",topic:"formal",type:"multi",diff:2,prompt:"In one acetate resonance contributor, CH₃–C(=O)–O⁻, assign the two oxygens.",fields:[{label:"Double-bonded O (2 lone pairs)",answer:0},{label:"Single-bonded O (3 lone pairs)",answer:-1}],why:"The C=O oxygen is neutral: 6 − 4 − 2 = 0. The single-bond oxygen is −1: 6 − 6 − 1 = −1. Same element, different roles—connectivity and lone pairs decide."},
+{id:"SIM-FC-20260825-03",topic:"formal",type:"multi",diff:2,prompt:"Contrast nitrogen in ammonium and the amide ion.",fields:[{label:"N in NH₄⁺: 4 bonds, 0 lone pairs",answer:1},{label:"N in NH₂⁻: 2 bonds, 2 lone pairs",answer:-1}],why:"NH₄⁺ nitrogen: 5 − 0 − 4 = <b>+1</b>. NH₂⁻ nitrogen: 5 − 4 − 2 = <b>−1</b>."},
+{id:"SIM-FC-20260825-04",topic:"formal",type:"multi",diff:2,prompt:"Both carbons below have three bonds. Use the lone-pair information to distinguish their charges.",fields:[{label:"CH₃⁺ carbon: 0 lone pairs",answer:1},{label:"CH₃⁻ carbon: 1 lone pair",answer:-1}],why:"Three bonds alone do not determine carbon's sign. With 0 lone pairs: 4 − 0 − 3 = <b>+1</b>. With 1 lone pair: 4 − 2 − 3 = <b>−1</b>."},
+
+/* ===== v3.19 EXACT MIXED-RESPONSE BATCH (Gabe upload, 2026-08-25) =====
+   Source screenshots remain immutable. Display viewports exclude selected controls; answers
+   are re-rendered as dropdown grids, mixed inline blanks, checkboxes, or shuffled image MC. */
+{id:"EXACT-MIX-20260825-01",topic:"formal",type:"multi",diff:3,prompt:"Use the atom labels in acetylcholine to identify every formal charge."+bondShot("exact-01-acetylcholine-formal-charges.png",1618,1164,135,420,735,330,"Acetylcholine structure with atoms a through g labeled"),fields:[{label:"Charge on atom a (carbonyl O)",answer:0},{label:"Charge on atom b",answer:0},{label:"Charge on atom c",answer:0},{label:"Charge on atom d (ester O)",answer:0},{label:"Charge on atom e",answer:0},{label:"Charge on atom f",answer:0},{label:"Charge on atom g (quaternary N)",answer:1}],why:"<b>a–f are neutral; g is +1.</b> The carbonyl O has two lone pairs and two bond orders; the ester O has two lone pairs and two single bonds; every labelled carbon has four bond orders. Nitrogen has four single bonds and no lone pair: FC = 5 − 0 − 4 = +1."},
+{id:"EXACT-MIX-20260825-02",topic:"formal",type:"mc",diff:2,prompt:"Select the Lewis structure that best represents potassium ethoxide, CH₃CH₂OK.",choices:[bondShot("exact-02-potassium-ethoxide-structure.png",1586,1144,142,343,215,126,"Option 1: neutral oxygen covalently bonded to potassium"),bondShot("exact-02-potassium-ethoxide-structure.png",1586,1144,142,473,225,126,"Option 2: covalent oxygen-potassium bond with lone pairs on potassium"),bondShot("exact-02-potassium-ethoxide-structure.png",1586,1144,142,604,265,122,"Option 3: separated ethoxide and potassium with electron dots on potassium"),bondShot("exact-02-potassium-ethoxide-structure.png",1586,1144,142,731,250,122,"Option 4: oxygen positive and potassium negative"),bondShot("exact-02-potassium-ethoxide-structure.png",1586,1144,142,858,252,120,"Option 5: ethoxide oxygen negative and potassium positive, separated ions"),bondShot("exact-02-potassium-ethoxide-structure.png",1586,1144,142,982,240,122,"Option 6: oxygen negative while bonded to potassium")],choiceLabels:["neutral O–K covalent structure","O–K covalent with lone pairs on K","separated ions but electron dots on K⁺","O⁺ and K⁻","CH₃CH₂O⁻ plus K⁺ as separated ions","O⁻–K⁺ covalent line"],answer:4,why:"Potassium ethoxide is ionic: <b>CH₃CH₂O⁻ K⁺</b>. Oxygen has one C–O bond and three lone pairs (FC −1); K has lost its valence electron (K⁺), and no covalent O–K bond is drawn."},
+{id:"EXACT-MIX-20260825-03",topic:"polarity",type:"multiSelect",selectN:2,diff:3,prompt:"δ+ regions are attacked by anions such as HO⁻. Select the two labelled carbons most likely to be attacked."+bondShot("exact-03-electrophilic-carbons.png",1630,838,115,285,540,225,"Five-carbon chain labeled A through E with a carbonyl at B and chlorine attached at E"),choices:["A","B","C","D","E"],answer:[1,4],why:"<b>B and E.</b> The C=O bond polarizes carbonyl carbon B δ+ because O pulls electron density. The C–Cl bond polarizes carbon E δ+ because Cl pulls electron density. Hydroxide is attracted to those electrophilic carbons."},
+{id:"EXACT-MIX-20260825-04",topic:"polarity",type:"mc",diff:3,prompt:"Identify the correct partial-charge distribution for epichlorohydrin.",choices:[bondShot("exact-04-epichlorohydrin-partial-charges.png",1618,1196,198,458,250,166,"Option 1 partial-charge distribution"),bondShot("exact-04-epichlorohydrin-partial-charges.png",1618,1196,198,630,250,166,"Option 2 partial-charge distribution"),bondShot("exact-04-epichlorohydrin-partial-charges.png",1618,1196,198,802,250,166,"Option 3 partial-charge distribution"),bondShot("exact-04-epichlorohydrin-partial-charges.png",1618,1196,198,976,250,166,"Option 4 partial-charge distribution")],choiceLabels:["O and Cl δ−; carbons bonded to them δ+","O and carbons δ−; Cl δ+","O δ+; ring carbons δ−; terminal carbon δ+; Cl δ−","only the terminal C–Cl bond labeled"],answer:0,why:"<b>O and Cl are δ−; the carbons directly bonded to them are δ+.</b> Oxygen is more electronegative than carbon across both C–O bonds, and chlorine is more electronegative across C–Cl."},
+{id:"EXACT-MIX-20260825-05",topic:"orbitals",type:"blanks",diff:2,prompt:"Complete the exact σ/π rotation statement."+bondShot("exact-05-sigma-pi-rotation-blanks.png",1546,586,45,160,500,215,"Ethane sigma bond shown with a rotation arrow"),template:"Rotation of a single bond {{0}} cause a reduction in orbital overlap because the overlap {{1}} on the bond axis. Rotation of a π bond {{2}} cause a reduction because its orbital overlap {{3}} on the bond axis.",fields:[{label:"single-bond effect",kind:"select",choices:["does","does not"],answer:"does not"},{label:"sigma-overlap location",kind:"select",choices:["occurs","does not occur"],answer:"occurs"},{label:"pi-bond effect",kind:"select",choices:["does","does not"],answer:"does"},{label:"pi-overlap location",kind:"select",choices:["is","is not"],answer:"is not"}],why:"A σ bond overlaps <b>on the bond axis</b>, so rotating around that axis preserves overlap. A π bond overlaps side-by-side <b>off the axis</b>; rotation misaligns the p orbitals and reduces/destroys overlap."},
+{id:"EXACT-MIX-20260825-06",topic:"hybrid",type:"blanks",diff:2,prompt:"Determine the hybridization of each carbon in CH₃–C(=O)–CH=CH₂, from left to right."+bondShot("exact-06-hybridization-carbonyl-alkene.png",1368,862,80,35,820,675,"Expanded structure of methyl vinyl ketone with four carbons"),template:"Carbon 1: {{0}} · carbonyl carbon 2: {{1}} · alkene carbon 3: {{2}} · terminal alkene carbon 4: {{3}}.",fields:[{label:"carbon 1",kind:"select",choices:["sp","sp²","sp³"],answer:"sp³"},{label:"carbon 2",kind:"select",choices:["sp","sp²","sp³"],answer:"sp²"},{label:"carbon 3",kind:"select",choices:["sp","sp²","sp³"],answer:"sp²"},{label:"carbon 4",kind:"select",choices:["sp","sp²","sp³"],answer:"sp²"}],why:"The CH₃ carbon has four σ domains → <b>sp³</b>. A carbonyl carbon and both alkene carbons each have three electron domains → <b>sp²</b>. A double bond counts as one domain."},
+{id:"EXACT-MIX-20260825-07",topic:"orbitals",type:"blanks",diff:1,prompt:"Rank the indicated C–C bonds by identifying the extremes."+bondShot("exact-07-bond-length-order.png",1078,568,65,25,610,430,"Carbon chain with single bond a, double bond b, and triple bond c indicated"),template:"The shortest bond is {{0}}, and the longest bond is {{1}}.",fields:[{label:"shortest bond",kind:"select",choices:["a","b","c"],answer:"c"},{label:"longest bond",kind:"select",choices:["a","b","c"],answer:"a"}],why:"Bond length decreases as bond order increases: <b>C≡C (c) &lt; C=C (b) &lt; C–C (a)</b>. More shared electron density pulls the nuclei closer."},
+{id:"EXACT-MIX-20260825-08",topic:"hybrid",type:"mc",diff:1,prompt:"Compare a three-bond carbocation with a three-bond carbanion. Assign the correct geometry to each ion."+bondShot("exact-08-carbocation-carbanion-geometry.png",1624,492,65,20,470,190,"Generic carbocation and carbanion structures"),choices:["The carbanion is trigonal planar and the carbocation is trigonal pyramidal.","The carbocation is trigonal planar and the carbanion is trigonal pyramidal."],answer:1,why:"A carbocation has three bonds and an empty p orbital: <b>sp², trigonal planar</b>. A simple carbanion has three bonds plus one lone pair: four domains, <b>sp³, trigonal pyramidal</b>."},
+{id:"EXACT-MIX-20260825-09",topic:"hybrid",type:"blanks",diff:3,prompt:"Use VSEPR to compare ammonia with ammonium and predict the bond-angle change."+bondShot("exact-09-ammonia-ammonium-vsepr.png",1640,846,90,205,1260,380,"Reaction of ammonia with hydronium to form ammonium and water"),template:"In NH₃, N has {{0}} bonds and {{1}} lone pair(s), giving {{2}} geometry and an angle of about {{3}}. In NH₄⁺, N has {{4}} bonds and {{5}} lone pairs, giving {{6}} geometry and an angle of {{7}}. The bond angles therefore {{8}}.",fields:[{label:"NH3 bond count",kind:"num",answer:3},{label:"NH3 lone pairs",kind:"select",choices:["no","one","two"],answer:"one"},{label:"NH3 geometry",kind:"select",choices:["bent","trigonal planar","trigonal pyramidal","tetrahedral"],answer:"trigonal pyramidal"},{label:"NH3 angle",kind:"select",choices:["104.5°","107°","109.5°","120°"],answer:"107°"},{label:"NH4+ bond count",kind:"num",answer:4},{label:"NH4+ lone pairs",kind:"select",choices:["no","one","two"],answer:"no"},{label:"NH4+ geometry",kind:"select",choices:["bent","trigonal planar","trigonal pyramidal","tetrahedral"],answer:"tetrahedral"},{label:"NH4+ angle",kind:"select",choices:["104.5°","107°","109.5°","120°"],answer:"109.5°"},{label:"angle change",kind:"select",choices:["increase","decrease","stay the same"],answer:"increase"}],why:"NH₃ is AX₃E: trigonal pyramidal, about 107°. Protonation uses the lone pair to form a fourth N–H bond, producing AX₄ tetrahedral NH₄⁺ at 109.5°. Removing lone-pair compression makes the angle <b>increase</b>."},
+{id:"EXACT-MIX-20260825-10",topic:"polarity",type:"mc",diff:2,prompt:"For CHCl₃, choose the direction of the net molecular dipole.",choices:[bondShot("exact-10-dipole-chcl3.png",1554,716,163,248,175,106,"Dipole arrow from hydrogen side toward the three chlorines"),bondShot("exact-10-dipole-chcl3.png",1554,716,163,368,175,106,"Dipole arrow toward hydrogen"),bondShot("exact-10-dipole-chcl3.png",1554,716,163,486,175,106,"Dipole arrow sideways"),"none"],choiceLabels:["toward the three-Cl side","toward H","sideways","no molecular dipole"],answer:0,why:"The three C–Cl bond dipoles outweigh the C–H contribution. Their vector sum points <b>away from H and toward the three-chlorine side</b>."},
+{id:"EXACT-MIX-20260825-11",topic:"polarity",type:"mc",diff:2,prompt:"For CH₃OCH₃, choose the direction of the net molecular dipole.",choices:[bondShot("exact-11-dipole-dimethyl-ether.png",1514,562,132,153,170,92,"Dipole arrow toward oxygen"),bondShot("exact-11-dipole-dimethyl-ether.png",1514,562,132,250,170,92,"Dipole arrow away from oxygen"),bondShot("exact-11-dipole-dimethyl-ether.png",1514,562,132,350,170,92,"Dipole arrow sideways"),"none"],choiceLabels:["toward O","away from O","sideways","no molecular dipole"],answer:0,why:"The C–O bond dipoles point toward oxygen. Because the molecule is bent at O, they do not cancel; the net dipole points <b>toward O</b>."},
+{id:"EXACT-MIX-20260825-12",topic:"polarity",type:"mc",diff:2,prompt:"For NH₃, choose the direction of the net molecular dipole.",choices:[bondShot("exact-12-dipole-ammonia.png",1532,574,142,143,145,103,"Dipole arrow toward nitrogen and its lone pair"),bondShot("exact-12-dipole-ammonia.png",1532,574,142,260,145,103,"Dipole arrow away from nitrogen"),bondShot("exact-12-dipole-ammonia.png",1532,574,142,370,145,103,"Dipole arrow sideways"),"none"],choiceLabels:["toward N/lone-pair side","toward the H atoms","sideways","no molecular dipole"],answer:0,why:"NH₃ is trigonal pyramidal. Each N–H dipole points toward N, so the components add along the molecular axis <b>toward N and the lone-pair side</b>."},
+{id:"EXACT-MIX-20260825-13",topic:"polarity",type:"mc",diff:3,prompt:"For tetrahedral CCl₂Br₂, choose the direction of the net molecular dipole.",choices:[bondShot("exact-13-dipole-ccl2br2.png",1618,868,208,337,145,105,"Dipole arrow toward the chlorine side"),bondShot("exact-13-dipole-ccl2br2.png",1618,868,208,449,145,105,"Dipole arrow opposite the chlorine side"),bondShot("exact-13-dipole-ccl2br2.png",1618,868,208,559,145,105,"Dipole arrow toward bromines"),"none"],choiceLabels:["toward the two-Cl side","opposite the two-Cl side","toward the two-Br side","no molecular dipole"],answer:0,why:"C–Cl bonds are more polar than C–Br bonds because Cl is more electronegative. The tetrahedral vectors do not cancel; the net points <b>toward the two-Cl side</b>."},
+{id:"EXACT-MIX-20260825-14",topic:"polarity",type:"mc",diff:2,prompt:"For cis-1,2-dichloroethene, choose the direction of the net molecular dipole.",choices:[bondShot("exact-14-dipole-cis-dichloroethene.png",1512,848,118,252,180,150,"Dipole arrow toward both chlorines"),bondShot("exact-14-dipole-cis-dichloroethene.png",1512,848,118,420,180,150,"Dipole arrow away from both chlorines"),bondShot("exact-14-dipole-cis-dichloroethene.png",1512,848,118,587,180,150,"Dipole arrow sideways"),"none"],choiceLabels:["toward the side bearing both Cl atoms","away from the Cl atoms","sideways","no molecular dipole"],answer:0,why:"In the <b>cis</b> isomer, both C–Cl dipoles have components in the same direction. Sideways components cancel, but the components toward the Cl side add."},
+{id:"EXACT-MIX-20260825-15",topic:"polarity",type:"mc",diff:2,prompt:"For trans-1,2-dichloroethene, choose the direction of the net molecular dipole.",choices:["none",bondShot("exact-15-dipole-trans-dichloroethene.png",1524,844,152,315,180,145,"Vertical dipole arrow"),bondShot("exact-15-dipole-trans-dichloroethene.png",1524,844,152,475,180,145,"Opposite vertical dipole arrow"),bondShot("exact-15-dipole-trans-dichloroethene.png",1524,844,152,632,180,145,"Diagonal dipole arrow")],choiceLabels:["no molecular dipole","upward","downward","diagonal"],answer:0,why:"The trans molecule is symmetric: the two C–Cl bond dipoles are equal and opposite, so they <b>cancel</b>. Net molecular dipole = 0."},
+{id:"EXACT-MIX-20260825-16",topic:"polarity",type:"mc",diff:2,prompt:"For 1,1-dichloroethene (CCl₂=CH₂), choose the direction of the net molecular dipole.",choices:[bondShot("exact-16-dipole-11-dichloroethene.png",1564,838,130,245,180,155,"Dipole arrow toward the two chlorines"),bondShot("exact-16-dipole-11-dichloroethene.png",1564,838,130,416,180,155,"Dipole arrow toward the two hydrogens"),bondShot("exact-16-dipole-11-dichloroethene.png",1564,838,130,580,180,155,"Diagonal dipole arrow"),"none"],choiceLabels:["toward the CCl₂ side","toward the CH₂ side","diagonal","no molecular dipole"],answer:0,why:"Both strong C–Cl dipoles are on one end of the alkene. Their net points <b>toward the CCl₂ end</b>; the molecule is not symmetric enough to cancel."},
+{id:"EXACT-MIX-20260825-17",topic:"polarity",type:"mc",diff:1,prompt:"For tetrachloroethene (C₂Cl₄), choose the direction of the net molecular dipole.",choices:[bondShot("exact-17-dipole-tetrachloroethene.png",1474,802,115,242,180,140,"Vertical dipole arrow"),bondShot("exact-17-dipole-tetrachloroethene.png",1474,802,115,398,180,140,"Opposite vertical dipole arrow"),bondShot("exact-17-dipole-tetrachloroethene.png",1474,802,115,548,180,140,"Horizontal dipole arrow"),"none"],choiceLabels:["upward","downward","horizontal","no molecular dipole"],answer:3,why:"C₂Cl₄ is planar and symmetric. Every C–Cl dipole has an equal opposite partner, so all vectors <b>cancel</b>."},
+
+/* Transfer set: new molecules and contexts, same rules as the exact batch. */
+{id:"SIM-MIX-20260825-01",topic:"formal",type:"multi",diff:2,prompt:"Choline is HO–CH₂–CH₂–N(CH₃)₃⁺. Assign the two heteroatoms.",fields:[{label:"Alcohol O (2 bonds, 2 lone pairs)",answer:0},{label:"Quaternary N (4 bonds, 0 lone pairs)",answer:1}],why:"The alcohol oxygen is neutral. Four-bond nitrogen has FC = 5 − 4 = <b>+1</b>, just as in acetylcholine."},
+{id:"SIM-MIX-20260825-02",topic:"formal",type:"mc",diff:2,prompt:"Which notation best represents potassium methoxide?",choices:["CH₃–O–K with no charges","CH₃–O⁺ K⁻","CH₃O⁻  K⁺ as separated ions","CH₃⁺  O–K⁻"],answer:2,why:"An alkali-metal alkoxide is ionic: <b>CH₃O⁻ K⁺</b>. The negative formal charge is on O; K is the counterion."},
+{id:"SIM-MIX-20260825-03",topic:"polarity",type:"multiSelect",selectN:2,diff:2,prompt:"In CH₃–C(=O)–CH₂Br, which labelled carbons are most electrophilic to an anion?",choices:["A: CH₃ carbon","B: carbonyl carbon","C: CH₂Br carbon"],answer:[1,2],why:"The carbonyl carbon B is δ+ from C=O polarization; carbon C is δ+ from C–Br polarization. The ordinary methyl carbon A lacks a strongly electron-withdrawing heteroatom bond."},
+{id:"SIM-MIX-20260825-04",topic:"polarity",type:"mc",diff:2,prompt:"In propylene oxide, which partial-charge pattern is correct?",choices:["O δ−; both ring carbons δ+","O δ+; both ring carbons δ−","Every atom is neutral with no bond polarity","Only hydrogens carry partial charge"],answer:0,why:"Oxygen pulls electron density through both C–O bonds, so <b>O is δ− and both bonded carbons are δ+</b>."},
+{id:"SIM-MIX-20260825-05",topic:"orbitals",type:"blanks",diff:2,prompt:"Complete the orbital-overlap contrast.",template:"Rotating about a C–C σ bond {{0}} substantially reduce overlap because σ overlap lies {{1}} the bond axis. Rotating the p orbitals of a C=C π bond {{2}} reduce overlap because π overlap lies {{3}} the axis.",fields:[{label:"sigma rotation",kind:"select",choices:["does","does not"],answer:"does not"},{label:"sigma location",kind:"select",choices:["on","off"],answer:"on"},{label:"pi rotation",kind:"select",choices:["does","does not"],answer:"does"},{label:"pi location",kind:"select",choices:["on","off"],answer:"off"}],why:"Axial σ overlap survives rotation; side-by-side π overlap requires parallel p orbitals and is lost when they rotate out of alignment."},
+{id:"SIM-MIX-20260825-06",topic:"hybrid",type:"blanks",diff:2,prompt:"Assign each carbon in CH₃–C≡C–CHO from left to right.",template:"C1 {{0}} · C2 {{1}} · C3 {{2}} · aldehyde carbonyl C4 {{3}}.",fields:[{label:"C1",kind:"select",choices:["sp","sp²","sp³"],answer:"sp³"},{label:"C2",kind:"select",choices:["sp","sp²","sp³"],answer:"sp"},{label:"C3",kind:"select",choices:["sp","sp²","sp³"],answer:"sp"},{label:"C4",kind:"select",choices:["sp","sp²","sp³"],answer:"sp²"}],why:"Methyl C is sp³; both alkyne carbons have two domains and are sp; the carbonyl carbon has three domains and is sp²."},
+{id:"SIM-MIX-20260825-07",topic:"orbitals",type:"blanks",diff:1,prompt:"Compare an ordinary C–C, C=C, and C≡C bond.",template:"The shortest is {{0}} and the longest is {{1}}.",fields:[{label:"shortest",kind:"select",choices:["C–C","C=C","C≡C"],answer:"C≡C"},{label:"longest",kind:"select",choices:["C–C","C=C","C≡C"],answer:"C–C"}],why:"Increasing bond order shortens the bond: triple &lt; double &lt; single."},
+{id:"SIM-MIX-20260825-08",topic:"hybrid",type:"blanks",diff:2,prompt:"Compare the central carbon of R₃C⁺ and R₃C⁻.",template:"R₃C⁺ is {{0}} and {{1}}; R₃C⁻ is {{2}} and {{3}}.",fields:[{label:"carbocation hybridization",kind:"select",choices:["sp","sp²","sp³"],answer:"sp²"},{label:"carbocation geometry",kind:"select",choices:["linear","trigonal planar","trigonal pyramidal"],answer:"trigonal planar"},{label:"carbanion hybridization",kind:"select",choices:["sp","sp²","sp³"],answer:"sp³"},{label:"carbanion geometry",kind:"select",choices:["linear","trigonal planar","trigonal pyramidal"],answer:"trigonal pyramidal"}],why:"The carbocation's empty p orbital leaves three sp² σ bonds. The carbanion's lone pair is a fourth domain, giving sp³ electron geometry and a pyramidal molecular shape."},
+{id:"SIM-MIX-20260825-09",topic:"hybrid",type:"blanks",diff:3,prompt:"Use VSEPR to compare H₂O with H₃O⁺.",template:"H₂O has {{0}} bonds and {{1}} lone pairs, giving {{2}} geometry near {{3}}. H₃O⁺ has {{4}} bonds and {{5}} lone pair, giving {{6}} geometry near {{7}}. The angle {{8}}.",fields:[{label:"H2O bonds",kind:"num",answer:2},{label:"H2O lone pairs",kind:"num",answer:2},{label:"H2O shape",kind:"select",choices:["bent","trigonal pyramidal","tetrahedral"],answer:"bent"},{label:"H2O angle",kind:"select",choices:["104.5°","107°","109.5°"],answer:"104.5°"},{label:"H3O+ bonds",kind:"num",answer:3},{label:"H3O+ lone pair",kind:"num",answer:1},{label:"H3O+ shape",kind:"select",choices:["bent","trigonal pyramidal","tetrahedral"],answer:"trigonal pyramidal"},{label:"H3O+ angle",kind:"select",choices:["104.5°","107°","109.5°"],answer:"107°"},{label:"angle change",kind:"select",choices:["increases","decreases","stays the same"],answer:"increases"}],why:"Two lone pairs compress water most strongly (~104.5°). Hydronium has one lone pair, so it is trigonal pyramidal with a larger angle near 107°."},
+{id:"SIM-MIX-20260825-10",topic:"polarity",type:"multiSelect",selectN:2,diff:2,prompt:"Select the two molecules with a nonzero molecular dipole.",choices:["CO₂","H₂O","BF₃","CH₃Cl"],answer:[1,3],why:"H₂O is bent and CH₃Cl is unsymmetrical, so both are polar. Linear CO₂ and trigonal-planar BF₃ cancel their bond dipoles."},
+{id:"SIM-MIX-20260825-11",topic:"polarity",type:"multiSelect",selectN:2,diff:3,prompt:"Select the two compounds whose bond dipoles cancel to zero.",choices:["trans-1,2-dichloroethene","cis-1,2-dichloroethene","CCl₄","CH₂Cl₂"],answer:[0,2],why:"Trans-1,2-dichloroethene cancels across the alkene; tetrahedral CCl₄ cancels by full symmetry. The cis alkene and CH₂Cl₂ do not."},
+{id:"SIM-MIX-20260825-12",topic:"polarity",type:"mc",diff:1,prompt:"In formaldehyde, H₂C=O, the net molecular dipole points:",choices:["Toward oxygen","Toward the two hydrogens","Perpendicular to the molecular plane","There is no net dipole"],answer:0,why:"The strong C=O dipole dominates and points <b>toward oxygen</b>; the two C–H contributions do not cancel it."},
+
+/* ===== v3.20 EXACT DIPOLE / PHYSICAL-PROPERTIES BATCH (Gabe upload, 2026-08-25) =====
+   Full screenshots stay immutable. Crops omit selected source controls and correctness banners;
+   the app re-renders the assessed action using its own answer controls. */
+{id:"EXACT-DPI-20260825-01",topic:"polarity",type:"mc",diff:2,prompt:"Does diphenyl ether exhibit a molecular dipole moment?"+dpiShot("exact-01-diphenyl-ether-dipole-yes-no.png",1560,994,560,405,490,305,"Structure of diphenyl ether, two phenyl rings joined through oxygen"),choices:["no","yes"],answer:1,why:"<b>Yes.</b> Both C–O bond dipoles point toward oxygen. The C–O–C unit is bent, so those vectors do not point in exactly opposite directions and cannot cancel completely."},
+{id:"EXACT-DPI-20260825-02",topic:"polarity",type:"mc",diff:3,prompt:"Indicate the direction of the net molecular dipole moment in diphenyl ether.",choices:[dpiShot("exact-02-diphenyl-ether-dipole-direction.png",936,946,74,85,300,200,"Horizontal dipole arrow pointing left"),dpiShot("exact-02-diphenyl-ether-dipole-direction.png",936,946,74,293,300,200,"Horizontal dipole arrow pointing right"),dpiShot("exact-02-diphenyl-ether-dipole-direction.png",936,946,74,499,300,200,"Vertical dipole arrow pointing away from oxygen"),dpiShot("exact-02-diphenyl-ether-dipole-direction.png",936,946,74,705,300,200,"Vertical dipole arrow pointing toward oxygen")],choiceLabels:["left","right","away from O","toward O along the C–O–C bisector"],answer:3,why:"The two C–O bond dipoles have equal sideways components that cancel. Their components along the C–O–C bisector add, so the net dipole points <b>toward oxygen</b>."},
+{id:"EXACT-DPI-20260825-03",topic:"imf",type:"mc",diff:2,prompt:"For this pair of isomeric ethers, identify the higher-boiling compound and justify the choice."+dpiShot("exact-03-ether-branching-boiling-point.png",982,720,35,300,420,125,"A branched ether followed by a less-branched ether"),choices:["The first compound has the higher boiling point because it has a greater surface area.","The second compound has the higher boiling point because it is less branched.","The first compound has the higher boiling point because it is more branched.","The second compound has the higher boiling point because it has more hydrogen-bonding interactions."],answer:1,why:"The compounds are isomers, so their molecular weights and functional groups match. The <b>less-branched second ether</b> has greater contact surface area, stronger London dispersion, and the higher boiling point."},
+{id:"EXACT-DPI-20260825-04",topic:"imf",type:"mc",diff:1,prompt:"Which member of this pair has the higher boiling point, and why?"+dpiShot("exact-04-cyclopentane-cyclohexane-boiling-point.png",952,340,35,55,230,95,"Cyclopentane and cyclohexane"),choices:["The first compound, because it is less branched.","The second compound, because it has a higher molecular weight.","The first compound, because it has greater London dispersion forces.","The second compound, because it has more hydrogen-bonding interactions."],answer:1,why:"<b>Cyclohexane</b> has one more CH₂ unit, more electrons, and a larger polarizable surface than cyclopentane. Its stronger London dispersion forces give the higher boiling point."},
+{id:"EXACT-DPI-20260825-05",topic:"imf",type:"mc",diff:1,prompt:"For this ether/alcohol pair, identify the higher-boiling compound and justify the choice."+dpiShot("exact-05-ether-alcohol-boiling-point.png",966,452,45,135,430,105,"Diethyl ether and 1-butanol"),choices:["The second compound has the higher boiling point because it has more hydrogen-bonding interactions.","The first compound has the higher boiling point because it is more polar.","The second compound has the higher boiling point because it has a higher molecular weight.","The first compound has the higher boiling point because it is less branched."],answer:0,why:"Both have the same formula, but only the alcohol has an <b>O–H donor</b>. Its molecules hydrogen-bond to one another, so the second compound has the higher boiling point."},
+{id:"EXACT-DPI-20260825-06",topic:"imf",type:"mc",diff:2,prompt:"For this pair of isomeric alcohols, identify the higher-boiling compound and justify the choice."+dpiShot("exact-06-butanol-tert-butanol-boiling-point.png",936,420,25,45,380,105,"1-butanol and tert-butanol"),choices:["The first compound has the higher boiling point because it has a higher molecular weight.","The second compound has the higher boiling point because it is more branched.","The first compound has the higher boiling point because it is less branched.","The second compound has the higher boiling point because it has a lower molecular weight."],answer:2,why:"Both are C₄H₁₀O alcohols and both hydrogen-bond. The <b>less-branched first alcohol</b> has more surface contact and stronger dispersion, so it boils higher."},
+{id:"EXACT-DPI-20260825-07",topic:"imf",type:"mc",diff:2,prompt:"Which epichlorohydrin/phenol product (3 or 4) is expected to have the lower boiling point?"+dpiShot("exact-07-epichlorohydrin-products-boiling-point.png",1040,488,55,80,840,220,"Reaction scheme producing alcohol 3 and epoxide ether 4"),choices:["Compound 4, because it has a higher molecular weight.","Compound 3, because it has fewer hydrogen-bonding interactions.","Compound 3, because it is more branched.","Compound 4, because it has fewer hydrogen-bonding interactions."],answer:3,why:"Compound 3 contains an O–H group and can hydrogen-bond as both donor and acceptor. Compound 4 has ether/epoxide oxygens but no O–H donor, so it has <b>fewer hydrogen-bonding interactions and the lower boiling point</b>."},
+{id:"EXACT-DPI-20260825-08",topic:"polarity",type:"blanks",diff:1,prompt:"Identify the partial charges in numbered HBr."+dpiShot("exact-08-hbr-partial-charges.png",968,312,25,92,115,68,"HBr with hydrogen numbered 1 and bromine numbered 2"),template:"Atom(s) with δ+: {{0}} · atom(s) with δ−: {{1}}.",fields:[{label:"delta-positive atom numbers",kind:"text",width:120,answer:"1"},{label:"delta-negative atom numbers",kind:"text",width:120,answer:"2"}],why:"Bromine is more electronegative, so electron density shifts toward Br: <b>H(1) is δ+ and Br(2) is δ−</b>."},
+{id:"EXACT-DPI-20260825-09",topic:"polarity",type:"blanks",diff:1,prompt:"Identify the partial charges in numbered H₂O."+dpiShot("exact-09-water-partial-charges.png",984,344,25,98,125,70,"Water with hydrogens numbered 1 and 3 and oxygen numbered 2"),template:"Atom(s) with δ+: {{0}} · atom(s) with δ−: {{1}}.",fields:[{label:"delta-positive atom numbers",kind:"text",width:140,answer:"1,3",accept:["1,3","1, 3"]},{label:"delta-negative atom numbers",kind:"text",width:120,answer:"2"}],why:"Oxygen pulls electron density through both O–H bonds: <b>H atoms 1 and 3 are δ+; O atom 2 is δ−</b>."},
+{id:"EXACT-DPI-20260825-10",topic:"polarity",type:"blanks",diff:2,prompt:"Identify the partial charges on the numbered atoms in methanol. Treat C–H as nonpolar for this exercise."+dpiShot("exact-10-methanol-partial-charges.png",1036,482,35,112,180,150,"Methanol with carbon 2, oxygen 5, and hydroxyl hydrogen 6 numbered"),template:"Atom(s) with δ+: {{0}} · atom(s) with δ−: {{1}}.",fields:[{label:"delta-positive atom numbers",kind:"text",width:140,answer:"2,6",accept:["2,6","2, 6"]},{label:"delta-negative atom numbers",kind:"text",width:120,answer:"5"}],why:"Across C–O, carbon 2 is δ+ and oxygen 5 is δ−. Across O–H, hydrogen 6 is δ+ and oxygen remains δ−. Thus <b>δ+: 2,6; δ−: 5</b>."},
+{id:"EXACT-DPI-20260825-11",topic:"p_bondtypes",type:"blanks",diff:2,prompt:"Complete the ionic-character comparison."+dpiShot("exact-11-brcl-fcl-ionic-character-blanks.png",998,194,25,20,950,75,"Compare BrCl with FCl for ionic character"),template:"{{0}}, because the disparity in {{1}} between F and Cl is {{2}} than the disparity in {{3}} between Br and Cl.",fields:[{label:"compound with more ionic character",kind:"select",choices:["BrCl","FCl"],answer:"FCl"},{label:"first property",kind:"select",choices:["electronegativity","atomic mass","bond length"],answer:"electronegativity"},{label:"comparison",kind:"select",choices:["greater","smaller","equal"],answer:"greater"},{label:"second property",kind:"select",choices:["electronegativity","atomic mass","bond length"],answer:"electronegativity"}],why:"F is much more electronegative than Cl, whereas Br and Cl are closer. The larger electronegativity difference makes <b>FCl more polar and more ionic in character</b>."},
+{id:"EXACT-DPI-20260825-12",topic:"lewis",type:"mc",diff:2,drawMol:"CH3CN",prompt:"Select the correct Lewis dot structure for CH₃CN.",choices:[dpiShot("exact-12-acetonitrile-lewis-structure.png",1028,552,82,145,110,86,"CH3 single bonded to carbon triple bonded to nitrogen with one nitrogen lone pair"),dpiShot("exact-12-acetonitrile-lewis-structure.png",1028,552,82,250,110,78,"Alternative Lewis structure option 2"),dpiShot("exact-12-acetonitrile-lewis-structure.png",1028,552,82,345,110,78,"Alternative Lewis structure option 3"),dpiShot("exact-12-acetonitrile-lewis-structure.png",1028,552,82,438,110,78,"Alternative Lewis structure option 4")],choiceLabels:["CH₃–C≡N with one lone pair on N","option 2","option 3","option 4"],answer:0,why:"The correct structure is <b>CH₃–C≡N:</b>. The methyl carbon has four single bonds; the nitrile carbon has one single plus one triple bond; nitrogen has a triple bond and one lone pair. Every atom has its normal formal charge."},
+
+/* Transfer set: same decisions on new molecules and structures. */
+{id:"SIM-DPI-20260825-01",topic:"polarity",type:"mc",diff:2,prompt:"Does anisole (methoxybenzene, C₆H₅–O–CH₃) have a molecular dipole?",choices:["Yes — the two C–O bond dipoles do not cancel","No — every aromatic molecule is nonpolar","No — oxygen removes all bond polarity","Only when dissolved in water"],answer:0,why:"Anisole has two polar C–O bonds in a bent C–O–C arrangement. Their vectors do not cancel, so the molecule has a net dipole."},
+{id:"SIM-DPI-20260825-02",topic:"polarity",type:"mc",diff:2,prompt:"In dimethyl ether, CH₃–O–CH₃, the net dipole points:",choices:["Toward O along the C–O–C bisector","Away from O","Along either C–H bond","The molecule has no dipole"],answer:0,why:"Both C–O dipoles point toward oxygen. Sideways components cancel and the bisector components add toward O."},
+{id:"SIM-DPI-20260825-03",topic:"imf",type:"mc",diff:1,prompt:"n-Pentane and neopentane have the same formula. Which has the higher boiling point?",choices:["n-Pentane — less branching gives greater surface contact","Neopentane — more branching gives more hydrogen bonding","They are identical because their formulas match","Neopentane — it has a higher molecular weight"],answer:0,why:"Their masses match. Linear n-pentane has more contact surface, stronger London dispersion, and the higher boiling point."},
+{id:"SIM-DPI-20260825-04",topic:"imf",type:"mc",diff:1,prompt:"Which should boil higher: cyclopentane or cycloheptane?",choices:["Cycloheptane — greater molecular weight and polarizability","Cyclopentane — smaller rings always boil higher","They are identical because both are cycloalkanes","Cyclopentane — it hydrogen-bonds"],answer:0,why:"Cycloheptane has more electrons and a larger polarizable surface, so its dispersion forces are stronger."},
+{id:"SIM-DPI-20260825-05",topic:"imf",type:"mc",diff:1,prompt:"Ethanol and dimethyl ether are C₂H₆O isomers. Which boils higher?",choices:["Ethanol — it can donate and accept hydrogen bonds","Dimethyl ether — it is more branched","Dimethyl ether — it has the larger molecular weight","They must boil at the same temperature"],answer:0,why:"Only ethanol contains O–H, so only ethanol forms a donor/acceptor hydrogen-bond network in the pure liquid."},
+{id:"SIM-DPI-20260825-06",topic:"imf",type:"mc",diff:2,prompt:"1-Pentanol and 2-methyl-2-butanol are isomeric alcohols. Which should boil higher?",choices:["1-Pentanol — its less-branched shape gives greater surface contact","2-Methyl-2-butanol — branching strengthens dispersion","2-Methyl-2-butanol — it has more oxygen atoms","They must be equal because both hydrogen-bond"],answer:0,why:"Both hydrogen-bond and have the same molecular weight. The less-branched 1-pentanol has greater surface contact and stronger dispersion."},
+{id:"SIM-DPI-20260825-07",topic:"imf",type:"mc",diff:2,prompt:"Two isomeric products differ only because one contains an alcohol O–H and the other contains two ether oxygens but no O–H. Which generally boils higher?",choices:["The alcohol — it can donate hydrogen bonds","The diether — two oxygens guarantee stronger donor bonding","They are equal because they are isomers","The diether — ethers are ionic"],answer:0,why:"An ether oxygen can accept an H bond but cannot donate one. The alcohol can both donate and accept, creating stronger intermolecular association."},
+{id:"SIM-DPI-20260825-08",topic:"polarity",type:"blanks",diff:1,prompt:"In numbered HF, H is atom 1 and F is atom 2.",template:"Atom(s) with δ+: {{0}} · atom(s) with δ−: {{1}}.",fields:[{label:"delta-positive atom numbers",kind:"text",width:120,answer:"1"},{label:"delta-negative atom numbers",kind:"text",width:120,answer:"2"}],why:"Fluorine is more electronegative: H(1) is δ+ and F(2) is δ−."},
+{id:"SIM-DPI-20260825-09",topic:"p_bondtypes",type:"blanks",diff:2,prompt:"Compare HCl with HBr for ionic character.",template:"{{0}} has more ionic character because its disparity in {{1}} is {{2}}.",fields:[{label:"compound",kind:"select",choices:["HCl","HBr"],answer:"HCl"},{label:"property",kind:"select",choices:["electronegativity","molecular weight","surface area"],answer:"electronegativity"},{label:"comparison",kind:"select",choices:["greater","smaller","the same"],answer:"greater"}],why:"Cl is more electronegative than Br, so ΔEN(H–Cl) is greater than ΔEN(H–Br). HCl therefore has more ionic character."},
+{id:"SIM-DPI-20260825-10",topic:"lewis",type:"mc",diff:2,prompt:"Which description is the correct neutral Lewis structure of propionitrile, CH₃CH₂CN?",choices:["CH₃CH₂–C≡N with one lone pair on N","CH₃CH₂–C=N with two lone pairs on N","CH₃CH₂–C–N with three lone pairs on N","CH₃CH₂=C=N with no lone pairs"],answer:0,why:"A neutral nitrile contains <b>C≡N:</b>. The nitrile carbon has four bond orders; nitrogen has three bonds and one lone pair."},
+
+/* ===== v3.21 EXACT DIPOLE / BOND-TYPE / BOND-ANGLE BATCH (Gabe upload, 2026-08-25) =====
+   Full screenshots stay immutable. These compact source prompts are reconstructed so the
+   already-selected source controls never reveal an answer. Control types match the upload. */
+{id:"EXACT-DBA-20260825-01",topic:"polarity",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-01-ch4-molecular-dipole.png",prompt:"Determine whether the compound below exhibits a molecular dipole moment: <b>CH₄</b>",template:"Molecular dipole moment: {{0}}.",fields:[{label:"CH4 molecular dipole",kind:"select",choices:["Yes","No"],answer:"No"}],why:"<b>No.</b> CH₄ is tetrahedral with four identical C–H bonds. Their bond-dipole vectors cancel by symmetry."},
+{id:"EXACT-DBA-20260825-02",topic:"polarity",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-02-co2-molecular-dipole.png",prompt:"Determine whether the compound below exhibits a molecular dipole moment: <b>CO₂</b>",template:"Molecular dipole moment: {{0}}.",fields:[{label:"CO2 molecular dipole",kind:"select",choices:["Yes","No"],answer:"No"}],why:"<b>No.</b> CO₂ is linear. Its two equal C=O bond dipoles point in opposite directions and cancel."},
+{id:"EXACT-DBA-20260825-03",topic:"polarity",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-03-ccl4-molecular-dipole.png",prompt:"Determine whether the compound below exhibits a molecular dipole moment: <b>CCl₄</b>",template:"Molecular dipole moment: {{0}}.",fields:[{label:"CCl4 molecular dipole",kind:"select",choices:["Yes","No"],answer:"No"}],why:"<b>No.</b> Each C–Cl bond is polar, but the four equal vectors cancel in the symmetric tetrahedral molecule."},
+{id:"EXACT-DBA-20260825-04",topic:"p_bondtypes",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-04-naoh-bond-classification.png",prompt:"In NaOH, classify each indicated interaction as covalent, polar covalent, or ionic.",template:"Na–O is {{0}}, and O–H is {{1}}.",fields:[{label:"Na-O classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"ionic"},{label:"O-H classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"polar covalent"}],why:"NaOH consists of <b>Na⁺ and OH⁻</b>, so the Na⁺/OH⁻ attraction is ionic. Within hydroxide, O and H share electrons unequally, so O–H is polar covalent."},
+{id:"EXACT-DBA-20260825-05",topic:"p_bondtypes",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-05-methanol-bond-classification.png",prompt:"In CH₃OH, classify each bond as covalent, polar covalent, or ionic.",template:"O–H is {{0}}, C–O is {{1}}, and each C–H is {{2}}.",fields:[{label:"O-H classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"polar covalent"},{label:"C-O classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"polar covalent"},{label:"C-H classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"covalent"}],why:"O is substantially more electronegative than C or H, so <b>O–H and C–O are polar covalent</b>. In this course convention, the small C–H electronegativity difference is treated as nonpolar covalent."},
+{id:"EXACT-DBA-20260825-06",topic:"polarity",type:"text",diff:1,sourceFile:DBA_SOURCE+"exact-06-co-bond-dipole-direction.png",prompt:"For the bond C–O (C on the left, O on the right), enter <b>a</b> for δ+ ⟶ δ− and <b>b</b> for δ− ⟵ δ+.",answer:"a",why:"O is more electronegative than C, so <b>C is δ+ and O is δ−</b>. The dipole points from C toward O, which is choice <b>a</b>."},
+{id:"EXACT-DBA-20260825-07",topic:"hybrid",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-07-ethylene-bond-angles.png",prompt:"Predict the bond angles for all bonds in C₂H₄.",template:"All bond angles are approximately {{0}}.",fields:[{label:"C2H4 bond angles",kind:"select",choices:["109.5°","120°","180°"],answer:"120°"}],why:"Each alkene carbon is <b>sp² and trigonal planar</b>, so the bond angles are approximately 120°."},
+{id:"EXACT-DBA-20260825-08",topic:"hybrid",type:"blanks",diff:1,sourceFile:DBA_SOURCE+"exact-08-acetylene-bond-angles.png",prompt:"Predict the bond angles for all bonds in C₂H₂.",template:"All bond angles are {{0}}.",fields:[{label:"C2H2 bond angles",kind:"select",choices:["109.5°","120°","180°"],answer:"180°"}],why:"Each alkyne carbon is <b>sp and linear</b>, so H–C≡C and C≡C–H are 180°."},
+{id:"EXACT-DBA-20260825-09",topic:"hybrid",type:"blanks",diff:2,sourceFile:DBA_SOURCE+"exact-09-dimethyl-ether-bond-angles.png",prompt:"Use the idealized VSEPR model from this exercise to predict the bond angles in CH₃OCH₃.",template:"Bond angles are approximately {{0}}, except the C–O–C angle is expected to be {{1}} because of lone-pair repulsion on O.",fields:[{label:"general bond angle",kind:"select",choices:["109.5°","120°","180°"],answer:"109.5°"},{label:"C-O-C comparison",kind:"select",choices:["less than 109.5°","equal to 109.5°","greater than 109.5°"],answer:"less than 109.5°"}],why:"The carbons and oxygen have tetrahedral electron-domain geometry. In the <b>idealized VSEPR comparison used by this source item</b>, oxygen's lone pairs compress the C–O–C bond angle below 109.5°."},
+{id:"EXACT-DBA-20260825-10",topic:"hybrid",type:"blanks",diff:2,sourceFile:DBA_SOURCE+"exact-10-acetonitrile-bond-angles.png",prompt:"Predict the bond angles for all bonds in CH₃CN.",template:"Angles around the CH₃ carbon are approximately {{0}}, while the C–C≡N angle is {{1}}°.",fields:[{label:"CH3 carbon angle",kind:"select",choices:["109.5°","120°","180°"],answer:"109.5°"},{label:"C-C-N angle",kind:"num",width:95,answer:180}],why:"The CH₃ carbon is <b>sp³ and tetrahedral</b>, giving about 109.5°. The nitrile carbon is <b>sp and linear</b>, so C–C≡N is 180°."},
+
+/* Transfer set: same decisions and response actions on new compounds. */
+{id:"SIM-DBA-20260825-01",topic:"polarity",type:"blanks",diff:1,prompt:"Does BF₃ exhibit a molecular dipole moment?",template:"Molecular dipole moment: {{0}}.",fields:[{label:"BF3 molecular dipole",kind:"select",choices:["Yes","No"],answer:"No"}],why:"BF₃ is trigonal planar with three equal B–F bond dipoles. The vectors cancel by symmetry."},
+{id:"SIM-DBA-20260825-02",topic:"polarity",type:"blanks",diff:1,prompt:"Does H₂O exhibit a molecular dipole moment?",template:"Molecular dipole moment: {{0}}.",fields:[{label:"H2O molecular dipole",kind:"select",choices:["Yes","No"],answer:"Yes"}],why:"H₂O is bent, so its two O–H bond dipoles do not cancel. Their vector sum points toward O."},
+{id:"SIM-DBA-20260825-03",topic:"polarity",type:"blanks",diff:2,prompt:"Does CH₂Cl₂ exhibit a molecular dipole moment?",template:"Molecular dipole moment: {{0}}.",fields:[{label:"CH2Cl2 molecular dipole",kind:"select",choices:["Yes","No"],answer:"Yes"}],why:"A tetrahedron with two H and two Cl substituents is not fully symmetric. The C–Cl vectors do not cancel the C–H contributions, so CH₂Cl₂ is polar."},
+{id:"SIM-DBA-20260825-04",topic:"p_bondtypes",type:"blanks",diff:1,prompt:"In KOH, classify the K–O interaction and the O–H bond.",template:"K–O is {{0}}, and O–H is {{1}}.",fields:[{label:"K-O classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"ionic"},{label:"O-H classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"polar covalent"}],why:"KOH contains K⁺ and OH⁻, while the bond inside OH⁻ shares electrons unequally. Thus K–O is ionic and O–H is polar covalent."},
+{id:"SIM-DBA-20260825-05",topic:"p_bondtypes",type:"blanks",diff:1,prompt:"In CH₃Cl, classify the C–Cl and C–H bonds using this course's convention.",template:"C–Cl is {{0}}, and each C–H is {{1}}.",fields:[{label:"C-Cl classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"polar covalent"},{label:"C-H classification",kind:"select",choices:["covalent","polar covalent","ionic"],answer:"covalent"}],why:"Cl pulls electron density strongly enough for C–Cl to be polar covalent. The smaller C–H difference is treated as nonpolar covalent in this course."},
+{id:"SIM-DBA-20260825-06",topic:"polarity",type:"text",diff:1,prompt:"For H–F (H on the left, F on the right), enter <b>a</b> for δ+ ⟶ δ− and <b>b</b> for δ− ⟵ δ+.",answer:"a",why:"F is more electronegative: H is δ+, F is δ−, and the bond dipole points right toward F. That is choice <b>a</b>."},
+{id:"SIM-DBA-20260825-07",topic:"hybrid",type:"blanks",diff:1,prompt:"Predict the O–S–O bond angles in trigonal-planar SO₃.",template:"All O–S–O bond angles are approximately {{0}}.",fields:[{label:"SO3 bond angles",kind:"select",choices:["109.5°","120°","180°"],answer:"120°"}],why:"Sulfur has three electron domains and no lone pair in the trigonal-planar model, giving 120° angles."},
+{id:"SIM-DBA-20260825-08",topic:"hybrid",type:"blanks",diff:1,prompt:"Predict the H–C–N bond angle in HCN.",template:"The H–C–N bond angle is {{0}}.",fields:[{label:"HCN bond angle",kind:"select",choices:["109.5°","120°","180°"],answer:"180°"}],why:"The central carbon is sp hybridized with two electron domains, so H–C≡N is linear."},
+{id:"SIM-DBA-20260825-09",topic:"hybrid",type:"blanks",diff:2,prompt:"Use VSEPR to predict the H–N–H bond angle in NH₃.",template:"The angle is approximately {{0}}, which is {{1}} the ideal tetrahedral angle.",fields:[{label:"NH3 angle",kind:"select",choices:["104.5°","107°","109.5°","120°"],answer:"107°"},{label:"comparison with 109.5",kind:"select",choices:["less than","equal to","greater than"],answer:"less than"}],why:"NH₃ has three bonds and one lone pair. Lone-pair repulsion compresses the H–N–H angle from 109.5° to about <b>107°</b>."},
+{id:"SIM-DBA-20260825-10",topic:"hybrid",type:"blanks",diff:2,prompt:"Predict the characteristic bond angles in CH₃CH₂CN.",template:"Angles around the saturated carbons are approximately {{0}}, while the C–C≡N angle is {{1}}°.",fields:[{label:"saturated-carbon angle",kind:"select",choices:["109.5°","120°","180°"],answer:"109.5°"},{label:"C-C-N angle",kind:"num",width:95,answer:180}],why:"The saturated carbons are sp³ and approximately tetrahedral. The nitrile carbon is sp, so the C–C≡N segment is linear at 180°."},
+
+/* ===== v3.22 EXACT BONDS / H-BONDING / HYBRIDIZATION / DIPOLES (2026-08-25) =====
+   Eleven immutable screenshots form ten questions because caffeine spans two captures.
+   Numbered structures and dipole options use non-destructive crops; answer controls are fresh. */
+{id:"EXACT-BHD-20260825-01",topic:"orbitals",type:"blanks",diff:2,sourceFile:BHD_SOURCE+"exact-01-sigma-pi-count.png",prompt:"Count the total number of σ bonds and π bonds in the compound below."+bhdShot("exact-01-sigma-pi-count.png",716,280,20,55,530,135,"HOCH2CH=CHC triple-bond CCH2NH2 expanded structure"),template:"{{0}} σ bond(s) · {{1}} π bond(s).",fields:[{label:"sigma bond count",kind:"num",width:110,answer:16},{label:"pi bond count",kind:"num",width:110,answer:3}],why:"Count one σ bond for every connected atom pair: 9 X–H σ bonds plus 7 heavy-atom σ connections = <b>16 σ</b>. The C=C contributes one π and the C≡C contributes two π, for <b>3 π</b>."},
+{id:"EXACT-BHD-20260825-02",topic:"imf",type:"multiSelect",selectN:3,diff:2,sourceFile:BHD_SOURCE+"exact-02-pure-compound-hbonding.png",prompt:"Which of the following pure compounds will exhibit hydrogen bonding? Select exactly three.",choices:["CH₂O","CH₃OCH₃","C₂H₄","C₂H₂","CH₃NH₂","CH₃CH₂OH","NH₃","C₃H₈"],answer:[4,5,6],why:"A pure compound needs an <b>O–H, N–H, or F–H donor</b> as well as an acceptor to hydrogen-bond with itself. CH₃NH₂, CH₃CH₂OH, and NH₃ qualify. CH₂O and CH₃OCH₃ accept H bonds but cannot donate them."},
+{id:"EXACT-BHD-20260825-03",topic:"valence",type:"num",diff:1,sourceFile:BHD_SOURCE+"exact-03-ch2clx-valence.png",prompt:"For CH₂Cl<sub>x</sub>, identify the most likely value of x.",answer:2,why:"Neutral carbon needs four bonds. Two C–H bonds leave two bonding positions for Cl, so <b>x = 2</b>."},
+{id:"EXACT-BHD-20260825-04",topic:"hybrid",type:"blanks",diff:3,sourceFile:BHD_SOURCE+"exact-04-enyne-carbon-hybridization.png",prompt:"Identify the hybridization state and geometry of each numbered carbon in the structure."+bhdShot("exact-04-enyne-carbon-hybridization.png",950,420,345,15,300,205,"Six-carbon chain HC triple-bond C-CH=CH-C triple-bond CH with carbons numbered 1 through 6"),template:"sp³ carbon atom(s): {{0}} · geometry: {{1}}. sp² carbon atom(s): {{2}} · geometry: {{3}}. sp carbon atom(s): {{4}} · geometry: {{5}}.",fields:[{label:"sp3 carbon numbers",kind:"text",width:130,answer:"0"},{label:"sp3 geometry",kind:"select",choices:["N/A","linear","trigonal planar","tetrahedral"],answer:"N/A"},{label:"sp2 carbon numbers",kind:"text",width:130,answer:"3,4"},{label:"sp2 geometry",kind:"select",choices:["N/A","linear","trigonal planar","tetrahedral"],answer:"trigonal planar"},{label:"sp carbon numbers",kind:"text",width:150,answer:"1,2,5,6"},{label:"sp geometry",kind:"select",choices:["N/A","linear","trigonal planar","tetrahedral"],answer:"linear"}],why:"Alkyne carbons 1, 2, 5, and 6 each have two electron domains → <b>sp, linear</b>. Alkene carbons 3 and 4 each have three domains → <b>sp², trigonal planar</b>. No carbon is sp³, so enter 0 and N/A."},
+{id:"EXACT-BHD-20260825-05",topic:"hybrid",type:"blanks",diff:3,sourceFile:BHD_SOURCE+"exact-05-nicotine-nitrogen-hybridization.png",prompt:"Use 1 = sp, 2 = sp², and 3 = sp³ to identify the hybridization and molecular geometry of each numbered nitrogen in nicotine."+bhdShot("exact-05-nicotine-nitrogen-hybridization.png",948,498,330,50,400,280,"Nicotine structure with pyridine nitrogen 1 and amine nitrogen 2 numbered"),template:"Nitrogen 1 is {{0}} hybridized and {{1}}. Nitrogen 2 is {{2}} hybridized and {{3}}.",fields:[{label:"nitrogen 1 hybridization code",kind:"num",width:90,answer:2},{label:"nitrogen 1 geometry",kind:"select",choices:["linear","bent","trigonal planar","trigonal pyramidal"],answer:"bent"},{label:"nitrogen 2 hybridization code",kind:"num",width:90,answer:3},{label:"nitrogen 2 geometry",kind:"select",choices:["linear","bent","trigonal planar","trigonal pyramidal"],answer:"trigonal pyramidal"}],why:"Pyridine-like N1 is <b>sp²</b>; counting only bonded atoms, its molecular geometry is <b>bent</b> within a trigonal-planar electron arrangement. Tertiary amine N2 has three σ bonds plus a lone pair → <b>sp³, trigonal pyramidal</b>."},
+{id:"EXACT-BHD-20260825-06",topic:"lewis",type:"blanks",diff:3,sourceFiles:[BHD_SOURCE+"exact-06-caffeine-lone-pairs-main.png",BHD_SOURCE+"exact-06b-caffeine-lone-pairs-continuation.png"],prompt:"Caffeine is shown without lone pairs. Identify every numbered atom with one, two, or three lone pairs."+bhdShot("exact-06-caffeine-lone-pairs-main.png",980,1154,310,40,400,360,"Numbered caffeine structure with four nitrogens and two carbonyl oxygens"),template:"One lone pair: atom(s) {{0}}. Two lone pairs: atom(s) {{1}}. Three lone pairs: atom(s) {{2}}.",fields:[{label:"atoms with one lone pair",kind:"text",width:170,answer:"1,3,7,9"},{label:"atoms with two lone pairs",kind:"text",width:150,answer:"10,15"},{label:"atoms with three lone pairs",kind:"text",width:110,answer:"0"}],why:"Each neutral nitrogen (1, 3, 7, 9) has <b>one lone pair</b>. Each carbonyl oxygen (10, 15) has <b>two lone pairs</b>. No atom in the shown neutral structure has three, so enter <b>0</b>."},
+{id:"EXACT-BHD-20260825-07",topic:"polarity",type:"mc",diff:3,sourceFile:BHD_SOURCE+"exact-07-ortho-dichlorobenzene-dipole.png",prompt:"Does the shown ortho-dichlorobenzene possess a molecular dipole, and in what direction?"+bhdShot("exact-07-ortho-dichlorobenzene-dipole.png",952,1272,25,55,240,210,"Ortho-dichlorobenzene with adjacent chlorines at the top and upper right"),choices:[bhdShot("exact-07-ortho-dichlorobenzene-dipole.png",952,1272,75,340,190,205,"No molecular dipole moment"),bhdShot("exact-07-ortho-dichlorobenzene-dipole.png",952,1272,75,571,190,205,"Dipole arrow down and left"),bhdShot("exact-07-ortho-dichlorobenzene-dipole.png",952,1272,75,802,190,205,"Dipole arrow upward"),bhdShot("exact-07-ortho-dichlorobenzene-dipole.png",952,1272,75,1033,190,205,"Dipole arrow upper right between the chlorines")],choiceLabels:["no dipole","down-left","up","upper-right bisector"],answer:3,why:"The two equal C–Cl bond dipoles are not opposite. Their components add along the <b>bisector between the adjacent Cl substituents</b>, toward the upper right in the drawing."},
+{id:"EXACT-BHD-20260825-08",topic:"polarity",type:"mc",diff:3,sourceFile:BHD_SOURCE+"exact-08-meta-dichlorobenzene-dipole.png",prompt:"Does the shown meta-dichlorobenzene possess a molecular dipole, and in what direction?"+bhdShot("exact-08-meta-dichlorobenzene-dipole.png",974,1278,35,55,240,210,"Meta-dichlorobenzene with chlorines at the top and lower right"),choices:[bhdShot("exact-08-meta-dichlorobenzene-dipole.png",974,1278,95,342,190,205,"Dipole arrow upper right between the chlorines"),bhdShot("exact-08-meta-dichlorobenzene-dipole.png",974,1278,95,573,190,205,"No molecular dipole moment"),bhdShot("exact-08-meta-dichlorobenzene-dipole.png",974,1278,95,804,190,205,"Dipole arrow lower right toward one chlorine"),bhdShot("exact-08-meta-dichlorobenzene-dipole.png",974,1278,95,1035,190,205,"Dipole arrow upward toward one chlorine")],choiceLabels:["upper-right bisector","no dipole","lower-right","up"],answer:0,why:"The two equal C–Cl vectors are separated by 120°. Their sum points along the <b>bisector between them</b>, toward the upper right in the drawing."},
+{id:"EXACT-BHD-20260825-09",topic:"polarity",type:"mc",diff:2,sourceFile:BHD_SOURCE+"exact-09-para-dichlorobenzene-dipole.png",prompt:"Does the shown para-dichlorobenzene possess a molecular dipole, and in what direction?"+bhdShot("exact-09-para-dichlorobenzene-dipole.png",970,1244,25,50,240,210,"Para-dichlorobenzene with chlorines opposite at top and bottom"),choices:[bhdShot("exact-09-para-dichlorobenzene-dipole.png",970,1244,75,334,190,205,"No molecular dipole moment"),bhdShot("exact-09-para-dichlorobenzene-dipole.png",970,1244,75,565,190,205,"Two opposing dipole arrows"),bhdShot("exact-09-para-dichlorobenzene-dipole.png",970,1244,75,796,190,205,"Dipole arrow upward"),bhdShot("exact-09-para-dichlorobenzene-dipole.png",970,1244,75,1027,190,205,"Dipole arrow downward")],choiceLabels:["no dipole","two arrows","up","down"],answer:0,why:"The two equal C–Cl bond dipoles point in exactly opposite directions in the para isomer, so they <b>cancel to zero</b>."},
+{id:"EXACT-BHD-20260825-10",topic:"polarity",type:"mc",diff:3,sourceFile:BHD_SOURCE+"exact-10-para-chlorobromobenzene-dipole.png",prompt:"Does the shown para-chlorobromobenzene possess a molecular dipole, and in what direction?"+bhdShot("exact-10-para-chlorobromobenzene-dipole.png",988,1284,40,60,240,220,"Para-chlorobromobenzene with chlorine at the top and bromine at the bottom"),choices:[bhdShot("exact-10-para-chlorobromobenzene-dipole.png",988,1284,103,354,190,205,"Dipole arrow upward toward chlorine"),bhdShot("exact-10-para-chlorobromobenzene-dipole.png",988,1284,103,585,190,205,"No molecular dipole moment"),bhdShot("exact-10-para-chlorobromobenzene-dipole.png",988,1284,103,816,190,205,"Dipole arrow downward toward bromine"),bhdShot("exact-10-para-chlorobromobenzene-dipole.png",988,1284,103,1047,190,205,"Dipole arrow downward on the chlorine side")],choiceLabels:["up toward Cl","no dipole","down toward Br","down from Cl"],answer:0,why:"The C–Cl and C–Br dipoles oppose, but they are not equal. The stronger C–Cl contribution wins, so the net molecular dipole points <b>toward Cl</b>."},
+
+/* Transfer set: same skills, new molecules and orientations. */
+{id:"SIM-BHD-20260825-01",topic:"orbitals",type:"blanks",diff:2,prompt:"Count σ and π bonds in CH₃–C≡C–CH=CH₂.",template:"{{0}} σ bond(s) · {{1}} π bond(s).",fields:[{label:"sigma bond count",kind:"num",width:110,answer:10},{label:"pi bond count",kind:"num",width:110,answer:3}],why:"There are six C–H σ bonds and four C–C σ connections, for 10 σ. One C=C π plus two C≡C π bonds gives 3 π."},
+{id:"SIM-BHD-20260825-02",topic:"imf",type:"multiSelect",selectN:3,diff:2,prompt:"Which pure compounds can hydrogen-bond with themselves? Select exactly three.",choices:["CH₃OH","CH₃COCH₃","H₂O","CH₃OCH₃","CH₃NHCH₃","CH₃CH₃","HCN"],answer:[0,2,4],why:"CH₃OH and H₂O contain O–H; dimethylamine contains N–H. Acetone and ether accept but cannot donate; HCN has H bonded to carbon, not N."},
+{id:"SIM-BHD-20260825-03",topic:"valence",type:"num",diff:1,prompt:"For CHCl<sub>x</sub>, what value of x gives neutral carbon four single bonds?",answer:3,why:"One C–H bond leaves three carbon valences for chlorine, so x = 3."},
+{id:"SIM-BHD-20260825-04",topic:"hybrid",type:"blanks",diff:2,prompt:"In CH₂(1)=CH(2)–C(3)≡N, assign the numbered carbons by hybridization and geometry.",template:"sp³ carbon(s): {{0}} · geometry: {{1}}. sp² carbon(s): {{2}} · geometry: {{3}}. sp carbon(s): {{4}} · geometry: {{5}}.",fields:[{label:"sp3 carbon numbers",kind:"text",width:110,answer:"0"},{label:"sp3 geometry",kind:"select",choices:["N/A","linear","trigonal planar","tetrahedral"],answer:"N/A"},{label:"sp2 carbon numbers",kind:"text",width:120,answer:"1,2"},{label:"sp2 geometry",kind:"select",choices:["N/A","linear","trigonal planar","tetrahedral"],answer:"trigonal planar"},{label:"sp carbon numbers",kind:"text",width:110,answer:"3"},{label:"sp geometry",kind:"select",choices:["N/A","linear","trigonal planar","tetrahedral"],answer:"linear"}],why:"The two alkene carbons are sp²/trigonal planar; the nitrile carbon is sp/linear; no carbon is sp³."},
+{id:"SIM-BHD-20260825-05",topic:"hybrid",type:"blanks",diff:2,prompt:"Use 1 = sp, 2 = sp², and 3 = sp³. Compare the ring nitrogen of pyridine (N1) with the nitrogen of trimethylamine (N2).",template:"N1 is {{0}} hybridized and {{1}}. N2 is {{2}} hybridized and {{3}}.",fields:[{label:"pyridine N code",kind:"num",width:90,answer:2},{label:"pyridine N molecular geometry",kind:"select",choices:["linear","bent","trigonal planar","trigonal pyramidal"],answer:"bent"},{label:"trimethylamine N code",kind:"num",width:90,answer:3},{label:"trimethylamine N geometry",kind:"select",choices:["linear","bent","trigonal planar","trigonal pyramidal"],answer:"trigonal pyramidal"}],why:"Pyridine N is sp² with two bonded neighbors (bent molecular geometry); trimethylamine N has three bonds plus a lone pair and is sp³/trigonal pyramidal."},
+{id:"SIM-BHD-20260825-06",topic:"lewis",type:"blanks",diff:2,prompt:"In CH₃–O(1)–C(=O(2))–NH(3)–CH₃, group the numbered heteroatoms by lone-pair count.",template:"One lone pair: atom(s) {{0}}. Two lone pairs: atom(s) {{1}}. Three lone pairs: atom(s) {{2}}.",fields:[{label:"one-lone-pair atoms",kind:"text",width:110,answer:"3"},{label:"two-lone-pair atoms",kind:"text",width:120,answer:"1,2"},{label:"three-lone-pair atoms",kind:"text",width:110,answer:"0"}],why:"Neutral amide N3 has one lone pair (delocalized but present). Both neutral oxygens have two lone pairs. None has three."},
+{id:"SIM-BHD-20260825-07",topic:"polarity",type:"mc",diff:2,prompt:"In 1,2-difluorobenzene, place F atoms at 12 and 2 o'clock. Where does the net dipole point?",choices:["Toward 1 o'clock, between the F atoms","Toward 7 o'clock, away from the F atoms","Straight up at 12 o'clock","No molecular dipole"],answer:0,why:"The equal adjacent C–F vectors add along their angle bisector, toward 1 o'clock."},
+{id:"SIM-BHD-20260825-08",topic:"polarity",type:"mc",diff:2,prompt:"In 1,3-dibromobenzene, place Br atoms at 12 and 4 o'clock. Where does the net dipole point?",choices:["Toward 2 o'clock, between the Br atoms","Toward 8 o'clock","Straight down","No molecular dipole"],answer:0,why:"The equal meta C–Br vectors add along the bisector between them, toward 2 o'clock."},
+{id:"SIM-BHD-20260825-09",topic:"polarity",type:"mc",diff:1,prompt:"Does 1,4-dibromobenzene have a molecular dipole?",choices:["No — equal para C–Br dipoles cancel","Yes — toward either Br atom","Yes — perpendicular to the ring","Only in a polar solvent"],answer:0,why:"The two equal para bond-dipole vectors are collinear and opposite, so their vector sum is zero."},
+{id:"SIM-BHD-20260825-10",topic:"polarity",type:"mc",diff:3,prompt:"In 1-chloro-4-iodobenzene, place Cl at 12 o'clock and I at 6 o'clock. Which way does the net dipole point?",choices:["Up toward Cl","Down toward I","No molecular dipole","Sideways in the ring plane"],answer:0,why:"The opposing para vectors are unequal. The C–Cl bond dipole is stronger than C–I, so the net points toward Cl."},
 
 /* ================= v3.9 BANK EXPANSION (2026-08-25) =================
    Gabe: "I get the same questions very often. Increase the bank. Do similar
@@ -1336,25 +1576,33 @@ const QUESTIONS = [
 QUESTIONS.forEach(q => { if (q.answerOverride !== undefined) q.answer = q.answerOverride; });
 
 /* ================= MOLECULES (Lewis Lab) =================
-   atoms: element counts · ve: total valence e⁻ (the step-1 answer)
-   central: accepted central atom element(s)
-   afterSingles: e⁻ remaining after connecting the skeleton with single bonds (step-3 answer)
-   hint: shown only after 2 failed audits
-   Generic checker: formula match + budget spent + H rule + octets + connectivity. */
+   Every target is a labelled molecular graph. The audit matches a student's graph up to
+   rotation/reordering, but never ignores bond order, lone pairs, formal charge, or atom role. */
+const TN=(el,lp=0,fc=0)=>({el,lp,fc});
 const MOLECULES = [
-  {formula:"H₂O",  key:"H2O",  atoms:{O:1,H:2}, ve:8,  central:["O"], afterSingles:4, due:"2026-08-09", done:false, blurb:"The owed warm-up. Finish your steps 3–5 properly this time.", hint:"2 bonds use 4 e⁻; the remaining 4 = 2 lone pairs on O."},
-  {formula:"C₂H₄", key:"C2H4", atoms:{C:2,H:4}, ve:12, central:["C"], afterSingles:2, due:"2026-08-09", done:false, blurb:"Two central atoms! Connect C–C first, hang the H's, then audit.", hint:"5 single bonds spend 10 of 12. Put the last 2 on a carbon as a lone pair — then CONVERT that pair into a second C–C bond: C=C, and no lone pairs anywhere in the final structure."},
-  {formula:"NH₃",  key:"NH3",  atoms:{N:1,H:3}, ve:8,  central:["N"], afterSingles:2, done:false, blurb:"Straightforward — if your bond-number table is loaded.", hint:"N: 3 bonds + 1 lone pair."},
-  {formula:"CO₂",  key:"CO2",  atoms:{C:1,O:2}, ve:16, central:["C"], afterSingles:12, done:false, blurb:"Redo from tutoring. Carbon will come up short — quantify how short.", hint:"C is short by 4 after singles → pull one pair from EACH oxygen → two double bonds."},
-  {formula:"CH₂O", key:"CH2O", atoms:{C:1,O:1,H:2}, ve:12, central:["C"], afterSingles:6, done:false, blurb:"Formaldehyde — your first double-bond fix, revisited.", hint:"C short by 2 → one pair off O → C=O."},
-  {formula:"HCN",  key:"HCN",  atoms:{H:1,C:1,N:1}, ve:10, central:["C"], afterSingles:6, done:false, blurb:"The triple-bond one. Short by 4 → 2 pairs convert.", hint:"H–C≡N with one lone pair left on N."},
-  {formula:"CH₃OH",key:"CH3OH",atoms:{C:1,O:1,H:4}, ve:14, central:["C"], afterSingles:4, done:false, blurb:"Two heavy atoms again: C–O skeleton, H's around.", hint:"All singles; O keeps 2 lone pairs."},
-  {formula:"CH₃NH₂",key:"CH3NH2",atoms:{C:1,N:1,H:5}, ve:14, central:["C"], afterSingles:2, done:false, blurb:"Methylamine — N's lone pair is the business end of every amine.", hint:"All singles; 1 lone pair on N."},
-  {formula:"N₂",   key:"N2",   atoms:{N:2}, ve:10, central:["N"], afterSingles:8, done:false, blurb:"Deceptively simple. Both atoms short → big conversion.", hint:"N≡N with a lone pair on each end."},
-  {formula:"C₂H₆", key:"C2H6", atoms:{C:2,H:6}, ve:14, central:["C"], afterSingles:0, done:false, blurb:"Ethane — pure skeleton practice, zero leftovers.", hint:"7 single bonds spend all 14 exactly."},
+  {formula:"H₂O",key:"H2O",atoms:{O:1,H:2},ve:8,central:["O"],afterSingles:4,due:"2026-08-09",blurb:"The owed warm-up. Finish your steps 3–5 properly this time.",hint:"2 bonds use 4 e⁻; the remaining 4 = 2 lone pairs on O.",target:{nodes:[TN("O",2),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1]]}},
+  {formula:"C₂H₄",key:"C2H4",atoms:{C:2,H:4},ve:12,central:["C"],afterSingles:2,due:"2026-08-09",blurb:"Two central atoms! Connect C–C first, hang the H's, then audit.",hint:"The final skeleton is H₂C=CH₂: one C=C and no lone pairs.",target:{nodes:[TN("C"),TN("C"),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,2],[0,2,1],[0,3,1],[1,4,1],[1,5,1]]}},
+  {formula:"NH₃",key:"NH3",atoms:{N:1,H:3},ve:8,central:["N"],afterSingles:2,blurb:"Straightforward — if your bond-number table is loaded.",hint:"N: 3 bonds + 1 lone pair.",target:{nodes:[TN("N",1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1]]}},
+  {formula:"CO₂",key:"CO2",atoms:{C:1,O:2},ve:16,central:["C"],afterSingles:12,blurb:"Redo from tutoring. Carbon will come up short — quantify how short.",hint:"O=C=O; each oxygen keeps two lone pairs.",target:{nodes:[TN("C"),TN("O",2),TN("O",2)],bonds:[[0,1,2],[0,2,2]]}},
+  {formula:"CH₂O",key:"CH2O",atoms:{C:1,O:1,H:2},ve:12,central:["C"],afterSingles:6,blurb:"Formaldehyde — your first double-bond fix, revisited.",hint:"H₂C=O; oxygen keeps two lone pairs.",target:{nodes:[TN("C"),TN("O",2),TN("H"),TN("H")],bonds:[[0,1,2],[0,2,1],[0,3,1]]}},
+  {formula:"HCN",key:"HCN",atoms:{H:1,C:1,N:1},ve:10,central:["C"],afterSingles:6,exactId:"EXACT-DRAW-20260825-03",exactPrompt:"Draw HCN (hydrogen cyanide)",sourceFile:"exact-03-draw-hcn.png",sourcePreview:fcShot("exact-03-draw-hcn.png",2004,1040,0,25,2004,290,"Exact HCN Lewis-structure prompt"),blurb:"Exact quiz/exam drawing prompt · hydrogen cyanide.",hint:"H–C≡N with one lone pair left on N.",target:{nodes:[TN("H"),TN("C"),TN("N",1)],bonds:[[0,1,1],[1,2,3]]}},
+  {formula:"CH₃OH",key:"CH3OH",atoms:{C:1,O:1,H:4},ve:14,central:["C"],afterSingles:4,exactId:"EXACT-DRAW-20260825-01",exactPrompt:"Draw CH₃OH",sourceFile:"exact-01-draw-ch3oh.png",sourcePreview:fcShot("exact-01-draw-ch3oh.png",1948,698,0,0,1948,295,"Exact methanol Lewis-structure prompt"),blurb:"Exact quiz/exam drawing prompt · methanol.",hint:"CH₃–O–H; all single bonds and two lone pairs on O.",target:{nodes:[TN("C"),TN("O",2),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1]]}},
+  {formula:"CH₂CHBr",key:"C2H3Br",atoms:{C:2,H:3,Br:1},ve:18,central:["C"],afterSingles:8,exactId:"EXACT-DRAW-20260825-02",exactPrompt:"Draw CH₂CHBr",sourceFile:"exact-02-draw-ch2chbr.png",sourcePreview:fcShot("exact-02-draw-ch2chbr.png",1906,862,0,0,1906,270,"Exact vinyl-bromide Lewis-structure prompt"),blurb:"Exact quiz/exam drawing prompt · vinyl bromide.",hint:"H₂C=CH–Br; bromine keeps three lone pairs.",target:{nodes:[TN("C"),TN("C"),TN("H"),TN("H"),TN("H"),TN("Br",3)],bonds:[[0,1,2],[0,2,1],[0,3,1],[1,4,1],[1,5,1]]}},
+  {formula:"CH₃CN",key:"CH3CN",atoms:{C:2,H:3,N:1},ve:16,central:["C"],afterSingles:6,exactId:"EXACT-DPI-20260825-12",exactPrompt:"Draw CH₃CN",sourceFile:"exact-12-acetonitrile-lewis-structure.png",sourcePreview:dpiShot("exact-12-acetonitrile-lewis-structure.png",1028,552,25,20,960,95,"Exact acetonitrile Lewis-structure selection prompt"),blurb:"Exact-source reconstruction · acetonitrile.",hint:"CH₃–C≡N; nitrogen keeps one lone pair.",target:{nodes:[TN("C"),TN("C"),TN("N",1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[1,2,3],[0,3,1],[0,4,1],[0,5,1]]}},
+  {formula:"CH₃NH₂",key:"CH3NH2",atoms:{C:1,N:1,H:5},ve:14,central:["C"],afterSingles:2,blurb:"Methylamine — N's lone pair is the business end of every amine.",hint:"All singles; one lone pair on N.",target:{nodes:[TN("C"),TN("N",1),TN("H"),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1],[1,6,1]]}},
+  {formula:"N₂",key:"N2",atoms:{N:2},ve:10,central:["N"],afterSingles:8,blurb:"Deceptively simple. Both atoms short → big conversion.",hint:"N≡N with a lone pair on each end.",target:{nodes:[TN("N",1),TN("N",1)],bonds:[[0,1,3]]}},
+  {formula:"C₂H₆",key:"C2H6",atoms:{C:2,H:6},ve:14,central:["C"],afterSingles:0,blurb:"Ethane — pure skeleton practice, zero leftovers.",hint:"H₃C–CH₃; seven single bonds spend all 14 exactly.",target:{nodes:[TN("C"),TN("C"),TN("H"),TN("H"),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1],[1,6,1],[1,7,1]]}},
+  {formula:"H₃O⁺",key:"H3O+",atoms:{O:1,H:3},ve:8,charge:1,central:["O"],afterSingles:2,blurb:"Reconstruct the exact hydronium formal-charge item.",hint:"Three O–H bonds, one lone pair on O, and FC +1 on O.",target:{nodes:[TN("O",1,1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1]]}},
+  {formula:"AlH₄⁻",key:"AlH4-",atoms:{Al:1,H:4},ve:8,charge:-1,central:["Al"],afterSingles:0,blurb:"Reconstruct the exact aluminum hydride formal-charge item.",hint:"Four Al–H single bonds; Al carries −1 and has no lone pairs.",target:{nodes:[TN("Al",0,-1),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]]}},
+  {formula:"CH₃⁻",key:"CH3-",atoms:{C:1,H:3},ve:8,charge:-1,central:["C"],afterSingles:2,blurb:"Three bonds plus a lone pair: the methyl anion contrast.",hint:"Three C–H bonds and one lone pair on carbon give FC −1.",target:{nodes:[TN("C",1,-1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1]]}},
+  {formula:"CH₃⁺",key:"CH3+",atoms:{C:1,H:3},ve:6,charge:1,central:["C"],afterSingles:0,electronCounts:{C:[6]},blurb:"Three bonds, no lone pair: the methyl cation contrast.",hint:"Three C–H bonds, no lone pair on carbon, FC +1; carbon has a six-electron exception.",target:{nodes:[TN("C",0,1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1]]}},
+  {formula:"CH₃O⁺",key:"CH3O+",atoms:{C:1,O:1,H:3},ve:12,charge:1,central:["C"],afterSingles:4,blurb:"Reconstruct the protonated-formaldehyde exact item.",hint:"H₂C=O(H)⁺: C=O, one O–H, two C–H, and one lone pair on O.",target:{nodes:[TN("C"),TN("O",1,1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,2],[0,2,1],[0,3,1],[1,4,1]]}},
+  {formula:"NH₂⁻",key:"NH2-",atoms:{N:1,H:2},ve:8,charge:-1,central:["N"],afterSingles:4,blurb:"Build the correct option from the exact NH₂⁻ question.",hint:"Two N–H bonds and two lone pairs on N give FC −1.",target:{nodes:[TN("N",2,-1),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1]]}},
+  {formula:"H₃N⁺–CH₂–COO⁻",key:"glycine-zwitterion",atoms:{N:1,C:2,O:2,H:5},ve:30,central:["C"],afterSingles:12,blurb:"Exact labelled glycine item · role-sensitive oxygen check.",hint:"H₃N⁺–CH₂–C(=O)–O⁻: N +1; carbonyl O 0; single-bond O −1.",target:{nodes:[TN("N",0,1),TN("C"),TN("C"),TN("O",2),TN("O",3,-1),TN("H"),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,5,1],[0,6,1],[0,7,1],[1,2,1],[1,8,1],[1,9,1],[2,3,2],[2,4,1]]}},
+  {formula:"AlCl₅",key:"AlCl5",atoms:{Al:1,Cl:5},ve:38,central:["Al"],afterSingles:28,blurb:"Exact labelled AlCl₅ connectivity · bridge-aware charge check.",hint:"Al bonds to three terminal Cl and one bridging Cl; that bridge also bonds to the fifth Cl. FC: Al −1, bridge +1, terminals 0.",target:{nodes:[TN("Al",0,-1),TN("Cl",2,1),TN("Cl",3),TN("Cl",3),TN("Cl",3),TN("Cl",3)],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1]]}},
 ];
-const VALENCE = {H:1, C:4, N:5, O:6, F:7, Cl:7, Br:7, S:6, P:5};
-const ATOM_COLORS = {H:"#8aa4b8", C:"#20241F", N:"#2E5EAA", O:"#C0392B", F:"#2E7D32", Cl:"#2E7D32", Br:"#8B4513", S:"#B7950B", P:"#B7950B"};
+const VALENCE = {H:1, C:4, N:5, O:6, F:7, Cl:7, Br:7, S:6, P:5, Al:3};
+const ATOM_COLORS = {H:"#8aa4b8", C:"#20241F", N:"#2E5EAA", O:"#C0392B", F:"#2E7D32", Cl:"#2E7D32", Br:"#8B4513", S:"#B7950B", P:"#B7950B", Al:"#9B6B6B"};
 
 /* ================= STATE ================= */
 const S = {
@@ -1367,7 +1615,7 @@ const S = {
   masteryDays: safeStore.get("masteryDays", {}), // v3.16: {topicKey:[dates]} — the same bar, now for EVERY topic. formal stays mirrored to fcMastery for back-compat.
   lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
   diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
-  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","formal","polarity","hybrid","imf"]}), // v3.0: editable (Canvas gives ≥3 days notice)
+  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","isomers","formal","polarity","hybrid","imf"]}), // v3.17: isomers added from Gabe's reported exact quiz/exam batch; still editable
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
@@ -1412,6 +1660,16 @@ function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.get
    store. fcMastery stays populated too (the report export and other sessions still read it). */
 (function migrateMastery(){ S.masteryDays=S.masteryDays||{};
   if((S.fcMastery||[]).length){ const cur=S.masteryDays.formal||[]; S.masteryDays.formal=[...new Set([...cur, ...S.fcMastery])]; }
+})();
+/* v3.17: existing installs already have the seeded Ch 1 quiz in local/cloud state, so changing
+   only the default above would miss them. Narrow migration: touch only that known seeded event;
+   never rewrite a quiz Gabe renamed, redated, or otherwise customized. */
+(function migrateCh1IsomerScope(){
+  if(S.nextQuiz&&S.nextQuiz.name==="Ch 1 Quiz"&&S.nextQuiz.date==="2026-08-27"&&!(S.nextQuiz.topics||[]).includes("isomers")){
+    S.nextQuiz.topics=[...(S.nextQuiz.topics||[]),"isomers"];
+    S.nextQuiz.setAt=new Date().toISOString();
+    safeStore.set("nextQuiz",S.nextQuiz);
+  }
 })();
 (function logVisit(){ const t=todayStr(); if(!S.visits.includes(t)){ S.visits.push(t); save(); } })();
 
@@ -2018,7 +2276,7 @@ const SESSION_MAX = 5; // v2.13: max questions per drill session (short sets, bi
 VIEWS.practice = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Three hands-on modes. New to a topic? Read its primer in 📖 Learn first, then practice it here.</p>'));
   const lab=el("div",{class:"card cream"});
-  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">10 molecules, the 6-step method enforced (count → central → bonds → lone pairs → convert → audit). Blank-page building — the antidote to recognizing-without-deriving.</p>';
+  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked targets, including four exact-source structures. Six-step method enforced (count → central → predict → build → audit); the final check verifies the full molecular graph and formal charges.</p>';
   lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
   v.appendChild(lab);
   v.appendChild(el("div",{class:"card"},'<h3>🎯 Drill a topic</h3><p class="muted">Quick generation rounds; each answer explains the why.</p>'));
@@ -2110,7 +2368,10 @@ VIEWS.drill = (v) => {
       '<p style="margin:10px 0 4px"><b style="color:'+(rec.ok?"#2a9d8f":"#e76f51")+'">'+(rec.ok?"✓ you got this right":"✗ you got this wrong")+'</b>'+
         (rec.dk?' <span class="tag violet">🤷 unlearned</span>':(rec.g?' <span class="tag gold">🎲 guessed</span>':''))+'</p>'+
       (rec.ans?'<p style="margin:2px 0">You answered: <b class="mono">'+esc(rec.ans)+'</b></p>':'')+
-      (q&&q.type==="mc"&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String(q.choices[q.answer]))+'</b></p>':'')+
+      (q&&q.type==="mc"&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String((q.choiceLabels||q.choices)[q.answer]))+'</b></p>':'')+
+      (q&&q.type==="multi"&&!rec.ok?'<p style="margin:2px 0">Correct answers: <b class="mono">'+esc(q.fields.map(f=>f.label+": "+chargeLabel(f.answer)).join(" · "))+'</b></p>':'')+
+      (q&&q.type==="blanks"&&!rec.ok?'<p style="margin:2px 0">Correct blanks: <b class="mono">'+esc(q.fields.map(f=>f.label+": "+String(f.answer)).join(" · "))+'</b></p>':'')+
+      (q&&q.type==="multiSelect"&&!rec.ok?'<p style="margin:2px 0">Correct selections: <b class="mono">'+esc(q.answer.map(i=>(q.choiceLabels||q.choices)[i]).join(", "))+'</b></p>':'')+
       (q&&(q.type==="num"||q.type==="text")&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String(q.answer))+'</b></p>':'')+
       (rec.note?'<div class="why" style="margin-top:8px"><b>Your reasoning at the time:</b> '+esc(rec.note)+'</div>':'')+
       (q&&q.why?'<div class="why" style="margin-top:8px">'+q.why+'</div>':'');
@@ -2219,6 +2480,12 @@ VIEWS.drill = (v) => {
   const c = el("div",{class:"card"});
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · '+diffDots(qDiffM(q))+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+
     '<div class="qprompt">'+q.prompt+'</div>';
+  if(q.drawMol){
+    c.appendChild(el("button",{class:"btn ghost small",style:"margin:2px 0 8px",onclick:()=>{
+      snapshotDrill(D.i);
+      startLab(q.drawMol,"drill");
+    }},"✏️ Open checked drawing →"));
+  }
   const fb = el("div");
   // v3.0: guessed checkbox + optional rationale — on every non-written question
   let gk=null, rInp=null, dkk=null;
@@ -2275,7 +2542,57 @@ VIEWS.drill = (v) => {
     }},"Compare to model →");
     c.appendChild(ta); c.appendChild(gRow); c.appendChild(sub);
   }
-  else if (q.type==="mc"){
+  else if (q.type==="blanks"){
+    const controls=[];
+    const line=el("div",{style:"font-size:1.02rem;line-height:2.9;margin:8px 0 10px"});
+    const rx=/\{\{(\d+)\}\}/g; let last=0,match;
+    while((match=rx.exec(q.template))){
+      const span=el("span"); span.innerHTML=q.template.slice(last,match.index); line.appendChild(span);
+      const i=Number(match[1]),f=q.fields[i]; let ctl;
+      if(f.kind==="select"){
+        ctl=el("select",{class:"answerbox",style:"width:auto;min-width:110px;padding:8px;margin:0 4px","aria-label":f.label});
+        ctl.appendChild(el("option",{value:""},"choose"));
+        f.choices.forEach(x=>ctl.appendChild(el("option",{value:String(x)},String(x))));
+      }else{
+        ctl=el("input",{class:"answerbox",type:"text",inputmode:f.kind==="num"?"numeric":"text",placeholder:f.kind==="num"?"#":"answer",style:"width:"+(f.width||90)+"px;margin:0 4px","aria-label":f.label});
+      }
+      controls[i]=ctl; line.appendChild(ctl); last=rx.lastIndex;
+    }
+    const tail=el("span");tail.innerHTML=q.template.slice(last);line.appendChild(tail);
+    const sub=el("button",{class:"btn",onclick:()=>{
+      if(D.answered)return;
+      const vals=q.fields.map((f,i)=>(controls[i]?.value||"").trim());
+      if(vals.some(v=>v===""))return;
+      const norm=s=>String(s).toLowerCase().replace(/²/g,"2").replace(/³/g,"3").replace(/°/g,"").replace(/[\s.]/g,"");
+      const ok=q.fields.every((f,i)=>f.kind==="num"?Math.abs(Number(vals[i])-Number(f.answer))<=(f.tolerance||0):(f.accept||[f.answer]).some(a=>norm(a)===norm(vals[i])));
+      const correct=q.fields.map(f=>f.label+": "+f.answer).join(" · ");
+      const submitted=q.fields.map((f,i)=>f.label+": "+vals[i]).join(" · ");
+      controls.forEach(x=>x.disabled=true);sub.disabled=true;
+      finish(ok,"<b class='mono'>"+correct+"</b>",undefined,submitted);
+    }},"Check all blanks");
+    c.appendChild(line);c.appendChild(sub);
+  } else if (q.type==="multiSelect"){
+    const inputs=[];
+    const need=q.selectN||q.answer.length;
+    const ch=el("div",{class:"choices"});
+    q.choices.forEach((txt,i)=>{
+      const box=el("input",{type:"checkbox",id:"pick-"+i});inputs.push(box);
+      const lab=el("label",{for:"pick-"+i,class:"choice",style:"display:flex;gap:10px;align-items:center;cursor:pointer"});
+      lab.appendChild(box);lab.insertAdjacentHTML("beforeend","<span>"+txt+"</span>");ch.appendChild(lab);
+    });
+    const note=el("p",{class:"muted",style:"margin:6px 0"},"Select exactly "+need+".");
+    const sub=el("button",{class:"btn",onclick:()=>{
+      if(D.answered)return;
+      const got=inputs.map((x,i)=>x.checked?i:null).filter(i=>i!==null);
+      if(got.length!==need){note.innerHTML='<b style="color:var(--coral)">Select exactly '+need+' before checking.</b>';return;}
+      const want=[...q.answer].sort((a,b)=>a-b),have=[...got].sort((a,b)=>a-b);
+      const ok=want.every((x,i)=>x===have[i]);
+      const labels=(q.choiceLabels||q.choices);
+      inputs.forEach(x=>x.disabled=true);sub.disabled=true;
+      finish(ok,"<b class='mono'>"+want.map(i=>labels[i]).join(", ")+"</b>",undefined,have.map(i=>labels[i]).join(", "));
+    }},"Check "+need+" selections");
+    c.appendChild(ch);c.appendChild(note);c.appendChild(sub);
+  } else if (q.type==="mc"){
     const ch=el("div",{class:"choices"});
     const order=shuffle(q.choices.map((txt,i)=>({txt,i})));
     order.forEach(o=>{
@@ -2284,10 +2601,32 @@ VIEWS.drill = (v) => {
         const ok=o.i===q.answer;
         e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
         if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
-        finish(ok,"",undefined,o.txt); // v3.11: pass the choice he actually clicked into the history
+        finish(ok,"",undefined,(q.choiceLabels||q.choices)[o.i]); // v3.18: image choices log a readable label
       }},o.txt));
     });
     c.appendChild(ch);
+  } else if (q.type==="multi"){
+    const selects=[];
+    const grid=el("div",{style:"display:grid;gap:8px;margin:10px 0"});
+    q.fields.forEach((f,i)=>{
+      const row=el("div",{style:"display:grid;grid-template-columns:minmax(180px,1fr) minmax(120px,180px);gap:10px;align-items:center"});
+      row.appendChild(el("label",{for:"charge-"+i,style:"font-weight:700"},f.label));
+      const sel=el("select",{id:"charge-"+i,class:"answerbox wide",style:"width:100%;padding:9px"});
+      sel.appendChild(el("option",{value:""},"choose charge"));
+      [-2,-1,0,1,2].forEach(n=>sel.appendChild(el("option",{value:String(n)},chargeLabel(n))));
+      selects.push(sel); row.appendChild(sel); grid.appendChild(row);
+    });
+    const sub=el("button",{class:"btn",onclick:()=>{
+      if(D.answered)return;
+      const vals=selects.map(s=>s.value);
+      if(vals.some(v=>v===""))return;
+      const ok=vals.every((v,i)=>Number(v)===q.fields[i].answer);
+      const correct=q.fields.map(f=>f.label+": "+chargeLabel(f.answer)).join(" · ");
+      const submitted=q.fields.map((f,i)=>f.label+": "+chargeLabel(Number(vals[i]))).join(" · ");
+      selects.forEach(s=>s.disabled=true); sub.disabled=true;
+      finish(ok,"<b class='mono'>"+correct+"</b>",undefined,submitted);
+    }},"Check all charges");
+    c.appendChild(grid); c.appendChild(sub);
   } else {
     const inp=el("input",{class:"answerbox"+(q.type==="text"?" wide":""),type:q.type==="num"?"text":"text",inputmode:q.type==="num"?"numeric":"text",placeholder:q.type==="num"?"#":"answer"});
     const sub=el("button",{class:"btn",style:"margin-left:8px",onclick:()=>{
@@ -2313,24 +2652,31 @@ VIEWS.drill = (v) => {
 };
 
 /* ---- LEWIS LAB ---- */
-function startLab(molKey){
+function startLab(molKey,returnTo=null){
   const mol = MOLECULES.find(m=>m.key===molKey);
-  S.lab = {mol, step:1, tries:0, atoms:[], bonds:[], nextId:1, tool:"atom", selElement:Object.keys(mol.atoms)[0], selAtom:null, fails:0, msg:""};
+  if(!mol)return;
+  S.lab = {mol, returnTo, step:1, tries:0, atoms:[], bonds:[], nextId:1, tool:"atom", selElement:Object.keys(mol.atoms)[0], selAtom:null, fails:0, msg:""};
   go("lab");
+}
+function leaveLab(){
+  const back=S.lab&&S.lab.returnTo;
+  S.lab=null;
+  if(back==="drill"&&S.drill) go("drill"); else render();
 }
 VIEWS.lab = (v) => {
   if (!S.lab){ // molecule chooser
-    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Lewis Lab</span><h2>Build structures, step by step</h2><p class="muted">The six steps are enforced — no skipping to the answer picture. Counts first, drawing second, audit last. (Yes, this is aimed directly at your H₂O attempt.)</p>'));
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">Lewis Lab · '+MOLECULES.length+' checked targets</span><h2>Draw it; Claude checks the actual structure</h2><p class="muted">The six steps are enforced. The final audit compares your full molecular graph: atom inventory, connectivity, bond orders, lone pairs, electron budget, octets, and formal charge on each atom role.</p>'));
     const t=todayStr();
-    MOLECULES.forEach(m=>{
+    [...MOLECULES].sort((a,b)=>Number(!!b.exactId)-Number(!!a.exactId)).forEach(m=>{
       const done=S.molDone.includes(m.key);
-      const mdue = m.due||"2026-08-16";
-      const dueTag = done ? "" :
+      const mdue = m.due||"";
+      const dueTag = m.exactId ? '<span class="tag gold">EXACT QUIZ / EXAM DRAWING</span>' : done ? "" :
+        !mdue ? "" :
         mdue<t ? '<span class="duetag overdue">⏰ overdue — was due '+fmtDay(mdue)+'</span>' :
         mdue===t ? '<span class="duetag today-due">due today</span>' :
         '<span class="duetag">due by '+fmtDay(mdue)+'</span>';
       const c=el("div",{class:"card"+(done?" cream":"")});
-      c.innerHTML='<h3 class="mono" style="font-size:1.3rem">'+m.formula+(done?' <span style="color:var(--ok)">✓ built</span>':'')+'</h3><p class="muted">'+m.blurb+'</p>'+dueTag;
+      c.innerHTML='<h3 class="mono" style="font-size:1.3rem">'+m.formula+(done?' <span style="color:var(--ok)">✓ built</span>':'')+'</h3><p class="muted">'+(m.exactPrompt?'<b>'+m.exactPrompt+'</b><br>':'')+m.blurb+'</p>'+dueTag;
       c.appendChild(el("button",{class:"btn"+(done?" ghost":" coral"),style:"margin-top:8px",onclick:()=>startLab(m.key)},done?"Rebuild cold":"Build it"));
       v.appendChild(c);
     });
@@ -2345,7 +2691,8 @@ VIEWS.lab = (v) => {
   stepNames.forEach((s,i)=>st.appendChild(el("div",{class:"step"+(i<stepIdx?" ok":i===stepIdx?" on":"")},s)));
   wrap.appendChild(st);
   const card=el("div",{class:"card"});
-  card.innerHTML='<span class="tag">Lewis Lab · <span class="mono">'+m.formula+'</span></span>';
+  card.innerHTML='<span class="tag">Lewis Lab · <span class="mono">'+m.formula+'</span></span>'+(m.exactId?' <span class="tag gold">'+m.exactId+'</span>':'');
+  if(L.step===1&&m.sourcePreview) card.insertAdjacentHTML("beforeend",m.sourcePreview);
   const ask=el("div",{class:"stepask"});
   card.appendChild(ask);
   if (L.step===1){
@@ -2398,8 +2745,9 @@ VIEWS.lab = (v) => {
     // ledger
     const used = 2*L.bonds.reduce((s,b)=>s+b.order,0) + 2*L.atoms.reduce((s,a)=>s+a.lp,0);
     const rem = m.ve-used;
+    const netFC=L.atoms.reduce((s,a)=>s+atomFormalCharge(L,a),0), wantFC=m.charge||0;
     const led=el("div",{class:"ledger"});
-    led.innerHTML='<span>budget <b>'+m.ve+'</b></span><span>bonds <b>'+L.bonds.reduce((s,b)=>s+b.order,0)+'</b></span><span>lone pairs <b>'+L.atoms.reduce((s,a)=>s+a.lp,0)+'</b></span><span class="'+(rem===0?"good":rem<0?"bad":"warn")+'">remaining <b>'+rem+'</b></span>';
+    led.innerHTML='<span>budget <b>'+m.ve+'</b></span><span>bonds <b>'+L.bonds.reduce((s,b)=>s+b.order,0)+'</b></span><span>lone pairs <b>'+L.atoms.reduce((s,a)=>s+a.lp,0)+'</b></span><span class="'+(rem===0?"good":rem<0?"bad":"warn")+'">remaining <b>'+rem+'</b></span><span class="'+(netFC===wantFC?"good":"warn")+'">computed net FC <b>'+chargeLabel(netFC)+'</b> / target <b>'+chargeLabel(wantFC)+'</b></span>';
     wrap.appendChild(led);
     // canvas
     const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
@@ -2409,14 +2757,14 @@ VIEWS.lab = (v) => {
     // audit
     const arow=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;align-items:center"});
     arow.appendChild(el("button",{class:"btn coral",onclick:()=>runAudit(wrap)},"⚖️ Step 6 — Audit every octet"));
-    arow.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← molecules"));
+    arow.appendChild(el("button",{class:"btn ghost small",onclick:leaveLab},L.returnTo==="drill"?"← back to question":"← molecules"));
     wrap.appendChild(arow);
     L.auditBox=el("div"); wrap.appendChild(L.auditBox);
     v.appendChild(wrap);
     drawLab(svg);
     return;
   }
-  wrap.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.lab=null;render();}},"← molecules"));
+  wrap.appendChild(el("button",{class:"btn ghost small",onclick:leaveLab},L.returnTo==="drill"?"← back to question":"← molecules"));
   v.appendChild(wrap);
 };
 function labPointer(ev,svg){
@@ -2485,22 +2833,62 @@ function drawLab(svg){
       mk("circle",{cx:a.x+sx+(horiz?0:-4),cy:a.y+sy+(horiz?-4:0),r:"3",fill:"#0E7C6B"});
       mk("circle",{cx:a.x+sx+(horiz?0:4),cy:a.y+sy+(horiz?4:0),r:"3",fill:"#0E7C6B"});
     }
+    const fc=atomFormalCharge(L,a);
+    if(fc!==0&&(atomBondOrder(L,a)>0||a.lp>0)){
+      const q=mk("text",{x:a.x+22,y:a.y-19,"text-anchor":"middle","font-size":"13","font-weight":"900","font-family":"monospace",fill:"#C94C32"});
+      q.textContent=fc>0?"+"+fc:"−"+Math.abs(fc);
+    }
   });
 }
-// v2.4: per-atom formal-charge audit. FC = valence − lone-pair e⁻ − bond orders.
-// For these neutral molecules every atom's FC must be 0 (a mol may declare an fc map later
-// for ions). A structure can pass every octet and still be the WRONG molecule — this catches it.
-function fcAuditFails(m,L){
-  const fails=[]; const expected = m.fc || {};
-  L.atoms.forEach(a=>{
-    const orders=L.bonds.filter(b=>b.a===a.id||b.b===a.id).reduce((s,b)=>s+b.order,0);
-    const fc=(VALENCE[a.el]||0) - 2*a.lp - orders;
-    const want = expected[a.el]!==undefined ? expected[a.el] : 0;
-    if (fc!==want) fails.push("Formal-charge audit: your "+a.el+" carries FC "+(fc>0?"+":"")+fc+
-      " (FC = "+VALENCE[a.el]+" − "+(2*a.lp)+" LP e⁻ − "+orders+" bonds). Every atom in neutral "+
-      m.formula+" must be 0 — the octets check out, but this is a different structure (charge-separated or rearranged). Recount which atom took too many or too few bonds.");
-  });
-  return fails;
+function atomBondOrder(L,a){
+  return L.bonds.filter(b=>b.a===a.id||b.b===a.id).reduce((s,b)=>s+b.order,0);
+}
+function atomFormalCharge(L,a){ return (VALENCE[a.el]||0)-2*a.lp-atomBondOrder(L,a); }
+/* v3.18: graph-isomorphism checker. Page position and atom-placement order are irrelevant;
+   element, bond order, lone pairs, computed FC, and every neighbour relationship are not. */
+function targetGraphMatches(m,L){
+  if(!m.target)return true;
+  const T=m.target, tn=T.nodes, un=L.atoms;
+  if(tn.length!==un.length)return false;
+  const tm=Array.from({length:tn.length},()=>Array(tn.length).fill(0));
+  (T.bonds||[]).forEach(([a,b,o])=>{tm[a][b]=tm[b][a]=o;});
+  const ui=new Map(un.map((a,i)=>[a.id,i]));
+  const um=Array.from({length:un.length},()=>Array(un.length).fill(0));
+  L.bonds.forEach(b=>{const a=ui.get(b.a),c=ui.get(b.b);if(a!==undefined&&c!==undefined)um[a][c]=um[c][a]=b.order;});
+  const sig=(nodes,mat,i,isUser)=>{
+    const n=nodes[i], fc=isUser?atomFormalCharge(L,n):(n.fc||0);
+    const neigh=mat[i].map((o,j)=>o?nodes[j].el+":"+o:null).filter(Boolean).sort().join(",");
+    return [n.el,n.lp||0,fc,mat[i].reduce((s,o)=>s+o,0),neigh].join("|");
+  };
+  const ts=tn.map((_,i)=>sig(tn,tm,i,false)), us=un.map((_,i)=>sig(un,um,i,true));
+  const cand=tn.map((_,i)=>un.map((__,j)=>j).filter(j=>ts[i]===us[j]));
+  if(cand.some(c=>!c.length))return false;
+  const order=tn.map((_,i)=>i).sort((a,b)=>cand[a].length-cand[b].length);
+  const map=Array(tn.length).fill(-1), used=new Set();
+  const seek=k=>{
+    if(k===order.length)return true;
+    const ti=order[k];
+    for(const uj of cand[ti]){
+      if(used.has(uj))continue;
+      let ok=true;
+      for(let x=0;x<map.length;x++) if(map[x]>=0&&tm[ti][x]!==um[uj][map[x]]){ok=false;break;}
+      if(!ok)continue;
+      map[ti]=uj;used.add(uj);
+      if(seek(k+1))return true;
+      used.delete(uj);map[ti]=-1;
+    }
+    return false;
+  };
+  return seek(0);
+}
+function structureAuditFails(m,L){
+  if(targetGraphMatches(m,L))return [];
+  const expected=(m.target?.nodes||[]).map(n=>n.el+" "+chargeLabel(n.fc||0)+", "+(n.lp||0)+" LP").sort();
+  const actual=L.atoms.map(a=>a.el+" "+chargeLabel(atomFormalCharge(L,a))+", "+a.lp+" LP").sort();
+  const details=expected.join("|")===actual.join("|")
+    ? "Your atom details are individually plausible, but at least one atom is connected to the wrong neighbour or with the wrong bond order."
+    : "At least one atom has the wrong lone-pair count or computed formal charge.";
+  return ["Exact-structure check: "+details+" Match the target's full connectivity, bond orders, lone pairs, and atom-specific charges—not just its formula."];
 }
 function runAudit(wrap){
   const L=S.lab, m=L.mol;
@@ -2525,14 +2913,15 @@ function runAudit(wrap){
       if (orders!==1||a.lp!==0) fails.push("H needs exactly 1 bond and 0 lone pairs (has "+orders+" bond(s), "+a.lp+" LP). H stops at 2 — it's the exception.");
     } else {
       const count=2*orders+2*a.lp;
-      if (count!==8) fails.push(a.el+" audit: "+orders+" bond(s) ×2 + "+a.lp+" LP ×2 = "+count+" — "+(count<8?"short by "+(8-count)+". Quantify it: short÷2 = pairs to convert into bonds.":"OVER 8 by "+(count-8)+". Second-row atoms can't exceed the octet."));
+      const allowed=(m.electronCounts&&m.electronCounts[a.el])||[8];
+      if(!allowed.includes(count)) fails.push(a.el+" audit: "+orders+" bond(s) ×2 + "+a.lp+" LP ×2 = "+count+" electron(s); this target requires "+allowed.join(" or ")+" around "+a.el+".");
     }
   });
   // budget
   const used=2*L.bonds.reduce((s,b)=>s+b.order,0)+2*L.atoms.reduce((s,a)=>s+a.lp,0);
   if (used!==m.ve) fails.push("Budget: you spent "+used+" of "+m.ve+" electrons. Must land exactly.");
-  // v2.4 formal-charge audit: catches legal-octet-but-WRONG structures (H–N≡C, charge-separated CO₂, misplaced H's)
-  fails.push(...fcAuditFails(m,L));
+  // v3.18 exact molecular-graph audit: catches legal-octet-but-wrong connectivity and role swaps.
+  fails.push(...structureAuditFails(m,L));
   const box=L.auditBox; box.innerHTML="";
   if (!fails.length){
     confetti();
@@ -2541,8 +2930,8 @@ function runAudit(wrap){
     const t=todayStr(); const plan=TRACK.find(x=>x.day===t);
     if (plan && plan.topic==="lewis" && !S.doneDays.includes(t) && S.molDone.length>=2) S.doneDays.push(t);
     save();
-    const c=el("div",{class:"card teal"},'<h2>✓ '+m.formula+' — every octet checks out</h2><p>Final audit passed: formula ✓ · connected ✓ · H rule ✓ · octets ✓ · budget spent exactly ✓ · formal charges all correct ✓</p>');
-    c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{S.lab=null;render();}},"Next molecule →"));
+    const c=el("div",{class:"card teal"},'<h2>✓ '+m.formula+' — exact drawing match</h2><p>Final audit passed: formula ✓ · connected ✓ · H rule ✓ · electron counts ✓ · budget ✓ · bond orders ✓ · lone pairs ✓ · atom-specific formal charges ✓ · target graph ✓</p>');
+    c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:leaveLab},L.returnTo==="drill"?"Back to question →":"Next molecule →"));
     box.appendChild(c);
   } else {
     L.fails++;
