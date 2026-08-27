@@ -6,7 +6,23 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.26  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.27  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.27 (2026-08-27, Gabe: "Can we nest under each chapter, meaning there should be like that
+        triangle that i CAN use to expand a chapter into the topics. make it also a smooth
+        animation of everything opening. not just a click and everything popus up. should look
+        like sliding out"): COLLAPSIBLE CHAPTERS IN PRACTICE. Five chapters × up to eight
+        topics rendered as one flat ~30-card scroll with no way to put a chapter away. Each
+        chapter is now a tappable header with a ▶ caret that rotates to ▼, and its topics live
+        in a panel that slides. Three things make the motion read as unfolding rather than
+        popping: the panel height is MEASURED from real content and animated px→px (a
+        max-height guess snaps at the end and runs at different speeds for a 3-row vs an 8-row
+        chapter), each row inside slides down and fades on a 45 ms per-row stagger, and control
+        is handed back to height:auto on transitionend so a <details> opened inside a row can
+        still grow the panel. Open/closed state persists per chapter (course-current open by
+        default) and survives re-render, so the view he left is the view he returns to. One
+        Expand-all/Collapse-all control, cascaded. Keyboard-operable (Enter/Space, aria-expanded)
+        and fully disabled under prefers-reduced-motion. Presentation only — no change to any
+        drill, mastery, readiness or bank behavior.
   v3.26 (2026-08-27, Gabe on quiz morning: "Quick come up with a quiz for this and bond angles
         please. This is what I struggle with. I dont remember the bond angles (numbers) and i
         kind of guess on geometry" → "make sure this is in our app"): VSEPR TABLE + BOND ANGLES.
@@ -437,6 +453,26 @@
     background:#fff;border:2.5px solid var(--ink);border-radius:10px;
     box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
   }
+  /* v3.27 — collapsible chapter accordions (Practice). Height is measured and animated for
+     real, not faked with a max-height guess, so a 3-topic chapter and an 8-topic chapter
+     slide at the same speed and neither snaps at the end. */
+  .chgrp{margin:0 0 4px}
+  .chhead{cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;transition:box-shadow .18s ease,transform .18s ease}
+  .chhead:active{transform:translate(1px,1px);box-shadow:var(--shadow-sm)}
+  .chhead:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+  .chcaret{display:inline-block;flex:0 0 auto;width:1em;font-size:1.05rem;line-height:1;opacity:.75;
+    transform:rotate(0deg);transition:transform .34s cubic-bezier(.34,1.28,.44,1),opacity .2s ease}
+  .chgrp.open .chcaret{transform:rotate(90deg);opacity:1}
+  .chbody{overflow:hidden;height:0;opacity:.2;margin:0 0 6px 10px;padding-left:14px;
+    border-left:2.5px dashed rgba(32,36,31,.22);
+    transition:height .40s cubic-bezier(.33,1,.5,1),opacity .3s ease}
+  .chgrp.open .chbody{opacity:1}
+  .chbody>.card{transform:translateY(-12px);opacity:0;
+    transition:transform .42s cubic-bezier(.22,1,.36,1),opacity .34s ease}
+  .chgrp.open .chbody>.card{transform:none;opacity:1}
+  @media (prefers-reduced-motion: reduce){
+    .chcaret,.chbody,.chbody>.card,.chhead{transition:none!important}
+  }
   .card.cream{background:var(--paper2)}
   .card.teal{background:var(--teal);color:var(--paper)}
   .card h2{font-family:var(--serif);font-size:1.25rem;margin-bottom:8px}
@@ -575,7 +611,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.26</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.27</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1751,6 +1787,7 @@ const S = {
   adaptivePlan: safeStore.get("adaptivePlan", null), // v3.25: today's optional shadow-mode suggestion (local only)
   adaptiveRuns: safeStore.get("adaptiveRuns", []), // v3.25: planner pick/outcome audit trail, local only (cap 60)
   adaptiveReviews: safeStore.get("adaptiveReviews", []), // v3.25: slow-right spaced-retrieval queue, local only (cap 120)
+  practiceOpen: safeStore.get("practiceOpen", null), // v3.27: which Practice chapters are expanded {chId:bool}; null = seed with course-current only
   canvasFeed: safeStore.get("canvasFeed", null),   // v3.5: cached Canvas sync {courses:{chem231:{announcements[],deadlines[]}},fetched,_syncedAt} written daily by the canvas-sync task
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
@@ -2629,7 +2666,7 @@ function currentChapterId(){
   return wk<=1?"ch1":wk===2?"ch2":wk===3?"ch3":"ch4";
 }
 VIEWS.practice = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Organised by chapter, same as 📖 Learn. Each topic has two modes: <b>Drill</b> (quick rounds, explains every answer) and <b>Mastery check</b> (the real bar — 6 cold questions, all right first try, nothing guessed).</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Organised by chapter, same as 📖 Learn — <b>tap a chapter to open it</b>. Each topic has two modes: <b>Drill</b> (quick rounds, explains every answer) and <b>Mastery check</b> (the real bar — 6 cold questions, all right first try, nothing guessed).</p>'));
 
   const lab=el("div",{class:"card cream"});
   lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked targets, including exact-source structures. Six-step method enforced (count → central → predict → build → audit); the final check verifies the full molecular graph and formal charges.</p>';
@@ -2647,28 +2684,85 @@ VIEWS.practice = (v) => {
   /* v3.23: PER-CHAPTER. Course-current chapter leads; each topic gets one row carrying both
      its drill progress and its mastery status, instead of two separate flat lists. */
   const cur=currentChapterId();
-  const chapters=[...CHAPTERS].sort((a,b)=>(a.id===cur?-1:0)-(b.id===cur?-1:0));
+  /* v3.27: what LEADS the list, and what starts open. The course week alone says "Ch 2" —
+     but on the morning of a Ch-1 quiz the chapter he needs on top is Ch 1. So: if a graded
+     checkpoint is within a week and names topics, the chapter holding the most of those
+     topics leads; otherwise the course-current chapter leads. Both start expanded. */
+  const nextCp=nextCheckpoint();
+  let lead=cur;
+  if(nextCp && nextCp.topics && nextCp.topics.length && daysTo(nextCp.date)<=7){
+    const want=new Set(nextCp.topics);
+    const best=CHAPTERS.map(c=>({id:c.id,n:c.topics.filter(k=>want.has(k)).length})).sort((a,b)=>b.n-a.n)[0];
+    if(best && best.n) lead=best.id;
+  }
+  const rank=id=>(id===lead?0:(id===cur?1:2));
+  const chapters=[...CHAPTERS].sort((a,b)=>rank(a.id)-rank(b.id));
   const totalMastered=CHAPTERS.flatMap(c=>c.topics).filter(k=>masteryDaysFor(k).length>=2).length;
   v.appendChild(el("div",{class:"card"},'<span class="tag violet">⚖️ The real bar</span><h3>Mastery: '+totalMastered+' topic'+(totalMastered===1?'':'s')+' mastered</h3><p class="muted" style="margin:4px 0 0">A mastery check is <b>'+MASTERY_N+' cold questions, every one right first try, nothing flagged 🎲 or 🤷</b> = one clean day. Two clean days on <b>different</b> days = mastered. Drill % never counts.</p>'));
 
+  /* v3.27 — CHAPTERS COLLAPSE. Gabe: "there should be like that triangle that i CAN use to
+     expand a chapter into the topics… smooth animation of everything opening. not just a
+     click and everything popus up. should look like sliding out."
+     Five chapters × up to 8 topics was a ~30-card scroll with no way to put a chapter away.
+     Now each chapter is a header you open on purpose. Three details that make it feel right:
+     (1) the height is MEASURED from real content and animated px→px, so nothing snaps at the
+     end the way a max-height guess does; (2) the rows themselves slide down and fade with a
+     small per-row stagger, so it reads as unfolding rather than appearing; (3) open/closed
+     state persists per chapter (course-current open by default), so the view you left is the
+     view you come back to. prefers-reduced-motion disables all of it. */
+  const REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if(!S.practiceOpen || typeof S.practiceOpen!=="object"){
+    S.practiceOpen={}; CHAPTERS.forEach(c=>{ S.practiceOpen[c.id]=(c.id===lead||c.id===cur); });
+  }
+  const persistOpen=()=>safeStore.set("practiceOpen",S.practiceOpen);
+  const anyOpen=()=>CHAPTERS.some(c=>S.practiceOpen[c.id]);
+  const groups=[];
+
+  const bar=el("div",{style:"display:flex;justify-content:flex-end;margin:-8px 0 12px"});
+  const allBtn=el("button",{class:"btn ghost small"}, anyOpen()?"⌃ Collapse all":"⌄ Expand all");
+  const syncAllBtn=()=>{ allBtn.textContent = anyOpen()?"⌃ Collapse all":"⌄ Expand all"; };
+  allBtn.addEventListener("click",()=>{
+    const target=!anyOpen();
+    CHAPTERS.forEach(c=>{ S.practiceOpen[c.id]=target; }); persistOpen();
+    groups.forEach((g,i)=>{ if(REDUCED) g.set(target,false); else setTimeout(()=>g.set(target,true), i*55); });
+    syncAllBtn();
+  });
+  bar.appendChild(allBtn); v.appendChild(bar);
+
   chapters.forEach(ch=>{
-    const isCur=ch.id===cur;
-    const head=el("div",{class:"card"+(isCur?" teal":"")});
+    const isCur=ch.id===cur, isLead=ch.id===lead;
     const chTopics=ch.topics.filter(k=>TOPICS[k]);
     const mastered=chTopics.filter(k=>masteryDaysFor(k).length>=2).length;
-    head.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
-      '<h3 style="flex:1;margin:0">'+ch.ico+' '+ch.name+'</h3>'+
-      (isCur?'<span class="tag gold">course-current</span>':'')+
-      '<span class="tag violet">'+mastered+'/'+chTopics.length+' mastered</span></div>'+
-      '<p class="'+(isCur?'':'muted')+'" style="margin:6px 0 0;font-size:.85rem'+(isCur?';opacity:.92':'')+'">'+ch.sub+'</p>';
-    v.appendChild(head);
+    const open0=!!S.practiceOpen[ch.id];
 
-    chTopics.forEach(k=>{
+    const grp=el("div",{class:"chgrp"+(open0?" open":"")});
+    const head=el("div",{class:"card chhead"+(isCur||isLead?" teal":"")});
+    head.setAttribute("role","button"); head.setAttribute("tabindex","0");
+    head.setAttribute("aria-expanded",open0?"true":"false");
+    head.setAttribute("aria-label",ch.name+" — "+mastered+" of "+chTopics.length+" topics mastered");
+    /* v3.27: title gets the full width and the tags wrap onto their own line beneath it —
+       on a phone, a flex row of caret + title + two tags shreds a long chapter name into
+       four lines. */
+    head.innerHTML='<div style="display:flex;align-items:flex-start;gap:10px">'+
+      '<span class="chcaret" aria-hidden="true" style="margin-top:3px">▶</span>'+
+      '<div style="flex:1;min-width:0">'+
+        '<h3 style="margin:0">'+ch.ico+' '+ch.name+'</h3>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">'+
+          (isLead&&lead!==cur?'<span class="tag coral">next: '+esc(nextCp.name)+'</span>':'')+
+          (isCur?'<span class="tag gold">course-current</span>':'')+
+          '<span class="tag violet">'+mastered+'/'+chTopics.length+' mastered</span>'+
+        '</div>'+
+        '<p class="'+(isCur||isLead?'':'muted')+'" style="margin:7px 0 0;font-size:.85rem'+(isCur||isLead?';opacity:.92':'')+'">'+ch.sub+'</p>'+
+      '</div></div>';
+    const body=el("div",{class:"chbody"});
+
+    chTopics.forEach((k,ri)=>{
       const t=TOPICS[k];
       const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written");
       const seen=qs.filter(q=>S.qstats[q.id]?.r).length;
       const days=masteryDaysFor(k).length, canMaster=masteryEligible(k);
       const row=el("div",{class:"card cream"});
+      row.style.transitionDelay=Math.min(ri,7)*45+"ms"; // v3.27: the cascade — rows unfold, they don't blink in
       row.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
         '<b style="flex:1">'+(days>=2?"🏅 ":"")+(t.ico||"")+' '+t.name+'</b>'+
         (qs.length?'<span class="muted mono" style="font-size:.78rem">'+seen+'/'+qs.length+' seen</span>':'')+
@@ -2689,8 +2783,38 @@ VIEWS.practice = (v) => {
       } else {
         row.appendChild(el("button",{class:"btn ghost small",style:"margin-top:8px",onclick:()=>{S.learnCh=ch.id;S.learnTopic=k;go("learn");}},"📖 Read the primer"));
       }
-      v.appendChild(row);
+      body.appendChild(row);
     });
+
+    grp.appendChild(head); grp.appendChild(body); v.appendChild(grp);
+    body.style.height = open0 ? "auto" : "0";
+
+    /* px→px height animation. Closing needs no measurement (target is 0); opening measures the
+       real content height once, then hands control back to `auto` on transitionend so a
+       <details> opened inside a row can still grow the panel afterwards. */
+    const set=(open,animate)=>{
+      grp.classList.toggle("open",open);
+      head.setAttribute("aria-expanded",open?"true":"false");
+      if(!animate||REDUCED){ body.style.height=open?"auto":"0"; return; }
+      const from=body.getBoundingClientRect().height;
+      let to=0;
+      if(open){ body.style.height="auto"; to=body.getBoundingClientRect().height; }
+      body.style.height=from+"px";
+      void body.offsetHeight; // force the browser to accept the start value before we change it
+      requestAnimationFrame(()=>{ body.style.height=to+"px"; });
+    };
+    body.addEventListener("transitionend",e=>{
+      if(e.target!==body||e.propertyName!=="height") return;
+      if(grp.classList.contains("open")) body.style.height="auto";
+    });
+    const toggle=()=>{
+      const next=!grp.classList.contains("open");
+      S.practiceOpen[ch.id]=next; persistOpen();
+      set(next,true); syncAllBtn();
+    };
+    head.addEventListener("click",toggle);
+    head.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+    groups.push({set});
   });
 };
 /* ================= v3.24 — CLAUDE'S ASSESSMENT LAYER =================
