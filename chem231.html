@@ -6,7 +6,19 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.27  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.28  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.28 (2026-08-27, Gabe ~90 min before the quiz: "Where do I find the bond angles in
+        practice"): FOCUS SETS — a named subset of the bank, served COMPLETE and EASIEST-FIRST
+        in one run. The honest answer to his question was "buried": a hybrid drill is 5
+        questions from a 94-item pool, so the 26 new bond-angle items surfaced roughly 2 per
+        round — twelve rounds to see the set once. A selector tuned for spaced rotation is the
+        wrong instrument for "I have twenty minutes and one specific hole." FOCUS_SETS is the
+        right one, and it's declarative, so future gaps get an entry rather than a rebuild.
+        Reachable two ways: a card above the chapter list in Practice (with an n/total seen
+        counter), and a 📐 button on the owning topic's row. Everything else about the run is
+        unchanged — same grader, same 🎲/🤷 flags, same attempt ledger, same pause/resume — so
+        a focus run is honest evidence, not a mode with softer rules. Mastery checks stay cold
+        and untouched. First set: "Bond angles & the VSEPR table" (the 26 v3.26 items).
   v3.27 (2026-08-27, Gabe: "Can we nest under each chapter, meaning there should be like that
         triangle that i CAN use to expand a chapter into the topics. make it also a smooth
         animation of everything opening. not just a click and everything popus up. should look
@@ -611,7 +623,7 @@
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.27</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.28</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2614,6 +2626,32 @@ function renderAdaptiveAssignmentCard(v){
   c.appendChild(row);v.appendChild(c);
 }
 
+/* ================= v3.28 — FOCUS SETS =================
+   Gabe, 90 minutes into quiz-day prep: "Where do I find the bond angles in practice."
+   Honest answer at the time: buried. A hybrid drill is 5 questions drawn from a 94-item pool,
+   so a named 26-item gap surfaced ~2 items per round — twelve rounds to see it once. A drill
+   selector tuned for spaced rotation is the wrong instrument for "I have twenty minutes and
+   one specific hole." A FOCUS SET is that instrument: a named subset of the bank, served
+   COMPLETE and EASIEST-FIRST in a single run, so recall items land before the reasoning items
+   that depend on them. Everything else about the run is normal — same grader, same 🎲/🤷
+   flags, same attempt ledger, same pause/resume — so a focus run is honest evidence, not a
+   practice mode with different rules. Mastery checks stay cold and unaffected. */
+const FOCUS_SETS=[
+  {id:"angles", topic:"hybrid", ico:"📐",
+   name:"Bond angles & the VSEPR table",
+   blurb:"The five numbers and the ladder that produces them — 109.5 · 120 · 180 · 107 · 104.5, Ciesla's table row by row, and the H₂O-vs-SO₂ trap. Served easiest-first, all in one run.",
+   match:q=>String(q.id).startsWith("vs-")},
+];
+function focusPool(st){ return QUESTIONS.filter(q=>st.match(q)&&q.type!=="written"); }
+function focusSeen(st){ return focusPool(st).filter(q=>((S.qstats[q.id]?.r)||0)+((S.qstats[q.id]?.w)||0)>0).length; }
+function startFocusDrill(setId){
+  const st=FOCUS_SETS.find(s=>s.id===setId); if(!st) return;
+  const pool=focusPool(st); if(!pool.length){ alert("That set is empty."); return; }
+  /* easiest-first, and stable within a tier so the five bare numbers always open the run */
+  const queue=pool.map((q,i)=>({q,i})).sort((a,b)=>(qDiff(a.q)-qDiff(b.q))||(a.i-b.i)).map(x=>x.q);
+  S.drill={queue,i:0,right:0,wrong:0,topic:st.topic,answered:false,log:[],runId:makeRunId("focus"),scopeName:st.name};
+  go("drill");
+}
 function startDrill(topic){
   let pool;
   if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)&&q.type!=="written"); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
@@ -2681,6 +2719,20 @@ VIEWS.practice = (v) => {
     v.appendChild(mr);
   }
 
+  /* v3.28: focus sets sit ABOVE the chapter list — the point of one is that you can reach it
+     without knowing which chapter it lives in. */
+  FOCUS_SETS.forEach(st=>{
+    const pool=focusPool(st); if(!pool.length) return;
+    const done=focusSeen(st), fresh=pool.length-done;
+    const fc=el("div",{class:"card"+(fresh?" teal":" cream")});
+    fc.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap">'+
+      '<h3 style="flex:1;margin:0">'+st.ico+' '+st.name+'</h3>'+
+      '<span class="tag '+(fresh?'gold':'violet')+'">'+done+'/'+pool.length+' seen</span></div>'+
+      '<p class="'+(fresh?'':'muted')+'" style="margin:6px 0 10px;font-size:.85rem'+(fresh?';opacity:.92':'')+'">'+st.blurb+'</p>';
+    fc.appendChild(el("button",{class:"btn "+(fresh?"gold":"ghost"),onclick:()=>startFocusDrill(st.id)},
+      (fresh?"▶ Start all "+pool.length+" — easiest first":"↻ Run all "+pool.length+" again")));
+    v.appendChild(fc);
+  });
   /* v3.23: PER-CHAPTER. Course-current chapter leads; each topic gets one row carrying both
      its drill progress and its mastery status, instead of two separate flat lists. */
   const cur=currentChapterId();
@@ -2778,6 +2830,8 @@ VIEWS.practice = (v) => {
         br.appendChild(el("button",{class:"btn small",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"🎯 Drill"));
         if(k==="formal") br.appendChild(el("button",{class:"btn gold small",onclick:()=>startMastery()},"⚖️ Mastery check"));
         else if(canMaster) br.appendChild(el("button",{class:"btn "+(days>=2?"ghost":"gold")+" small",onclick:()=>startTopicMastery(k)},days>=2?"⚖️ Re-run check":"⚖️ Mastery check"));
+        FOCUS_SETS.filter(st=>st.topic===k&&focusPool(st).length).forEach(st=>{ // v3.28: the set is reachable from its own topic row too
+          br.appendChild(el("button",{class:"btn gold small",onclick:()=>startFocusDrill(st.id)},st.ico+" "+(st.shortLabel||"Bond angles")+" ("+focusPool(st).length+")")); });
         br.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.learnCh=ch.id;S.learnTopic=k;go("learn");}},"📖 Primer"));
         row.appendChild(br);
       } else {
