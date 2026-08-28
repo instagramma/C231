@@ -6,7 +6,7 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.29  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.29.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
   v3.29 (2026-08-27 evening, Gabe: "Make resonance a huge part of chapter 2… Need better
         pacing because i did alot of ch 1 stuff this week. Ch 2 quiz is next thursday"):
         RESONANCE BUILT OUT + CURVED ARROWS + A DATED CH-2 SPRINT. Three problems, one release.
@@ -3257,14 +3257,20 @@ VIEWS.drill = (v) => {
   }
   if (D.i>=D.queue.length){ // round over
     if(S.pausedDrill){ S.pausedDrill=null; safeStore.set("pausedDrill",null); } // v3.4.1: finished = nothing to resume
-    const pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    let pct = D.queue.length?Math.round(100*D.right/D.queue.length):0;
+    // v3.29.1: the headline used D.right/queue.length while the topic rows and the ONE-repair
+    // verdict used byTopic. When those disagreed the card contradicted itself (16/16 = 100%
+    // sitting above a red topic). byTopic is the same tally the verdict trusts, so it wins.
+    let scR=D.right, scT=D.queue.length;
+    if(D.byTopic){ let r=0,w=0; Object.values(D.byTopic).forEach(v=>{r+=(v.r||0);w+=(v.w||0);});
+      if(r+w>0){ scR=r; scT=r+w; pct=Math.round(100*r/(r+w)); } }
     // v3.0: every-2-day diagnostics (cumulative / scoped) → record the run + honest gap map
     if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec") && D.byTopic){
       const type=D.topic==="__cum"?"cum":(D.topic==="__lec"?"lec":"scope");
       const rep=gapReport(D.byTopic);
       D.runId=D.runId||makeRunId("diag-"+type);
       if(!S.diags.some(x=>x.runId===D.runId)){
-        S.diags.push({runId:D.runId,date:todayStr(), type, scope:D.scopeName, score:D.right, total:D.queue.length, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0});
+        S.diags.push({runId:D.runId,date:todayStr(), type, scope:D.scopeName, score:scR, total:scT, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0});
         if(S.diags.length>60) S.diags=S.diags.slice(-60);
         save();
       }
@@ -3274,7 +3280,7 @@ VIEWS.drill = (v) => {
       const nm=k=>TOPICS[k]?.name||k;
       const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
       c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
-        '<h2>'+D.right+' / '+D.queue.length+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+
+        '<h2>'+scR+' / '+scT+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+
         '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+
         '<div class="why">'+(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Clean board. Next diagnostic unlocks in 2 days — go live your life.')+'</div>'+
         (S.diags.length>=2?'<p class="muted" style="margin:6px 0 0;font-size:.85em">History: '+S.diags.slice(-5).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ")+'</p>':'');
@@ -3401,6 +3407,7 @@ VIEWS.drill = (v) => {
     c.appendChild(gRow);
   }
   const finish = (ok, revealHtml, wrText, submitted) => {
+    if(D.answered) return;   // v3.29.1: re-entry guard — a double-fire used to tally byTopic twice while D.right counted once, so the results card could show 100% AND flag a failing topic
     D.answered=true;
     const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
     const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
