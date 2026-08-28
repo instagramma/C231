@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.29.1  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.30  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.30 (2026-08-28, Gabe: "I need this to be readable"; then: "too many words… unorganized"):
+        READABILITY + INFORMATION HIERARCHY. Keeps every v3.29.1 feature, question, datum and
+        interaction while reorganizing the view layer. Claude's offline UI experiment established the calmer
+        document direction, but its 11–13 px support text, 31 px controls, and `.card.teal`
+        override produced white text on white in the adaptive assignment. This version repairs
+        that contrast failure, raises support text and question controls to readable sizes,
+        restores visual hierarchy with tinted emphasis cards, provides 44+ px targets, visible
+        keyboard focus, clearer selected states, and allows browser pinch-zoom. Today is no
+        longer an append-only stream: Continue → Choose one next step → Optional → Up next,
+        with course/progress detail folded but never deleted. Deadline rows show three at first;
+        Practice groups quick modes, focused sets, mastery and chapters. Default Today height
+        fell from 3442 px to 1576 px at the same desktop viewport. The outgoing
+        official is preserved byte-for-byte as old/chem231-v3.29.1.html.
   v3.29 (2026-08-27 evening, Gabe: "Make resonance a huge part of chapter 2… Need better
         pacing because i did alot of ch 1 stuff this week. Ch 2 quiz is next thursday"):
         RESONANCE BUILT OUT + CURVED ARROWS + A DATED CH-2 SPRINT. Three problems, one release.
@@ -643,11 +656,326 @@
     #lab-canvas{height:300px}
   }
 </style>
+<style id="ui-readable-reskin">
+/* ============================================================================
+   v3.30 — readable, organized document UI (2026-08-28)
+   The complete v3.29.1 engine, bank and storage model remain untouched; view
+   rendering is reorganized below. This preserves the useful direction of the offline UI test
+   without its low-contrast text, undersized controls or white-on-white teal cards.
+   ============================================================================ */
+:root{
+  --paper:#f7f7f4;
+  --paper2:#eef1f2;
+  --ink:#1d272c;
+  --line:#cfd6da;
+  --teal:#0f5f8a;
+  --teal-dk:#0a4667;
+  --coral:#9d3037;
+  --gold:#7a4d00;
+  --violet:#5d4b87;
+  --ok:#2f6b4c;
+  --muted-tx:#536169;
+  --sec-tx:#3f4c53;
+  --accent-bg:#e8f2f7;
+  --success-bg:#e8f3ec;
+  --warning-bg:#f8eed8;
+  --danger-bg:#f8e9e9;
+  --shadow:none;
+  --shadow-sm:none;
+  --serif:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+html{font-size:17px;scroll-padding-bottom:82px}
+body{
+  background:var(--paper);
+  background-image:none;
+  color:var(--ink);
+  line-height:1.6;
+  text-rendering:optimizeLegibility;
+}
+main{max-width:800px;padding:1.5rem 1.25rem 2.5rem}
+
+/* Quiet header, with all metadata still readable. */
+header{
+  align-items:center;
+  background:var(--paper);
+  color:var(--ink);
+  border-bottom:1px solid var(--line);
+  padding:1rem 1.25rem;
+}
+header h1{font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
+header h1 .flask{transform:none;margin-right:8px}
+header .countdown{
+  background:var(--accent-bg);
+  color:var(--teal-dk);
+  font-family:var(--sans);
+  font-size:.78rem;
+  font-weight:700;
+  padding:4px 10px;
+}
+.menubtn{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid #aeb9bf;
+  box-shadow:none;
+  font-family:var(--sans);
+  font-size:.78rem;
+  font-weight:700;
+  min-height:40px;
+  padding:8px 12px;
+  display:inline-flex;
+  align-items:center;
+}
+
+/* Seven destinations stay intact; clearer active state and usable tap targets. */
+nav{background:#fff;border-top:1px solid var(--line)}
+nav button{
+  min-height:64px;
+  border-right:none;
+  color:var(--muted-tx);
+  font-size:.72rem;
+  font-weight:650;
+  line-height:1.2;
+  padding:8px 2px 10px;
+}
+nav button .ico{font-size:1.2rem;opacity:.82}
+nav button.active{
+  background:var(--accent-bg);
+  color:var(--teal-dk);
+  box-shadow:inset 0 3px 0 var(--teal);
+}
+nav button.active .ico{opacity:1}
+
+/* Content hierarchy: clean surfaces, but important cards still look important. */
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(18,34,43,.06);
+  padding:1.2rem 1.3rem;
+  margin-bottom:1.15rem;
+}
+.card.cream{background:#f1f3f3}
+.card.teal{
+  background:var(--accent-bg);
+  border-color:#82adc3;
+  color:var(--ink);
+  box-shadow:0 1px 2px rgba(15,95,138,.10);
+}
+.card h2{font-size:1.24rem;font-weight:750;line-height:1.3;letter-spacing:-.01em}
+.card h3{font-size:1.02rem;font-weight:750;line-height:1.35}
+.muted{opacity:1;color:var(--muted-tx);font-size:.88rem;line-height:1.55}
+.deadline-row{
+  display:grid!important;
+  grid-template-columns:58px minmax(0,1fr) auto;
+  align-items:start!important;
+  gap:10px;
+  margin:10px 0!important;
+}
+.deadline-date{min-width:0!important}
+.deadline-main{min-width:0}
+.deadline-when{white-space:nowrap}
+.home-section-label{
+  color:var(--muted-tx);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  margin:.35rem .15rem .55rem;
+}
+.home-section{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(18,34,43,.05);
+  margin-bottom:1rem;
+  overflow:hidden;
+}
+.home-section>summary{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:64px;
+  padding:.85rem 1.1rem;
+  cursor:pointer;
+  list-style:none;
+}
+.home-section>summary::-webkit-details-marker{display:none}
+.home-section>summary::after{
+  content:"⌄";
+  color:var(--muted-tx);
+  font-size:1.15rem;
+  margin-left:auto;
+  transition:transform .18s ease;
+}
+.home-section[open]>summary::after{transform:rotate(180deg)}
+.home-section-title{display:block;font-size:1rem;font-weight:800;line-height:1.3}
+.home-section-sub{display:block;color:var(--muted-tx);font-size:.8rem;line-height:1.35;margin-top:2px}
+.home-section-body{border-top:1px solid var(--line)}
+.home-section-body>.card{
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+  box-shadow:none;
+  margin:0;
+}
+.home-section-body>.card:last-child{border-bottom:0}
+.home-section-body>.statrow{padding:1rem;margin:0}
+.home-actions{margin-bottom:1rem!important}
+.home-actions>.card{min-width:0}
+.home-resume-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:1rem}
+.home-resume-grid>.card{margin:0;min-width:0}
+.home-resume .tag{display:none}
+.practice-quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:1rem}
+.practice-quick-grid>.card{margin:0;min-width:0}
+.mini-details{margin-top:.65rem}
+.mini-details>summary{color:var(--teal-dk);cursor:pointer;font-size:.82rem;font-weight:750}
+.mini-details>p{margin:.45rem 0 0}
+.deadline-more{margin:.35rem 0 0}
+.deadline-more>summary{color:var(--teal-dk);cursor:pointer;font-size:.84rem;font-weight:750;padding:.3rem 0}
+
+/* Labels may be compact, but never faint. */
+.tag{
+  background:var(--paper2);
+  color:var(--sec-tx);
+  font-size:.72rem;
+  font-weight:750;
+  letter-spacing:.045em;
+  line-height:1.35;
+  text-transform:uppercase;
+  padding:4px 9px;
+  border-radius:99px;
+  margin-bottom:.65rem;
+}
+.tag.gold{background:var(--warning-bg);color:#684200}
+.tag.coral{background:var(--danger-bg);color:#8b272f}
+.tag.violet{background:#eeeaf7;color:#514078}
+.tag.teal{background:#dcecf4;color:var(--teal-dk)}
+
+/* Controls meet comfortable tap sizes and remain visually distinct. */
+.btn{
+  min-height:44px;
+  background:var(--teal);
+  color:#fff;
+  border:1px solid var(--teal-dk);
+  border-radius:8px;
+  box-shadow:none;
+  padding:9px 14px;
+  font-family:var(--sans);
+  font-size:.9rem;
+  font-weight:700;
+  line-height:1.25;
+}
+.btn:active{transform:none;box-shadow:none;filter:brightness(.94)}
+.btn.ghost{background:#fff;color:var(--ink);border-color:#aeb9bf}
+.btn.ghost:hover{background:#f1f4f5}
+.btn.gold{background:var(--warning-bg);color:#5d3c00;border-color:#c9a968}
+.btn.coral{background:var(--danger-bg);color:#81242c;border-color:#d4a0a4}
+.btn.violet{background:#eeeaf7;color:#4e3d76;border-color:#b9add5}
+.btn.small{min-height:38px;padding:7px 11px;font-size:.82rem}
+.btn:disabled{opacity:.58}
+.bigbtn{
+  min-height:52px;
+  border:1px solid #84262d;
+  border-radius:10px;
+  box-shadow:none;
+  padding:13px 16px;
+  font-family:var(--sans);
+  font-size:1rem;
+}
+
+/* Question reading and answering are the app's main job. */
+.qprompt{font-size:1.06rem;line-height:1.62;margin:12px 0 16px}
+.choices{gap:10px}
+.choice{
+  min-height:48px;
+  background:#fff;
+  border:1px solid #aeb9bf;
+  border-radius:9px;
+  box-shadow:none;
+  padding:12px 14px;
+  font-size:.98rem;
+  line-height:1.45;
+}
+.choice:hover:not(:disabled){background:#f1f4f5}
+.choice.picked-right,.choice.reveal-right{background:var(--success-bg);border-color:var(--ok)}
+.choice.picked-wrong{background:var(--danger-bg);border-color:var(--coral)}
+input.answerbox,.answerbox{
+  min-height:44px;
+  border:1px solid #9eabb2;
+  border-radius:8px;
+  box-shadow:none;
+  font-family:var(--sans);
+  font-size:1rem;
+  padding:9px 11px;
+}
+.why{
+  border-left:4px solid var(--teal);
+  background:#f0f3f4;
+  border-radius:0 8px 8px 0;
+  padding:.75rem .9rem;
+  font-size:.92rem;
+  line-height:1.6;
+}
+.why b{color:var(--teal-dk)}
+
+/* Supporting structures remain compact without becoming tiny. */
+.stat{background:#f0f3f4;border:1px solid #d8dfe2;border-radius:9px;box-shadow:none;padding:.9rem;text-align:left}
+.stat .n{font-family:var(--sans);font-size:1.45rem;font-weight:750}
+.stat .l{color:var(--muted-tx);font-size:.78rem;font-weight:600;letter-spacing:0;text-transform:none;opacity:1}
+.pill{min-height:40px;background:#fff;border:1px solid #aeb9bf;border-radius:99px;box-shadow:none;padding:8px 13px;font-size:.84rem;font-weight:700}
+.pill.on{background:var(--accent-bg);color:var(--teal-dk);border-color:var(--teal)}
+.pill.done{background:var(--success-bg);color:var(--ok);border-color:#95bea6}
+.progressbar{height:10px;background:#e2e7e9;border:none;border-radius:99px}
+.progressbar>div{background:var(--teal);border-right:none}
+.daycard{background:#fff;border:1px solid var(--line);border-radius:9px;box-shadow:none;padding:.8rem .9rem}
+.daycard.today{background:var(--accent-bg);border-color:#82adc3}
+.daycard.overdue{border-color:#c98085;box-shadow:none}
+.daycard.done{background:var(--success-bg);border-color:#a8cbb5}
+.daycard .d{font-family:var(--sans);font-size:.76rem;color:var(--muted-tx);opacity:1;font-weight:650}
+.daycard .t{font-family:var(--sans);font-size:.9rem;font-weight:700;line-height:1.4}
+.duetag{font-size:.7rem;border-width:1px;padding:3px 8px}
+.tool{min-height:42px;border:1px solid #aeb9bf;border-radius:8px;box-shadow:none;background:#fff;padding:8px 12px;font-family:var(--sans);font-size:.84rem;font-weight:700}
+.tool.on{background:var(--accent-bg);color:var(--violet);border-color:var(--violet)}
+.step{font-size:.72rem;border-width:1px;padding:7px 4px}
+.stepask{font-size:.98rem;line-height:1.6}
+table.cheat{font-size:.86rem;line-height:1.45}
+table.cheat th,table.cheat td{border-color:#9eabb2;padding:8px 9px}
+table.cheat th{background:var(--teal-dk)}
+textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-shadow:none}
+.chhead{box-shadow:none}
+.chhead:active{transform:none;box-shadow:none}
+
+/* Keyboard and assistive focus should be unmistakable. */
+:is(a,button,input,textarea,select,[tabindex]):focus-visible{
+  outline:3px solid #efb83a;
+  outline-offset:3px;
+}
+
+@media(max-width:600px){
+  html{font-size:16px}
+  body{padding-bottom:84px}
+  main{padding:1rem .75rem 2rem}
+  header{padding:.75rem .85rem;gap:8px}
+  header h1{font-size:1.08rem}
+  header>span{width:100%;justify-content:flex-start;flex-wrap:wrap}
+  .card{padding:1rem;margin-bottom:.9rem}
+  .statrow{gap:8px}
+  nav button{min-height:62px;font-size:.65rem}
+  .deadline-row{grid-template-columns:48px minmax(0,1fr);gap:3px 8px;margin:12px 0!important}
+  .deadline-when{grid-column:2;justify-self:start;margin:2px 0 0}
+  .home-section>summary{padding:.8rem 1rem}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.68rem;opacity:.75" title="app version — if Claude says a newer number, refresh the page">v3.29</span><span id="syncdot" style="font-family:var(--mono);font-size:.68rem;color:#F2B705">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.30</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2302,6 +2630,33 @@ VIEWS.mastery = (v) => {
 };
 
 /* ---- HOME ---- */
+function homeFold(title,sub,nodes){
+  const d=el("details",{class:"home-section"});
+  d.innerHTML='<summary><span><span class="home-section-title">'+title+'</span><span class="home-section-sub">'+sub+'</span></span></summary>';
+  const body=el("div",{class:"home-section-body"}); nodes.forEach(n=>body.appendChild(n)); d.appendChild(body); return d;
+}
+function organizeHome(v){
+  /* v3.30: Today used to be an append-only stream: deadlines, three announcements, pacing,
+     eleven progress bars, two resume cards, planner, two recommendations, another duplicate
+     recommendation, then four stats. Every component was useful; the flat hierarchy was not.
+     Reorder the same live nodes into a decision-first page and fold secondary detail. Moving
+     nodes preserves every event listener and data source. */
+  const nodes=[...v.children], used=new Set();
+  const take=sel=>nodes.filter(n=>n.matches&&n.matches(sel)).map(n=>(used.add(n),n));
+  const resume=take(".home-resume"), diagnostic=take(".home-diagnostic"), actions=take(".home-actions"), adaptive=take(".home-adaptive"), deadlines=take(".home-due");
+  const course=take(".home-updates,.home-pacing"), progress=take(".home-progress-detail,.home-stats");
+  const rest=nodes.filter(n=>!used.has(n));
+  v.innerHTML="";
+  const label=s=>v.appendChild(el("div",{class:"home-section-label"},s));
+  if(resume.length){label("Continue");const g=el("div",{class:"home-resume-grid"});resume.forEach(n=>g.appendChild(n));v.appendChild(g);}
+  if(diagnostic.length){label("Due today");diagnostic.forEach(n=>v.appendChild(n));}
+  if(actions.length){label("Choose one next step");actions.forEach(n=>v.appendChild(n));}
+  if(adaptive.length){label("Optional");adaptive.forEach(n=>v.appendChild(n));}
+  if(deadlines.length){label("Up next");deadlines.forEach(n=>v.appendChild(n));}
+  if(course.length)v.appendChild(homeFold("Course information","Canvas updates and weekly pacing",course));
+  if(progress.length)v.appendChild(homeFold("Progress details","Accuracy, topic bars and history totals",progress));
+  rest.forEach(n=>v.appendChild(n));
+}
 VIEWS.home = (v) => {
   const t = todayStr();
   // ---- v3.3: 📅 DEADLINES — real due dates, always visible (est. = confirm on Canvas) ----
@@ -2326,17 +2681,19 @@ VIEWS.home = (v) => {
   const MDL=DL.filter(x=>!CDL.some(c=>c.d===x.d&&normN(c.n)===normN(x.n))).concat(CDL).sort((a,b)=>a.d<b.d?-1:1);
   const up=MDL.filter(x=>x.d>=t);
   if(up.length){
-    const dl=el("div",{class:"card"});
+    const dl=el("div",{class:"card deadline-card home-due"});
+    const deadlineHTML=x=>{const n=daysTo(x.d);return '<div class="deadline-row"><b class="mono deadline-date">'+x.d.slice(5).replace("-","/")+'</b><span class="deadline-main">'+(x.big?'<b>'+x.n+'</b>':x.n)+(x.cv?' <span class="tag teal" style="font-size:.7rem;padding:2px 6px">☁ canvas</span>':'')+(x.est?' <span class="muted">(~est.)</span>':'')+(x.note?'<br><span class="muted" style="font-size:.82rem">'+x.note+'</span>':'')+'</span><span class="tag deadline-when '+(n<=3?'coral':'gold')+'">'+(n===0?'TODAY':'in '+n+'d')+'</span></div>';};
+    const later=up.slice(3,6);
     dl.innerHTML='<span class="tag coral">📅 Deadlines</span>'+
-      up.slice(0,6).map(x=>{const n=daysTo(x.d);return '<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b class="mono" style="min-width:52px">'+x.d.slice(5).replace("-","/")+'</b><span style="flex:1">'+(x.big?'<b>'+x.n+'</b>':x.n)+(x.cv?' <span class="tag teal" style="font-size:.6rem;padding:1px 6px">☁ canvas</span>':'')+(x.est?' <span class="muted">(~est.)</span>':'')+(x.note?'<br><span class="muted" style="font-size:.78rem">'+x.note+'</span>':'')+'</span><span class="tag '+(n<=3?'coral':'gold')+'">'+(n===0?'TODAY':'in '+n+'d')+'</span></div>';}).join("")+
-      (up.length>6?'<p class="muted" style="margin:4px 0 0">…+'+(up.length-6)+' more later</p>':'');
+      up.slice(0,3).map(deadlineHTML).join("")+
+      (later.length?'<details class="deadline-more"><summary>Show '+(up.length-3)+' more deadline'+(up.length-3===1?'':'s')+'</summary>'+later.map(deadlineHTML).join("")+(up.length>6?'<p class="muted" style="margin:4px 0 0">…+'+(up.length-6)+' later in the semester</p>':'')+'</details>':'');
     v.appendChild(dl);
   }
   // v3.5: Canvas announcements strip + staleness honesty
   if(cfc){
     const ageH=cf._syncedAt?Math.round((Date.now()-new Date(cf._syncedAt).getTime())/3600000):null;
     const an=(cfc.announcements||[]).slice(0,3);
-    const ac=el("div",{class:"card"});
+    const ac=el("div",{class:"card home-updates"});
     ac.innerHTML='<span class="tag violet">☁ Canvas'+(ageH!==null?(' · synced '+(ageH<1?'just now':ageH+'h ago')):'')+(ageH!==null&&ageH>48?' · <b style="color:var(--coral)">STALE — tap Run now on canvas-sync</b>':'')+'</span>'+
       (an.length?an.map(a=>'<div style="margin:6px 0"><b class="mono" style="font-size:.72rem">'+(a.date||"")+'</b> <b>'+(a.title||"")+'</b>'+(a.summary?'<br><span class="muted" style="font-size:.82rem">'+a.summary+'</span>':'')+'</div>').join(""):'<p class="muted" style="margin:6px 0 0">No recent announcements.</p>');
     v.appendChild(ac);
@@ -2347,7 +2704,7 @@ VIEWS.home = (v) => {
   (function(){
     const wk=Math.max(courseWeek(),1); const wkRow=SEMESTER.find(x=>x.wk===wk);
     const cleanPct=k=>{let r=0,w=0,g=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=(s.r||0);w+=(s.w||0);g+=(s.gr||0);}}});const tt=r+w;return tt?Math.round(100*Math.max(0,r-g)/tt):null;};
-    const pc=el("div",{class:"card"});
+    const pc=el("div",{class:"card home-pacing"});
     let inner='<span class="tag gold">📖 Pacing · week '+wk+'</span>';
     if(wkRow){
       const end=new Date(wkRow.start+"T00:00:00"); end.setDate(end.getDate()+6);
@@ -2380,7 +2737,7 @@ VIEWS.home = (v) => {
     const per=Object.keys(TOPICS).map(k=>{let tr=0,tw=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){tr+=s.r;tw+=s.w;}}});const tot=tr+tw;return tot?{k,pct:Math.round(100*tr/tot)}:null;}).filter(Boolean);
     const worst=per.slice().sort((a,b)=>a.pct-b.pct)[0];
     const lastD=S.diags.slice(-2).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ");
-    const c=el("div",{class:"card cream"});
+    const c=el("div",{class:"card cream home-progress-detail"});
     c.innerHTML='<span class="tag violet">📊 Measured</span>'+
       '<p style="margin:6px 0 6px"><b>All-time '+(r+w?Math.round(100*r/(r+w)):0)+'%</b> ('+r+'✓ '+w+'✗) · <b>7-day '+(A7.length?Math.round(100*ok7/A7.length):0)+'%</b> ('+A7.length+' attempts'+(med?' · median '+med+'s':'')+')'+(lastD?' · diags '+lastD:'')+' · FC clean days '+new Set(S.fcMastery).size+'/2</p>'+
       per.map(p=>'<div style="display:flex;align-items:center;gap:6px;margin:2px 0"><span style="min-width:150px;font-size:.75rem">'+TOPICS[p.k].ico+' '+TOPICS[p.k].name+'</span><div style="flex:1;height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden"><div style="width:'+p.pct+'%;height:8px;background:'+(p.pct>=75?'#2a9d8f':p.pct>=55?'#e9c46a':'#e76f51')+'"></div></div><b class="mono" style="min-width:38px;text-align:right;font-size:.75rem">'+p.pct+'%</b></div>').join("")+
@@ -2391,7 +2748,7 @@ VIEWS.home = (v) => {
   const due = diagDue();
   if (due){
     const cp = nextCheckpoint();
-    const b = el("div",{class:"card cream"});
+    const b = el("div",{class:"card cream home-diagnostic"});
     b.innerHTML = '<span class="tag coral">🩺 Diagnostic due · every 2 days</span>'+
       '<h3 style="margin:6px 0">'+(due==="cum"?"📚 Cumulative — everything the course has covered":"🎯 Scoped — "+(cp?cp.name+" is in "+daysTo(cp.date)+" day"+(daysTo(cp.date)===1?"":"s"):"next assessment"))+'</h3>'+
       '<p class="muted" style="margin:0 0 8px">Cold, honest, ~10 min. Ends with a gap map + ONE repair. Written items at the end get saved for Claude\'s review.</p>';
@@ -2419,8 +2776,8 @@ VIEWS.home = (v) => {
     // v3.4.1: paused-round card — quitting/reloading never loses a round again
     if(S.pausedDrill && S.pausedDrill.ids && S.pausedDrill.i < S.pausedDrill.ids.length){
       const p=S.pausedDrill;
-      const rc=el("div",{class:"card cream"});
-      rc.innerHTML='<span class="tag coral">⏸ Paused round</span><h3 style="margin:6px 0">'+(p.scopeName||"Round")+' — '+p.i+'/'+p.ids.length+' answered ('+p.right+'✓ '+p.wrong+'✗)</h3><p class="muted" style="margin:0 0 8px">Nothing was lost — every answer you gave is already saved. Pick up exactly where you left off.</p>';
+      const rc=el("div",{class:"card cream home-resume"});
+      rc.innerHTML='<span class="tag coral">⏸ Continue</span><h3 style="margin:6px 0">'+(p.scopeName||"Round")+' · '+p.i+'/'+p.ids.length+' done</h3><p class="muted" style="margin:0 0 8px">'+p.right+' right · '+p.wrong+' wrong · saved.</p>';
       const rr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
       rr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeDrill()},"▶ Resume round"));
       rr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedDrill=null;safeStore.set("pausedDrill",null);render();}},"discard"));
@@ -2430,8 +2787,8 @@ VIEWS.home = (v) => {
     // can be paused at the same time without either clobbering the other).
     if(S.pausedMastery && S.pausedMastery.names && S.pausedMastery.i < S.pausedMastery.names.length){
       const pm=S.pausedMastery;
-      const mc=el("div",{class:"card cream"});
-      mc.innerHTML='<span class="tag coral">⏸ Paused mastery check</span><h3 style="margin:6px 0">⚖️ Formal-charge mastery — '+pm.i+'/'+pm.names.length+' done'+(pm.clean===false?' · <b>already not-clean</b>':' · clean so far')+'</h3><p class="muted" style="margin:0 0 8px">'+(pm.clean===false?'This run already has a miss, so it can\'t bank a clean day — finish it for the practice, or discard and start fresh.':'Still clean. Nothing was lost — pick up at species '+(pm.i+1)+'.')+'</p>';
+      const mc=el("div",{class:"card cream home-resume"});
+      mc.innerHTML='<span class="tag coral">⏸ Continue</span><h3 style="margin:6px 0">⚖️ Formal-charge mastery · '+pm.i+'/'+pm.names.length+' done</h3><p class="muted" style="margin:0 0 8px">'+(pm.clean===false?'Already not-clean; finish for practice or discard.':'Still clean · saved at species '+(pm.i+1)+'.')+'</p>';
       const mr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
       mr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeMastery()},"▶ Resume mastery check"));
       mr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedMastery=null;safeStore.set("pausedMastery",null);render();}},"discard"));
@@ -2447,7 +2804,7 @@ VIEWS.home = (v) => {
       const nm=k=>TOPICS[k]?(TOPICS[k].ico+" "+TOPICS[k].name):k;
       const cpT=nextCheckpoint(); const cpDays=cpT?daysTo(cpT.date):99;
       const wkRow=SEMESTER.find(x=>x.wk===Math.max(courseWeek(),1));
-      const row=el("div",{style:"display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:10px"});
+      const row=el("div",{class:"home-actions",style:"display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:10px"});
       // ---- 📌 COVER TODAY ----
       const cov=el("div",{class:"card teal",style:"margin:0"});
       let covTopic=null, covWhy="", covHead="";
@@ -2464,11 +2821,12 @@ VIEWS.home = (v) => {
         covWhy=covTopic?((tStats(covTopic).att===0?"Not started yet":"At "+(tStats(covTopic).clean)+"% clean — push it past 75")+". Rest of the week: "+wkRow.topics.filter(k=>k!==covTopic).map(k=>nm(k)+(tStats(k).clean!==null?" "+tStats(k).clean+"%":"")).join(" · ")):"";
       }
       cov.innerHTML='<span class="tag gold">📌 Cover today</span>'+(covHead?'<p class="muted" style="margin:4px 0 2px;font-size:.8rem">'+covHead+'</p>':'')+
-        (covTopic?'<h3 style="margin:2px 0 6px">'+nm(covTopic)+'</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">'+covWhy+'</p>':'<h3 style="margin:2px 0 6px">Week covered ✓</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">Every topic this week is ≥75% clean. Bank ahead in Learn, or rest — consistency beats intensity.</p>');
+        (covTopic?'<h3 style="margin:2px 0 8px">'+nm(covTopic)+'</h3>':'<h3 style="margin:2px 0 6px">Week covered ✓</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">Nothing new is below the weekly target.</p>');
       if(covTopic){ const bb=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap"});
         bb.appendChild(el("button",{class:"btn coral",onclick:()=>startDrill(covTopic)},"▶ Drill "+(TOPICS[covTopic]?.name||covTopic)));
         bb.appendChild(el("button",{class:"btn ghost small",onclick:()=>go("learn")},"📖 Learn first"));
-        cov.appendChild(bb); }
+        cov.appendChild(bb);
+        const why=el("details",{class:"mini-details"}); why.innerHTML='<summary>Why this topic</summary><p class="muted">'+covWhy+'</p>'; cov.appendChild(why); }
       row.appendChild(cov);
       // ---- 🔧 REVIEW TODAY ----
       const rev=el("div",{class:"card cream",style:"margin:0"});
@@ -2476,35 +2834,30 @@ VIEWS.home = (v) => {
       const scored=allT.map(k=>({k,...tStats(k)})).filter(x=>x.att>0);
       const weak=scored.filter(x=>x.clean!==null&&x.clean<80).sort((a,b)=>a.clean-b.clean);
       const strong=scored.filter(x=>x.clean>=80);
-      const totCW=scored.reduce((s,x)=>s+x.cw,0), totDK=scored.reduce((s,x)=>s+x.dk,0);
+      const totCW=scored.reduce((s,x)=>s+x.cw,0);
       const dkTop=scored.filter(x=>x.dk>0).sort((a,b)=>b.dk-a.dk)[0];
       let rHead,rWhy,rBtnTxt,rAct;
-      if(totCW>0){ rHead="Misconceptions first"; rWhy=totCW+" confident-wrong answer"+(totCW>1?"s":"")+" on record — broken rules beat blank spots. Fix these before anything new."; rBtnTxt="▶ Review missed (misconceptions surface first)"; rAct=()=>startDrill("__missed"); }
+      if(totCW>0){ rHead="Misconceptions first"; rWhy=totCW+" confident-wrong answer"+(totCW>1?"s":"")+" on record — broken rules beat blank spots. Fix these before anything new."; rBtnTxt="▶ Fix missed questions"; rAct=()=>startDrill("__missed"); }
       else if(dkTop){ rHead="Learn-first: "+nm(dkTop.k); rWhy=dkTop.dk+"× marked 🤷 don't-know there — read the primer, THEN re-drill. Drilling blind teaches guessing."; rBtnTxt="📖 Open Learn"; rAct=()=>go("learn"); }
       else if(weak.length){ rHead="Weakest: "+nm(weak[0].k)+" · "+weak[0].clean+"%"; rWhy="Lowest clean topic with real attempts. One focused round."; rBtnTxt="▶ Drill "+(TOPICS[weak[0].k]?.name||weak[0].k); rAct=()=>startDrill(weak[0].k); }
       else { rHead="Nothing owed"; rWhy="No misconceptions, no don't-knows, nothing under 80%. Run Review-missed as maintenance or close the tab."; rBtnTxt="▶ Review missed"; rAct=()=>startDrill("__missed"); }
       let scopeLine="";
       if(cpT&&cpDays<=7){ const sw=(cpT.topics||[]).map(k=>({k,...tStats(k)})).filter(x=>x.clean===null||x.clean<80);
         scopeLine=sw.length?'<p style="margin:6px 0 0;font-size:.8rem"><b>'+cpT.name+' gap list:</b> '+sw.map(x=>nm(x.k)+" "+(x.clean??"—")+"%").join(" · ")+' <span class="muted">(gate: 80)</span></p>':'<p style="margin:6px 0 0;font-size:.8rem"><b>'+cpT.name+':</b> all scope topics ≥80% clean ✅</p>'; }
-      rev.innerHTML='<span class="tag coral">🔧 Review today</span><h3 style="margin:2px 0 6px">'+rHead+'</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">'+rWhy+'</p>';
+      const rShort=totCW>0?totCW+' confident-wrong to repair.':dkTop?dkTop.dk+' marked don\'t-know.':weak.length?'One focused round.':'No urgent repair.';
+      rev.innerHTML='<span class="tag coral">🔧 Review today</span><h3 style="margin:2px 0 6px">'+rHead+'</h3><p class="muted" style="margin:0 0 8px;font-size:.85rem">'+rShort+'</p>';
       const rb=el("button",{class:"btn teal",onclick:rAct},rBtnTxt); rev.appendChild(rb);
-      if(scopeLine){ const d=el("div"); d.innerHTML=scopeLine; rev.appendChild(d); }
-      if(strong.length){ const d2=el("div"); d2.innerHTML='<p class="muted" style="margin:6px 0 0;font-size:.78rem">💪 Solid (≥80): '+strong.map(x=>TOPICS[x.k]?.name||x.k).join(", ")+' — maintain, don\'t grind.</p>'; rev.appendChild(d2); }
+      const rd=el("details",{class:"mini-details"});
+      rd.innerHTML='<summary>Why this review</summary><p class="muted">'+rWhy+'</p>'+scopeLine+(strong.length?'<p class="muted" style="margin:6px 0 0;font-size:.78rem">💪 Solid (≥80): '+strong.map(x=>TOPICS[x.k]?.name||x.k).join(", ")+' — maintain, don\'t grind.</p>':'');
+      rev.appendChild(rd);
       row.appendChild(rev);
       v.appendChild(row);
     })();
-    const cp = nextCheckpoint(); const due = diagDue();
-    const card = el("div",{class:"card teal"});
-    card.innerHTML = '<span class="tag gold">Semester mode · week '+Math.max(courseWeek(),1)+'</span>'+
-      '<h2 style="font-size:1.4rem">Deadlines live on Canvas — check there first</h2>'+
-      '<p style="margin:6px 0 14px;opacity:.92">This app is practice, not your planner. '+
-      (cp?'Next checkpoint: <b>'+cp.name+'</b> · '+fmtDay(cp.date)+' ('+daysTo(cp.date)+'d). ':'')+
-      (due?'A <b>'+(due==="cum"?"📚 cumulative":"🎯 scoped")+' diagnostic</b> is due today.':'No diagnostic due today.')+'</p>';
-    card.appendChild(el("button",{class:"bigbtn",onclick:()=>{ due?startDiag2(due):startDrill("__missed"); }},
-      due?("▶ &nbsp;Start "+(due==="cum"?"cumulative":"scoped")+" diagnostic"):"▶ &nbsp;Review my missed questions"));
-    v.appendChild(card);
+    /* v3.30: the old Semester-mode card duplicated either the diagnostic banner or the Review
+       tile immediately above it. The actions remain in those two places; do not render a third
+       copy that makes Today look like three competing recommendations. */
     const a2 = accuracy();
-    const st = el("div",{class:"statrow"});
+    const st = el("div",{class:"statrow home-stats"});
     st.innerHTML =
       '<div class="stat"><div class="n">'+S.diags.length+'</div><div class="l">diagnostics</div></div>'+
       '<div class="stat"><div class="n">'+a2.t+'</div><div class="l">questions</div></div>'+
@@ -2512,6 +2865,7 @@ VIEWS.home = (v) => {
       '<div class="stat"><div class="n">'+S.missed.length+'</div><div class="l">in missed rotation</div></div>';
     v.appendChild(st);
     if(!safeStore.persistent) v.appendChild(el("div",{class:"card cream"},'<p class="muted">⚠️ Preview mode: progress won\'t survive closing this tab. Open the file from your CHEM 231 folder in Safari/Chrome for saved progress.</p>'));
+    organizeHome(v);
     return;
   }
   const todayPlan = TRACK.find(x=>x.day===t);
@@ -2790,19 +3144,22 @@ function adaptiveProgressFor(plan){
 function renderAdaptiveAssignmentCard(v){
   const plan=getAdaptivePlan(false), conf=adaptiveConfidence(plan.topics), complete=adaptiveProgressFor(plan), paused=S.pausedDrill&&S.pausedDrill.assignmentId===plan.id;
   const names=plan.topics.map(k=>(TOPICS[k]?.ico||"")+" "+(TOPICS[k]?.name||k)).join(" · ");
-  const c=el("div",{class:"card teal"});
-  c.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag gold">🧭 SHADOW MODE · optional</span><span class="muted" style="font-size:.76rem">planner suggests; you stay in control</span></div>'+ 
-    '<h2 style="font-size:1.45rem;margin:8px 0 3px">Today\'s adaptive assignment · ~12 min</h2><p class="muted" style="margin:0 0 9px">5 questions · '+names+'</p>'+ 
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:8px 0">'+
-      '<div><div style="display:flex;justify-content:space-between;font-size:.78rem"><b>Assignment completion</b><span>'+complete+'%</span></div><div class="progressbar"><div style="width:'+complete+'%"></div></div><p class="muted" style="font-size:.72rem;margin:3px 0 0">Only goes up.</p></div>'+ 
-      '<div><div style="display:flex;justify-content:space-between;font-size:.78rem"><b>Skill confidence</b><span>'+(conf.pct===null?'needs calibration':conf.pct+'%')+'</span></div><div class="progressbar"><div style="width:'+(conf.pct||0)+'%;background:'+(conf.pct!==null&&conf.pct>=80?'#2a9d8f':'#7b61a8')+'"></div></div><p class="muted" style="font-size:.72rem;margin:3px 0 0">May rise or fall as evidence changes.</p></div>'+ 
-    '</div><details class="why"><summary><b>Why this assignment?</b></summary><ul style="margin:7px 0 0 18px">'+plan.why.map(x=>'<li>'+x+'</li>').join("")+'</ul><p class="muted" style="margin:6px 0 0;font-size:.78rem">Under 3 recent varied items = needs calibration, not weak. Novel transfer counts more than exact-source recognition.</p></details>';
+  const c=el("div",{class:"card home-adaptive"});
+  c.innerHTML='<span class="tag violet">🧭 Adaptive · optional</span>'+ 
+    '<h3 style="margin:2px 0 4px">5 questions · ~12 min</h3><p class="muted" style="margin:0 0 10px">'+names+'</p>';
   const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
   if(paused)row.appendChild(el("button",{class:"btn coral",onclick:()=>resumeDrill()},"▶ Resume adaptive assignment"));
   else if(plan.status==="complete")row.appendChild(el("button",{class:"btn ghost",onclick:()=>{getAdaptivePlan(true);render();}},"Make another optional assignment"));
   else if(S.pausedDrill)row.appendChild(el("button",{class:"btn ghost",disabled:"disabled"},"Finish paused round first"));
-  else row.appendChild(el("button",{class:"bigbtn",onclick:()=>startAdaptiveAssignment(plan)},"▶ Start optional assignment"));
-  c.appendChild(row);v.appendChild(c);
+  else row.appendChild(el("button",{class:"btn ghost",onclick:()=>startAdaptiveAssignment(plan)},"▶ Start optional assignment"));
+  c.appendChild(row);
+  const detail=el("details",{class:"mini-details"});
+  detail.innerHTML='<summary>How it chose this set</summary>'+ 
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:10px 0">'+
+      '<div><div style="display:flex;justify-content:space-between;font-size:.82rem"><b>Completion</b><span>'+complete+'%</span></div><div class="progressbar"><div style="width:'+complete+'%"></div></div><p class="muted" style="font-size:.78rem;margin:3px 0 0">Only goes up.</p></div>'+ 
+      '<div><div style="display:flex;justify-content:space-between;font-size:.82rem"><b>Skill confidence</b><span>'+(conf.pct===null?'needs calibration':conf.pct+'%')+'</span></div><div class="progressbar"><div style="width:'+(conf.pct||0)+'%;background:'+(conf.pct!==null&&conf.pct>=80?'#2a9d8f':'#7b61a8')+'"></div></div><p class="muted" style="font-size:.78rem;margin:3px 0 0">May rise or fall.</p></div>'+ 
+    '</div><ul style="margin:7px 0 0 18px;font-size:.88rem">'+plan.why.map(x=>'<li>'+x+'</li>').join("")+'</ul><p class="muted" style="margin:6px 0 0;font-size:.78rem">Under 3 recent varied items = needs calibration, not weak.</p>';
+  c.appendChild(detail);v.appendChild(c);
 }
 
 /* ================= v3.28 — FOCUS SETS =================
@@ -2891,35 +3248,39 @@ function currentChapterId(){
   return wk<=1?"ch1":wk===2?"ch2":wk===3?"ch3":"ch4";
 }
 VIEWS.practice = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Do the reps</h2><p class="muted">Organised by chapter, same as 📖 Learn — <b>tap a chapter to open it</b>. Each topic has two modes: <b>Drill</b> (quick rounds, explains every answer) and <b>Mastery check</b> (the real bar — 6 cold questions, all right first try, nothing guessed).</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Choose a practice mode</h2><p class="muted">Drill = quick reps. Mastery = '+MASTERY_N+' cold questions, perfect and unguessed.</p>'));
 
+  const quick=el("div",{class:"practice-quick-grid"});
   const lab=el("div",{class:"card cream"});
-  lab.innerHTML='<h3>🧪 Lewis Lab — build structures</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked targets, including exact-source structures. Six-step method enforced (count → central → predict → build → audit); the final check verifies the full molecular graph and formal charges.</p>';
+  lab.innerHTML='<h3>🧪 Lewis Lab</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked structures · full graph and charge audit.</p>';
   lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
-  v.appendChild(lab);
+  quick.appendChild(lab);
 
   const missedN=[...new Set(S.missed)].length;
   if(missedN){
     const mr=el("div",{class:"card cream"});
-    mr.innerHTML='<h3>🔥 Review what you missed</h3><p class="muted" style="margin:4px 0 8px">'+missedN+' question'+(missedN===1?'':'s')+' you got wrong or flagged shaky, across every chapter.</p>';
+    mr.innerHTML='<h3>🔥 Review misses</h3><p class="muted" style="margin:4px 0 8px">'+missedN+' wrong or shaky across all chapters.</p>';
     mr.appendChild(el("button",{class:"btn coral",onclick:()=>startDrill("__missed")},"Review missed ("+missedN+") →"));
-    v.appendChild(mr);
+    quick.appendChild(mr);
   }
+  v.appendChild(quick);
 
   /* v3.28: focus sets sit ABOVE the chapter list — the point of one is that you can reach it
      without knowing which chapter it lives in. */
+  const focusCards=[];
   FOCUS_SETS.forEach(st=>{
     const pool=focusPool(st); if(!pool.length) return;
     const done=focusSeen(st), fresh=pool.length-done;
     const fc=el("div",{class:"card"+(fresh?" teal":" cream")});
     fc.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap">'+
       '<h3 style="flex:1;margin:0">'+st.ico+' '+st.name+'</h3>'+
-      '<span class="tag '+(fresh?'gold':'violet')+'">'+done+'/'+pool.length+' seen</span></div>'+
-      '<p class="'+(fresh?'':'muted')+'" style="margin:6px 0 10px;font-size:.85rem'+(fresh?';opacity:.92':'')+'">'+st.blurb+'</p>';
+      '<span class="tag '+(fresh?'gold':'violet')+'">'+done+'/'+pool.length+' seen</span></div>';
     fc.appendChild(el("button",{class:"btn "+(fresh?"gold":"ghost"),onclick:()=>startFocusDrill(st.id)},
       (fresh?"▶ Start all "+pool.length+" — easiest first":"↻ Run all "+pool.length+" again")));
-    v.appendChild(fc);
+    const fd=el("details",{class:"mini-details"});fd.innerHTML='<summary>What this set covers</summary><p class="muted">'+st.blurb+'</p>';fc.appendChild(fd);
+    focusCards.push(fc);
   });
+  if(focusCards.length)v.appendChild(homeFold("Focused sets","Resonance, curved arrows and bond angles",focusCards));
   /* v3.23: PER-CHAPTER. Course-current chapter leads; each topic gets one row carrying both
      its drill progress and its mastery status, instead of two separate flat lists. */
   const cur=currentChapterId();
@@ -2937,7 +3298,9 @@ VIEWS.practice = (v) => {
   const rank=id=>(id===lead?0:(id===cur?1:2));
   const chapters=[...CHAPTERS].sort((a,b)=>rank(a.id)-rank(b.id));
   const totalMastered=CHAPTERS.flatMap(c=>c.topics).filter(k=>masteryDaysFor(k).length>=2).length;
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">⚖️ The real bar</span><h3>Mastery: '+totalMastered+' topic'+(totalMastered===1?'':'s')+' mastered</h3><p class="muted" style="margin:4px 0 0">A mastery check is <b>'+MASTERY_N+' cold questions, every one right first try, nothing flagged 🎲 or 🤷</b> = one clean day. Two clean days on <b>different</b> days = mastered. Drill % never counts.</p>'));
+  const masteryInfo=el("div",{class:"card"},'<p class="muted">One clean day = '+MASTERY_N+' cold questions, all right and unguessed. Two clean days on different dates = mastered. Drill % does not count.</p>');
+  v.appendChild(homeFold("Mastery status",totalMastered+' topic'+(totalMastered===1?'':'s')+' mastered', [masteryInfo]));
+  v.appendChild(el("div",{class:"home-section-label"},"By chapter"));
 
   /* v3.27 — CHAPTERS COLLAPSE. Gabe: "there should be like that triangle that i CAN use to
      expand a chapter into the topics… smooth animation of everything opening. not just a
