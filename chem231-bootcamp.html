@@ -2002,7 +2002,12 @@ function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.get
    leaves the countdown stuck at 0d. Roll it forward once, on load, from the known schedule. */
 const KNOWN_QUIZZES=[{name:"Ch 2 Quiz",date:"2026-09-03",topics:["bondline","fgroups","resonance","arrows"]}];
 (function rollForwardCheckpoint(){ try{
-  const t=todayStr(); if(!S.nextQuiz||S.nextQuiz.date>=t) return;
+  /* A checkpoint is 'past' the day AFTER it, or the same evening — his assessments are in
+     lab, which ends at 17:00, so advancing at 18:00 keeps the countdown honest all day and
+     still hands him the next target the same night instead of at midnight. */
+  const t=todayStr(); if(!S.nextQuiz) return;
+  const past = S.nextQuiz.date < t || (S.nextQuiz.date===t && new Date().getHours()>=18);
+  if(!past) return;
   const nq=KNOWN_QUIZZES.find(q=>q.date>=t); if(!nq) return;
   S.nextQuiz={name:nq.name,date:nq.date,topics:nq.topics.slice(),setAt:new Date().toISOString(),rolledFrom:S.nextQuiz.name+" "+S.nextQuiz.date};
   safeStore.set("nextQuiz",S.nextQuiz);
