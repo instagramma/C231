@@ -6,7 +6,15 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.3  ·  built 2026-08-10
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.5  ·  built 2026-08-24
+  v2.5 (2026-08-28): READABLE UI — the CHEM 231 v3.30 stylesheet layer ported over so both
+        course apps look and read the same. Larger type, high-contrast cards, 44px+ controls,
+        visible focus rings, mobile reflow. Appended stylesheet only: markup, logic, question
+        bank and storage are byte-for-byte unchanged. Archived v2.4 before editing.
+  v2.4: 🧭 COURSE MAP tab — the course's real structure (4 streams + 1 midterm,
+  grade ruler, what-to-read rule, weekly rhythm, weeks-3–6 drift warning). Static
+  view, no state. Home semester card links to it. Content source:
+  project claude/phys210-structure-map.md + Course Intel (Day 1).
   v2.3 truth patch (audit r3, findings 1,18): semester-mode Home (no expired runway
   missions, no auto-queuing backlog; journal-first on class nights), k6 velocity wording.
   v2.2: cloud sync (gabe-p210).
@@ -203,6 +211,323 @@
   @media(max-width:520px){
     header h1{font-size:1.15rem}
   }
+</style>
+<style id="v25-readable-ui">
+
+/* ============================================================================
+   v2.5 — readable document UI, ported from CHEM 231 v3.30 (2026-08-28)
+   Ported by Claude so both course apps share one visual language. PURE STYLESHEET
+   APPEND — no markup, logic, questions or storage touched in the physics app. This preserves the useful direction of the offline UI test
+   without its low-contrast text, undersized controls or white-on-white teal cards.
+   ============================================================================ */
+:root{
+  --paper:#f7f7f4;
+  --paper2:#eef1f2;
+  --ink:#1d272c;
+  --line:#cfd6da;
+  --teal:#0f5f8a;
+  --teal-dk:#0a4667;
+  --coral:#9d3037;
+  --gold:#7a4d00;
+  --violet:#5d4b87;
+  --ok:#2f6b4c;
+  --muted-tx:#536169;
+  --sec-tx:#3f4c53;
+  --accent-bg:#e8f2f7;
+  --success-bg:#e8f3ec;
+  --warning-bg:#f8eed8;
+  --danger-bg:#f8e9e9;
+  --shadow:none;
+  --shadow-sm:none;
+  --serif:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+html{font-size:17px;scroll-padding-bottom:82px}
+body{
+  background:var(--paper);
+  background-image:none;
+  color:var(--ink);
+  line-height:1.6;
+  text-rendering:optimizeLegibility;
+}
+main{max-width:800px;padding:1.5rem 1.25rem 2.5rem}
+
+/* Quiet header, with all metadata still readable. */
+header{
+  align-items:center;
+  background:var(--paper);
+  color:var(--ink);
+  border-bottom:1px solid var(--line);
+  padding:1rem 1.25rem;
+}
+header h1{font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
+header h1 .flask{transform:none;margin-right:8px}
+header .countdown{
+  background:var(--accent-bg);
+  color:var(--teal-dk);
+  font-family:var(--sans);
+  font-size:.78rem;
+  font-weight:700;
+  padding:4px 10px;
+}
+.menubtn{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid #aeb9bf;
+  box-shadow:none;
+  font-family:var(--sans);
+  font-size:.78rem;
+  font-weight:700;
+  min-height:40px;
+  padding:8px 12px;
+  display:inline-flex;
+  align-items:center;
+}
+
+/* Seven destinations stay intact; clearer active state and usable tap targets. */
+nav{background:#fff;border-top:1px solid var(--line)}
+nav button{
+  min-height:64px;
+  border-right:none;
+  color:var(--muted-tx);
+  font-size:.72rem;
+  font-weight:650;
+  line-height:1.2;
+  padding:8px 2px 10px;
+}
+nav button .ico{font-size:1.2rem;opacity:.82}
+nav button.active{
+  background:var(--accent-bg);
+  color:var(--teal-dk);
+  box-shadow:inset 0 3px 0 var(--teal);
+}
+nav button.active .ico{opacity:1}
+
+/* Content hierarchy: clean surfaces, but important cards still look important. */
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(18,34,43,.06);
+  padding:1.2rem 1.3rem;
+  margin-bottom:1.15rem;
+}
+.card.cream{background:#f1f3f3}
+.card.teal{
+  background:var(--accent-bg);
+  border-color:#82adc3;
+  color:var(--ink);
+  box-shadow:0 1px 2px rgba(15,95,138,.10);
+}
+.card h2{font-size:1.24rem;font-weight:750;line-height:1.3;letter-spacing:-.01em}
+.card h3{font-size:1.02rem;font-weight:750;line-height:1.35}
+.muted{opacity:1;color:var(--muted-tx);font-size:.88rem;line-height:1.55}
+.deadline-row{
+  display:grid!important;
+  grid-template-columns:58px minmax(0,1fr) auto;
+  align-items:start!important;
+  gap:10px;
+  margin:10px 0!important;
+}
+.deadline-date{min-width:0!important}
+.deadline-main{min-width:0}
+.deadline-when{white-space:nowrap}
+.home-section-label{
+  color:var(--muted-tx);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  margin:.35rem .15rem .55rem;
+}
+.home-section{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(18,34,43,.05);
+  margin-bottom:1rem;
+  overflow:hidden;
+}
+.home-section>summary{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:64px;
+  padding:.85rem 1.1rem;
+  cursor:pointer;
+  list-style:none;
+}
+.home-section>summary::-webkit-details-marker{display:none}
+.home-section>summary::after{
+  content:"⌄";
+  color:var(--muted-tx);
+  font-size:1.15rem;
+  margin-left:auto;
+  transition:transform .18s ease;
+}
+.home-section[open]>summary::after{transform:rotate(180deg)}
+.home-section-title{display:block;font-size:1rem;font-weight:800;line-height:1.3}
+.home-section-sub{display:block;color:var(--muted-tx);font-size:.8rem;line-height:1.35;margin-top:2px}
+.home-section-body{border-top:1px solid var(--line)}
+.home-section-body>.card{
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+  box-shadow:none;
+  margin:0;
+}
+.home-section-body>.card:last-child{border-bottom:0}
+.home-section-body>.statrow{padding:1rem;margin:0}
+.home-actions{margin-bottom:1rem!important}
+.home-actions>.card{min-width:0}
+.home-resume-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:1rem}
+.home-resume-grid>.card{margin:0;min-width:0}
+.home-resume .tag{display:none}
+.practice-quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:1rem}
+.practice-quick-grid>.card{margin:0;min-width:0}
+.mini-details{margin-top:.65rem}
+.mini-details>summary{color:var(--teal-dk);cursor:pointer;font-size:.82rem;font-weight:750}
+.mini-details>p{margin:.45rem 0 0}
+.deadline-more{margin:.35rem 0 0}
+.deadline-more>summary{color:var(--teal-dk);cursor:pointer;font-size:.84rem;font-weight:750;padding:.3rem 0}
+
+/* Labels may be compact, but never faint. */
+.tag{
+  background:var(--paper2);
+  color:var(--sec-tx);
+  font-size:.72rem;
+  font-weight:750;
+  letter-spacing:.045em;
+  line-height:1.35;
+  text-transform:uppercase;
+  padding:4px 9px;
+  border-radius:99px;
+  margin-bottom:.65rem;
+}
+.tag.gold{background:var(--warning-bg);color:#684200}
+.tag.coral{background:var(--danger-bg);color:#8b272f}
+.tag.violet{background:#eeeaf7;color:#514078}
+.tag.teal{background:#dcecf4;color:var(--teal-dk)}
+
+/* Controls meet comfortable tap sizes and remain visually distinct. */
+.btn{
+  min-height:44px;
+  background:var(--teal);
+  color:#fff;
+  border:1px solid var(--teal-dk);
+  border-radius:8px;
+  box-shadow:none;
+  padding:9px 14px;
+  font-family:var(--sans);
+  font-size:.9rem;
+  font-weight:700;
+  line-height:1.25;
+}
+.btn:active{transform:none;box-shadow:none;filter:brightness(.94)}
+.btn.ghost{background:#fff;color:var(--ink);border-color:#aeb9bf}
+.btn.ghost:hover{background:#f1f4f5}
+.btn.gold{background:var(--warning-bg);color:#5d3c00;border-color:#c9a968}
+.btn.coral{background:var(--danger-bg);color:#81242c;border-color:#d4a0a4}
+.btn.violet{background:#eeeaf7;color:#4e3d76;border-color:#b9add5}
+.btn.small{min-height:38px;padding:7px 11px;font-size:.82rem}
+.btn:disabled{opacity:.58}
+.bigbtn{
+  min-height:52px;
+  border:1px solid #84262d;
+  border-radius:10px;
+  box-shadow:none;
+  padding:13px 16px;
+  font-family:var(--sans);
+  font-size:1rem;
+}
+
+/* Question reading and answering are the app's main job. */
+.qprompt{font-size:1.06rem;line-height:1.62;margin:12px 0 16px}
+.choices{gap:10px}
+.choice{
+  min-height:48px;
+  background:#fff;
+  border:1px solid #aeb9bf;
+  border-radius:9px;
+  box-shadow:none;
+  padding:12px 14px;
+  font-size:.98rem;
+  line-height:1.45;
+}
+.choice:hover:not(:disabled){background:#f1f4f5}
+.choice.picked-right,.choice.reveal-right{background:var(--success-bg);border-color:var(--ok)}
+.choice.picked-wrong{background:var(--danger-bg);border-color:var(--coral)}
+input.answerbox,.answerbox{
+  min-height:44px;
+  border:1px solid #9eabb2;
+  border-radius:8px;
+  box-shadow:none;
+  font-family:var(--sans);
+  font-size:1rem;
+  padding:9px 11px;
+}
+.why{
+  border-left:4px solid var(--teal);
+  background:#f0f3f4;
+  border-radius:0 8px 8px 0;
+  padding:.75rem .9rem;
+  font-size:.92rem;
+  line-height:1.6;
+}
+.why b{color:var(--teal-dk)}
+
+/* Supporting structures remain compact without becoming tiny. */
+.stat{background:#f0f3f4;border:1px solid #d8dfe2;border-radius:9px;box-shadow:none;padding:.9rem;text-align:left}
+.stat .n{font-family:var(--sans);font-size:1.45rem;font-weight:750}
+.stat .l{color:var(--muted-tx);font-size:.78rem;font-weight:600;letter-spacing:0;text-transform:none;opacity:1}
+.pill{min-height:40px;background:#fff;border:1px solid #aeb9bf;border-radius:99px;box-shadow:none;padding:8px 13px;font-size:.84rem;font-weight:700}
+.pill.on{background:var(--accent-bg);color:var(--teal-dk);border-color:var(--teal)}
+.pill.done{background:var(--success-bg);color:var(--ok);border-color:#95bea6}
+.progressbar{height:10px;background:#e2e7e9;border:none;border-radius:99px}
+.progressbar>div{background:var(--teal);border-right:none}
+.daycard{background:#fff;border:1px solid var(--line);border-radius:9px;box-shadow:none;padding:.8rem .9rem}
+.daycard.today{background:var(--accent-bg);border-color:#82adc3}
+.daycard.overdue{border-color:#c98085;box-shadow:none}
+.daycard.done{background:var(--success-bg);border-color:#a8cbb5}
+.daycard .d{font-family:var(--sans);font-size:.76rem;color:var(--muted-tx);opacity:1;font-weight:650}
+.daycard .t{font-family:var(--sans);font-size:.9rem;font-weight:700;line-height:1.4}
+.duetag{font-size:.7rem;border-width:1px;padding:3px 8px}
+.tool{min-height:42px;border:1px solid #aeb9bf;border-radius:8px;box-shadow:none;background:#fff;padding:8px 12px;font-family:var(--sans);font-size:.84rem;font-weight:700}
+.tool.on{background:var(--accent-bg);color:var(--violet);border-color:var(--violet)}
+.step{font-size:.72rem;border-width:1px;padding:7px 4px}
+.stepask{font-size:.98rem;line-height:1.6}
+table.cheat{font-size:.86rem;line-height:1.45}
+table.cheat th,table.cheat td{border-color:#9eabb2;padding:8px 9px}
+table.cheat th{background:var(--teal-dk)}
+textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-shadow:none}
+.chhead{box-shadow:none}
+.chhead:active{transform:none;box-shadow:none}
+
+/* Keyboard and assistive focus should be unmistakable. */
+:is(a,button,input,textarea,select,[tabindex]):focus-visible{
+  outline:3px solid #efb83a;
+  outline-offset:3px;
+}
+
+@media(max-width:600px){
+  html{font-size:16px}
+  body{padding-bottom:84px}
+  main{padding:1rem .75rem 2rem}
+  header{padding:.75rem .85rem;gap:8px}
+  header h1{font-size:1.08rem}
+  header>span{width:100%;justify-content:flex-start;flex-wrap:wrap}
+  .card{padding:1rem;margin-bottom:.9rem}
+  .statrow{gap:8px}
+  nav button{min-height:62px;font-size:.65rem}
+  .deadline-row{grid-template-columns:48px minmax(0,1fr);gap:3px 8px;margin:12px 0!important}
+  .deadline-when{grid-column:2;justify-self:start;margin:2px 0 0}
+  .home-section>summary{padding:.8rem 1rem}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
 </style>
 </head>
 <body>
@@ -472,6 +797,7 @@ function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAM
 /* ================= ROUTER ================= */
 const NAV = [
   {id:"home",  ico:"🏠", label:"Today"},
+  {id:"map",   ico:"🧭", label:"Course Map"},
   {id:"lab",   ico:"📝", label:"Problem Lab"},
   {id:"drill", ico:"🎯", label:"Drill"},
   {id:"track", ico:"🗓️", label:"Plan"},
@@ -507,6 +833,7 @@ VIEWS.home = (v) => {
       (isClassNight?'<b>Tonight is a class night: journal in your own words, cold, before sleep.</b> (Claude checks recall only AFTER you write.) ':'')+
       'Highest-yield practice here: the Problem Lab, blank-page first.</p>';
     card0.appendChild(el("button",{class:"bigbtn",onclick:()=>{ go("lab"); }},"▶ &nbsp;Open the Problem Lab"));
+    card0.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{ go("map"); }},"🧭 &nbsp;Confused about how this class works? Course Map"));
     v.appendChild(card0);
     const a0 = accuracy();
     const st0 = el("div",{class:"statrow"});
@@ -760,6 +1087,72 @@ VIEWS.lab = (v) => {
 };
 
 /* ---- CHEAT SHEET ---- */
+/* ---- COURSE MAP (v2.4) — the structure of the course itself ---- */
+VIEWS.map = (v) => {
+  v.appendChild(el("div",{class:"card teal"},
+    '<span class="tag gold">The map</span>'+
+    '<h2>There IS a structure — it just isn\'t shaped like a reading list</h2>'+
+    '<p style="margin:6px 0 0;opacity:.92">No assigned chapters, no slides, no test until late November. The course runs on <b>four continuous streams + one midterm</b>. Once you see the streams, the confusion goes away.</p>'));
+
+  // grade ruler
+  const gr = el("div",{class:"card"});
+  gr.innerHTML = '<h3>Where the grade comes from — 70% process, 30% one test</h3>'+
+    '<div style="display:flex;height:42px;border:2px solid var(--ink);border-radius:4px;overflow:hidden;margin:10px 0 4px;font-size:.72rem;font-weight:700">'+
+      '<div style="flex:20;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">HW 20</div>'+
+      '<div style="flex:20;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">LAB 20</div>'+
+      '<div style="flex:20;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">JRNL 20</div>'+
+      '<div style="flex:10;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">PPT 10</div>'+
+      '<div style="flex:30;display:flex;align-items:center;justify-content:center;background:var(--gold)">MIDTERM 30</div>'+
+    '</div>'+
+    '<p class="muted">Plus +4% extra-credit paper. Absolute scale or curve, whichever helps you. <b>No final exam.</b> 70% is earned by doing the drip — impossible to cram, impossible to recover once missed.</p>';
+  v.appendChild(gr);
+
+  // four streams
+  v.appendChild(el("div",{class:"card"},
+    '<h3>The four streams (= "the assignments")</h3>'+
+    '<table class="cheat"><tr><th>Stream</th><th>%</th><th>Lives in</th><th>Cadence</th></tr>'+
+    '<tr><td><b>Mastering Physics</b></td><td>20</td><td>Pearson — link on Canvas, already paid</td><td>Continuous. <b>Its own due dates, not Canvas\'s.</b></td></tr>'+
+    '<tr><td><b>Lab (Alex)</b></td><td>20</td><td>Canvas</td><td>Weekly · graded on quality, not completeness</td></tr>'+
+    '<tr><td><b>Daily Journal</b></td><td>20</td><td>Your Google Doc</td><td>Every class day, <b>before sleep</b></td></tr>'+
+    '<tr><td><b>Journal PPT</b></td><td>10</td><td>Presented to class</td><td>End of semester, built from the journal</td></tr></table>'+
+    '<p class="muted">The journal and the PPT are the same 30% twice: the doc is raw material, the deck is the graded-for-accuracy version. Every entry written well now = a slide you don\'t rebuild in December.</p>'));
+
+  // what to read
+  v.appendChild(el("div",{class:"card cream"},
+    '<span class="tag violet">The rule that replaces the reading list</span>'+
+    '<h3>The Mastering Physics assignment IS the reading list</h3>'+
+    '<p style="line-height:1.7">Open the current MP assignment → see which sections it draws from → read those in <b>Sears &amp; Zemansky, College Physics 11e</b> → then attempt the problems cold. When S&amp;Z is too dense, build the concept in <b>OpenStax College Physics 2e</b> (free) first. Waiting for someone to assign a chapter = waiting all semester.</p>'+
+    '<p class="muted">"Just his talks" is the design, not a defect: lab hands you the concrete thing (12:40), lecture supplies the frame (2:10), the journal converts it to your own words that night. "This doesn\'t make sense to me yet" is a valid entry — confusion is his stated step one.</p>'));
+
+  // midterm
+  v.appendChild(el("div",{class:"card"},
+    '<h3>The midterm — the only test</h3>'+
+    '<p style="line-height:1.7"><b>When:</b> right after Thanksgiving. <b>Scope:</b> linear motion only — kinematics → forces → energy → momentum, stops before rotation. <b>Weight:</b> 30%, no final to recover on, no makeups without documentation.</p>'+
+    '<p class="muted"><b>"Ready for the exam" is not a November project.</b> Everything on it gets taught and drilled week by week between now and then — the exam is the output of the drip. Only blank-page reps count as prep; solution-visible reps don\'t transfer. That\'s what the Problem Lab is for.</p>'));
+
+  // failure mode
+  v.appendChild(el("div",{class:"card",style:"border-color:var(--coral)"},
+    '<span class="tag coral">The one thing that kills this grade</span>'+
+    '<h3>Weeks 3–6: the silent-drift window</h3>'+
+    '<p style="line-height:1.7">Three months with no test means <b>nothing external tells you you\'re behind until it\'s expensive</b>. The syllabus\'s own words: <i>"It is very easy to fall behind."</i> Your only alarms are MP due dates, lab deadlines, and the journal — treat a missed one as the real alarm, because it\'s the only one you get.</p>'));
+
+  // weekly rhythm
+  v.appendChild(el("div",{class:"card"},
+    '<h3>The weekly rhythm that satisfies all of it</h3>'+
+    '<table class="cheat"><tr><th>Day</th><th>Move</th></tr>'+
+    '<tr><td class="mono">MON</td><td>OpenStax pre-read of the week\'s topic — 20–30 min, concept only</td></tr>'+
+    '<tr><td class="mono">WED</td><td>Lab → lecture → <b>journal before sleep</b> (highest-value 20 min of the week)</td></tr>'+
+    '<tr><td class="mono">THU</td><td>Mastering Physics while lecture is still warm</td></tr>'+
+    '<tr><td class="mono">SAT</td><td>2 problems cold in the Problem Lab — steps shown, misses tagged by step</td></tr>'+
+    '<tr><td class="mono">ANY</td><td>Confused? Office hours — Mohsen 36-105C or Alex. Free homework help, both prefer you early.</td></tr></table>'));
+
+  // next action
+  v.appendChild(el("div",{class:"card cream"},
+    '<span class="tag gold">Do this one thing next</span>'+
+    '<h3>Log into Mastering Physics → screenshot the assignment list + due dates</h3>'+
+    '<p class="muted">20% of the grade, running on its own deadlines, and the one stream nobody has looked at yet. Whatever it says, that screenshot turns the biggest unknown in this course into a known.</p>'));
+};
+
 VIEWS.cheat = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole math bridge on one page</h2>'));
   v.appendChild(el("div",{class:"card"},
