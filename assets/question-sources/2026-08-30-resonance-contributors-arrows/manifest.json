@@ -1,0 +1,152 @@
+{
+  "batchId": "BATCH-CH2-20260830-RESONANCE-CONTRIBUTORS",
+  "receivedDate": "2026-08-30",
+  "reportedUse": ["homework", "Chapter 2 quiz preparation", "app practice bank"],
+  "sourcePolicy": "Immutable full screenshots. Visible source numbering, selected responses, correctness markers, answer panels, and feedback are excluded from display and evidence. Answers were independently checked before banking.",
+  "items": [
+    {
+      "questionUid": "EXACT-RC-20260830R-01",
+      "assetUid": "ASSET-RC-20260830-01A",
+      "sourceFile": "exact-01-allylic-cation-arrow-pushing.png",
+      "sha256": "f1a0d3baa165f6055b832d42386e83979ec42310fa25ac9c8d839f26b9852448",
+      "sourcePixels": [1564, 1134],
+      "displayMode": "code-native allylic-cation reconstruction",
+      "answerIdentity": "one double-barbed arrow from the pi bond toward the carbocation"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-02",
+      "assetUid": "ASSET-RC-20260830-02A",
+      "sourceFile": "exact-02-allylic-anion-arrow-pushing.png",
+      "sha256": "99443d1a8dcbdf67081c17b92e7382cacd7fc1efe445a2a6abec3338db67a267",
+      "sourcePixels": [1630, 1196],
+      "displayMode": "code-native allylic-anion reconstruction",
+      "answerIdentity": "two arrows: lone pair into the new pi bond and old pi bond to the opposite terminal carbon"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-03",
+      "assetUid": "ASSET-RC-20260830-03A",
+      "sourceFile": "exact-03-allylic-radical-arrow-pushing.png",
+      "sha256": "f5c8852dff793734ab4c4e676efd92c188274c16a27320367532dd15a57c4b15",
+      "sourcePixels": [1632, 1188],
+      "displayMode": "code-native allylic-radical reconstruction",
+      "answerIdentity": "three one-electron fishhook arrows"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-04",
+      "assetUid": "ASSET-RC-20260830-04A",
+      "sourceFile": "exact-04-delocalized-electrons-selection.png",
+      "sha256": "7132e61cb092e566aa0d9ae227e6383f015e638728766f7d13f1d0be5839aa94",
+      "sourcePixels": [1672, 1020],
+      "displayViewport": [205, 130, 1120, 175],
+      "answerIdentity": "II and III"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-05",
+      "assetUid": "ASSET-RC-20260830-05A",
+      "sourceFile": "exact-05-benzylic-cation-charge-sites.png",
+      "sha256": "cd34629552c487e53ca340770d115d7063a7db6b52c6c6af86c0813d3d0b452c",
+      "sourcePixels": [1738, 1094],
+      "displayViewport": [285, 190, 520, 160],
+      "answerIdentity": "4 carbon charge sites"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-06",
+      "assetUid": "ASSET-RC-20260830-06A",
+      "sourceFile": "exact-06-fused-cation-contributor-count.png",
+      "sha256": "7bb2fedcfe61a793709a190fc80e9d762be44b4157861dc115749b885a6235e2",
+      "sourcePixels": [1644, 1066],
+      "displayViewport": [220, 185, 360, 185],
+      "answerIdentity": "3 contributors including shown"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-07",
+      "assetUid": "ASSET-RC-20260830-07A",
+      "sourceFile": "exact-07-methoxy-cyclohexadienyl-contributor-count.png",
+      "sha256": "13a4617cde4c88db1e5d47686d28782da294094fd049e7d7f9bf7d2a4764ad02",
+      "sourcePixels": [1682, 1066],
+      "displayMode": "code-native methoxy-cyclohexadienyl reconstruction",
+      "answerIdentity": "4 contributors including shown"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-08",
+      "assetUid": "ASSET-RC-20260830-08A",
+      "sourceFile": "exact-08-fused-cation-major-contributor.png",
+      "sha256": "55412390e924e130d34be745d452d81b646d44288bfc7c3bc88a7afeeb85e85f",
+      "sourcePixels": [1744, 1060],
+      "displayViewport": [225, 120, 1110, 205],
+      "answerIdentity": "C"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-09",
+      "assetUid": "ASSET-RC-20260830-09A",
+      "sourceFile": "exact-09-polyenyl-anion-major-contributor.png",
+      "sha256": "ee51cd565e847748a3aff0e0f893f9f708ba2e826bb1c9a5457ac152c63ffa17",
+      "sourcePixels": [1646, 996],
+      "displayViewport": [175, 105, 1280, 205],
+      "answerIdentity": "A"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-10",
+      "assetUid": "ASSET-RC-20260830-10A",
+      "sourceFile": "exact-10-methoxy-cation-major-contributor.png",
+      "sha256": "698c4de21238578c9604586ae73f4bfbe8ac5defb7e0f5aba672c4386fa6f2ad",
+      "sourcePixels": [1586, 1056],
+      "displayViewport": [150, 75, 1060, 230],
+      "answerIdentity": "D"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-11",
+      "assetUid": "ASSET-RC-20260830-11A",
+      "sourceFile": "exact-11-dicarbonyl-anion-contributor-count.png",
+      "sha256": "067164ca06b4a81f013f6cdd45e7e07f9e17723aa918a9e0189f9ee37f179da9",
+      "sourcePixels": [1660, 1034],
+      "displayMode": "code-native dicarbonyl-anion reconstruction",
+      "answerIdentity": "3 contributors including shown"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-12",
+      "assetUid": "ASSET-RC-20260830-12A",
+      "sourceFile": "exact-12-pyranone-invalid-contributor.png",
+      "sha256": "1e2fd1ef21b2563ae307b7fef2b3b4014db451953a6e5d51198cae3470c08139",
+      "sourcePixels": [1222, 1358],
+      "displayViewport": [165, 55, 170, 175],
+      "answerIdentity": "charge cannot reach the saturated carbon across the ring"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-13",
+      "assetUid": "ASSET-RC-20260830-13A",
+      "sourceFile": "exact-13-phenoxide-carbonyl-contributors.png",
+      "sha256": "c8df0f6561582359678879ca6913159e0456665f379be30d24245682f42df93b",
+      "sourcePixels": [814, 1098],
+      "displayViewport": [85, 70, 200, 180],
+      "answerIdentity": "all three additional charge endpoints are valid"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-14",
+      "assetUid": "ASSET-RC-20260830-14A",
+      "sourceFile": "exact-14-fused-polyenyl-cation-additional-count.png",
+      "sha256": "472651805c2def8f6d2c1519b0ba67c306b520f7547fe18d2f4abf8384aa69ff",
+      "sourcePixels": [932, 1170],
+      "displayViewport": [145, 125, 230, 105],
+      "answerIdentity": "3 additional contributors"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-15",
+      "assetUid": "ASSET-RC-20260830-15A",
+      "sourceFile": "exact-15-thiophenolate-nitrile-additional-count.png",
+      "sha256": "71b5ff31457d0f9516f96558ae50fdce20ec9dacfd81ce401a8a988ed0ea647e",
+      "sourcePixels": [950, 1220],
+      "displayViewport": [190, 125, 240, 150],
+      "answerIdentity": "4 additional contributors"
+    },
+    {
+      "questionUid": "EXACT-RC-20260830R-16",
+      "assetUid": "ASSET-RC-20260830-16A",
+      "sourceFile": "exact-16-branched-allylic-radical-invalid-contributor.png",
+      "sha256": "28df0d9d7b6000ba693c2f2b657bcaa5b029a84c697433b2f5cc54e6007687df",
+      "sourcePixels": [864, 1206],
+      "displayMode": "code-native branched allylic-radical reconstruction",
+      "answerIdentity": "far-right radical beyond the saturated carbon is invalid"
+    }
+  ]
+}

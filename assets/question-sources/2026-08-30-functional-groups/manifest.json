@@ -1,0 +1,98 @@
+{
+  "batchId": "BATCH-CH2-20260830-FGROUPS",
+  "receivedDate": "2026-08-30",
+  "reportedUse": ["homework", "quiz preparation", "app practice bank"],
+  "sourcePolicy": "Immutable full screenshots. App viewports include only the molecular structure; source numbering, selected responses, correctness markers, and feedback are excluded from evidence and display.",
+  "items": [
+    {
+      "questionUid": "EXACT-FG-20260830R-ALCOHOL",
+      "assetUid": "ASSET-FG-20260830-ALCOHOL-A",
+      "sourceFile": "exact-alcohol-2-propanol.png",
+      "sha256": "10033c09c16e5def04477351a296b15bc834ff69e3b162b2e2d598dde82676fa",
+      "sourcePixels": [1554, 1034],
+      "displayViewport": [85, 45, 430, 220],
+      "answer": "alcohol"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-ALKYL-HALIDE",
+      "assetUid": "ASSET-FG-20260830-ALKYL-HALIDE-A",
+      "sourceFile": "exact-alkyl-halide-bromohexane.png",
+      "sha256": "2a7955e5ee059ea854c4cc311c1217a61e18d66d111a84723d62b7e0e1e72692",
+      "sourcePixels": [1596, 1160],
+      "displayViewport": [135, 40, 600, 220],
+      "answer": "alkyl halide"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-AMINE",
+      "assetUid": "ASSET-FG-20260830-AMINE-A",
+      "sourceFile": "exact-amine-piperidine.png",
+      "sha256": "1842903955eb6ae1c00b6ba5ae19c464cd5610f40119f8f117a06afac4cff1a3",
+      "sourcePixels": [1580, 1232],
+      "displayViewport": [160, 15, 330, 305],
+      "answer": "amine"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-ALKENE",
+      "assetUid": "ASSET-FG-20260830-ALKENE-A",
+      "sourceFile": "exact-alkene-substituted-chain.png",
+      "sha256": "dab69e9c8cebafd64ade1920ad5feb44b4541d87ac66cc2d1e1e4a1b98022012",
+      "sourcePixels": [1584, 1276],
+      "displayViewport": [150, 15, 760, 300],
+      "answer": "alkene"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-ESTER",
+      "assetUid": "ASSET-FG-20260830-ESTER-A",
+      "sourceFile": "exact-ester-cyclic-lactone.png",
+      "sha256": "6fdd1a08e5e55dd0134a547f2f921a5adcf8b933105dcde37b925d336efd6dc1",
+      "sourcePixels": [1638, 1198],
+      "displayViewport": [155, 8, 340, 310],
+      "answer": "ester"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-ALKYNE",
+      "assetUid": "ASSET-FG-20260830-ALKYNE-A",
+      "sourceFile": "exact-alkyne-substituted-terminal.png",
+      "sha256": "8e05232ac5a26f7b89fc57ac06e61c63703659baca0c78128cbc3f5979ea9dbc",
+      "sourcePixels": [1620, 1204],
+      "displayViewport": [150, 8, 440, 310],
+      "answer": "alkyne"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-AMIDE",
+      "assetUid": "ASSET-FG-20260830-AMIDE-A",
+      "sourceFile": "exact-amide-n-ethyl-propanamide.png",
+      "sha256": "4fd9bc5d62ded111f96ac3ff56b436261fe612c790510fd449047f615e37e5b1",
+      "sourcePixels": [1530, 1240],
+      "displayViewport": [135, 25, 600, 225],
+      "answer": "amide"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-KETONE",
+      "assetUid": "ASSET-FG-20260830-KETONE-A",
+      "sourceFile": "exact-ketone-2-pentanone.png",
+      "sha256": "da54d48adc4b37a150846b7496548c4e253b38177d0772c5b99fc75285e688b9",
+      "sourcePixels": [1618, 1220],
+      "displayViewport": [140, 40, 530, 250],
+      "answer": "ketone"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-CARBOXYLIC-ACID",
+      "assetUid": "ASSET-FG-20260830-CARBOXYLIC-ACID-A",
+      "sourceFile": "exact-carboxylic-acid-cyclohexanecarboxylic-acid.png",
+      "sha256": "ef86a36c01da80443454efcf68c25a435ef63779b6e447aa8a2a410058566f94",
+      "sourcePixels": [1626, 1220],
+      "displayViewport": [150, 15, 400, 315],
+      "answer": "carboxylic acid"
+    },
+    {
+      "questionUid": "EXACT-FG-20260830R-ALDEHYDE",
+      "assetUid": "ASSET-FG-20260830-ALDEHYDE-A",
+      "sourceFile": "exact-aldehyde-ethanal.png",
+      "sha256": "21d1708a63c45b19e2091c205f046159bf1ac2f423302eaca4a622e31477f4ca",
+      "sourcePixels": [1738, 1150],
+      "displayViewport": [270, 70, 340, 240],
+      "answer": "aldehyde"
+    }
+  ]
+}

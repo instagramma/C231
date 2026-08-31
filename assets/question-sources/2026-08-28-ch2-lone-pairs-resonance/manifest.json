@@ -1,0 +1,64 @@
+{
+  "batchUid": "BATCH-CH2-20260828-LP-RESONANCE",
+  "receivedDate": "2026-08-28",
+  "course": "CHEM 231",
+  "chapter": 2,
+  "topic": "Molecular Representation and Resonance",
+  "evidencePolicy": "The user's self-report is that these concepts are not yet understood. Ignore all correctness, score, selection, and attempt markers visible in the screenshots; they are source material only and do not establish mastery.",
+  "assets": [
+    {
+      "assetUid": "ASSET-CH2-20260828-01A",
+      "questionUid": "EXACT-CH2-20260828-01",
+      "filename": "exact-01-imine-n-lone-pair-orbital.png",
+      "sha256": "c5433897e5c9ea44482241df4e6ccd7cba7d8d845560f639006069ca834c337b",
+      "width": 2064,
+      "height": 2752,
+      "role": "exact source for Wiley Question 8"
+    },
+    {
+      "assetUid": "ASSET-CH2-20260828-02A",
+      "questionUid": "EXACT-CH2-20260828-02",
+      "filename": "exact-02-benzylic-carbanion-lone-pair-orbital.png",
+      "sha256": "9515cf3c0caabca9f3fb13ff287d261c1e0f28a7c517bfb3416e4d7887b40175",
+      "width": 2064,
+      "height": 2752,
+      "role": "exact source for Wiley Question 9"
+    },
+    {
+      "assetUid": "ASSET-CH2-20260828-03A",
+      "questionUid": "EXACT-CH2-20260828-03",
+      "filename": "exact-03-amine-adjacent-carbocation-lone-pair-orbital.png",
+      "sha256": "812f26fd74dedfd2029ae0b35b4e8a5d7756c3b8e670e53b568a8d1f2fa4b57a",
+      "width": 2064,
+      "height": 2752,
+      "role": "exact source for Wiley Question 10"
+    },
+    {
+      "assetUid": "ASSET-CH2-20260828-04A",
+      "questionUid": "EXACT-CH2-20260828-04",
+      "filename": "exact-04-resonance-oh-n-cation-step1.png",
+      "sha256": "1333af57cffeee17269d757d6ad1952f686baea3416fc4c1ffe54fc3175b69d6",
+      "width": 2064,
+      "height": 2752,
+      "role": "initial structure and oxygen-donation step for Wiley Question 11"
+    },
+    {
+      "assetUid": "ASSET-CH2-20260828-04B",
+      "questionUid": "EXACT-CH2-20260828-04",
+      "filename": "exact-04b-resonance-oh-n-cation-step2.png",
+      "sha256": "306ebab4f06840ecd09d2d1bb6a82ffd7c5812d256b8c75f4af624e0bbef445b",
+      "width": 2064,
+      "height": 2752,
+      "role": "nitrogen-donation continuation for the same Wiley Question 11"
+    },
+    {
+      "assetUid": "ASSET-CH2-20260828-05A",
+      "questionUid": "EXACT-CH2-20260828-05",
+      "filename": "exact-05-resonance-allylic-cation-enol-ether-step1.png",
+      "sha256": "9c538a5712cf5e95299e3a3afd4a90fe8ff8a1883638135e87ec9a2c0af4f884",
+      "width": 2064,
+      "height": 2752,
+      "role": "initial structure and allylic-shift step for Wiley Question 12"
+    }
+  ]
+}
