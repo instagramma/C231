@@ -6,7 +6,15 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.33  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.34  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.34 (2026-08-30, Gabe: "For questions like this… build the bond line structure first"):
+        STRUCTURE-FIRST RESONANCE GATE. The acetate arrow-walk no longer begins with six
+        abstract blanks. It first opens the checked structure builder for CH3COO− and requires
+        a graph-exact contributor (connectivity, bond orders, lone pairs, formal charges, electron
+        budget, and octets) before the electron-pushing audit unlocks. Completion is tied to the
+        current question attempt and survives pause/resume; a previously built molecule does not
+        silently skip the step in a new round. Establishes the reusable drawFirst contract for
+        future formula-to-resonance questions. Outgoing v3.33 is archived byte-for-byte.
   v3.33 (2026-08-30, Gabe advanced-resonance diagram intake: "these questions, and make similar"):
         ELECTRON FLOW + DELOCALIZATION + CONTRIBUTOR RANKING. Preserves sixteen supplied
         screenshots as immutable UID-bound sources, while app viewports show only the chemical
@@ -1005,7 +1013,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.33</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.34</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2167,7 +2175,7 @@ const QUESTIONS = [
 {id:"rz-13",topic:"resonance",type:"mc",diff:1,prompt:"Which pair of second-row atoms may NEVER exceed an octet?",choices:["C, N and O — all of them","Only carbon","Only nitrogen","None — second-row atoms can expand"],answer:0,why:"<b>All second-row atoms.</b> C, N, O, F — no d orbitals, hard cap at 8. This is the rule that forces the second arrow in almost every resonance problem you'll draw."},
 {id:"rz-14",topic:"resonance",type:"mc",diff:1,prompt:"Carbon may never EXCEED an octet. May it have LESS than one?",choices:["Yes — a carbocation has only 6 electrons and is perfectly legal","No, carbon always needs exactly 8","Only if it's sp³","Only in the hybrid"],answer:0,why:"<b>Yes.</b> Ciesla drew this line clearly: less than an octet is allowed, more is not. A carbocation with 3 bonds and no lone pair has 6 electrons and is a completely valid resonance structure — and often an important one."},
 {id:"rz-15",topic:"resonance",type:"mc",diff:2,prompt:"Converting acetate structure A to structure B needs TWO arrows, not one. Why?",choices:["One arrow alone would give the carbon 10 electrons — a second arrow must push a pair off","Because there are two oxygens","To show the reaction is reversible","Because acetate has a −1 charge"],answer:0,why:"<b>Octet enforcement.</b> Arrow 1 brings a lone pair from the negative oxygen in to make a new C=O. That carbon already had four bonds, so it now has 10 electrons. Arrow 2 pushes the OLD pi bond up onto the other oxygen, which restores carbon to 8 and gives that oxygen a third lone pair and the −1 charge. <b>Electrons in, electrons out</b> — that pairing is the core move of the whole topic."},
-{id:"rz-16",topic:"resonance",type:"blanks",diff:2,prompt:"Walk the acetate ion CH₃COO⁻ from one resonance structure to the other.",template:"Arrow 1: a {{0}} on the negatively charged oxygen becomes a {{1}}. That would leave carbon with {{2}} electrons, so arrow 2 pushes the original {{3}} up onto the other oxygen, which now carries {{4}} lone pairs and a formal charge of {{5}}.",fields:[{label:"arrow 1 source",kind:"select",choices:["lone pair","sigma bond","pi bond"],answer:"lone pair"},{label:"arrow 1 product",kind:"select",choices:["lone pair","pi bond","sigma bond"],answer:"pi bond"},{label:"electrons on C",kind:"num",answer:10},{label:"arrow 2 source",kind:"select",choices:["pi bond","sigma bond","lone pair"],answer:"pi bond"},{label:"lone pairs now",kind:"num",answer:3},{label:"formal charge",kind:"select",choices:["−1","0","+1"],answer:"−1"}],why:"The two arrows are locked together. The count that forces arrow 2 is <b>10 electrons on carbon</b> — and once you've seen that number, you know a second arrow is coming. The oxygen that receives the pi pair goes from 2 lone pairs to <b>3</b>, which is exactly what makes its formal charge <b>−1</b>."},
+{id:"rz-16",topic:"resonance",type:"blanks",diff:2,drawMol:"acetate",drawFirst:true,prompt:"Build acetate, CH₃COO⁻, first. Then walk it from one resonance contributor to the other.",template:"Arrow 1: a {{0}} on the negatively charged oxygen becomes a {{1}}. That would leave carbon with {{2}} electrons, so arrow 2 pushes the original {{3}} up onto the other oxygen, which now carries {{4}} lone pairs and a formal charge of {{5}}.",fields:[{label:"arrow 1 source",kind:"select",choices:["lone pair","sigma bond","pi bond"],answer:"lone pair"},{label:"arrow 1 product",kind:"select",choices:["lone pair","pi bond","sigma bond"],answer:"pi bond"},{label:"electrons on C",kind:"num",answer:10},{label:"arrow 2 source",kind:"select",choices:["pi bond","sigma bond","lone pair"],answer:"pi bond"},{label:"lone pairs now",kind:"num",answer:3},{label:"formal charge",kind:"select",choices:["−1","0","+1"],answer:"−1"}],why:"You established the electron sources before moving anything: one C=O oxygen has 2 lone pairs, while the single-bond O⁻ has 3. The two arrows are locked together. The count that forces arrow 2 is <b>10 electrons on carbon</b> — and once you've seen that number, you know a second arrow is coming. The oxygen that receives the pi pair goes from 2 lone pairs to <b>3</b>, which is exactly what makes its formal charge <b>−1</b>."},
 {id:"rz-17",topic:"resonance",type:"mc",diff:2,prompt:"After you push arrows and draw the new structure, what MUST you do next?",choices:["Reassign every formal charge","Redraw it in bond-line","Check the bond angles","Number the carbons"],answer:0,why:"<b>Reassign formal charges.</b> Ciesla: this whole topic \"depends on reliably being able to assign formal charges.\" Every arrow changes an atom's electron count, so every arrow changes somebody's formal charge. Skipping this step is the most common way a correct arrow produces a wrong answer."},
 {id:"rz-18",topic:"resonance",type:"mc",diff:2,prompt:"CONSERVATION OF CHARGE. A neutral molecule's resonance structures must each have:",choices:["A sum of formal charges equal to zero","No formal charges anywhere","Exactly one + and one −","A sum equal to the number of atoms"],answer:0,why:"<b>The SUM must match, not the individual charges.</b> A neutral molecule can absolutely have a resonance structure with a +1 somewhere and a −1 somewhere else — that sums to zero, so it's legal. What can't happen is starting at 0 and ending at −1. Use it as a free error check on every structure you draw."},
 {id:"rz-19",topic:"resonance",type:"blanks",diff:2,prompt:"You start from a NEUTRAL molecule and push a lone pair from oxygen to make a new pi bond, pushing the old pi bond onto a carbon.",template:"The oxygen now has one fewer lone pair, so its formal charge is {{0}}. The carbon that received a lone pair has formal charge {{1}}. Sum of formal charges: {{2}} — which {{3}} conservation of charge.",fields:[{label:"O charge",kind:"select",choices:["+1","0","−1"],answer:"+1"},{label:"C charge",kind:"select",choices:["+1","0","−1"],answer:"−1"},{label:"sum",kind:"num",answer:0},{label:"verdict",kind:"select",choices:["satisfies","violates"],answer:"satisfies"}],why:"Oxygen gave a lone pair away → it 'owns' two fewer electrons → <b>+1</b>. Carbon gained a lone pair → <b>−1</b>. Sum = <b>0</b>, matching the neutral starting material, so the structure is legal. Charge-separated structures like this are real and common — they're just usually minor contributors."},
@@ -2347,6 +2355,7 @@ const MOLECULES = [
   {formula:"CH₂O",key:"CH2O",atoms:{C:1,O:1,H:2},ve:12,central:["C"],afterSingles:6,blurb:"Formaldehyde — your first double-bond fix, revisited.",hint:"H₂C=O; oxygen keeps two lone pairs.",target:{nodes:[TN("C"),TN("O",2),TN("H"),TN("H")],bonds:[[0,1,2],[0,2,1],[0,3,1]]}},
   {formula:"HCN",key:"HCN",atoms:{H:1,C:1,N:1},ve:10,central:["C"],afterSingles:6,exactId:"EXACT-DRAW-20260825-03",exactPrompt:"Draw HCN (hydrogen cyanide)",sourceFile:"exact-03-draw-hcn.png",sourcePreview:fcShot("exact-03-draw-hcn.png",2004,1040,0,25,2004,290,"Exact HCN Lewis-structure prompt"),blurb:"Exact quiz/exam drawing prompt · hydrogen cyanide.",hint:"H–C≡N with one lone pair left on N.",target:{nodes:[TN("H"),TN("C"),TN("N",1)],bonds:[[0,1,1],[1,2,3]]}},
   {formula:"CH₃OH",key:"CH3OH",atoms:{C:1,O:1,H:4},ve:14,central:["C"],afterSingles:4,exactId:"EXACT-DRAW-20260825-01",exactPrompt:"Draw CH₃OH",sourceFile:"exact-01-draw-ch3oh.png",sourcePreview:fcShot("exact-01-draw-ch3oh.png",1948,698,0,0,1948,295,"Exact methanol Lewis-structure prompt"),blurb:"Exact quiz/exam drawing prompt · methanol.",hint:"CH₃–O–H; all single bonds and two lone pairs on O.",target:{nodes:[TN("C"),TN("O",2),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1]]}},
+  {formula:"CH₃COO⁻",key:"acetate",atoms:{C:2,O:2,H:3},ve:24,charge:-1,central:["C"],afterSingles:12,blurb:"Required structure-first stage for the acetate resonance arrow walk.",hint:"Build one contributor: CH₃–C(=O)–O⁻. The carbonyl O has 2 lone pairs; the single-bond O⁻ has 3.",target:{nodes:[TN("C"),TN("C"),TN("O",2),TN("O",3,-1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[1,2,2],[1,3,1],[0,4,1],[0,5,1],[0,6,1]]}},
   {formula:"CH₂CHBr",key:"C2H3Br",atoms:{C:2,H:3,Br:1},ve:18,central:["C"],afterSingles:8,exactId:"EXACT-DRAW-20260825-02",exactPrompt:"Draw CH₂CHBr",sourceFile:"exact-02-draw-ch2chbr.png",sourcePreview:fcShot("exact-02-draw-ch2chbr.png",1906,862,0,0,1906,270,"Exact vinyl-bromide Lewis-structure prompt"),blurb:"Exact quiz/exam drawing prompt · vinyl bromide.",hint:"H₂C=CH–Br; bromine keeps three lone pairs.",target:{nodes:[TN("C"),TN("C"),TN("H"),TN("H"),TN("H"),TN("Br",3)],bonds:[[0,1,2],[0,2,1],[0,3,1],[1,4,1],[1,5,1]]}},
   {formula:"CH₃CN",key:"CH3CN",atoms:{C:2,H:3,N:1},ve:16,central:["C"],afterSingles:6,exactId:"EXACT-DPI-20260825-12",exactPrompt:"Draw CH₃CN",sourceFile:"exact-12-acetonitrile-lewis-structure.png",sourcePreview:dpiShot("exact-12-acetonitrile-lewis-structure.png",1028,552,25,20,960,95,"Exact acetonitrile Lewis-structure selection prompt"),blurb:"Exact-source reconstruction · acetonitrile.",hint:"CH₃–C≡N; nitrogen keeps one lone pair.",target:{nodes:[TN("C"),TN("C"),TN("N",1),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[1,2,3],[0,3,1],[0,4,1],[0,5,1]]}},
   {formula:"CH₃NH₂",key:"CH3NH2",atoms:{C:1,N:1,H:5},ve:14,central:["C"],afterSingles:2,blurb:"Methylamine — N's lone pair is the business end of every amine.",hint:"All singles; one lone pair on N.",target:{nodes:[TN("C"),TN("N",1),TN("H"),TN("H"),TN("H"),TN("H"),TN("H")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1],[1,5,1],[1,6,1]]}},
@@ -2436,13 +2445,13 @@ function save(){
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
-  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", masteryTopic:D.masteryTopic||"", log:D.log||[], runId:D.runId||"", adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], ts:Date.now()};
+  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", masteryTopic:D.masteryTopic||"", log:D.log||[], runId:D.runId||"", adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, ts:Date.now()};
   safeStore.set("pausedDrill", S.pausedDrill);
 }
 function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
   const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
-  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName, masteryTopic:p.masteryTopic||"", log:p.log||[], runId:p.runId||"", adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[]}; // v3.25: adaptive/mastery metadata rides the existing pause/resume path
+  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName, masteryTopic:p.masteryTopic||"", log:p.log||[], runId:p.runId||"", adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}}; // v3.34: a passed structure-first gate survives pause/resume inside the same round
   go("drill");
 }
 /* v3.14: the FC mastery gate pauses too. It was the one multi-step run with no exit —
@@ -3309,6 +3318,10 @@ function renderAdaptiveAssignmentCard(v){
    flags, same attempt ledger, same pause/resume — so a focus run is honest evidence, not a
    practice mode with different rules. Mastery checks stay cold and unaffected. */
 const FOCUS_SETS=[
+  {id:"structure-first-resonance", topic:"resonance", ico:"✏️", shortLabel:"Structure-first resonance",
+   name:"Build first → push electrons",
+   blurb:"Start from the formula, pass the checked structure audit, then unlock the electron-pushing question. This set grows automatically as more structure-first items enter the bank.",
+   match:q=>q.drawFirst===true},
   {id:"resonance-contributors-advanced", topic:"resonance", ico:"↔️", shortLabel:"Advanced resonance diagrams",
    name:"Resonance — arrows, paths & contributors",
    blurb:"All sixteen supplied resonance patterns plus twenty new transfer problems. Start with arrow tails and fishhooks, then identify continuous p paths, count charge sites/contributors, reject illegal drawings, and rank major contributors by octet, charge and substitution.",
@@ -3897,11 +3910,25 @@ VIEWS.drill = (v) => {
   const c = el("div",{class:"card"});
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+ 
     '<div class="qprompt">'+q.prompt+'</div>';
+  const structureDone=!!(D.structureBuilt&&D.structureBuilt[q.id]===q.drawMol);
   if(q.drawMol){
-    c.appendChild(el("button",{class:"btn ghost small",style:"margin:2px 0 8px",onclick:()=>{
+    const drawLabel=q.drawFirst?(structureDone?"✓ Structure checked — rebuild if needed":"✏️ Step 1 — build and check the structure →"):"✏️ Open checked drawing →";
+    c.appendChild(el("button",{class:"btn "+(q.drawFirst&&!structureDone?"coral":"ghost")+" small",style:"margin:2px 0 8px",onclick:()=>{
       snapshotDrill(D.i);
       startLab(q.drawMol,"drill");
-    }},"✏️ Open checked drawing →"));
+    }},drawLabel));
+  }
+  if(q.drawFirst&&!structureDone){
+    const gate=el("div",{class:"why",style:"margin:6px 0 2px"});
+    gate.innerHTML='<b>Step 2 is locked.</b> The electron-pushing blanks appear after your structure passes the checked audit for formula, connectivity, bond orders, electron budget, octets, lone pairs, and formal charges.';
+    c.appendChild(gate);
+    const _rt=resTile(q.topic); if(_rt) c.appendChild(_rt);
+    v.appendChild(c);
+    const ctl=el("div",{class:"center",style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center"});
+    if((D.log||[]).length) ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=D.log.length-1; render();}},"👀 see my previous answers"));
+    ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{snapshotDrill(S.drill.i);S.drill=null;go("home");}},"⏸ pause round — saved, resume from Home"));
+    v.appendChild(ctl);
+    return;
   }
   const fb = el("div");
   // v3.0: guessed checkbox + optional rationale — on every non-written question
@@ -4075,7 +4102,8 @@ VIEWS.drill = (v) => {
 function startLab(molKey,returnTo=null){
   const mol = MOLECULES.find(m=>m.key===molKey);
   if(!mol)return;
-  S.lab = {mol, returnTo, step:1, tries:0, atoms:[], bonds:[], nextId:1, tool:"atom", selElement:Object.keys(mol.atoms)[0], selAtom:null, fails:0, msg:""};
+  const returnQuestionId=returnTo==="drill"&&S.drill&&S.drill.queue ? (S.drill.queue[S.drill.i]?.id||"") : "";
+  S.lab = {mol, returnTo, returnQuestionId, step:1, tries:0, atoms:[], bonds:[], nextId:1, tool:"atom", selElement:Object.keys(mol.atoms)[0], selAtom:null, fails:0, msg:""};
   go("lab");
 }
 function leaveLab(){
@@ -4346,6 +4374,11 @@ function runAudit(wrap){
   if (!fails.length){
     confetti();
     if (!S.molDone.includes(m.key)) S.molDone.push(m.key);
+    if(L.returnTo==="drill"&&S.drill&&L.returnQuestionId){
+      S.drill.structureBuilt=S.drill.structureBuilt||{};
+      S.drill.structureBuilt[L.returnQuestionId]=m.key;
+      snapshotDrill(S.drill.i);
+    }
     // lewis day auto-credit
     const t=todayStr(); const plan=TRACK.find(x=>x.day===t);
     if (plan && plan.topic==="lewis" && !S.doneDays.includes(t) && S.molDone.length>=2) S.doneDays.push(t);
