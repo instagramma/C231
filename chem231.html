@@ -6,7 +6,25 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.35  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.36  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25
+  v3.36 (2026-08-31, Gabe on the adaptive card: "adaptive should be on what the upcoming
+        quiz is. When the quiz changes… it should now get us ready for chapter 3" and "it
+        should include everything, once we get to getting ready for the exam"): THE ASSIGNMENT
+        TRACKS THE NEXT ASSESSMENT. Three changes. (1) Within 7 days of a quiz the planner's
+        candidate list is the quiz scope, full stop — an off-scope topic with confident-wrongs
+        banked (the IMF slot on his screenshot) no longer outranks the quiz three days out;
+        repair waits until after Thursday. (2) Succession: KNOWN_QUIZZES now carries the
+        Ch 3 Quiz (est. 9/10, acid–base scope, date confirmable in the quiz editor), so the
+        evening the Ch 2 quiz passes, the checkpoint — and with it the planner, readiness and
+        countdown — rolls to Chapter 3 instead of going stale or skipping to the exam.
+        (3) When the next assessment IS an exam, its scope is cumulative by construction
+        (Exam 1 lists its Ch 1–4 topics; later exams are topics:null → everything covered),
+        so the same scope-first rule serves "include everything" with no special case.
+        The card's first why-line now names the regime it is in. Same rule for DIAGNOSTICS
+        ("Same goes for diagnostic"): within 7 days of an assessment the offered run is the
+        scoped one every time — the cum/scope alternation only applies in open water — and
+        since the scoped run takes its topics from nextCheckpoint(), it follows the same
+        succession, with exam scope cumulative by construction.
   v3.35 (2026-08-31, bond-line day of the sprint, Gabe: "We need to add questions on
         condensing too. How to condense/expand or whatever"): CONDENSE / EXPAND, AS DOING.
         The bank's condensed coverage was four meta items — what her method is, what the
@@ -1024,7 +1042,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.35</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.36</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1298,10 +1316,19 @@ function diagDue(){
     const doneToday=S.diags.some(d=>d.date===todayStr()&&d.type==="scope");
     return doneToday?null:"scope";
   }
-  if(!S.diags.length) return "cum";
+  /* v3.36 (Gabe: "Same goes for diagnostic"): during an assessment week the diagnostic ON
+     OFFER is the scoped one, every time — the cum/scope alternation only runs in open water
+     with no checkpoint within 7 days. Note the scoped run inherits its topics from
+     nextCheckpoint(), so this follows the succession automatically: Ch 2 scope this week,
+     Ch 3 scope after Thursday, and when the next assessment is an EXAM the scope is
+     cumulative by construction (explicit Ch 1–4 list for Exam 1; topics:null → everything
+     covered for the rest) — a scoped run then IS the include-everything run. */
+  const inWindow = cp && daysTo(cp.date)>=0 && daysTo(cp.date)<=7;
+  if(!S.diags.length) return inWindow?"scope":"cum";
   const last=S.diags[S.diags.length-1];
   const age=Math.floor((new Date(todayStr()+"T00:00:00")-new Date(last.date+"T00:00:00"))/86400000);
   if(age<2) return null;
+  if(inWindow) return "scope";
   return last.type==="cum"?"scope":"cum";
 }
 function startDiag2(type){
@@ -2517,7 +2544,16 @@ function resumeMastery(){ const p=S.pausedMastery; if(!p) return;
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 /* v3.29: a checkpoint whose date has passed silently corrupts every readiness number and
    leaves the countdown stuck at 0d. Roll it forward once, on load, from the known schedule. */
-const KNOWN_QUIZZES=[{name:"Ch 2 Quiz",date:"2026-09-03",topics:["bondline","fgroups","resonance","arrows"]}];
+/* v3.36: the SUCCESSION list. When one checkpoint passes, the app must already know the next
+   one, or the adaptive planner and every readiness number silently keep aiming at a quiz that
+   is over (Gabe: "When the quiz changes… it should now get us ready for chapter 3"). Dates
+   marked est. follow her every-Thursday-in-lab pattern with ≥3 days notice — confirm each in
+   the app's quiz editor when she announces it; after the last known quiz, nextCheckpoint()
+   falls through to the fixed exams, whose scope is cumulative. */
+const KNOWN_QUIZZES=[
+  {name:"Ch 2 Quiz",date:"2026-09-03",topics:["bondline","fgroups","resonance","arrows"]},
+  {name:"Ch 3 Quiz (est. — confirm date)",date:"2026-09-10",topics:["acidbase1","acidbase2","lewisab"]},
+];
 (function rollForwardCheckpoint(){ try{
   /* A checkpoint is 'past' the day AFTER it, or the same evening — his assessments are in
      lab, which ends at 17:00, so advancing at 18:00 keeps the countdown honest all day and
@@ -3240,6 +3276,23 @@ function adaptiveTopicScores(){
   const dueReviews=new Set((S.adaptiveReviews||[]).filter(x=>x.due<=Date.now()).map(x=>x.topic));
   let candidates=[...new Set([...cpScope,...wkScope,...coveredTopics(),...dueReviews])].filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
   if(!candidates.length)candidates=[...new Set(QUESTIONS.filter(q=>q.type!=="written").map(q=>q.topic))];
+  /* v3.36 (Gabe: "adaptive should be on what the upcoming quiz is" … "it should include
+     everything, once we get to getting ready for the exam"). Two regimes, one rule:
+     the assignment serves whatever the NEXT assessment tests.
+     · QUIZ within a week → its scope is the whole menu. An off-scope topic — even one with
+       confident-wrongs banked — waits until after Thursday; misconception repair on Ch-1 IMF
+       does not outrank the quiz that is three days out. (Off-scope only tops up if the scope
+       itself offers fewer than three drillable topics.)
+     · EXAM next → scope IS everything it covers (Exam 1 lists Ch 1–4 topics; Exams 2–3 are
+       cumulative, topics:null → coveredTopics()), so nothing is excluded and the same code
+       path serves "include everything" for free. No special case needed — the exam's scope
+       set is simply big. */
+  const cpIsSoon = cp && cpDays>=0 && cpDays<=7 && cpScope.size>0;
+  if(cpIsSoon){
+    const scoped=candidates.filter(k=>cpScope.has(k));
+    if(scoped.length>=3) candidates=scoped;
+    else candidates=scoped.concat(candidates.filter(k=>!cpScope.has(k)).slice(0,3-scoped.length));
+  }
   return candidates.map(k=>{ const e=topicEvidence(k); let score=0; const factors=[];
     if(cpScope.has(k)){ const u=Math.max(2,9-Math.max(0,cpDays)/2); score+=u; factors.push((cp?cp.name:"assessment")+" scope · "+cpDays+"d"); }
     if(wkScope.has(k)){score+=3; factors.push("current course week");}
@@ -3259,7 +3312,11 @@ function getAdaptivePlan(force){
   if(!force&&S.adaptivePlan&&S.adaptivePlan.date===todayStr()) return S.adaptivePlan;
   const ranked=adaptiveTopicScores(), chosen=ranked.slice(0,3), cp=nextCheckpoint();
   const why=[];
-  if(cp&&daysTo(cp.date)>=0&&daysTo(cp.date)<=21)why.push(cp.name+" scope + "+daysTo(cp.date)+"-day urgency");
+  if(cp&&daysTo(cp.date)>=0&&daysTo(cp.date)<=21){
+    const exam=/exam|final/i.test(cp.name);
+    why.push(exam ? cp.name+" — cumulative scope, everything counts ("+daysTo(cp.date)+"d)"
+                  : (daysTo(cp.date)<=7 ? cp.name+" scope ONLY · "+daysTo(cp.date)+"d — off-scope topics wait" : cp.name+" scope + "+daysTo(cp.date)+"-day urgency"));
+  }
   chosen.slice(0,2).forEach(x=>why.push((TOPICS[x.k]?.name||x.k)+": "+x.factors.slice(0,2).join(" + ")));
   const plan={id:makeRunId("aa"),date:todayStr(),createdAt:Date.now(),status:"suggested",topics:chosen.map(x=>x.k),scores:chosen.map(x=>({topic:x.k,score:x.score,state:x.e.state,confidence:x.e.confidence})),why:why.slice(0,3),total:ADAPTIVE_TOTAL};
   S.adaptivePlan=plan; safeStore.set("adaptivePlan",plan); return plan;
