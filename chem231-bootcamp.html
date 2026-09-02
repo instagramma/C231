@@ -6,7 +6,18 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.46  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15 09-02
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.47  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15 09-02
+  v3.47 (2026-09-02, PROFILES — Gabe + Sam):
+        TWO ISOLATED PROFILES WITH PIN LOCK. Lock screen on load: pick Gabe (owner) or Sam
+        (auditor, treated as a student), enter a per-profile PIN (set by that person on first
+        login; SHA-256 hash stored in the profile's own cloud row + cached locally for offline).
+        Sam's data lives in cloud row `sam-c231` and localStorage namespace `sam::*`; Gabe's
+        row `gabe-c231` and un-prefixed keys are untouched, so nothing migrates and nothing
+        mixes. Header shows WHO IS LOGGED IN (👤 Gabe / 🧪 Sam · auditor) with a Switch button.
+        Owner-only 👁 Sam button opens a READ-ONLY stats view fetched straight from Sam's row —
+        never merged into Gabe's state. Canvas feed is Gabe-only. Report tab carries a banner
+        on Sam's profile so his output is never pasted into Gabe's Learning Profile. QA mode
+        (?qa) bypasses the lock with an in-memory profile. Outgoing v3.46 archived byte-for-byte.
   v3.46 (2026-09-02, checked Resonance Lab):
         REAL CURVED-ARROW + CONTRIBUTOR GENERATION. Eight quiz-core targets require the
         learner to place each curved arrow from an electron source to its destination, then
@@ -1163,7 +1174,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.46</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.47</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1173,13 +1184,27 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 
 /* ================= STORAGE (safe wrapper) ================= */
 const QA_MODE = new URLSearchParams(location.search).has("qa"); // QA is session-only and must never become learner evidence
+/* v3.47: PROFILES. Two people, two fully separate stores. Gabe (owner) keeps the original
+   un-prefixed localStorage keys and cloud row "gabe-c231" — zero migration. Sam (auditor,
+   treated as a student) gets keys "sam::*" and cloud row "sam-c231". Nothing is ever merged
+   across profiles. The active profile is fixed at page load from the device session and can
+   only change via Switch → reload, so every read/write below is provably single-profile. */
+const PROFILES = {
+  gabe:{ name:"Gabe", short:"Gabe", ico:"👤", role:"owner",   row:"gabe-c231", ns:"",      color:"#2f6b4c", bg:"#e8f3ec" },
+  sam: { name:"Sam",  short:"Sam",  ico:"🧪", role:"auditor", row:"sam-c231",  ns:"sam::", color:"#5d4b87", bg:"#ece8f5" }
+};
+const SESSION_KEY="c231_session";
+function readSession(){ try{ const j=JSON.parse(localStorage.getItem(SESSION_KEY)||"null"); return (j&&PROFILES[j.p])?j.p:null; }catch(e){ return null; } }
+const PROFILE = QA_MODE ? "gabe" : readSession();   // null → lock screen; QA runs as an in-memory Gabe-shaped profile that never persists
+const P = PROFILES[PROFILE||"gabe"];
 const safeStore = (() => {
   let mem = {};
   let ok = false;
-  try { if(!QA_MODE){localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true;} } catch(e){ ok = false; }
+  try { if(!QA_MODE && PROFILE){localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true;} } catch(e){ ok = false; }
+  const ns = k => (PROFILE ? PROFILES[PROFILE].ns : "locked::") + k;
   return {
-    get(k, fallback){ try { const v = ok ? localStorage.getItem(k) : mem[k]; return v == null ? fallback : JSON.parse(v); } catch(e){ return fallback; } },
-    set(k, v){ try { const s = JSON.stringify(v); if (ok) localStorage.setItem(k, s); else mem[k] = s; } catch(e){} },
+    get(k, fallback){ try { const v = ok ? localStorage.getItem(ns(k)) : mem[ns(k)]; return v == null ? fallback : JSON.parse(v); } catch(e){ return fallback; } },
+    set(k, v){ try { const s = JSON.stringify(v); if (ok) localStorage.setItem(ns(k), s); else mem[ns(k)] = s; } catch(e){} },
     persistent: ok
   };
 })();
@@ -1190,7 +1215,7 @@ const safeStore = (() => {
    iPad / iPhone / Mac / any browser all see the same progress.  */
 const SB_URL = "https://tzdreklmkntpopqncada.supabase.co";
 const SB_KEY = "sb_publishable_PWdbyaBoBg8hM2kptSrwBA_I4lFrnQr";
-const SB_PROFILE = "gabe-c231";
+const SB_PROFILE = P.row; // v3.47: per-profile row
 let cloudState = "init";
 let _pushT = null;
 function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Content-Type":"application/json"}; }
@@ -1199,6 +1224,7 @@ function mergeRemote(remote){
   ["doneDays","molDone","bondDone","resDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
   if(remote.resRuns){ const rr=new Map([...(remote.resRuns||[]),...(S.resRuns||[])].map(x=>[x.id,x])); S.resRuns=[...rr.values()].sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-40); }
   if(remote.masteryDays){ const md=S.masteryDays||{}; Object.keys(remote.masteryDays).forEach(k=>{ md[k]=[...new Set([...(remote.masteryDays[k]||[]), ...(md[k]||[])])]; }); S.masteryDays=md; } // v3.16: union per topic
+  if (remote.pinHash && !S.pinHash) S.pinHash = remote.pinHash; // v3.47: PIN hash rides in the profile's own row; never cleared by merge
   if (remote.lastEval && (!S.lastEval || remote.lastEval.date > S.lastEval.date)) S.lastEval = remote.lastEval;
   const seenM = new Set(S.missed);
   (remote.missed||[]).forEach(id=>{ if(!seenM.has(id)){ S.missed.push(id); seenM.add(id); } });
@@ -1233,6 +1259,7 @@ function mergeRemote(remote){
 /* v3.5: pull the Canvas feed (written daily by the `canvas-sync` scheduled task via Chrome —
    no tokens/credentials; the task reads Gabe's signed-in Canvas pages and posts JSON here). */
 async function canvasPull(){
+  if(PROFILE!=="gabe") return; // v3.47: Canvas feed is Gabe's only
   if(!navigator.onLine) return;
   try{
     const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq.canvas-feed&select=data,updated_at",{headers:sbHeaders()});
@@ -1246,6 +1273,7 @@ async function canvasPull(){
 }
 async function cloudPull(){
   if(QA_MODE){ cloudState="qa"; renderSyncDot(); return; }
+  if(!PROFILE){ cloudState="locked"; renderSyncDot(); return; }
   try {
     const r = await fetch(SB_URL+"/rest/v1/progress?profile=eq."+SB_PROFILE+"&select=data", {headers:sbHeaders()});
     if (!r.ok) throw 0;
@@ -1256,10 +1284,11 @@ async function cloudPull(){
 }
 async function cloudPush(now){
   if(QA_MODE){ cloudState="qa"; renderSyncDot(); return; }
+  if(!PROFILE){ return; } // v3.47: locked page never writes anywhere
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays},
+      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -1268,8 +1297,104 @@ async function cloudPush(now){
 }
 function renderSyncDot(){
   const d = document.getElementById("syncdot"); if(!d) return;
-  d.textContent = cloudState==="synced" ? "● cloud" : cloudState==="qa" ? "● QA local" : cloudState==="offline" ? "○ local only" : "◌ syncing…";
+  d.textContent = cloudState==="synced" ? "● cloud" : cloudState==="qa" ? "● QA local" : cloudState==="locked" ? "🔒 locked" : cloudState==="offline" ? "○ local only" : "◌ syncing…";
   d.style.color = cloudState==="synced" ? "#8FE3A1" : cloudState==="qa" ? "#8fd4e3" : "#F2B705";
+  renderWhoami();
+}
+/* v3.47: the always-visible identity badge. If this is wrong, stop and Switch. */
+function renderWhoami(){
+  const w=document.getElementById("whoami"); if(!w) return;
+  if(!PROFILE){ w.innerHTML='<span style="font-family:var(--mono);font-size:.75rem;color:#F2B705">🔒 not logged in</span>'; return; }
+  const p=PROFILES[PROFILE];
+  w.innerHTML='<span title="You are logged in as '+p.name+' ('+p.role+')" style="font-family:var(--mono);font-size:.78rem;font-weight:700;padding:2px 9px;border-radius:999px;background:'+p.bg+';color:'+p.color+';border:1px solid '+p.color+'">'+p.ico+' '+p.name+(p.role==="auditor"?" · auditor":"")+(QA_MODE?" · QA":"")+'</span>'
+    +(PROFILE==="gabe"&&!QA_MODE?'<button onclick="ownerView()" title="Owner only: read-only view of Sam\'s stats" style="font:inherit;font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:999px;border:1px solid #5d4b87;background:#ece8f5;color:#5d4b87;cursor:pointer">👁 Sam</button>':'')
+    +(!QA_MODE?'<button onclick="switchProfile()" title="Log out of this profile on this device" style="font:inherit;font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--paper2);color:var(--muted-tx);cursor:pointer">Switch</button>':'');
+}
+function switchProfile(){ if(!confirm("Log out of "+PROFILES[PROFILE].name+" on this device? Your progress is saved to the cloud; nothing is deleted.")) return; try{ localStorage.removeItem(SESSION_KEY); }catch(e){} location.reload(); }
+async function sha256Hex(str){ const b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function fetchRow(row){ const r=await fetch(SB_URL+"/rest/v1/progress?profile=eq."+row+"&select=data,updated_at",{headers:sbHeaders()}); if(!r.ok) throw new Error("cloud "+r.status); const rows=await r.json(); return rows[0]||null; }
+/* ---- LOCK SCREEN (v3.47) ---- */
+function lockScreen(){
+  document.body.style.overflow="hidden";
+  const o=document.createElement("div"); o.id="lock";
+  o.style.cssText="position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:20px";
+  o.innerHTML='<div class="card" style="max-width:420px;width:100%">'
+    +'<span class="tag teal">CHEM 231 · who is this?</span><h2 style="margin:6px 0 4px">Choose your profile</h2>'
+    +'<p class="muted" style="margin-bottom:12px">Stats are kept completely separate per person. Pick yourself, then enter your PIN. First time? You\'ll set one.</p>'
+    +'<div id="lockPick" style="display:flex;gap:10px;margin-bottom:12px">'
+    +Object.keys(PROFILES).map(k=>{const p=PROFILES[k];return '<button data-p="'+k+'" style="flex:1;font:inherit;font-size:1.05rem;font-weight:700;padding:14px 8px;border-radius:12px;border:2px solid '+p.color+';background:'+p.bg+';color:'+p.color+';cursor:pointer;min-height:44px">'+p.ico+' '+p.name+'<div style="font-size:.72rem;font-weight:500;opacity:.8">'+p.role+'</div></button>';}).join("")
+    +'</div>'
+    +'<div id="lockPin" style="display:none">'
+    +'<div id="lockWho" style="font-weight:700;margin-bottom:6px"></div>'
+    +'<input id="pin1" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="PIN (4–8 digits)" style="width:100%;font:inherit;font-size:1.2rem;letter-spacing:.3em;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px">'
+    +'<input id="pin2" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Repeat new PIN" style="display:none;width:100%;font:inherit;font-size:1.2rem;letter-spacing:.3em;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px">'
+    +'<div style="display:flex;gap:8px"><button id="lockGo" class="btn teal" style="flex:1">Log in</button><button id="lockBack" class="btn" style="background:var(--paper2);color:var(--ink)">Back</button></div>'
+    +'<div id="lockMsg" class="muted" style="margin-top:8px;min-height:1.2em"></div>'
+    +'</div></div>';
+  document.body.appendChild(o);
+  let pick=null, mode="check", hash=null;
+  const $l=id=>o.querySelector("#"+id);
+  const msg=t=>{ $l("lockMsg").textContent=t; };
+  o.querySelectorAll("#lockPick button").forEach(b=>b.onclick=async()=>{
+    pick=b.dataset.p; const p=PROFILES[pick];
+    $l("lockPick").style.display="none"; $l("lockPin").style.display="block";
+    $l("lockWho").innerHTML=p.ico+" "+p.name+' <span class="muted" style="font-weight:500">('+p.role+')</span>';
+    $l("pin1").value=""; $l("pin2").value=""; msg("checking cloud…"); $l("lockGo").disabled=true;
+    hash=null;
+    try{ const row=await fetchRow(p.row); hash=row&&row.data&&row.data.pinHash||null; }catch(e){}
+    if(!hash){ try{ hash=localStorage.getItem("c231_pin_"+pick)||null; }catch(e){} }
+    if(hash){ mode="check"; $l("pin2").style.display="none"; $l("lockGo").textContent="Log in"; msg(""); }
+    else { mode="create"; $l("pin2").style.display="block"; $l("lockGo").textContent="Set PIN + log in"; msg("No PIN yet for "+p.name+". Create one now — you\'ll need it on every device."); }
+    $l("lockGo").disabled=false; $l("pin1").focus();
+  });
+  $l("lockBack").onclick=()=>{ $l("lockPin").style.display="none"; $l("lockPick").style.display="flex"; pick=null; };
+  const go=async()=>{
+    const p=PROFILES[pick]; const v1=$l("pin1").value.trim();
+    if(!/^\d{4,8}$/.test(v1)){ msg("PIN must be 4–8 digits."); return; }
+    $l("lockGo").disabled=true;
+    const h=await sha256Hex("c231:"+pick+":"+v1);
+    if(mode==="create"){
+      if($l("pin2").value.trim()!==v1){ msg("PINs don\'t match."); $l("lockGo").disabled=false; return; }
+      try{
+        const row=await fetchRow(p.row); const data=Object.assign({}, row&&row.data||{}, {pinHash:h});
+        const r=await fetch(SB_URL+"/rest/v1/progress",{method:"POST",headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"},body:JSON.stringify({profile:p.row,data,updated_at:new Date().toISOString()})});
+        if(!r.ok) throw new Error("save "+r.status);
+      }catch(e){ msg("Couldn\'t save the PIN to the cloud ("+e.message+"). Get online and try again."); $l("lockGo").disabled=false; return; }
+    } else if(h!==hash){ msg("Wrong PIN for "+p.name+"."); $l("pin1").value=""; $l("lockGo").disabled=false; return; }
+    try{ localStorage.setItem("c231_pin_"+pick,h); localStorage.setItem(p.ns+"pinHash",JSON.stringify(h)); localStorage.setItem(SESSION_KEY,JSON.stringify({p:pick,ts:Date.now()})); }catch(e){}
+    msg("Logged in as "+p.name+" — loading…"); location.reload();
+  };
+  $l("lockGo").onclick=go; $l("pin1").addEventListener("keydown",e=>{ if(e.key==="Enter") go(); }); $l("pin2").addEventListener("keydown",e=>{ if(e.key==="Enter") go(); });
+}
+/* ---- OWNER VIEW (v3.47): Gabe reads Sam's row. Read-only. Never touches S. ---- */
+async function ownerView(){
+  if(PROFILE!=="gabe") return;
+  const sam=PROFILES.sam;
+  const o=document.createElement("div");
+  o.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(29,39,44,.55);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto";
+  o.innerHTML='<div class="card" style="max-width:640px;width:100%;max-height:calc(100vh - 40px);overflow:auto"><span class="tag violet">Owner view · read-only</span><h2 style="margin:6px 0 2px">🧪 Sam\'s stats</h2><p class="muted" id="ovMeta">loading from row <code>'+sam.row+'</code>…</p><div id="ovBody"></div><button class="btn" style="margin-top:12px;background:var(--paper2);color:var(--ink)" id="ovClose">Close</button></div>';
+  document.body.appendChild(o); o.querySelector("#ovClose").onclick=()=>o.remove(); o.addEventListener("click",e=>{ if(e.target===o) o.remove(); });
+  let row=null; try{ row=await fetchRow(sam.row); }catch(e){ o.querySelector("#ovMeta").textContent="Couldn\'t reach the cloud: "+e.message; return; }
+  const d=row&&row.data||null; const meta=o.querySelector("#ovMeta"), body=o.querySelector("#ovBody");
+  if(!d){ meta.textContent="Sam hasn\'t logged in yet — no row exists."; return; }
+  meta.innerHTML="Last cloud write: <b>"+(row.updated_at?new Date(row.updated_at).toLocaleString():"—")+"</b> · PIN set: "+(d.pinHash?"yes":"no");
+  const att=d.attempts||[]; const ok=att.filter(a=>a.ok).length; const guessed=att.filter(a=>a.g).length; const dk=att.filter(a=>a.dk).length;
+  const dayAgo=Date.now()-7*864e5; const recent=att.filter(a=>(a.ts||0)>dayAgo);
+  const byT={}; att.forEach(a=>{ const q=QUESTIONS.find(x=>x.id===a.id); const t=q?q.topic:"?"; const s=byT[t]||(byT[t]={r:0,w:0}); a.ok?s.r++:s.w++; });
+  const topics=Object.entries(byT).sort((a,b)=>(b[1].r+b[1].w)-(a[1].r+a[1].w));
+  const pct=(r,w)=>(r+w)?Math.round(100*r/(r+w))+"%":"—";
+  let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0">';
+  const stat=(k,v)=>'<div style="background:var(--paper2);border-radius:10px;padding:8px 10px"><div class="muted" style="font-size:.72rem">'+k+'</div><div style="font-size:1.25rem;font-weight:700">'+v+'</div></div>';
+  h+=stat("attempts",att.length)+stat("accuracy",pct(ok,att.length-ok))+stat("last 7 days",recent.length)+stat("guessed",guessed)+stat("didn\'t know",dk)+stat("active days",(d.doneDays||[]).length);
+  h+=stat("Lewis targets",(d.molDone||[]).length)+stat("bond-line targets",(d.bondDone||[]).length)+stat("resonance targets",(d.resDone||[]).length);
+  h+='</div>';
+  if(topics.length){ h+='<h3>By topic</h3><table style="width:100%;font-size:.9rem;border-collapse:collapse">'+topics.map(([t,s])=>'<tr><td style="padding:3px 0">'+(TOPICS[t]?TOPICS[t].ico+" "+TOPICS[t].name:t)+'</td><td style="text-align:right">'+(s.r+s.w)+'</td><td style="text-align:right;font-weight:700;color:'+((s.r/(s.r+s.w))>=.8?"var(--ok)":(s.r/(s.r+s.w))>=.6?"var(--gold)":"var(--coral)")+'">'+pct(s.r,s.w)+'</td></tr>').join("")+'</table>'; }
+  const diags=(d.diags||[]).slice(-8).reverse();
+  if(diags.length){ h+='<h3 style="margin-top:12px">Diagnostics</h3><ul style="margin:0;padding-left:18px">'+diags.map(x=>'<li>'+x.date+' · '+(x.type||"")+(x.scope?" · "+x.scope:"")+' · <b>'+x.score+'/'+x.total+'</b></li>').join("")+'</ul>'; }
+  const runs=(d.resRuns||[]).slice(-6).reverse();
+  if(runs.length){ h+='<h3 style="margin-top:12px">Resonance Lab sequences</h3><ul style="margin:0;padding-left:18px">'+runs.map(r=>'<li>'+(r.ts?new Date(r.ts).toLocaleDateString():"")+' · '+(r.cold?"cold":"guided")+(r.clean?' · <b style="color:var(--ok)">first-audit clean</b>':' · not clean')+(r.passed!=null?' · '+r.passed+'/'+(r.total||8):'')+'</li>').join("")+'</ul>'; }
+  if(!att.length&&!diags.length) h+='<p class="muted">Row exists (PIN set) but no attempts yet.</p>';
+  body.innerHTML=h;
 }
 
 /* ================= TRACK (swap for syllabus later) ================= */
@@ -2913,6 +3038,7 @@ const S = {
   adaptiveRuns: safeStore.get("adaptiveRuns", []), // v3.25: planner pick/outcome audit trail, local only (cap 60)
   adaptiveReviews: safeStore.get("adaptiveReviews", []), // v3.25: slow-right spaced-retrieval queue, local only (cap 120)
   practiceOpen: safeStore.get("practiceOpen", null), // v3.27: which Practice chapters are expanded {chId:bool}; null = seed with course-current only
+  pinHash: safeStore.get("pinHash", null),         // v3.47: this profile's PIN hash (mirrors the cloud row)
   canvasFeed: safeStore.get("canvasFeed", null),   // v3.5: cached Canvas sync {courses:{chem231:{announcements[],deadlines[]}},fetched,_syncedAt} written daily by the canvas-sync task
   view: "home",
   drill: null,   // {queue:[], i, right, wrong, topic}
@@ -2962,7 +3088,7 @@ function dedupeWrLog(items){
 initLegacyQstats(); rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
 function save(){
   rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
-  safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("resDone",S.resDone); safeStore.set("resRuns",S.resRuns); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); cloudPush(false);
+  safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("resDone",S.resDone); safeStore.set("resRuns",S.resRuns); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); safeStore.set("pinHash",S.pinHash); cloudPush(false);
 }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
@@ -5604,7 +5730,8 @@ VIEWS.report = (v) => {
   v.appendChild(hist);
 
   const c=el("div",{class:"card"});
-  c.innerHTML='<span class="tag coral">Close the loop</span><h2>Report to Claude</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
+  if(PROFILE==="sam") v.appendChild(el("div",{class:"card",style:"border:2px solid #5d4b87;background:#ece8f5"},'<b>🧪 Auditor profile.</b> This report is <b>Sam\'s</b>. It is not Gabe\'s performance and must not be pasted into Gabe\'s Learning Profile.'));
+  c.innerHTML='<span class="tag coral">Close the loop</span><h2>'+(PROFILE==="sam"?"Report (Sam)":"Report to Claude")+'</h2><p class="muted" style="margin-bottom:10px">This feeds your Learning Profile — adherence, error patterns, what stuck. Copy it, paste it into the chat, and the ledger gets updated with real data instead of vibes.</p>';
   const ta=el("textarea",{class:"report",readonly:"readonly"}); ta.value=txt; c.appendChild(ta);
   const b=el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{ ta.select(); try{ navigator.clipboard.writeText(txt); b.textContent="✓ Copied";}catch(e){ document.execCommand("copy"); b.textContent="✓ Copied"; } setTimeout(()=>b.textContent="Copy report",1600); }},"Copy report");
   c.appendChild(b);
@@ -5613,7 +5740,7 @@ VIEWS.report = (v) => {
 };
 
 /* ================= BOOT ================= */
-render(); cloudPull(); canvasPull(); // v3.5
+if(!PROFILE){ renderWhoami(); renderSyncDot(); lockScreen(); } else { render(); cloudPull(); canvasPull(); } // v3.47: lock first; v3.5 canvas
 /* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
 (function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
 </script>
