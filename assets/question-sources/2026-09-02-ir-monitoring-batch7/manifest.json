@@ -1,0 +1,13 @@
+{
+  "intakeUid": "RB7-20260902",
+  "receivedDatePacific": "2026-09-02",
+  "release": "v3.45",
+  "status": "DEPLOY PENDING",
+  "policy": "Original PNGs are immutable. Duplicate answer-state captures map to the existing v3.44 cyclic amino-cation question; only the clean polymer-scheme crop renders in the new exact IR item.",
+  "assets": [
+    {"assetUid":"ASSET-RB7-20260902-01","questionUid":"EXACT-RB6-20260902-07","file":"duplicate-01-cyclic-amine-cation-part1.png","original":"codex-clipboard-557a583e-8b48-41ef-b0df-9e379c1df277.png","sha256":"9b180b76d82659fe77e5b5f47f424dc3790299d1857b03bd7dcc3d3362248adc","width":1116,"height":1444,"display":"provenance-only","duplicateOf":"ASSET-RB6-20260902-17"},
+    {"assetUid":"ASSET-RB7-20260902-02","questionUid":"EXACT-RB6-20260902-07","file":"duplicate-02-cyclic-amine-cation-part2.png","original":"codex-clipboard-af9e37fa-9981-4000-a5bf-a8ddc14d4432.png","sha256":"5e679f75eb9cc15e76ed8b1449fd569bedc790554fb08ac6d011bf5cad31484c","width":1192,"height":1390,"display":"provenance-only","duplicateOf":"ASSET-RB6-20260902-18"},
+    {"assetUid":"ASSET-RB7-20260902-03","questionUid":"EXACT-RB6-20260902-07","file":"duplicate-03-cyclic-amine-cation-ranking.png","original":"codex-clipboard-45832e10-062e-448a-b3a2-b6aa7b6e65e6.png","sha256":"0a3115a3e5325d4938540465e565e79a59cba6b7fd70f55c7d855a1fb3db5fa3","width":1058,"height":916,"display":"provenance-only","duplicateOf":"ASSET-RB6-20260902-19"},
+    {"assetUid":"ASSET-RB7-20260902-04","questionUid":"EXACT-RB7-20260902-01","file":"exact-04-polyvinyl-acetate-hydrolysis-ir.png","original":"codex-clipboard-f39543b6-e6b1-47d0-980d-068f2d356ab8.png","sha256":"339a9dde492bb3a311c8e197570e54f86536217124132dcf679ac98549618c32","width":1166,"height":1200,"display":"crop","crop":[58,390,495,330]}
+  ]
+}

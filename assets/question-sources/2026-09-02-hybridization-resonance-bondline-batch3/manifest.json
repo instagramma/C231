@@ -1,0 +1,114 @@
+{
+  "batchUid": "RB3-20260902",
+  "receivedDatePacific": "2026-09-02",
+  "immutability": "byte-for-byte copies of user uploads",
+  "questionCount": 10,
+  "assetCount": 11,
+  "assets": [
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-01",
+      "sourceFile": "exact-01-bondline-diethoxyethane.png",
+      "sha256": "4f054bc51aafa739ec9c592743cd81eec4e1759a4b5b61b0d4ccded644f44a5c",
+      "width": 1174,
+      "height": 852,
+      "exactQuestionId": "EXACT-RB3-20260902-01",
+      "displayCrop": {"x": 75, "y": 58, "width": 500, "height": 70}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-02",
+      "sourceFile": "exact-02-ozone-resonance-arrows.png",
+      "sha256": "093f94a5efebca82c944485e1b98a0c63b8a20f4b00207ccb7d030709d9a7d69",
+      "width": 1102,
+      "height": 1164,
+      "exactQuestionId": "EXACT-RB3-20260902-02",
+      "displayCrop": {"x": 60, "y": 140, "width": 300, "height": 110}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-03",
+      "sourceFile": "exact-03-melatonin-hybridization-part1.png",
+      "sha256": "17fdfb657ff74b3303e2cc359242ddab42fdca387ab9e8b155cff286e12987b1",
+      "width": 1212,
+      "height": 1476,
+      "exactQuestionId": "EXACT-RB3-20260902-03",
+      "displayCrop": {"x": 140, "y": 180, "width": 930, "height": 365}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-04",
+      "sourceFile": "exact-04-melatonin-hybridization-part2.png",
+      "sha256": "8be06412ff76d3d633217fc2434686913e956d050faa17449834655a4c0c47a8",
+      "width": 1206,
+      "height": 1412,
+      "exactQuestionId": "EXACT-RB3-20260902-03",
+      "displayCrop": null,
+      "note": "Supporting answer-state provenance only; never rendered."
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-05",
+      "sourceFile": "exact-05-conjugated-electrophilic-sites.png",
+      "sha256": "ecb71f54bb94c82f0afbad8b9af2ce50d3b0d29c3b74441f50f636900b775b09",
+      "width": 1154,
+      "height": 1090,
+      "exactQuestionId": "EXACT-RB3-20260902-04",
+      "displayCrop": {"x": 76, "y": 235, "width": 390, "height": 135}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-06",
+      "sourceFile": "exact-06-benzyl-cation-except.png",
+      "sha256": "301abe7318ca28a1018f95312ecfbb0642caf44f81015e21423424ca5f145e54",
+      "width": 1080,
+      "height": 938,
+      "exactQuestionId": "EXACT-RB3-20260902-05",
+      "displayCrop": {"x": 85, "y": 210, "width": 560, "height": 145}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-07",
+      "sourceFile": "exact-07-sp3-nitrogen-selection.png",
+      "sha256": "620e903949d2360f01543b894693425f3d72dcdb9b37f23145b75add5400b1f7",
+      "width": 1086,
+      "height": 876,
+      "exactQuestionId": "EXACT-RB3-20260902-06",
+      "displayCrops": [
+        {"label": "A", "x": 121, "y": 293, "width": 95, "height": 115},
+        {"label": "B", "x": 121, "y": 412, "width": 80, "height": 86},
+        {"label": "C", "x": 121, "y": 504, "width": 108, "height": 80},
+        {"label": "D", "x": 121, "y": 590, "width": 133, "height": 107}
+      ]
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-08",
+      "sourceFile": "exact-08-bondline-branched-ether.png",
+      "sha256": "9f805e341ee3b1cd8fe3305241efefabe5a6bd2737809aaac808920d40f045f8",
+      "width": 1096,
+      "height": 798,
+      "exactQuestionId": "EXACT-RB3-20260902-07",
+      "displayCrop": {"x": 95, "y": 200, "width": 660, "height": 50}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-09",
+      "sourceFile": "exact-09-acetate-hybrid.png",
+      "sha256": "96a59b5ae2ceb22e75486e2716a95980f711478d642ac6854ba1d221acdaae0b",
+      "width": 1096,
+      "height": 830,
+      "exactQuestionId": "EXACT-RB3-20260902-08",
+      "displayCrop": {"x": 80, "y": 220, "width": 220, "height": 95}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-10",
+      "sourceFile": "exact-10-cycloserine-hybridization-counts.png",
+      "sha256": "b5ceeb3ddf1adf1d258ef5c8371c1cdca124c2ea1a9284e5ddd2b4dff60c9f60",
+      "width": 1096,
+      "height": 796,
+      "exactQuestionId": "EXACT-RB3-20260902-09",
+      "displayCrop": {"x": 90, "y": 195, "width": 570, "height": 190}
+    },
+    {
+      "sourceAssetUid": "ASSET-RB3-20260902-11",
+      "sourceFile": "exact-11-cycloserine-lone-pair-localization.png",
+      "sha256": "6d1b73524d906b7d8c1bd8d438c26745a5acaf44387b15738b0044f6fbf05070",
+      "width": 1076,
+      "height": 1174,
+      "exactQuestionId": "EXACT-RB3-20260902-10",
+      "displayCrop": {"x": 70, "y": 215, "width": 680, "height": 370}
+    }
+  ]
+}
