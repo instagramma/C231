@@ -6,7 +6,18 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.45  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14 09-02
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.46  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15 09-02
+  v3.46 (2026-09-02, checked Resonance Lab):
+        REAL CURVED-ARROW + CONTRIBUTOR GENERATION. Eight quiz-core targets require the
+        learner to place each curved arrow from an electron source to its destination, then
+        build the resulting resonance contributor by changing only bond orders, lone pairs,
+        and formal charges on a locked sigma skeleton. The checker independently audits the
+        arrow set, exact contributor, total charge, and electron-pair conservation. Guided
+        sequencing covers all five single-step patterns from Ciesla's handout; later cold runs
+        hide the pattern label and are logged separately from ordinary completion. Includes
+        carboxylate, amide, allylic cation/anion, cyclic amino cation, carbonyl, nitrile-anion,
+        and benzene examples from Gabe's supplied test material. Outgoing v3.45 is archived
+        byte-for-byte. Public v3.37; v3.46 DEPLOY PENDING.
   v3.45 (2026-09-02, Gabe final intake batch 7):
         THREE DUPLICATE CAPTURES DEDUPED + ONE NEW IR SOURCE + EIGHT TRANSFERS.
         The repeated cyclic amino-cation sequence maps to its existing v3.44 question instead
@@ -778,6 +789,24 @@
     width:100%;height:340px;background:#fff;border:2.5px solid var(--ink);border-radius:10px;
     box-shadow:var(--shadow);touch-action:none;display:block;
   }
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  .res-stage{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
+  .res-stage h3{font-size:.9rem;margin:0 0 4px}
+  .res-svg{display:block;width:100%;height:auto;min-height:250px;background:#fff;border-radius:8px;touch-action:manipulation}
+  .res-hit{cursor:pointer;outline:none}
+  .res-hit:focus-visible{filter:drop-shadow(0 0 5px #efb83a)}
+  .res-toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  .res-toolbar .tool{font-family:var(--sans)}
+  .res-status{min-height:1.7em;color:var(--muted-tx);font-size:.82rem;margin:6px 0 0}
+  .res-checklist{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0}
+  .res-check{background:#f0f3f4;border:1px solid var(--line);border-radius:8px;padding:7px;text-align:center;font-size:.75rem;font-weight:700}
+  .res-check.ok{background:var(--success-bg);color:var(--ok);border-color:#a8cbb5}
+  .res-check.bad{background:var(--danger-bg);color:#81242c;border-color:#d4a0a4}
+  @media(max-width:720px){
+    .res-grid{grid-template-columns:1fr}
+    .res-svg{min-height:230px}
+    .res-checklist{grid-template-columns:1fr 1fr}
+  }
   .tooltray{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .tool{
     border:2px solid var(--ink);border-radius:8px;background:#fff;box-shadow:var(--shadow-sm);
@@ -1134,7 +1163,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.45</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.46</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1143,10 +1172,11 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 "use strict";
 
 /* ================= STORAGE (safe wrapper) ================= */
+const QA_MODE = new URLSearchParams(location.search).has("qa"); // QA is session-only and must never become learner evidence
 const safeStore = (() => {
   let mem = {};
   let ok = false;
-  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true; } catch(e){ ok = false; }
+  try { if(!QA_MODE){localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true;} } catch(e){ ok = false; }
   return {
     get(k, fallback){ try { const v = ok ? localStorage.getItem(k) : mem[k]; return v == null ? fallback : JSON.parse(v); } catch(e){ return fallback; } },
     set(k, v){ try { const s = JSON.stringify(v); if (ok) localStorage.setItem(k, s); else mem[k] = s; } catch(e){} },
@@ -1161,13 +1191,13 @@ const safeStore = (() => {
 const SB_URL = "https://tzdreklmkntpopqncada.supabase.co";
 const SB_KEY = "sb_publishable_PWdbyaBoBg8hM2kptSrwBA_I4lFrnQr";
 const SB_PROFILE = "gabe-c231";
-const QA_MODE = new URLSearchParams(location.search).has("qa"); // local visual checks must never become learning evidence
 let cloudState = "init";
 let _pushT = null;
 function sbHeaders(){ return {"apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Content-Type":"application/json"}; }
 function mergeRemote(remote){
   if (!remote) return;
-  ["doneDays","molDone","bondDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
+  ["doneDays","molDone","bondDone","resDone","visits","fcMastery"].forEach(k=>{ S[k] = [...new Set([...(remote[k]||[]), ...(S[k]||[])])]; });
+  if(remote.resRuns){ const rr=new Map([...(remote.resRuns||[]),...(S.resRuns||[])].map(x=>[x.id,x])); S.resRuns=[...rr.values()].sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-40); }
   if(remote.masteryDays){ const md=S.masteryDays||{}; Object.keys(remote.masteryDays).forEach(k=>{ md[k]=[...new Set([...(remote.masteryDays[k]||[]), ...(md[k]||[])])]; }); S.masteryDays=md; } // v3.16: union per topic
   if (remote.lastEval && (!S.lastEval || remote.lastEval.date > S.lastEval.date)) S.lastEval = remote.lastEval;
   const seenM = new Set(S.missed);
@@ -1229,7 +1259,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays},
+      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -2807,6 +2837,55 @@ const BONDLINE_MOLECULES=[
   {key:"rb5-transfer-ethyl-isobutanoate",name:"transfer ester · ethyl 2-methylpropanoate",formula:"(CH₃)₂CHC(=O)OCH₂CH₃",atoms:{C:6,O:2},hint:"Build C(=O)–O–ethyl. The carbonyl's carbon side is CH with two methyl endpoints.",target:{nodes:[BN("C"),BN("O"),BN("O"),BN("C"),BN("C"),BN("C"),BN("C"),BN("C")],bonds:[[0,1,2],[0,2,1],[2,3,1],[3,4,1],[0,5,1],[5,6,1],[5,7,1]]}},
   {key:"rb5-transfer-neopentane",name:"transfer alkane · neopentane",formula:"C(CH₃)₄",atoms:{C:5},hint:"One quaternary center connects four methyl endpoints.",target:{nodes:[BN("C"),BN("C"),BN("C"),BN("C"),BN("C")],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]]}},
 ];
+
+/* ================= v3.46 — CHECKED RESONANCE LAB =================
+   Fixed coordinates keep the sigma skeleton invariant. Gabe supplies the chemistry: first
+   the curved-arrow map (source → destination), then the next contributor's bond orders,
+   lone pairs, and atom-specific formal charges. Recognition questions already existed; this
+   is the missing production instrument. The ordered set follows Ciesla's five one-step
+   patterns and the exact contributor types in Gabe's screenshots/annotated handout. */
+const RESONANCE_TARGETS=[
+  {key:"carbonyl-polarization",name:"Carbonyl polarization",formula:"CH₃C(=O)CH₃",pattern:"π bond between atoms of differing electronegativity",arrowCount:1,
+   prompt:"Move the carbonyl π pair onto oxygen, then build the charge-separated contributor.",
+   graph:{nodes:[{id:"o",el:"O",label:"O",x:200,y:42,lp:2},{id:"c",el:"C",label:"C",x:200,y:126},{id:"m1",el:"C",label:"CH₃",x:95,y:190},{id:"m2",el:"C",label:"CH₃",x:305,y:190}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"m1",order:1},{a:"c",b:"m2",order:1}]},
+   arrows:[{from:"bond:c-o",to:"atom:o"}],result:{bonds:{"c-o":1},nodes:{o:{lp:3,charge:-1},c:{charge:1}}},
+   hint:"The arrow tail belongs on the C=O π bond, not on carbon. Its head lands on O.",ranking:"The neutral carbonyl is major; this charge-separated form is minor because carbon lacks an octet.",hybrid:"O is δ−, the carbonyl carbon is δ+, and C–O has partial double-bond character."},
+  {key:"allylic-cation",name:"Allylic carbocation",formula:"CH₂=CH–CH₂⁺",pattern:"allylic carbocation",arrowCount:1,
+   prompt:"Shift the π pair toward the adjacent carbocation, then place the positive charge where the π pair started.",
+   graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:82,y:166},{id:"c2",el:"C",label:"CH",x:200,y:92},{id:"c3",el:"C",label:"CH₂",x:318,y:166,charge:1}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"c3",order:1}]},
+   arrows:[{from:"bond:c1-c2",to:"bond:c2-c3"}],result:{bonds:{"c1-c2":1,"c2-c3":2},nodes:{c1:{charge:1},c3:{charge:0}}},
+   hint:"Start at the π bond nearest C⁺ and point to the intervening single bond.",ranking:"The two contributors are equivalent in unsubstituted allyl cation.",hybrid:"Both terminal carbons carry δ+ and both C–C bonds have partial double-bond character."},
+  {key:"allylic-anion",name:"Allylic lone pair",formula:"⁻CH₂–CH=CH₂",pattern:"allylic lone pair",arrowCount:2,
+   prompt:"Use the carbanion lone pair to make a π bond while the old π pair moves to the far carbon.",
+   graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:82,y:166,lp:1,charge:-1},{id:"c2",el:"C",label:"CH",x:200,y:92},{id:"c3",el:"C",label:"CH₂",x:318,y:166}],bonds:[{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:2}]},
+   arrows:[{from:"lp:c1",to:"bond:c1-c2"},{from:"bond:c2-c3",to:"atom:c3"}],result:{bonds:{"c1-c2":2,"c2-c3":1},nodes:{c1:{lp:0,charge:0},c3:{lp:1,charge:-1}}},
+   hint:"Two arrows must happen together: lone pair → adjacent bond; old π bond → terminal atom.",ranking:"The two contributors are equivalent in unsubstituted allyl anion.",hybrid:"Negative charge and π density are shared by the two terminal carbons."},
+  {key:"lone-pair-next-to-cation",name:"Lone pair next to C⁺",formula:"cyclic amino cation",pattern:"lone pair adjacent to a carbocation",arrowCount:1,
+   prompt:"Use nitrogen's lone pair to fill the adjacent carbon octet. Keep the remote alkene unchanged.",
+   graph:{nodes:[{id:"n",el:"N",label:"NH",x:200,y:34,lp:1},{id:"c1",el:"C",label:"C",x:298,y:86,charge:1},{id:"c2",el:"C",label:"CH",x:298,y:178},{id:"c3",el:"C",label:"CH",x:200,y:230},{id:"c4",el:"C",label:"CH",x:102,y:178},{id:"c5",el:"C",label:"CH₂",x:102,y:86}],bonds:[{a:"n",b:"c1",order:1},{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:2},{a:"c3",b:"c4",order:1},{a:"c4",b:"c5",order:1},{a:"c5",b:"n",order:1}]},
+   arrows:[{from:"lp:n",to:"bond:c1-n"}],result:{bonds:{"c1-n":2},nodes:{n:{lp:0,charge:1},c1:{charge:0}}},
+   hint:"One arrow: N lone pair → the N–C⁺ bond. Nitrogen becomes positive when it gains a fourth bond.",ranking:"The iminium contributor is major because it gives every second-row atom an octet.",hybrid:"Positive character is shared by N and the conjugated carbon path; bonds that change order are partial in the hybrid."},
+  {key:"amide-donation",name:"Amide donation",formula:"CH₃C(=O)NH₂",pattern:"allylic lone pair",arrowCount:2,
+   prompt:"Delocalize the nitrogen lone pair into the carbonyl and move the C=O π pair to oxygen.",
+   graph:{nodes:[{id:"o",el:"O",label:"O",x:200,y:38,lp:2},{id:"c",el:"C",label:"C",x:200,y:122},{id:"m",el:"C",label:"CH₃",x:95,y:188},{id:"n",el:"N",label:"NH₂",x:310,y:188,lp:1}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"m",order:1},{a:"c",b:"n",order:1}]},
+   arrows:[{from:"lp:n",to:"bond:c-n"},{from:"bond:c-o",to:"atom:o"}],result:{bonds:{"c-n":2,"c-o":1},nodes:{n:{lp:0,charge:1},o:{lp:3,charge:-1}}},
+   hint:"N lone pair → C–N; at the same time C=O π bond → O. Do not exceed carbon's octet.",ranking:"The neutral contributor is major because it has no formal-charge separation; both contributors have octets.",hybrid:"C–N has partial double-bond character, explaining planarity and restricted rotation; N's donating pair occupies a p orbital."},
+  {key:"carboxylate",name:"Carboxylate equivalence",formula:"CH₃CO₂⁻",pattern:"allylic lone pair",arrowCount:2,
+   prompt:"Swap which oxygen bears the π bond and which bears the negative charge.",
+   graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:124},{id:"m",el:"C",label:"CH₃",x:88,y:190},{id:"o1",el:"O",label:"O",x:178,y:38,lp:2},{id:"o2",el:"O",label:"O",x:310,y:150,lp:3,charge:-1}],bonds:[{a:"c",b:"m",order:1},{a:"c",b:"o1",order:2},{a:"c",b:"o2",order:1}]},
+   arrows:[{from:"lp:o2",to:"bond:c-o2"},{from:"bond:c-o1",to:"atom:o1"}],result:{bonds:{"c-o1":1,"c-o2":2},nodes:{o1:{lp:3,charge:-1},o2:{lp:2,charge:0}}},
+   hint:"Negative O lone pair → C–O; old C=O π bond → the other O.",ranking:"The two contributors are equivalent and equally significant.",hybrid:"Both C–O bonds are equivalent with bond order about 1.5; each oxygen carries partial negative charge."},
+  {key:"nitrile-anion",name:"Move charge onto nitrogen",formula:"CH₃–CH⁻–C≡N",pattern:"allylic lone pair",arrowCount:2,
+   prompt:"Make the C=C bond and move one nitrile π pair onto nitrogen.",
+   graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:56,y:172},{id:"ca",el:"C",label:"CH",x:145,y:112,lp:1,charge:-1},{id:"cn",el:"C",label:"C",x:255,y:112},{id:"n",el:"N",label:"N",x:350,y:112,lp:1}],bonds:[{a:"m",b:"ca",order:1},{a:"ca",b:"cn",order:1},{a:"cn",b:"n",order:3}]},
+   arrows:[{from:"lp:ca",to:"bond:ca-cn"},{from:"bond:cn-n",to:"atom:n"}],result:{bonds:{"ca-cn":2,"cn-n":2},nodes:{ca:{lp:0,charge:0},n:{lp:2,charge:-1}}},
+   hint:"Carbanion lone pair → C–C; one C≡N π pair → N. The triple bond becomes double, not single.",ranking:"The N⁻ contributor is more significant because both have octets and nitrogen is more electronegative than carbon.",hybrid:"Negative charge is shared between the alpha carbon and nitrogen; both adjacent bonds have partial multiple-bond character."},
+  {key:"benzene-shift",name:"Ring π-bond shift",formula:"benzene",pattern:"conjugated π bonds enclosed in a ring",arrowCount:3,
+   prompt:"Move all three π pairs one bond around the ring in the same direction to make the other Kekulé contributor.",
+   graph:{nodes:[{id:"c1",el:"C",label:"C",x:200,y:28},{id:"c2",el:"C",label:"C",x:302,y:84},{id:"c3",el:"C",label:"C",x:302,y:190},{id:"c4",el:"C",label:"C",x:200,y:246},{id:"c5",el:"C",label:"C",x:98,y:190},{id:"c6",el:"C",label:"C",x:98,y:84}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"c3",order:1},{a:"c3",b:"c4",order:2},{a:"c4",b:"c5",order:1},{a:"c5",b:"c6",order:2},{a:"c6",b:"c1",order:1}]},
+   arrows:[{from:"bond:c1-c2",to:"bond:c2-c3"},{from:"bond:c3-c4",to:"bond:c4-c5"},{from:"bond:c5-c6",to:"bond:c1-c6"}],result:{bonds:{"c1-c2":1,"c2-c3":2,"c3-c4":1,"c4-c5":2,"c5-c6":1,"c1-c6":2},nodes:{}},
+   hint:"Three arrows, all clockwise or all counterclockwise. Each starts on a π bond and ends on the neighboring single bond.",ranking:"The two Kekulé contributors are equivalent.",hybrid:"All six C–C bonds are equivalent and intermediate between single and double."},
+];
 const VALENCE = {H:1, C:4, N:5, O:6, F:7, Cl:7, Br:7, S:6, P:5, Al:3};
 const ATOM_COLORS = {H:"#8aa4b8", C:"#20241F", N:"#2E5EAA", O:"#C0392B", F:"#2E7D32", Cl:"#2E7D32", Br:"#8B4513", S:"#B7950B", P:"#B7950B", Al:"#9B6B6B"};
 
@@ -2818,6 +2897,8 @@ const S = {
   missed:   safeStore.get("missed", []),      // ids, most recent last
   molDone:  safeStore.get("molDone", []),
   bondDone: safeStore.get("bondDone", []),
+  resDone: safeStore.get("resDone", []),       // v3.46: individually passed Resonance Lab targets
+  resRuns: safeStore.get("resRuns", []),       // v3.46: completed guided/cold sequences; cold+clean is readiness evidence
   visits:   safeStore.get("visits", []),
   fcMastery: safeStore.get("fcMastery", []),  // dates of CLEAN 6/6 mastery-check runs; 2 distinct days = mastered
   masteryDays: safeStore.get("masteryDays", {}), // v3.16: {topicKey:[dates]} — the same bar, now for EVERY topic. formal stays mirrored to fcMastery for back-compat.
@@ -2837,6 +2918,8 @@ const S = {
   drill: null,   // {queue:[], i, right, wrong, topic}
   lab: null,     // lab session state
   bondLab: null, // checked skeletal/bond-line session state
+  resLab: null,  // checked arrow + contributor session state
+  resRun: null,  // ordered guided/cold resonance sequence (session-only wrapper)
   attView: {topic:"all",outcome:"all",limit:60,qid:null}, // v3.11: attempt-history browser filters (session-only, never persisted)
 };
 /* v3.25: attempts are the merge-safe source of truth. Preserve only the portion of qstats
@@ -2879,7 +2962,7 @@ function dedupeWrLog(items){
 initLegacyQstats(); rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
 function save(){
   rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
-  safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); cloudPush(false);
+  safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("resDone",S.resDone); safeStore.set("resRuns",S.resRuns); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); cloudPush(false);
 }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
@@ -2952,7 +3035,7 @@ const KNOWN_QUIZZES=[
 
 /* ================= HELPERS ================= */
 const $ = sel => document.querySelector(sel);
-const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else e.setAttribute(k,v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
+const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else if(v===false||v==null){} else e.setAttribute(k,v===true?"":v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function confetti(){ const c=$("#confetti"); const em=["🎉","⚗️","✨","🧪","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
 function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
@@ -3108,7 +3191,7 @@ const LESSONS = {
     links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
 };
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
-const NAV_GROUP={lab:"practice",bondlab:"practice",drill:"practice",mastery:"practice",attempts:"report"}; // active-tab highlight for sub-views (v3.11: attempts lives under Report — nav stays at 7 tabs)
+const NAV_GROUP={lab:"practice",bondlab:"practice",reslab:"practice",drill:"practice",mastery:"practice",attempts:"report"}; // active-tab highlight for sub-views (v3.46: all three drawing labs live under Practice)
 function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
   // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
@@ -3925,9 +4008,15 @@ function currentChapterId(){
   return wk<=1?"ch1":wk===2?"ch2":wk===3?"ch3":"ch4";
 }
 VIEWS.practice = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Choose a practice mode</h2><p class="muted">Drill = quick reps. Mastery = '+MASTERY_N+' cold questions, perfect and unguessed.</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Choose a practice mode</h2><p class="muted">For the Chapter 2 quiz, start with Resonance Lab: it checks the arrows and the contributor you build. Drill = quick reps. Mastery = '+MASTERY_N+' cold questions, perfect and unguessed.</p>'));
 
   const quick=el("div",{class:"practice-quick-grid"});
+  const resLab=el("div",{class:"card teal"});
+  const cleanRes=(S.resRuns||[]).filter(r=>r.cold&&r.clean).length;
+  resLab.innerHTML='<span class="tag coral">Quiz core · generate, don\'t recognize</span><h3>↪️ Resonance Lab</h3><p style="margin:4px 0 8px">'+S.resDone.length+'/'+RESONANCE_TARGETS.length+' checked transformations · draw curved arrows, then build the next contributor.</p><p class="muted" style="margin:4px 0 8px">Audits arrow tails/heads, bond orders, lone pairs, charges, charge conservation, and electron-pair conservation.'+(cleanRes?' '+cleanRes+' clean cold run'+(cleanRes===1?'':'s')+' recorded.':'')+'</p>';
+  resLab.appendChild(el("button",{class:"btn gold",onclick:()=>go("reslab")},"Open Resonance Lab →"));
+  quick.appendChild(resLab);
+
   const lab=el("div",{class:"card cream"});
   lab.innerHTML='<h3>🧪 Lewis Lab</h3><p class="muted" style="margin:4px 0 8px">'+MOLECULES.length+' checked structures · full graph and charge audit.</p>';
   lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
@@ -5020,6 +5109,189 @@ function runBondAudit(){
   if(!fails.length){confetti();if(!S.bondDone.includes(m.key))S.bondDone.push(m.key);if(B.returnTo==="drill"&&S.drill&&B.returnQuestionId){const map=S.drill.bondStructuresBuilt=S.drill.bondStructuresBuilt||{},arr=map[B.returnQuestionId]=map[B.returnQuestionId]||[];if(!arr.includes(m.key))arr.push(m.key);snapshotDrill(S.drill.i);}save();const c=el("div",{class:"card teal"},'<h2>✓ '+m.name+' — exact skeleton match</h2><p>Inventory ✓ · connected graph ✓ · bond orders ✓ · carbon valence/implied H ✓ · heteroatom labels ✓</p>');c.appendChild(el("button",{class:"btn gold",onclick:leaveBondLab},B.returnTo==="drill"?"Back to question →":"Back to structures →"));B.auditBox.appendChild(c);}else{B.fails++;B.auditBox.appendChild(el("div",{class:"card cream"},'<h3>Check these parts</h3><ul class="audit">'+fails.map(f=>'<li class="fail">'+f+'</li>').join("")+'</ul>'+(B.fails>=2?'<div class="why"><b>Hint:</b> '+m.hint+'</div>':"")));}
 }
 
+/* ---- v3.46 CHECKED RESONANCE LAB ----
+   A curved arrow is stored as an exact source→destination pair. The second panel begins as
+   a copy of the first contributor; connectivity and atom positions are deliberately locked,
+   while bond orders, lone pairs and charges remain editable. That is the resonance rule in
+   the interface itself: electrons move; atoms and sigma connectivity do not. */
+function resBondKey(a,b){return [a,b].sort().join("-");}
+function resCloneGraph(g){return {nodes:g.nodes.map(n=>({...n,lp:n.lp||0,charge:n.charge||0})),bonds:g.bonds.map(b=>({...b,key:resBondKey(b.a,b.b)}))};}
+function resExpectedGraph(t){
+  const g=resCloneGraph(t.graph);
+  Object.entries(t.result.bonds||{}).forEach(([key,order])=>{const b=g.bonds.find(x=>x.key===key);if(b)b.order=order;});
+  Object.entries(t.result.nodes||{}).forEach(([id,patch])=>{const n=g.nodes.find(x=>x.id===id);if(n)Object.assign(n,patch);});
+  return g;
+}
+function resNetCharge(g){return g.nodes.reduce((s,n)=>s+(n.charge||0),0);}
+function resElectronPairs(g){return g.bonds.reduce((s,b)=>s+b.order,0)+g.nodes.reduce((s,n)=>s+(n.lp||0),0);}
+function resTarget(key){return RESONANCE_TARGETS.find(t=>t.key===key);}
+function startResLab(key,guided=true){
+  const target=resTarget(key);if(!target)return;
+  S.resLab={target,guided:!!guided,arrows:[],pending:null,product:resCloneGraph(target.graph),editSel:null,fails:0,audit:null,msg:"Tap an electron source: a lone pair or a π bond."};
+  go("reslab");
+}
+function startResRun(cold){
+  if(cold&&S.resDone.length<RESONANCE_TARGETS.length){alert("Finish the guided pattern set once before starting a cold run.");return;}
+  S.resRun={id:"res-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),queue:RESONANCE_TARGETS.map(t=>t.key),i:0,cold:!!cold,clean:true,complete:false};
+  startResLab(S.resRun.queue[0],!cold);
+}
+function resumeResRun(){const R=S.resRun;if(!R||R.complete)return;startResLab(R.queue[R.i],!R.cold);}
+function leaveResLab(){S.resLab=null;go("reslab");}
+function finishResRun(){
+  const run=S.resRun;if(!run)return;
+  const rec={id:run.id,ts:Date.now(),date:todayStr(),cold:!!run.cold,clean:!!run.clean,total:run.queue.length};
+  S.resRuns=(S.resRuns||[]).filter(r=>r.id!==rec.id).concat(rec).slice(-40);
+  run.complete=true;run.result=rec;S.resLab=null;save();render();
+}
+function advanceResRun(){
+  const run=S.resRun;if(!run)return leaveResLab();
+  if(run.i>=run.queue.length-1)return finishResRun();
+  run.i++;startResLab(run.queue[run.i],!run.cold);
+}
+function resPointLabel(p){
+  const [kind,key]=String(p||"").split(":");
+  if(kind==="lp")return "lone pair on "+key.toUpperCase();
+  if(kind==="bond")return "bond "+key.toUpperCase().replace("-","–");
+  return "atom "+key.toUpperCase();
+}
+function resBondLabel(g,b){
+  const a=g.nodes.find(n=>n.id===b.a),c=g.nodes.find(n=>n.id===b.b),mark=b.order===3?"≡":b.order===2?"=":"–";
+  return (a?(a.label||a.el):b.a)+mark+(c?(c.label||c.el):b.b);
+}
+function resBondControlLabel(g,b){
+  const base=resBondLabel(g,b),same=g.bonds.filter(x=>resBondLabel(g,x)===base).length;
+  return same>1?base+" · "+resBondKey(b.a,b.b).toUpperCase().replace("-","–"):base;
+}
+function resHandlePoint(kind,id){
+  const R=S.resLab;if(!R)return;
+  const key=kind==="bond"?"bond:"+id:"atom:"+id;
+  if(!R.pending){
+    if(kind==="atom"){
+      const n=R.target.graph.nodes.find(x=>x.id===id);
+      if(!n||!(n.lp>0)){R.msg="An arrow cannot start there: that atom has no drawn lone pair.";R.audit=null;render();return;}
+      R.pending="lp:"+id;
+    }else R.pending=key;
+    R.msg="Start: "+resPointLabel(R.pending)+". Now tap where that electron pair ends.";
+  }else{
+    R.arrows.push({from:R.pending,to:key});R.pending=null;
+    R.msg="Arrow "+R.arrows.length+" placed. Add another if the electron move requires it.";
+  }
+  R.audit=null;render();
+}
+function resSelectEdit(kind,id){const R=S.resLab;if(!R)return;R.editSel={kind,id};R.audit=null;render();}
+function resAdjust(kind,delta){
+  const R=S.resLab;if(!R||!R.editSel)return;
+  if(kind==="bond"&&R.editSel.kind==="bond"){
+    const b=R.product.bonds.find(x=>x.key===R.editSel.id);if(b)b.order=Math.max(1,Math.min(3,b.order+delta));
+  }else if((kind==="charge"||kind==="lp")&&R.editSel.kind==="atom"){
+    const n=R.product.nodes.find(x=>x.id===R.editSel.id);if(n)n[kind]=Math.max(kind==="lp"?0:-2,Math.min(kind==="lp"?4:2,(n[kind]||0)+delta));
+  }
+  R.audit=null;render();
+}
+function resEndpointPoint(R,p){
+  const [kind,key]=String(p).split(":");
+  if(kind==="bond"){
+    const b=R.target.graph.bonds.find(x=>resBondKey(x.a,x.b)===key),a=b&&R.target.graph.nodes.find(n=>n.id===b.a),c=b&&R.target.graph.nodes.find(n=>n.id===b.b);
+    return a&&c?{x:(a.x+c.x)/2,y:(a.y+c.y)/2}:{x:200,y:125};
+  }
+  const n=R.target.graph.nodes.find(x=>x.id===key);if(!n)return{x:200,y:125};
+  return kind==="lp"?{x:n.x,y:n.y-31}:{x:n.x,y:n.y};
+}
+function resSvgNode(tag,attrs,parent){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));(parent||document).appendChild(e);return e;}
+function drawResGraph(svg,g,mode){
+  const R=S.resLab,NS="http://www.w3.org/2000/svg";svg.innerHTML="";svg.setAttribute("viewBox","0 0 400 270");svg.setAttribute("role","group");
+  const defs=document.createElementNS(NS,"defs"),marker=document.createElementNS(NS,"marker"),tip=document.createElementNS(NS,"path"),markerId="res-tip-"+mode;
+  marker.setAttribute("id",markerId);marker.setAttribute("viewBox","0 0 10 10");marker.setAttribute("refX","9");marker.setAttribute("refY","5");marker.setAttribute("markerWidth","7");marker.setAttribute("markerHeight","7");marker.setAttribute("orient","auto-start-reverse");tip.setAttribute("d","M 0 0 L 10 5 L 0 10 z");tip.setAttribute("fill","#9d3037");marker.appendChild(tip);defs.appendChild(marker);svg.appendChild(defs);
+  g.bonds.forEach(b=>{
+    const A=g.nodes.find(n=>n.id===b.a),C=g.nodes.find(n=>n.id===b.b);if(!A||!C)return;
+    const key=b.key||resBondKey(b.a,b.b);
+    const dx=C.x-A.x,dy=C.y-A.y,len=Math.hypot(dx,dy)||1,ox=-dy/len*4.5,oy=dx/len*4.5,offs=b.order===1?[0]:b.order===2?[-1,1]:[-1.7,0,1.7];
+    const selected=mode==="edit"&&R.editSel&&R.editSel.kind==="bond"&&R.editSel.id===key;
+    offs.forEach(o=>resSvgNode("line",{x1:A.x+ox*o,y1:A.y+oy*o,x2:C.x+ox*o,y2:C.y+oy*o,stroke:selected?"#9d3037":"#1d272c","stroke-width":selected?"4":"3","stroke-linecap":"round"},svg));
+    // A nearly transparent painted stroke keeps the full 24 px target reliably clickable
+    // in browsers that do not treat stroke="transparent" as a hit-testable SVG line.
+    const hit=resSvgNode("line",{x1:A.x,y1:A.y,x2:C.x,y2:C.y,stroke:"#ffffff","stroke-opacity":"0.001","stroke-width":"24",class:"res-hit",tabindex:"0",role:"button","aria-label":(mode==="source"?"Use":"Select")+" bond "+key},svg);
+    const act=()=>mode==="source"?resHandlePoint("bond",key):resSelectEdit("bond",key);hit.addEventListener("click",act);hit.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act();}});
+  });
+  if(mode==="source")R.arrows.forEach((a,i)=>{
+    const s=resEndpointPoint(R,a.from),t=resEndpointPoint(R,a.to),dx=t.x-s.x,dy=t.y-s.y,len=Math.hypot(dx,dy)||1,bend=28+(i%2)*8,mx=(s.x+t.x)/2-dy/len*bend,my=(s.y+t.y)/2+dx/len*bend;
+    resSvgNode("path",{d:"M "+s.x+" "+s.y+" Q "+mx+" "+my+" "+t.x+" "+t.y,fill:"none",stroke:"#9d3037","stroke-width":"4","stroke-linecap":"round","marker-end":"url(#"+markerId+")"},svg);
+  });
+  g.nodes.forEach(n=>{
+    const selected=mode==="edit"&&R.editSel&&R.editSel.kind==="atom"&&R.editSel.id===n.id;
+    const pending=mode==="source"&&R.pending==="lp:"+n.id;
+    resSvgNode("circle",{cx:n.x,cy:n.y,r:Math.max(23,12+String(n.label||n.el).length*4),fill:"#fff",stroke:selected||pending?"#9d3037":"#aeb9bf","stroke-width":selected||pending?"4":"1.5"},svg);
+    const txt=resSvgNode("text",{x:n.x,y:n.y+6,"text-anchor":"middle","font-size":"18","font-weight":"800","font-family":"sans-serif",fill:n.el==="O"?"#b03135":n.el==="N"?"#245c9d":"#1d272c"},svg);txt.textContent=n.label||n.el;
+    const lpSlots=[[0,-31],[31,0],[0,31],[-31,0]];
+    for(let i=0;i<(n.lp||0);i++){const [sx,sy]=lpSlots[i%4],h=sy===0;resSvgNode("circle",{cx:n.x+sx+(h?0:-4),cy:n.y+sy+(h?-4:0),r:"2.8",fill:"#0f5f8a"},svg);resSvgNode("circle",{cx:n.x+sx+(h?0:4),cy:n.y+sy+(h?4:0),r:"2.8",fill:"#0f5f8a"},svg);}
+    if(n.charge){const q=resSvgNode("text",{x:n.x+28,y:n.y-22,"text-anchor":"middle","font-size":"18","font-weight":"900","font-family":"sans-serif",fill:"#9d3037"},svg);q.textContent=n.charge>0?"+":"−";}
+    const hit=resSvgNode("circle",{cx:n.x,cy:n.y,r:"29",fill:"transparent",class:"res-hit",tabindex:"0",role:"button","aria-label":(mode==="source"?"Use atom or lone pair on ":"Select atom ")+(n.label||n.el)},svg);
+    const act=()=>mode==="source"?resHandlePoint("atom",n.id):resSelectEdit("atom",n.id);hit.addEventListener("click",act);hit.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act();}});
+  });
+  if(mode==="source"&&R.pending){const p=resEndpointPoint(R,R.pending);resSvgNode("circle",{cx:p.x,cy:p.y,r:"10",fill:"none",stroke:"#9d3037","stroke-width":"3","stroke-dasharray":"4 3"},svg);}
+}
+function resAuditTarget(){
+  const R=S.resLab,t=R.target,want=resExpectedGraph(t),sig=a=>a.from+">"+a.to;
+  const arrowOk=R.arrows.map(sig).sort().join("|")===t.arrows.map(sig).sort().join("|");
+  const bondsOk=want.bonds.every(w=>{const a=R.product.bonds.find(b=>b.key===w.key);return a&&a.order===w.order;});
+  const atomsOk=want.nodes.every(w=>{const a=R.product.nodes.find(n=>n.id===w.id);return a&&(a.lp||0)===(w.lp||0)&&(a.charge||0)===(w.charge||0);});
+  const chargeOk=resNetCharge(R.product)===resNetCharge(t.graph);
+  const pairsOk=resElectronPairs(R.product)===resElectronPairs(t.graph);
+  return {arrowOk,structureOk:bondsOk&&atomsOk,chargeOk,pairsOk,ok:arrowOk&&bondsOk&&atomsOk&&chargeOk&&pairsOk};
+}
+function runResAudit(){
+  const R=S.resLab;if(!R)return;const a=resAuditTarget();R.audit=a;
+  if(!a.ok){R.fails++;if(S.resRun&&!S.resRun.complete)S.resRun.clean=false;render();return;}
+  if(!S.resDone.includes(R.target.key))S.resDone.push(R.target.key);save();render();
+}
+function resResetProduct(){const R=S.resLab;if(!R)return;R.product=resCloneGraph(R.target.graph);R.editSel=null;R.audit=null;render();}
+function resUndoArrow(){const R=S.resLab;if(!R)return;if(R.pending)R.pending=null;else R.arrows.pop();R.msg=R.arrows.length?"Last arrow removed.":"Tap an electron source: a lone pair or a π bond.";R.audit=null;render();}
+function resAuditFeedback(){
+  const R=S.resLab,a=R.audit;if(!a)return null;
+  const checks=[['arrowOk','Curved arrows'],['structureOk','Next contributor'],['chargeOk','Net charge'],['pairsOk','Electron pairs']];
+  const box=el("div");
+  const row=el("div",{class:"res-checklist"});checks.forEach(([k,label])=>row.appendChild(el("div",{class:"res-check "+(a[k]?"ok":"bad")},(a[k]?"✓ ":"✗ ")+label)));box.appendChild(row);
+  if(a.ok){
+    const c=el("div",{class:"card teal"},'<span class="tag gold">Exact transformation passed</span><h2>Arrows and contributor agree</h2><p><b>Ranking:</b> '+R.target.ranking+'</p><p><b>Hybrid:</b> '+R.target.hybrid+'</p><p class="muted">This records a completed build. It counts as a clean cold-run step only when the whole sequence was started in cold mode and no audit failed.</p>');
+    c.appendChild(el("button",{class:"btn gold",onclick:advanceResRun},S.resRun&&!S.resRun.complete?(S.resRun.i===S.resRun.queue.length-1?"Finish sequence →":"Next pattern →"):"Back to targets →"));box.appendChild(c);
+  }else{
+    const failed=[];if(!a.arrowOk)failed.push("At least one arrow has the wrong tail or head, or the arrow count is wrong.");if(!a.structureOk)failed.push("At least one bond order, lone-pair count, or atom-specific charge is wrong.");if(!a.chargeOk)failed.push("The total formal charge changed; resonance cannot change net charge.");if(!a.pairsOk)failed.push("The total number of tracked electron pairs changed; move pairs rather than creating or deleting them.");
+    box.appendChild(el("div",{class:"card cream"},'<h3>Audit found '+failed.length+' problem'+(failed.length===1?'':'s')+'</h3><ul class="audit">'+failed.map(x=>'<li class="fail">'+x+'</li>').join("")+'</ul>'+(R.fails>=2?'<div class="why"><b>One next move:</b> '+R.target.hint+'</div>':'')));
+  }
+  return box;
+}
+VIEWS.reslab=(v)=>{
+  const R=S.resLab;
+  if(!R){
+    const complete=S.resDone.filter(k=>resTarget(k)).length,clean=(S.resRuns||[]).filter(r=>r.cold&&r.clean).length;
+    v.appendChild(el("div",{class:"card teal"},'<span class="tag coral">Resonance Lab · '+RESONANCE_TARGETS.length+' checked transformations</span><h2>Draw the arrows. Build what they produce.</h2><p>Tap where an electron pair starts, then where it ends. In the second panel, edit bond orders, lone pairs, and charges on the same locked atom framework. The audit checks both panels independently.</p><div class="why"><b>Fast test routine:</b> ① find a movable pair or nearby C⁺ · ② draw one legal pattern · ③ rebuild bonds/LP/charges · ④ confirm same atoms, same net charge, same electron-pair count · ⑤ rank: octets → fewer charges → favorable charge placement.</div><p class="muted" style="margin-top:8px">Completion: <b>'+complete+'/'+RESONANCE_TARGETS.length+'</b> · clean cold sequences: <b>'+clean+'</b>. Completion is practice evidence; only an entire first-audit-clean cold sequence is labeled cold readiness evidence.</p>'));
+    if(S.resRun&&S.resRun.complete){const x=S.resRun.result;v.appendChild(el("div",{class:"card "+(x.cold&&x.clean?"teal":"cream")},'<h3>'+(x.cold?(x.clean?'✓ Clean cold sequence':'Cold sequence completed with corrections'):'✓ Guided sequence completed')+'</h3><p class="muted">'+x.total+' transformations finished. '+(x.cold&&x.clean?'Every target passed on its first audit. This is readiness evidence, not a permanent mastery claim.':x.cold?'Run it cold again after fixing the missed pattern(s).':'Now repeat the set cold—with pattern names and hints hidden.')+'</p>'));}
+    const actions=el("div",{class:"card"});actions.innerHTML='<h3>One next action</h3><p class="muted">'+(complete<RESONANCE_TARGETS.length?'Run the guided sequence once, in order. It teaches all five handout patterns with eight test-relevant molecules.':'Run the full set cold. The pattern label and starter hint stay hidden until after the audit.')+'</p>';
+    if(S.resRun&&!S.resRun.complete)actions.appendChild(el("button",{class:"btn coral",style:"margin-right:8px",onclick:resumeResRun},"Resume sequence · "+(S.resRun.i+1)+"/"+S.resRun.queue.length+" →"));
+    actions.appendChild(el("button",{class:"btn "+(complete<RESONANCE_TARGETS.length?"coral":"ghost"),style:"margin-right:8px",onclick:()=>startResRun(false)},complete<RESONANCE_TARGETS.length?"Start guided sequence →":"Review guided →"));
+    const coldBtn=el("button",{class:"btn "+(complete===RESONANCE_TARGETS.length?"gold":"ghost"),disabled:complete!==RESONANCE_TARGETS.length,onclick:()=>startResRun(true)},complete===RESONANCE_TARGETS.length?"Start cold sequence →":"Cold sequence unlocks at 8/8");actions.appendChild(coldBtn);v.appendChild(actions);
+    const ref=el("div",{class:"card cream"});ref.innerHTML='<details><summary><b>Handout quick reference · five legal one-step patterns</b></summary><ol class="audit"><li>Lone pair next to a π bond: pair makes a π bond while the old π pair moves.</li><li>Allylic carbocation: the neighboring π pair shifts toward C⁺.</li><li>Lone pair next to C⁺: the pair makes the missing bond.</li><li>π bond between atoms of different electronegativity: move the pair to the more electronegative atom.</li><li>Conjugated π bonds in a ring: shift every π pair together in one direction.</li></ol><div class="why"><b>Always:</b> arrows start at electrons; atoms and sigma connectivity stay fixed; total charge and electron pairs stay constant. A conjugated lone pair occupies a p orbital; a localized pair follows the atom\'s hybridization. Rank contributors by octets → fewer charges → favorable charge placement. The hybrid uses partial bonds/charges; it is not another contributor.</div></details>';
+    ref.appendChild(el("button",{class:"btn ghost small",style:"margin-top:10px",onclick:()=>{S.learnCh="ch2";S.learnTopic="fgroups";go("learn");}},"Open the handout's functional-group reference →"));v.appendChild(ref);
+    RESONANCE_TARGETS.forEach((t,i)=>{const done=S.resDone.includes(t.key),c=el("div",{class:"card "+(done?"cream":"")});c.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><h3 style="flex:1;margin:0">'+(i+1)+'. '+t.name+(done?' <span style="color:var(--ok)">✓</span>':'')+'</h3><span class="tag violet">'+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span></div><p class="mono" style="margin:6px 0">'+t.formula+'</p><p class="muted">'+t.pattern+'</p>';c.appendChild(el("button",{class:"btn "+(done?"ghost":"teal"),onclick:()=>{S.resRun=null;startResLab(t.key,true);}},done?"Rebuild":"Practice this pattern"));v.appendChild(c);});
+    return;
+  }
+  const t=R.target,run=S.resRun&&!S.resRun.complete?S.resRun:null;
+  const head=el("div",{class:"card"});head.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><div style="flex:1"><span class="tag '+(run&&run.cold?'coral':'violet')+'">'+(run?(run.cold?'Cold sequence':'Guided sequence')+' · '+(run.i+1)+'/'+run.queue.length:'Guided target')+'</span><h2>'+t.name+'</h2><p class="mono" style="font-size:1.05rem">'+t.formula+'</p></div>'+(R.guided?'<span class="tag gold">'+t.pattern+' · '+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span>':'')+'</div><p>'+t.prompt+'</p><p class="muted"><b>Rule:</b> atom connectivity is locked. Only electrons move. Build the complete next contributor—not the resonance hybrid.</p>';v.appendChild(head);
+  const grid=el("div",{class:"res-grid"});
+  const source=el("div",{class:"res-stage"});source.innerHTML='<h3>1 · Draw curved arrow'+(t.arrowCount===1?'':'s')+'</h3><p class="muted" style="margin:0">Tap source → destination for each electron pair.</p>';
+  const ssvg=document.createElementNS("http://www.w3.org/2000/svg","svg");ssvg.setAttribute("class","res-svg");ssvg.setAttribute("aria-label","Starting resonance contributor and curved arrows");source.appendChild(ssvg);
+  const sb=el("div",{class:"res-toolbar","aria-label":"Bond targets for curved arrows"});sb.appendChild(el("span",{class:"muted"},"Bond targets:"));t.graph.bonds.forEach(b=>{const label=resBondControlLabel(t.graph,b);sb.appendChild(el("button",{class:"tool","aria-label":"Use "+label+" bond target",onclick:()=>resHandlePoint("bond",resBondKey(b.a,b.b))},label));});source.appendChild(sb);
+  source.appendChild(el("p",{class:"res-status"},R.msg));const st=el("div",{class:"res-toolbar"});st.appendChild(el("button",{class:"tool",disabled:!R.pending&&!R.arrows.length,onclick:resUndoArrow},R.pending?"Cancel start":"Undo arrow"));st.appendChild(el("button",{class:"tool",onclick:()=>{R.arrows=[];R.pending=null;R.msg="Tap an electron source: a lone pair or a π bond.";R.audit=null;render();}},"Clear arrows"));source.appendChild(st);grid.appendChild(source);
+  const product=el("div",{class:"res-stage"});product.innerHTML='<h3>2 · Build the next contributor</h3><p class="muted" style="margin:0">Tap an atom or bond, then use the controls.</p>';
+  const psvg=document.createElementNS("http://www.w3.org/2000/svg","svg");psvg.setAttribute("class","res-svg");psvg.setAttribute("aria-label","Editable next resonance contributor");product.appendChild(psvg);
+  const pb=el("div",{class:"res-toolbar","aria-label":"Bond selectors for the next contributor"});pb.appendChild(el("span",{class:"muted"},"Select bond:"));R.product.bonds.forEach(b=>{const label=resBondControlLabel(R.product,b);pb.appendChild(el("button",{class:"tool","aria-label":"Select "+label+" bond control",onclick:()=>resSelectEdit("bond",b.key)},label));});product.appendChild(pb);
+  const sel=R.editSel,bar=el("div",{class:"res-toolbar"});bar.appendChild(el("span",{class:"muted",style:"width:100%"},sel?(sel.kind==="bond"?"Selected bond "+sel.id.toUpperCase().replace("-","–"):"Selected atom "+sel.id.toUpperCase()):"Select an atom or bond above."));
+  [["Bond −","bond",-1],["Bond +","bond",1],["Charge −","charge",-1],["Charge +","charge",1],["LP −","lp",-1],["LP +","lp",1]].forEach(([label,kind,d])=>bar.appendChild(el("button",{class:"tool",disabled:!sel||(kind==="bond")!==(sel.kind==="bond"),onclick:()=>resAdjust(kind,d)},label)));
+  bar.appendChild(el("button",{class:"tool",onclick:resResetProduct},"Reset contributor"));product.appendChild(bar);grid.appendChild(product);v.appendChild(grid);
+  const row=el("div",{class:"card",style:"margin-top:12px"});row.innerHTML='<h3>3 · Audit before ranking</h3><p class="muted">The checker will verify arrow source/head, exact next contributor, conserved net charge, and conserved electron pairs.</p>';row.appendChild(el("button",{class:"btn coral",onclick:runResAudit},"Check arrows + contributor"));row.appendChild(el("button",{class:"btn ghost small",style:"margin-left:8px",onclick:leaveResLab},"← targets"));v.appendChild(row);
+  const fb=resAuditFeedback();if(fb)v.appendChild(fb);drawResGraph(ssvg,t.graph,"source");drawResGraph(psvg,R.product,"edit");
+};
+
 /* ---- CHEAT SHEET ---- */
 VIEWS.learn = (v) => {
   /* v3.7: chaptered Learn — Chapters menu → topic list → primer. Back buttons at every level. */
@@ -5039,6 +5311,7 @@ VIEWS.learn = (v) => {
     c.innerHTML='<span class="tag violet">'+ch.ico+' '+ch.name+'</span><h2 style="margin:6px 0">'+tName(k)+'</h2>'+
       (L?'<p style="margin:0 0 10px">'+L.primer+'</p><p class="muted" style="margin:0 0 8px">📕 Read: <b>'+L.klein+'</b>'+(ch.id!=="prelim"?' (WileyPLUS eText → Course Resources)':'')+'</p>':'<p class="muted">Primer coming — use the videos below, then drill.</p>');
     const rt=resTile(k); if(rt){ rt.open=true; c.appendChild(rt); }
+    if(k==="resonance"||k==="arrows")c.appendChild(el("button",{class:"btn coral",style:"margin:12px 8px 0 0",onclick:()=>go("reslab")},"Build it in Resonance Lab →"));
     if(QUESTIONS.some(q=>q.topic===k&&q.type!=="written")) c.appendChild(el("button",{class:"btn teal",style:"margin-top:12px",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"Now drill it →"));
     v.appendChild(c);
     v.appendChild(back("All chapters", ()=>{S.learnTopic=null;S.learnCh=null; render();}));
@@ -5297,6 +5570,7 @@ VIEWS.report = (v) => {
 "Questions: "+a.r+" right / "+a.w+" wrong ("+a.pct+"% overall)\n"+
 (perTopic?("By topic:\n"+perTopic+"\n"):"")+
 "Molecules built: "+(S.molDone.join(", ")||"none")+"\n"+
+"Resonance Lab: "+S.resDone.length+"/"+RESONANCE_TARGETS.length+" transformations passed · "+(S.resRuns||[]).filter(r=>r.cold&&r.clean).length+" clean cold sequence(s)\n"+
 "FC mastery: "+new Set(S.fcMastery).size+"/2 clean days"+(S.fcMastery.length?" ("+[...new Set(S.fcMastery)].join(", ")+")":"")+(new Set(S.fcMastery).size>=2?" — MASTERED":"")+"\n"+
 (S.lastEval?("Evaluator ("+S.lastEval.date+", "+S.lastEval.kind+"): "+S.lastEval.pct+"% · gaps to study first: "+(S.lastEval.gaps.length?S.lastEval.gaps.map(k=>TOPICS[k]?.name||k).join(" > "):"none")+"\n"):"")+
 (missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
