@@ -6,7 +6,45 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.55  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22 09-03
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.58  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07
+  v3.58 (2026-09-07, CHAPTER-2 CLEANUP + CHAPTER-3 CURRENT STATE, CODEX): Practice now leads
+      with the verified Chapter 3 quiz on Thu 9/10 and its lecture set instead of the expired
+      Chapter 2 quiz. The calendar map keeps Chapter 3 current through quiz week and moves
+      Chapter 4 to the following week. New and stale profiles are seeded/migrated to the Ch 3
+      checkpoint so Today, diagnostics, readiness and Adaptive all use acid/base scope.
+      Chapter 2 is no longer scattered across the top of Practice: its accordion contains one
+      numbered review path—bond-line build → functional-group scan → arrow grammar → checked
+      resonance construction—with a direct action at each step. Drawing labs remain intact but
+      live under one compact fold; the four Ch 2 topic rows follow the same prerequisite order,
+      and Bond-line is no longer ambiguously labeled “+ groups.” Outgoing v3.57 archived byte-for-byte.
+  v3.57 (2026-09-03, CH 3 LECTURE 1 — ACID/BASE, CLAUDE): 37 new items (AB3-*) authored from the
+      Thursday 9/3 lecture transcript + the 49-slide Ch 3 deck, into the existing acidbase1/acidbase2 topics.
+      Covers the gaps the old 36-item acid/base bank had no items for: WHERE A MECHANISM ARROW STARTS AND ENDS
+      (she said out loud that arrows are graded and that an arrow "going off into space" gets no credit),
+      the resonance-arrow vs mechanism-arrow distinction, formal charges after a transfer, identifying
+      proton-transfer steps inside a multi-step mechanism (alcohol dehydration: steps 1 and 3, not 2),
+      favourability as low-pKa acid -> high-pKa conjugate acid, ranking BASES via the conjugate acid,
+      functional-group-to-pKa lookup, the nicotine critical-thinking item, leveling, and Lewis vs Bronsted.
+      4 generation items (3 written + 1 multi) because the measured split is ~75-80% MC vs ~0-40% written
+      and exams+final are 55% of the grade.
+      *** SCORING FIX, this is the important one: a3 and x2-ab07 marked the pKa of water as 15.7/16 with
+      tight tolerances, so answering 14 was scored WRONG. Ciesla scored out the 15.7 on her own handout in
+      lecture ("the graphic is from an older edition... the pKa value for water is 14"). Both items now accept
+      14-16 and tell him to write 14 on her exam. The bank was actively training the wrong number.
+      New FOCUS_SET "lecture-ab1" serves the whole set in her lecture order.
+      Outgoing v3.56 archived byte-for-byte. NOT YET DEPLOYED.
+
+      v3.56 (2026-09-03, HOMEWORK-LEVEL READINESS DIAGNOSTIC):
+        Replaces the old two-items-per-topic sampler with a ten-item readiness blueprint.
+        Chapter 2 now requires checked bond-line construction, large-molecule multi-group
+        recognition, contributor generation/ranking, an exact curved-arrow + resulting-
+        contributor build, and resonance-hybrid/partial-charge transfer. Tier-0 recall is
+        excluded; the deck is tier 2/3 plus two production items. Readiness now requires
+        >=80% raw, zero guessed-rights, every tested area passing, and every named critical
+        task clean; an older or
+        differently scoped diagnostic cannot clear a new checkpoint. Pause/resume preserves
+        the blueprint and first-audit evidence. Outgoing v3.55 archived byte-for-byte.
+        Public v3.55; v3.56 DEPLOY PENDING.
   v3.55 (2026-09-03, CHAPTER 2 USES THE EXAM REPRESENTATION):
         Structure-dependent functional-group, lone-pair, formal-charge, and resonance cards from
         the worked Chapter-2 sets now show responsive code-drawn bond-line structures instead of
@@ -1093,6 +1131,17 @@ nav button.active .ico{opacity:1}
 .home-resume .tag{display:none}
 .practice-quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:1rem}
 .practice-quick-grid>.card{margin:0;min-width:0}
+.home-section-body>.practice-quick-grid{padding:10px;margin:0}
+.practice-current{border-left:5px solid var(--coral)}
+.ch2-path{background:#fff;border-color:#88aab9}
+.ch2-path-intro{margin:5px 0 12px;color:var(--muted-tx);font-size:.86rem;line-height:1.5}
+.ch2-steps{display:grid;gap:8px}
+.ch2-step{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.ch2-step-num{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-family:var(--mono);font-weight:850}
+.ch2-step-copy{min-width:0}
+.ch2-step-copy b{display:block;font-size:.9rem}
+.ch2-step-copy span{display:block;color:var(--muted-tx);font-size:.78rem;line-height:1.4;margin-top:2px}
+@media(max-width:620px){.ch2-step{grid-template-columns:32px minmax(0,1fr)}.ch2-step .btn{grid-column:1/-1;width:100%}}
 .mini-details{margin-top:.65rem}
 .mini-details>summary{color:var(--teal-dk);cursor:pointer;font-size:.82rem;font-weight:750}
 .mini-details>p{margin:.45rem 0 0}
@@ -1239,8 +1288,8 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 </head>
 <body>
 <header>
-  <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">PREPARATION</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.55</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
+  <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">CHAPTER 3</span></h1>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.58</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1496,7 +1545,7 @@ const TOPICS = {
   resonance:{ name:"Resonance",          ico:"🔁" },
   acidbase1:{ name:"Acid-base: pKa",     ico:"🍋" },
   acidbase2:{ name:"Acid-base: ARIO",    ico:"⚖️" },
-  bondline: { name:"Bond-line + groups", ico:"⛓️" },
+  bondline: { name:"Bond-line structures", ico:"⛓️" },
   diag:     { name:"Final diagnostic",   ico:"🏁" },
 };
 
@@ -1508,7 +1557,8 @@ const SEMESTER = [ // courseWeek -> topics INTRODUCED that week (app-bank keys o
   {wk:1,  start:"2026-08-17", ch:"Ch 1 (gen-chem review)", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf"]},
   {wk:2,  start:"2026-08-24", ch:"Ch 2 (molecular representation)", topics:["bondline","fgroups","resonance","arrows"]}, // v3.13: fgroups introduced in lecture 3 (Tue 8/25); v3.29: arrows now has a bank, so it counts as covered
   {wk:3,  start:"2026-08-31", ch:"Ch 3 (acids/bases)", topics:["acidbase1","acidbase2"]},
-  {wk:4,  start:"2026-09-07", ch:"Ch 4 (alkanes/cycloalkanes)", topics:[]}, // bank items TBD (future version)
+  {wk:4,  start:"2026-09-07", ch:"Ch 3 (acids/bases) · quiz week", topics:["acidbase1","acidbase2"]}, // Gabe 9/7: still on Ch 3; quiz Thu 9/10
+  {wk:5,  start:"2026-09-14", ch:"Ch 4 (alkanes/cycloalkanes)", topics:[]}, // bank items TBD (future version)
 ];
 const CHECKPOINTS = [ // fixed, from the verified schedule; quizzes come via S.nextQuiz
   {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf","bondline","resonance","acidbase1","acidbase2"]},
@@ -1520,7 +1570,7 @@ function courseWeek(){ const ms=new Date()-new Date(CLASS_START+"T00:00:00"); re
 function coveredTopics(){ // everything the course has introduced up to the current week, that the bank actually has
   const wk=courseWeek(); const t=[];
   SEMESTER.forEach(w=>{ if(w.wk<=Math.max(wk,1)) t.push(...w.topics); });
-  return t.filter(k=>QUESTIONS.some(q=>q.topic===k));
+  return [...new Set(t)].filter(k=>QUESTIONS.some(q=>q.topic===k));
 }
 function nextCheckpoint(){ // nearest future graded event: nextQuiz (if set & future) vs fixed checkpoints
   const today=todayStr(); const fixed=CHECKPOINTS.find(c=>c.date>=today);
@@ -1631,7 +1681,8 @@ function diagDue(){
   const cp=nextCheckpoint();
   // v3.1 (audit F3): checkpoint-proximity check runs FIRST — even on a first-ever run
   if(cp && daysTo(cp.date)<=2 && daysTo(cp.date)>=0) { // final approach: scoped takes priority
-    const doneToday=S.diags.some(d=>d.date===todayStr()&&d.type==="scope");
+    const cpScope=scopeForCheckpoint(cp).filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
+    const doneToday=S.diags.some(d=>d.date===todayStr()&&d.type==="scope"&&d.diagVersion>=READINESS_DIAG_VERSION&&sameTopicScope(d.scopeTopics,cpScope));
     return doneToday?null:"scope";
   }
   /* v3.36 (Gabe: "Same goes for diagnostic"): during an assessment week the diagnostic ON
@@ -1642,12 +1693,75 @@ function diagDue(){
      cumulative by construction (explicit Ch 1–4 list for Exam 1; topics:null → everything
      covered for the rest) — a scoped run then IS the include-everything run. */
   const inWindow = cp && daysTo(cp.date)>=0 && daysTo(cp.date)<=7;
-  if(!S.diags.length) return inWindow?"scope":"cum";
-  const last=S.diags[S.diags.length-1];
+  const current=S.diags.filter(d=>d.diagVersion>=READINESS_DIAG_VERSION);
+  if(!current.length) return inWindow?"scope":"cum";
+  const last=current[current.length-1];
   const age=Math.floor((new Date(todayStr()+"T00:00:00")-new Date(last.date+"T00:00:00"))/86400000);
   if(age<2) return null;
   if(inWindow) return "scope";
   return last.type==="cum"?"scope":"cum";
+}
+const READINESS_DIAG_VERSION=2;
+function sameTopicScope(a,b){
+  const x=[...new Set(a||[])].sort(),y=[...new Set(b||[])].sort();
+  return x.length===y.length&&x.every((k,i)=>k===y[i]);
+}
+function diagCriticalAudit(D){
+  const logs=D.log||[],bondEvidence=D.bondBuildEvidence||{},resEvidence=D.resLabEvidence||{};
+  return (D.diagCriticalIds||[]).map(id=>{
+    const rec=logs.slice().reverse().find(x=>x.id===id),role=(D.diagRoles||{})[id]||id;
+    let ok=!!rec&&rec.ok&&!rec.g&&!rec.dk,detail="answer must be correct without a guess flag";
+    const bondKeys=(D.diagBondRequirements||{})[id]||[];
+    if(bondKeys.length){
+      const ev=bondEvidence[id]||[];
+      const clean=bondKeys.every(key=>ev.some(x=>x.key===key&&x.clean));
+      ok=ok&&clean; if(!clean)detail="bond-line build was not first-audit clean";
+    }
+    const resKey=(D.diagResonanceRequirements||{})[id];
+    if(resKey){
+      const ev=resEvidence[id];
+      const clean=!!ev&&ev.key===resKey&&ev.clean;
+      ok=ok&&clean; if(!clean)detail="curved arrows + resulting contributor were not first-audit clean";
+    }
+    return {id,role,ok,detail};
+  });
+}
+function buildReadinessDiagnostic(scopeTopics,type,needScore){
+  const picked=[],used=new Set(),roles={},critical=[],bondRequirements={},resonanceRequirements={};
+  const ranked=qs=>shuffle(qs.filter(q=>q&&!used.has(q.id))).sort((a,b)=>needScore(b)-needScore(a));
+  const take=(qs,role,isCritical=false)=>{const q=ranked(qs)[0];if(!q)return null;picked.push(q);used.add(q.id);roles[q.id]=role;if(isCritical)critical.push(q.id);return q;};
+  const byIds=ids=>ids.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
+  const chapter2Core=["bondline","fgroups","resonance","arrows"];
+  if(chapter2Core.every(k=>scopeTopics.includes(k))){
+    const bond=take(byIds(["EXACT-RB5-20260902-03","EXACT-RB5-20260902-20","EXACT-RB5-20260902-21","SIM-BLLP-20260901-09"]),"checked bond-line construction",true);
+    if(bond)bondRequirements[bond.id]=(bond.bondLineFirst||[]).slice();
+    const bond2=take(QUESTIONS.filter(q=>q.topic==="bondline"&&q.type!=="written"&&itemDifficulty(q)>=2&&(q.bondLineFirst||[]).length),"bond-line transfer");
+    if(bond2)bondRequirements[bond2.id]=(bond2.bondLineFirst||[]).slice();
+    const fg1=take(byIds(["SIM-FG-20260903L-01","SIM-FG-20260903L-02","SIM-FG-20260903L-03"]),"large-molecule functional-group scan",true);
+    take(byIds(["SIM-FG-20260903L-01","SIM-FG-20260903L-02","SIM-FG-20260903L-03"]),"second large-molecule functional-group scan");
+    take(byIds(["EXACT-RB6-20260902-05"]),"generate and rank a conjugated contributor chain",true);
+    take(byIds(["EXACT-RB6-20260902-08"]),"resonance hybrid and partial-charge map",true);
+    take(byIds(["SIM-LARGE-RES-20260903-01","SIM-LARGE-RES-20260903-02","SIM-LARGE-RES-20260903-03"]),"large-molecule resonance scan");
+    const arrows=take(byIds(["EXACT-RB6-20260902-06"]),"draw curved arrows and build their exact product",true);
+    if(arrows)resonanceRequirements[arrows.id]="nitrile-anion";
+    take(byIds(["dr-02"]),"blank-page contributors, ranking, and hybrid",true);
+    take(byIds(["rz-39"]),"explain the hybrid from experimental evidence");
+  }else{
+    const eligible=QUESTIONS.filter(q=>scopeTopics.includes(q.topic)&&q.type!=="written"&&itemDifficulty(q)>=2);
+    scopeTopics.forEach(k=>{
+      if(picked.length>=8)return;
+      take(eligible.filter(q=>q.topic===k),"homework-level "+(TOPICS[k]?.name||k),true);
+    });
+    while(picked.length<8){
+      const q=take(eligible,"homework-level transfer");
+      if(!q)break;
+    }
+    const written=QUESTIONS.filter(q=>scopeTopics.includes(q.topic)&&q.type==="written"&&itemDifficulty(q)>=2);
+    while(picked.length<10){const q=take(written,"blank-page production",picked.filter(x=>x.type==="written").length===0);if(!q)break;}
+    while(picked.length<10){const q=take(eligible,"homework-level transfer");if(!q)break;}
+  }
+  const auto=shuffle(picked.filter(q=>q.type!=="written")),written=shuffle(picked.filter(q=>q.type==="written"));
+  return {queue:auto.concat(written),roles,critical,bondRequirements,resonanceRequirements};
 }
 function startDiag2(type){
   const cov=coveredTopics();
@@ -1667,14 +1781,15 @@ function startDiag2(type){
   scopeTopics=scopeTopics.filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
   if(!scopeTopics.length){ alert("No in-scope topics in the bank yet."+(missing.length?" Uncovered: "+missing.join(", "):"")); return; }
   if(missing.length) alert("⚠ HONESTY NOTE — this "+(type==="scope"?"scoped":"cumulative")+" run does NOT cover: "+missing.join(", ")+".\nThe score below excludes those. Study them from the book/Canvas — the app can't see them.");
-  // 2 MCQ/num per topic (recall-weighted: missed → guessed-shaky → least-seen), + up to 2 written items in scope
+  // v3.56: difficulty is a validity constraint, not just a display badge. Tier-0 recall is
+  // never eligible for a readiness diagnostic; Chapter 2 uses an explicit production-heavy
+  // blueprint and every other scope uses a balanced tier-2/3 ten-item sampler.
   const seen=id=>(S.qstats[id]?.r||0)+(S.qstats[id]?.w||0);
   // v3.2: misconception (confident-wrong) ranked above guessed-wrong; difficulty is MEASURED (qDiffM), not the static constant
-  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(s&&(s.dk||0)>0&&s.r===0)n+=1; if(seen(q.id)===0)n+=2; if(type==="scope")n+=personalFriction(q).score; return n-recencyPenalty(q.id)+Math.random(); }; // v3.25: scope targeting uses personal friction while difficulty-spread remains authored/item-level.
-  const pool=[];
-  scopeTopics.forEach(k=>{ const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written").sort((a,b)=>needScore(b)-needScore(a)); pool.push(...qs.slice(0,2)); });
-  const wr=shuffle(QUESTIONS.filter(q=>q.type==="written"&&scopeTopics.includes(q.topic))).slice(0,2);
-  S.drill={queue:shuffle(pool).concat(wr), i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName, log:[], runId:makeRunId("diag-"+type)};
+  const needScore=q=>{ const s=S.qstats[q.id]; let n=0; if(s&&(s.w-(s.gw||0)-(s.dk||0))>0)n+=4; else if(s&&s.w>0)n+=2; if(s&&(s.gr||0)>0&&s.r<= (s.gr||0))n+=2; if(s&&(s.dk||0)>0&&s.r===0)n+=1; if(seen(q.id)===0)n+=2; if(type==="scope")n+=personalFriction(q).score; return n-recencyPenalty(q.id); };
+  const plan=buildReadinessDiagnostic(scopeTopics,type,needScore);
+  if(plan.queue.length<8){alert("This scope does not yet contain enough homework-level items for a valid readiness diagnostic. It has "+plan.queue.length+"; readiness needs at least 8.");return;}
+  S.drill={queue:plan.queue, i:0, right:0, wrong:0, topic:"__"+type, answered:false, byTopic:{}, cold:true, guessedRight:0, scopeName, scopeTopics:scopeTopics.slice(), log:[], runId:makeRunId("diag-"+type),diagVersion:READINESS_DIAG_VERSION,diagRoles:plan.roles,diagCriticalIds:plan.critical,diagBondRequirements:plan.bondRequirements,diagResonanceRequirements:plan.resonanceRequirements,bondBuildEvidence:{},resLabEvidence:{}};
   go("drill");
 }
 /* v3.3: Lecture Check — fixed cold deck of the Aug 20 lecture items (auto + written),
@@ -2188,8 +2303,8 @@ const QUESTIONS = [
 {id:"r5",topic:"resonance",type:"mc",prompt:"Which resonance structure contributes MOST to the hybrid?",choices:["Full octets, least charge separation, − on the most electronegative atom","The one with the most charges","The one drawn first","They always contribute equally"],answer:0,why:"Ranking rules: <b>octets full > minimal charge > negative on the EN atom</b>. Equivalent structures (like acetate's) contribute equally."},
 /* --- acid-base I --- */
 {id:"a1",topic:"acidbase1",type:"mc",prompt:"Lower pKa means…",choices:["Stronger acid","Weaker acid","Stronger base","Higher pH always"],answer:0,why:"<b>pKa down = acid strength up</b> (it's a log scale: each unit = 10×). Burn this in — every ochem acid-base question routes through it."},
-{id:"a2",topic:"acidbase1",type:"num",prompt:"Approximate pKa of a carboxylic acid (like acetic acid)?",answer:5,tolerance:1,why:"≈ <b>5</b> (4.76 for acetic — either is accepted). Landmarks to know cold: HCl −7 · H₃O⁺ −1.7 · RCOOH 5 · H₂O 15.7 · ROH 16 · alkyne 25 · alkane 50."},
-{id:"a3",topic:"acidbase1",type:"num",prompt:"Approximate pKa of water?",answer:16,why:"<b>15.7</b> (we accept 16). Water is a far weaker acid than a carboxylic acid — 10 pKa units ≈ 10 billion times weaker.",tolerance:1},
+{id:"a2",topic:"acidbase1",type:"num",prompt:"Approximate pKa of a carboxylic acid (like acetic acid)?",answer:5,tolerance:1,why:"≈ <b>5</b> (4.76 for acetic — either is accepted). Landmarks to know cold: H₂SO₄ −9 · HCl −7 · H₃O⁺ −1.7 · RCOOH 5 · phenol 10 · H₂O <b>14</b> (Ciesla) · ROH 16–18 · alkyne 25 · NH₃ 38 · alkane 50."},
+{id:"a3",topic:"acidbase1",type:"num",prompt:"Approximate pKa of water?",answer:15,why:"<b>Ciesla teaches 14</b> (2026-09-03 lecture: newer experimental value, and the number she uses). The printed handout/older Klein table shows <b>15.7</b>. Both accepted here (14–16). On her exam, write <b>14</b>. Either way water is ~9–10 pKa units weaker than a carboxylic acid.",tolerance:2},
 {id:"a4",topic:"acidbase1",type:"mc",prompt:"An acid-base equilibrium favors the side with…",choices:["The weaker acid (higher pKa)","The stronger acid","More molecules","The heavier compounds"],answer:0,why:"Equilibrium runs <b>downhill to the weaker acid</b>. Compare the two pKa values; the side holding the higher-pKa acid wins."},
 {id:"a5",topic:"acidbase1",type:"mc",prompt:"Acetate (CH₃CO₂⁻) + water — is the equilibrium for acetate pulling a proton OFF water favored?",choices:["No — that would form acetic acid (pKa 5) from water (pKa 15.7), uphill","Yes, strongly favored","Yes, about half-way","Only when heated"],answer:0,why:"Going acetate + H₂O → acetic acid + OH⁻ converts a pKa-15.7 acid into a pKa-5 acid — <b>uphill by ~10¹¹</b>. Equilibrium says no."},
 {id:"a6",topic:"acidbase1",type:"text",prompt:"Conjugate base of H₂O? (type a formula, e.g. NH2-)",answer:"oh-",accept:["oh-","ho-","oh−","ho−"],why:"Remove H⁺ from H₂O → <b>OH⁻</b>. Conjugate pairs differ by exactly one proton."},
@@ -2772,7 +2887,7 @@ const QUESTIONS = [
 {id:"x2-ab04",topic:"acidbase1",type:"text",diff:1,prompt:"What is the conjugate ACID of NH₃? (type the formula WITH its charge, like: xy2+)",answer:"nh4+",accept:["nh4+","ammonium"],why:"<b>NH₄⁺.</b> Conjugate acid = add a proton. The charge goes UP by one when you add H⁺ — neutral NH₃ becomes +1. <b>NH₄ without the + is wrong</b>: charge bookkeeping IS the answer. (audit r5: charge-less 'nh4' no longer accepted)"},
 {id:"x2-ab05",topic:"acidbase1",type:"mc",diff:1,prompt:"Which is the strongest acid?",choices:["HCl (pKa −7)","Acetic acid (pKa 5)","Water (pKa 15.7)","Ethanol (pKa 16)"],answer:0,why:"<b>HCl</b>, by a colossal margin — pKa −7 vs 5 is twelve orders of magnitude. Lowest pKa wins, and negative pKa values mean very strong acids."},
 {id:"x2-ab06",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of a carboxylic acid (RCOOH)?",answer:5,tolerance:1,why:"<b>~5.</b> A number worth having cold. Carboxylic acids are the most acidic of the common neutral functional groups you'll meet this semester, thanks to resonance stabilization of the carboxylate. (Sulfonic acids are stronger still, but they mostly show up as catalysts rather than as the compounds you're ranking.)"},
-{id:"x2-ab07",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of water?",answer:15.7,tolerance:0.5,why:"<b>15.7.</b> The reference point in the middle of the ladder. Alcohols sit right beside it (~16), which is why hydroxide and alkoxides are comparably strong bases."},
+{id:"x2-ab07",topic:"acidbase1",type:"num",diff:2,prompt:"Roughly what is the pKa of water? (Ciesla's number)",answer:14,tolerance:2,why:"<b>Ciesla says 14.</b> From the 2026-09-03 lecture: the handout table is from an older edition showing <b>15.7</b>; the current experimental value is <b>14</b>, and that is the number she uses. Accepted range here is 14–16, but <b>write 14 on her exam</b>. Either number puts water beside alcohols (~16) — that is why hydroxide and alkoxides are comparably strong bases."},
 {id:"x2-ab08",topic:"acidbase1",type:"mc",diff:2,prompt:"An acid-base equilibrium favors:",choices:["The side with the WEAKER acid (higher pKa)","The side with the stronger acid","Neither — always 50/50","The left side always"],answer:0,why:"<b>Weaker acid wins.</b> Reactions run downhill toward stability, and the weaker acid is the more stable species. Compare the pKa on each side and the bigger number tells you where the equilibrium sits."},
 {id:"x2-ab09",topic:"acidbase1",type:"mc",diff:2,prompt:"The stronger the acid, its conjugate base is:",choices:["Weaker (more stable)","Stronger","Unchanged","Also strong"],answer:0,why:"<b>Inverse relationship.</b> A strong acid gives up its proton readily precisely because the resulting anion is stable — and a stable anion is a weak base. Cl⁻ (from HCl) is a terrible base; NH₂⁻ (from NH₃, pKa 38) is ferocious."},
 {id:"x2-ab10",topic:"acidbase1",type:"mc",diff:3,prompt:"Will hydroxide (⁻OH) deprotonate a terminal alkyne (pKa ~25)?",choices:["No — the product side would hold the STRONGER acid (water, 15.7), so equilibrium favors the reactants","Yes, easily","Yes, but slowly","Only when heated"],answer:0,why:"<b>No.</b> Write the reaction out: alkyne (pKa 25) + ⁻OH → acetylide + H₂O (pKa 15.7). Water is the <b>stronger</b> acid (lower pKa), and equilibrium always favors the side with the WEAKER acid — that's the reactant side here, by about 9 pKa units. To deprotonate the alkyne you need a base whose conjugate acid has pKa above 25: NaNH₂ works, because NH₃ is 38."},
@@ -2792,6 +2907,43 @@ const QUESTIONS = [
 {id:"x2-ac10",topic:"acidbase2",type:"mc",diff:3,prompt:"Induction gets weaker as the electronegative atom moves further from the charge. Roughly how fast?",choices:["Sharply — it's essentially gone after 3 or so bonds","Not at all","It gets stronger","It doubles per bond"],answer:0,why:"<b>Drops off fast.</b> Induction travels through σ bonds and dies within a few bonds. A Cl on the alpha carbon matters a lot; the same Cl four carbons away barely registers. Resonance, by contrast, reaches as far as the conjugated system does."},
 {id:"x2-ac11",topic:"acidbase2",type:"mc",diff:3,prompt:"Phenol (pKa 10) is much more acidic than cyclohexanol (pKa 16). Which factor?",choices:["Resonance — phenoxide delocalizes the charge into the ring","Induction","Orbital","Atom"],answer:0,why:"<b>Resonance.</b> Both put a − on oxygen (same Atom), but phenoxide spreads it into the aromatic ring across several structures. Cyclohexanol's alkoxide is stuck. Same atom → move to R."},
 {id:"x2-ac12",topic:"acidbase2",type:"mc",diff:3,prompt:"What's the single question to ask when ranking acidity?",choices:["Which conjugate base is more stable?","Which acid is bigger?","Which has more hydrogens?","Which is more polar?"],answer:0,why:"<b>Always look at the conjugate base.</b> Acidity is decided by what's left AFTER the proton leaves. Deprotonate both, compare the anions with ARIO, and the more stable anion came from the stronger acid. Never try to rank the acids directly."},
+{id:"AB3-arw01",topic:"acidbase1",type:"mc",diff:1,prompt:"In a Brønsted acid–base step, the curved arrow must START at:",choices:["The lone pair on the base","The proton (H) being transferred","The positive charge on the acid","The bond angle between the two molecules"],answer:0,why:"<b>The lone pair on the base.</b> Ciesla, 2026-09-03: <i>&ldquo;if your arrow starts at the H it is wrong — that is not where the electron density is.&rdquo;</i> Arrows track ELECTRONS, and H⁺ has none. This is exactly why she wants you to say <b>the base steals the proton</b> rather than <b>the acid donates the proton</b> — the first phrasing puts the arrow where it belongs."},
+{id:"AB3-arw02",topic:"acidbase1",type:"mc",diff:2,prompt:"Why does Ciesla want you to think &ldquo;the base steals the proton&rdquo; instead of &ldquo;the acid donates the proton&rdquo;?",choices:["Because the donate-phrasing makes students draw the arrow starting at the proton, which has no electrons","Because acids do not actually donate protons","Because it is the Lewis definition","Because bases are always stronger than acids"],answer:0,why:"Her stated reason, verbatim: students who think <i>donate</i> draw the arrow from the proton — <b>but the proton has no electrons</b>. Thinking <i>steal</i> puts the arrow on the base, where the electron density actually is. A mental-model fix aimed at one specific graded error."},
+{id:"AB3-arw03",topic:"acidbase1",type:"num",diff:2,prompt:"How many curved arrows does a complete Brønsted acid–base step require?",answer:2,tolerance:0,why:"<b>Two</b>, drawn simultaneously (one step, never two). Arrow 1: lone pair on the base → the H. Arrow 2: the H–A bond → back onto A. One arrow makes the bond, one breaks it. Slide 3-6: <i>two pairs of electrons move simultaneously</i>."},
+{id:"AB3-arw04",topic:"acidbase1",type:"mc",diff:2,prompt:"The second arrow in an acid–base step starts at the H–A bond. Where does it END?",choices:["On atom A (becoming a new lone pair)","On the H","On the base","In empty space beside the molecule"],answer:0,why:"<b>On A.</b> The shared pair leaves H behind and localises on A as a new lone pair — which is why A picks up a negative formal charge. Ciesla warned specifically about arrows <i>&ldquo;going off into space&rdquo;</i>: an arrow that does not land on an atom or a bond <b>gets no credit</b>."},
+{id:"AB3-arw05",topic:"acidbase1",type:"mc",diff:3,prompt:"You have been drawing curved arrows since resonance (Ch 2). What changes in Ch 3?",choices:["Ch 3 arrows show a real chemical reaction — bonds actually break and form, and connectivity changes","Nothing, they mean the same thing","Ch 3 arrows move atoms instead of electrons","Ch 3 arrows are optional"],answer:0,why:"<b>Connectivity changes.</b> Resonance arrows shuffle lone pairs and π bonds between structures of the <i>same</i> molecule — no reaction occurs. Mechanism arrows break and make real bonds between atoms. Same notation, different claim. Ciesla flagged this as the Ch 2 → Ch 3 shift."},
+{id:"AB3-arw06",topic:"acidbase1",type:"multi",diff:3,prompt:"An amine nitrogen (3 bonds + 1 lone pair) uses that lone pair to steal a proton. After the step, give the formal charges.",fields:[{label:"Charge on N after it grabs H⁺",answer:1},{label:"Charge on the O that lost the H (now 1 bond, 3 lone pairs)",answer:-1}],why:"<b>N = +1:</b> 4 bonds, 0 lone pairs → FC = 5 − 0 − 4 = <b>+1</b>. <b>O = −1:</b> 1 bond, 3 lone pairs → FC = 6 − 6 − 1 = <b>−1</b>. Ciesla, same lecture: <i>&ldquo;formal charges have to be checked&rdquo;</i> — the arrows and the charges are graded together, and forgetting the charge after a transfer is the standard lost point."},
+{id:"AB3-arw07",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Write it out in full:</b> hydroxide (⁻OH) deprotonates acetic acid (CH₃COOH). Describe BOTH curved arrows — exactly where each one starts and where it ends — then give the products with their formal charges.<br><span class='muted'>State the origin of each arrow as an atom-and-electron-source, not as a molecule name. This is the format she grades.</span>",model:"<b>Arrow 1:</b> starts on a <b>lone pair of the hydroxide oxygen</b> → ends at the <b>acidic H</b> of the COOH group (makes the new O–H bond).<br><b>Arrow 2:</b> starts at the <b>O–H σ bond</b> of acetic acid → ends on <b>that oxygen</b> (becomes a new lone pair, breaking the bond).<br><b>Products:</b> H₂O (neutral, O has 2 bonds + 2 lone pairs → FC = 6 − 4 − 2 = 0) and acetate CH₃COO⁻ (the deprotonated O has 1 bond + 3 lone pairs → FC = 6 − 6 − 1 = <b>−1</b>; the charge is delocalised over both oxygens by resonance).<br><b>Favourable?</b> Yes — acetic acid pKa ≈ 5 → water pKa 14. Low to high, so products win by ~9 orders of magnitude.",rubric:["Arrow 1 starts at a LONE PAIR on the hydroxide oxygen — not at the hydroxide as a whole, not at the H","Arrow 1 ends at the acidic proton","Arrow 2 starts at the O–H BOND (not the H, not the O)","Arrow 2 ends ON the oxygen as a new lone pair","Both products drawn with correct formal charges (H₂O neutral, acetate −1)","Did not draw the arrow starting at H⁺"]},
+{id:"AB3-mech01",topic:"acidbase1",type:"mc",diff:3,prompt:"In the acid-catalysed dehydration of an alcohol (3 steps: protonate the OH → lose water → remove a proton to form the alkene), which steps are proton transfers?",choices:["Steps 1 and 3","Step 1 only","Steps 1 and 2","All three"],answer:0,why:"<b>1 and 3.</b> Step 1 puts H⁺ onto the OH; step 3 takes an H⁺ off the carbon to form the π bond. Both move a proton from one species to another — that is the definition. <b>Step 2 is not</b>: nothing is transferred, a leaving group simply departs. Worked in class on 2026-09-03."},
+{id:"AB3-mech02",topic:"acidbase1",type:"mc",diff:2,prompt:"In that same mechanism, step 2 breaks a C–O bond and water departs. What is this step called?",choices:["Loss of a leaving group","Proton transfer","Resonance","Nucleophilic attack"],answer:0,why:"<b>Loss of a leaving group.</b> Ciesla: <i>&ldquo;you do not need to know this now, you will need it in Chapter 6&rdquo;</i> — but you DO need to recognise that it is not a proton transfer. Naming mechanistic steps is a standing exam task."},
+{id:"AB3-mech03",topic:"acidbase1",type:"mc",diff:1,prompt:"What defines a proton-transfer step?",choices:["An H⁺ moves from one species to another","Any step with a curved arrow","Any step where a bond breaks","Any step involving water"],answer:0,why:"<b>An H⁺ moves from one species to another.</b> That is the whole test. Proton transfers show up inside larger mechanisms all semester — ester formation, substitutions — so being able to point at one inside a multi-step scheme is a recurring question type."},
+{id:"AB3-pka01",topic:"acidbase1",type:"mc",diff:2,prompt:"Which is the stronger acid: hydronium (H₃O⁺, pKa −1.7) or HCl (pKa −7)?",choices:["HCl — lower pKa","H₃O⁺ — it carries a positive charge","They are equal","Cannot tell without concentrations"],answer:0,why:"<b>HCl.</b> Lower pKa always wins. Worked in class: this is why <i>&ldquo;the only time you have used HCl you used it in water — and what you were actually working with was hydronium.&rdquo;</i> Bubble HCl into an organic solvent and you have a far stronger acid than aqueous HCl ever was."},
+{id:"AB3-pka02",topic:"acidbase1",type:"num",diff:2,prompt:"pKa of sulfuric acid (H₂SO₄)?",answer:-9,tolerance:1,why:"<b>−9.</b> In gen chem you called it &ldquo;fully dissociating&rdquo; with no Ka at all. In orgo every acid gets a number — including the strong ones — because we are often not in water. H₂SO₄ (−9) is <b>100×</b> stronger than HCl (−7): each pKa unit is one power of 10."},
+{id:"AB3-pka03",topic:"acidbase1",type:"mc",diff:2,prompt:"Why does organic chemistry have measured pKa values for strong acids when general chemistry does not?",choices:["Because orgo is often not run in water, so the leveling effect does not wipe out the differences","Because orgo uses better instruments","Because strong acids are weaker in orgo","Because pKa is calculated, never measured"],answer:0,why:"In water, anything stronger than H₃O⁺ is <b>levelled</b> — it just makes hydronium, so you cannot tell strong acids apart. Non-aqueous solvents remove the ceiling and let the real differences show. (Some values are also obtained mathematically.)"},
+{id:"AB3-pka04",topic:"acidbase1",type:"mc",diff:1,prompt:"Sulfuric acid has pKa −9; HCl has pKa −7. How much stronger is H₂SO₄?",choices:["100×","2×","20×","Half as strong"],answer:0,why:"<b>100×.</b> Each pKa unit = one order of magnitude, and the gap is 2 units → 10² = 100. Slide 3-12 states exactly this."},
+{id:"AB3-fav01",topic:"acidbase1",type:"mc",diff:2,prompt:"Hydroxide (⁻OH) is used to deprotonate ethanol (pKa 16). The conjugate acid formed is water (pKa 14). Is the reaction favourable?",choices:["No — you go from pKa 16 to pKa 14, high to low","Yes — hydroxide is a strong base","Yes — any base deprotonates any alcohol","No reaction occurs at all"],answer:0,why:"<b>Not favourable.</b> Favourable = <b>lower pKa acid on the left → higher pKa conjugate acid on the right</b>. Here it runs 16 → 14, the wrong way. Ciesla: <i>&ldquo;hydroxide is not a good base to use to deprotonate an alcohol.&rdquo;</i>"},
+{id:"AB3-fav02",topic:"acidbase1",type:"mc",diff:2,prompt:"Hydroxide deprotonates phenol (pKa 9.9), forming water (pKa 14). Favourable?",choices:["Yes — 9.9 → 14 is low to high","No — phenol is an alcohol","Only at high temperature","Cannot tell"],answer:0,why:"<b>Yes.</b> 9.9 → 14 runs low to high. Her contrast in class: <i>&ldquo;phenol you can easily deprotonate with sodium hydroxide; other alcohols you cannot.&rdquo;</i> Same OH group, 6 pKa units apart — resonance into the ring is the reason."},
+{id:"AB3-fav03",topic:"acidbase1",type:"mc",diff:2,prompt:"An amide ion (⁻NH₂) removes the proton from a terminal alkyne (pKa 25), forming NH₃ (pKa 38). Favourable?",choices:["Yes — 25 → 38, and the 13-unit gap makes it essentially complete","No — alkynes are not acidic","Yes, but barely","No — NH₃ is a gas"],answer:0,why:"<b>Yes, decisively.</b> 25 → 38 is low to high, and Ciesla's rule of thumb is that a gap over ~10 units is <i>&ldquo;not really an equilibrium — think of it as going straight through.&rdquo;</i>"},
+{id:"AB3-fav04",topic:"acidbase1",type:"mc",diff:3,prompt:"A reaction runs pKa 16 → pKa 14. A classmate says &ldquo;so no product forms at all.&rdquo; Correct them.",choices:["Product does form — the equilibrium simply favours the reactants","Correct, zero product forms","Correct, the reaction is impossible","Product forms and is favoured"],answer:0,why:"<b>It is an equilibrium, not a wall.</b> Ciesla addressed this directly: <i>&ldquo;it does not mean you have zero — it means your equilibrium favours the reactant side.&rdquo;</i> But if the exam asks <b>is it favourable?</b>, the answer is still <b>no</b>. Know both halves; the question wording decides which one you write."},
+{id:"AB3-fav05",topic:"acidbase1",type:"mc",diff:2,prompt:"Ciesla's &ldquo;top tip&rdquo; when a question asks whether a deprotonation will proceed but gives you no equation:",choices:["Write out the full acid–base equation first","Guess from the functional groups","Assume it proceeds","Look up Ka instead of pKa"],answer:0,why:"<b>Write the equation first.</b> Her stated reason: it forces you to identify which species is the acid and which is the conjugate acid, so you look up the <b>right two</b> pKa values. Most lost points here are lookup errors, not reasoning errors."},
+{id:"AB3-fav06",topic:"acidbase1",type:"written",diff:3,prompt:"<b>State the rule and apply it:</b> will sodium hydroxide deprotonate ethanol? Write the acid–base equation, identify the acid and conjugate acid, quote both pKa values, and give a verdict.",model:"<b>Equation:</b> CH₃CH₂O–H + ⁻OH ⇌ CH₃CH₂O⁻ + H–OH<br><b>Acid</b> (loses the proton) = ethanol, pKa <b>16</b>. <b>Conjugate acid</b> (gains it) = water, pKa <b>14</b>.<br><b>Rule:</b> favourable when the reactant acid has the LOWER pKa and the conjugate acid formed has the HIGHER pKa.<br><b>Verdict:</b> 16 → 14 is high to low → <b>not favourable</b>. An equilibrium exists and some ethoxide forms, but it favours the left side by ~10² . To deprotonate an alcohol properly you need a base whose conjugate acid has a pKa well above 16 — e.g. NaH (H₂, pKa 35) or NaNH₂ (NH₃, pKa 38).",rubric:["Wrote the full acid–base equation before reasoning","Correctly identified ethanol as the acid and water as the conjugate acid","Quoted pKa 16 and pKa 14","Stated the low→high rule explicitly","Verdict: not favourable","Bonus: noted product still forms, just not favoured"]},
+{id:"AB3-bas01",topic:"acidbase1",type:"mc",diff:2,prompt:"To rank two BASES using a pKa table, which pKa do you look up?",choices:["The pKa of each base's CONJUGATE ACID","The pKa of the base itself","The pKa of the solvent","Bases cannot be ranked with pKa"],answer:0,why:"<b>The conjugate acid.</b> Add a proton to the base, then look that species up. Ciesla flagged this as a recurring exam error: <i>&ldquo;students end up looking up the wrong thing on the pKa table because they have not identified what the appropriate acid is.&rdquo;</i>"},
+{id:"AB3-bas02",topic:"acidbase1",type:"mc",diff:2,prompt:"Rule for basicity from a pKa table: the stronger base is the one whose conjugate acid has the…",choices:["Higher pKa (weaker acid)","Lower pKa (stronger acid)","pKa closest to 7","Same pKa as water"],answer:0,why:"<b>Higher pKa.</b> Higher pKa conjugate acid = weaker acid = it clings to its proton = its conjugate base is desperate for one = <b>stronger base</b>. The class derived this rule themselves on 2026-09-03."},
+{id:"AB3-bas03",topic:"acidbase1",type:"mc",diff:2,prompt:"Which is the stronger base: an acetylide (⁻C≡CR, conjugate acid pKa 25) or an amide ion (⁻NH₂, conjugate acid pKa 38)?",choices:["The amide ion — its conjugate acid has the higher pKa","The acetylide — carbon holds charge better","Equal","Cannot tell from pKa"],answer:0,why:"<b>Amide ion.</b> Conjugate acid pKa 38 > 25, so NH₃ is the weaker acid, so ⁻NH₂ is the stronger base. Worked example from lecture."},
+{id:"AB3-bas04",topic:"acidbase1",type:"mc",diff:3,prompt:"Which is the stronger base: an alkyl carbanion (conjugate acid = alkane, pKa 50) or an acetylide (conjugate acid pKa 25)?",choices:["The carbanion — conjugate acid pKa 50 is far higher","The acetylide — sp carbon","Equal — both are carbon anions","Neither is a base"],answer:0,why:"<b>The carbanion.</b> pKa 50 vs 25 — a 25-unit gap. An alkane is the feeblest acid on the table, so its conjugate base is the most violently reactive. Second worked pair from lecture; note it is the same reasoning as the amide case, run on carbon."},
+{id:"AB3-fg01",topic:"acidbase1",type:"mc",diff:3,prompt:"A molecule contains BOTH an alcohol (–OH) and an amine (–NH). Which proton is lost first, and why?",choices:["The O–H — alcohols are pKa 16–18, amines are pKa ~38","The N–H — nitrogen is bigger","The C–H — carbon has the most hydrogens","They are lost simultaneously"],answer:0,why:"<b>The O–H.</b> ~16–18 versus ~38 is a 20-unit gap — not close. Her method: <b>ignore the C–H bonds</b> (hydrogens on electronegative atoms are the acidic ones), identify each functional group, look each up, take the lowest pKa. Also her stated reason for memorising functional groups: <i>&ldquo;if you cannot identify it, you are looking up the wrong thing on your table.&rdquo;</i>"},
+{id:"AB3-fg02",topic:"acidbase1",type:"mc",diff:2,prompt:"Scanning a large molecule for its most acidic hydrogen, which H's can you usually skip immediately?",choices:["Hydrogens attached to carbon","Hydrogens attached to oxygen","Hydrogens attached to nitrogen","Hydrogens on the longest chain"],answer:0,why:"<b>C–H.</b> Her top tip verbatim: <i>&ldquo;hydrogens bonded to electronegative elements are going to be much more acidic — if you see OH, NH, you can kind of ignore the ones attached to carbon.&rdquo;</i> Usually, not always: an sp C–H (alkyne, 25) beats an amine N–H (38), so check the orbital before you discard."},
+{id:"AB3-nic01",topic:"acidbase1",type:"mc",diff:3,prompt:"Nicotine has two nitrogens. Protonated at N-A the conjugate acid has pKa 3.1; protonated at N-B it has pKa 8.0. In the mono-protonated form, which nitrogen carries the proton?",choices:["N-B — its conjugate acid has the higher pKa, so N-B is the more basic nitrogen","N-A — lower pKa means it grabs the proton faster","Whichever is closer to the ring","Both equally"],answer:0,why:"<b>N-B.</b> Chain: higher conjugate-acid pKa (8.0) → that conjugate acid is the weaker acid → it holds its proton → so N-B is the <b>stronger base</b> → N-B gets protonated first. Ciesla called this a <b>critical-thinking</b> item: the numbers are given, but nothing tells you what to do with them. Her aside — <i>&ldquo;that is why orgo is a prerequisite for medicine: can you take information and logic it out?&rdquo;</i>"},
+{id:"AB3-nic02",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Justify it in writing:</b> a diamine's two nitrogens have conjugate-acid pKa values of 3.1 and 8.0. Explain, in a chain of reasoning, which nitrogen is protonated first.<br><span class='muted'>Every link must be stated. This is the format she asked students to practise out loud in class.</span>",model:"The nitrogen whose conjugate acid has pKa <b>8.0</b> is protonated first.<br><b>Chain:</b> (1) A higher pKa means a <b>weaker acid</b>. (2) A weaker acid holds onto its proton rather than releasing it. (3) The conjugate base of a weaker acid is a <b>stronger base</b>. (4) The stronger base is the better proton-grabber, so it is protonated first. Therefore the N whose conjugate acid sits at 8.0 — not the one at 3.1 — carries the proton in the mono-protonated form.",rubric:["Named the pKa 8.0 nitrogen as the answer","Stated higher pKa = weaker acid","Linked weaker acid → stronger conjugate base","Linked stronger base → protonated first","Did NOT treat the pKa values as belonging to the bases themselves"]},
+{id:"AB3-cj01",topic:"acidbase1",type:"mc",diff:1,prompt:"Fastest way to identify the acid in a written acid–base reaction?",choices:["Track the proton: the acid HAS it on the left and has LOST it on the right","The acid is always written first","The acid is the one with a charge","The acid is always the smaller molecule"],answer:0,why:"<b>Track the proton.</b> Acid: has the H on the reactant side, missing it on the product side (what remains = conjugate base). Base: lacks it on the left, has it on the right (= conjugate acid). Ciesla: <i>&ldquo;it sounds very simple, but it can trip people up.&rdquo;</i>"},
+{id:"AB3-cj02",topic:"acidbase1",type:"mc",diff:2,prompt:"Water is the base in one reaction and the acid in another. What is this property called?",choices:["Amphoteric","Amphipathic","Aprotic","Ambident"],answer:0,why:"<b>Amphoteric</b> — it can act as either, depending on what else is in the flask. This underpins the leveling effect: water reacts with anything stronger than H₃O⁺ or stronger than ⁻OH, so those reagents cannot be used in water at all."},
+{id:"AB3-sw01",topic:"acidbase2",type:"mc",diff:2,prompt:"In Ciesla's framing, calling a species &ldquo;weak&rdquo; means:",choices:["It is stable, so it is not motivated to do its job","It is present in low concentration","It reacts slowly","It has a low molecular weight"],answer:0,why:"<b>Stable = unmotivated.</b> Her recasting: strong = <i>motivated/reactive</i>, weak = <i>stable</i>. A strong acid is good at losing its proton precisely because what it becomes is stable — and that stable conjugate base is a lousy base, because it no longer needs a proton."},
+{id:"AB3-sw02",topic:"acidbase2",type:"mc",diff:2,prompt:"Sulfate/bisulfate is the weakest base on the table. Why?",choices:["Its negative charge is delocalised by resonance over three oxygens","Sulfur is very electronegative","It is a large molecule","It has no lone pairs"],answer:0,why:"<b>Resonance over three oxygens.</b> Worked in class: the charge is spread thin, which is why H₂SO₄ (pKa −9) gives up its proton so readily — <i>&ldquo;once it loses the proton it is happy to just hang out.&rdquo;</i> Strongest acid ⇄ weakest conjugate base, and resonance is the reason."},
+{id:"AB3-sw03",topic:"acidbase2",type:"mc",diff:2,prompt:"In organic chemistry, acid and base strength is described as:",choices:["Relative — stronger or weaker than whatever else is in the flask","Absolute — there are exactly 7 strong acids","Fixed by the pH scale","Determined only by concentration"],answer:0,why:"<b>Relative.</b> Gen chem gave you seven strong acids and called the rest weak. Orgo compares: <i>stronger acid, stronger base</i>, relative to the other species present. Ciesla called this out as a required mindset shift for the chapter."},
+{id:"AB3-ario01",topic:"acidbase2",type:"mc",diff:2,prompt:"ARIO is used in which order when assessing acidity?",choices:["Atom → Resonance → Induction → Orbital, as a priority ranking","Any order — all four are equal","Orbital first, it is the strongest effect","Only whichever one applies"],answer:0,why:"<b>Strict priority order</b>, like ranking resonance structures: check Atom first, and only fall through to Resonance, then Induction, then Orbital if the earlier factor does not decide it. Coming up in the Tuesday lecture (qualitative analysis) — this is the tool for when NO pKa values are given."},
+{id:"AB3-ario02",topic:"acidbase2",type:"mc",diff:3,prompt:"When ARIO and the measured pKa values disagree, which wins?",choices:["The pKa values — ARIO is a guideline that sometimes fails","ARIO — it is based on theory","Whichever gives the larger difference","They can never disagree"],answer:0,why:"<b>pKa always wins.</b> Slide 3-30/3-31 makes this explicit with acetylene vs ammonia: ARIO predicts one answer, experiment gives another. <i>&ldquo;Using the pKa values you can never go wrong.&rdquo;</i> Use ARIO when no numbers are supplied — not to override numbers you were given."},
+{id:"AB3-lev01",topic:"acidbase2",type:"mc",diff:3,prompt:"Why can a base stronger than hydroxide not be used in water?",choices:["Water is acidic enough to protonate it, destroying it before it can react","It would not dissolve","Water freezes it out","It would evaporate"],answer:0,why:"<b>Water protonates it.</b> Anything more basic than ⁻OH simply deprotonates water and becomes its own conjugate acid — you are left holding hydroxide no matter what you added. The mirror rule: acids stronger than H₃O⁺ are levelled down to H₃O⁺. This is the <b>leveling effect</b>, and it is why orgo runs in non-aqueous solvents."},
+{id:"AB3-lew01",topic:"acidbase2",type:"mc",diff:2,prompt:"How do the Lewis definitions differ from Brønsted–Lowry?",choices:["Lewis is about electron-pair acceptance/donation, so it covers reactions with no proton at all","Lewis only applies in water","Lewis acids must contain hydrogen","They are identical"],answer:0,why:"<b>Lewis acid = electron-pair acceptor; Lewis base = electron-pair donor.</b> Every Brønsted acid/base is also a Lewis one, but not the reverse: BF₃ + NH₃ is a Lewis acid–base reaction with no proton anywhere. Arrhenius is the third definition and is useless here — it is water-only."},
 
 /* ===== v3.13 — LECTURE 3 (Ciesla, Tue 2026-08-25, Ch 2 part 1) =====
    Built from Gabe's transcript + the Klein Ch-2 deck + the official Functional Groups table
@@ -3479,7 +3631,7 @@ const S = {
   masteryDays: safeStore.get("masteryDays", {}), // v3.16: {topicKey:[dates]} — the same bar, now for EVERY topic. formal stays mirrored to fcMastery for back-compat.
   lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
   diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
-  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 1 Quiz",date:"2026-08-27",topics:["valence","lewis","isomers","formal","polarity","hybrid","imf"]}), // v3.17: isomers added from Gabe's reported exact quiz/exam batch; still editable
+  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 3 Quiz",date:"2026-09-10",topics:["acidbase1","acidbase2"]}),
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
@@ -3544,13 +3696,13 @@ function save(){
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
-  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", masteryTopic:D.masteryTopic||"", log:D.log||[], runId:D.runId||"", adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, bondStructuresBuilt:D.bondStructuresBuilt||{}, ts:Date.now()};
+  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", scopeTopics:D.scopeTopics||[], masteryTopic:D.masteryTopic||"", log:D.log||[], runId:D.runId||"", diagVersion:D.diagVersion||0, diagRoles:D.diagRoles||{}, diagCriticalIds:D.diagCriticalIds||[], diagBondRequirements:D.diagBondRequirements||{}, diagResonanceRequirements:D.diagResonanceRequirements||{}, bondBuildEvidence:D.bondBuildEvidence||{}, resLabEvidence:D.resLabEvidence||{}, adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, bondStructuresBuilt:D.bondStructuresBuilt||{}, ts:Date.now()};
   safeStore.set("pausedDrill", S.pausedDrill);
 }
 function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
   const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
-  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName, masteryTopic:p.masteryTopic||"", log:p.log||[], runId:p.runId||"", adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}, bondStructuresBuilt:p.bondStructuresBuilt||{}}; // v3.39: both Lewis and bond-line structure gates survive pause/resume inside the same round
+  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName, scopeTopics:p.scopeTopics||[], masteryTopic:p.masteryTopic||"", log:p.log||[], runId:p.runId||"", diagVersion:p.diagVersion||0, diagRoles:p.diagRoles||{}, diagCriticalIds:p.diagCriticalIds||[], diagBondRequirements:p.diagBondRequirements||{}, diagResonanceRequirements:p.diagResonanceRequirements||{}, bondBuildEvidence:p.bondBuildEvidence||{}, resLabEvidence:p.resLabEvidence||{}, adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}, bondStructuresBuilt:p.bondStructuresBuilt||{}}; // v3.56: diagnostic blueprint and first-audit construction evidence also survive pause/resume
   go("drill");
 }
 /* v3.14: the FC mastery gate pauses too. It was the one multi-step run with no exit —
@@ -3570,6 +3722,14 @@ function resumeMastery(){ const p=S.pausedMastery; if(!p) return;
   go("mastery");
 }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+/* v3.58: existing Gabe/Sam profiles may still hold the expired Ch 1/Ch 2 checkpoint.
+   During the verified Ch 3 quiz window, migrate only an older quiz date; a newer manual
+   checkpoint always wins. Persist locally now so every routing surface agrees this load. */
+const CH3_QUIZ={name:"Ch 3 Quiz",date:"2026-09-10",topics:["acidbase1","acidbase2"]};
+if(todayStr()<=CH3_QUIZ.date&&(!S.nextQuiz||!S.nextQuiz.date||S.nextQuiz.date<CH3_QUIZ.date)){
+  S.nextQuiz={...CH3_QUIZ,setAt:new Date().toISOString()};
+  safeStore.set("nextQuiz",S.nextQuiz);
+}
 /* v3.29: a checkpoint whose date has passed silently corrupts every readiness number and
    leaves the countdown stuck at 0d. Roll it forward once, on load, from the known schedule. */
 /* v3.36: the SUCCESSION list. When one checkpoint passes, the app must already know the next
@@ -3920,6 +4080,7 @@ VIEWS.home = (v) => {
     {d:"2026-08-28",n:"Drop deadline (partial refund)"},
     {d:"2026-08-30",n:"Ch 2 WileyPLUS HW",note:"date est. — check Canvas",est:1},
     {d:"2026-09-07",n:"Drop deadline (no record)"},
+    {d:"2026-09-10",n:"Ch 3 QUIZ — Thursday",note:"Acids/bases · pKa, proton transfer, favourability and ARIO",big:1},
     {d:"2026-09-15",n:"EXAM 1 — wk of Sep 14 (likely Thu 9/17)",note:"Ch 1–4 · lowest of 3 exams dropped",est:1,big:1},
     {d:"2026-10-20",n:"EXAM 2 — wk of Oct 19",est:1,big:1},
     {d:"2026-11-10",n:"EXAM 3 — wk of Nov 9",est:1,big:1},
@@ -3971,12 +4132,8 @@ VIEWS.home = (v) => {
     if(nxt) inner+='<p class="muted" style="margin:4px 0 0;font-size:.8rem">Next week: '+nxt.ch+'</p>';
     const cp=nextCheckpoint();
     if(cp&&daysTo(cp.date)<=7&&daysTo(cp.date)>=0){
-      const scope=(cp.topics||[]).filter(k=>QUESTIONS.some(q=>q.topic===k));
-      const ps=scope.map(k=>cleanPct(k)).filter(x=>x!==null);
-      const avg=ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):null;
-      const lastScoped=S.diags.slice().reverse().find(d=>d.type==="scope");
-      const ready=(avg!==null&&avg>=80)&&!!lastScoped&&lastScoped.pct>=80;
-      inner+='<div class="why" style="margin-top:8px"><b>'+(ready?'🟢':'🔴')+' '+cp.name+' readiness · '+daysTo(cp.date)+'d out:</b> clean '+(avg===null?'—':avg+'%')+' across scope · last 🎯 scoped diag: '+(lastScoped?lastScoped.pct+'% ('+fmtDay(lastScoped.date)+')':'<b>none yet</b>')+'.<br>Gate: <b>≥80% clean</b> on scope AND <b>a scoped diagnostic ≥80%</b> by the night before. '+(ready?'✅ Cleared — maintain, don\'t cram.':'Not cleared yet — the 🎯 Scoped diagnostic is the fastest path.')+'</div>';
+      const R=readinessFor(cp);
+      inner+='<div class="why" style="margin-top:8px"><b>'+(R.ready?'🟢':'🔴')+' '+cp.name+' readiness · '+daysTo(cp.date)+'d out:</b> clean '+(R.avg===null?'—':R.avg+'%')+' across scope · rigorous 🎯 diagnostic: '+(R.lastScoped?R.lastScoped.pct+'% · '+R.lastScoped.criticalPassed+'/'+R.lastScoped.criticalTotal+' critical ('+fmtDay(R.lastScoped.date)+')':'<b>none for this exact scope</b>')+'.<br>Gate: <b>≥80% clean</b>, no untouched topic, diagnostic <b>≥80%</b>, zero guessed-rights, every tested area passing, and <b>every critical task clean</b>. '+(R.ready?'✅ Cleared — maintain, don\'t cram.':'Not cleared yet — take or repair the homework-level scoped diagnostic.')+'</div>';
     }
     pc.innerHTML=inner; v.appendChild(pc);
   })();
@@ -4004,7 +4161,7 @@ VIEWS.home = (v) => {
     const b = el("div",{class:"card cream home-diagnostic"});
     b.innerHTML = '<span class="tag coral">🩺 Diagnostic due · every 2 days</span>'+
       '<h3 style="margin:6px 0">'+(due==="cum"?"📚 Cumulative — everything the course has covered":"🎯 Scoped — "+(cp?cp.name+" is in "+daysTo(cp.date)+" day"+(daysTo(cp.date)===1?"":"s"):"next assessment"))+'</h3>'+
-      '<p class="muted" style="margin:0 0 8px">Cold, honest, ~10 min. Ends with a gap map + ONE repair. Written items at the end get saved for Claude\'s review.</p>';
+      '<p class="muted" style="margin:0 0 8px">Cold and homework-level: 10 items when available, no tier-0 trivia, two production tasks, and named critical skills that cannot be averaged away. Passing also requires every tested area to clear its screen. Written work is saved for Claude\'s review.</p>';
     b.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2(due)},"Start diagnostic →"));
     v.appendChild(b);
   }
@@ -4466,6 +4623,11 @@ function renderAdaptiveAssignmentCard(v){
    flags, same attempt ledger, same pause/resume — so a focus run is honest evidence, not a
    practice mode with different rules. Mastery checks stay cold and unaffected. */
 const FOCUS_SETS=[
+  {id:"lecture-ab1", topic:"acidbase1", ico:"🍋", shortLabel:"Ch 3 lecture 1",
+   name:"Ch 3 lecture 1 — proton transfer, arrows & the pKa table",
+   blurb:"Everything from Thursday 9/3, in her order: the base-steals-the-proton reframe, where a mechanism arrow starts and ends (she grades this), spotting proton-transfer steps inside a multi-step mechanism, reading the pKa table, favourability by low→high pKa, and ranking BASES through the conjugate acid. Ends with the written derivations.",
+   includeWritten:true,
+   match:q=>/^AB3-/.test(String(q.id))},
   {id:"lecture6", topic:"resonance", ico:"🧭", shortLabel:"Lecture-6 set",
    name:"Lecture 6 — lone pairs, ranking & the five patterns",
    blurb:"Everything from Tuesday's lecture, quiz-ready: localized vs delocalized lone pairs (which orbital, the steric-number consequence, HER RING EXCEPTION), the ranking rules in priority order, the five single-step patterns with arrow counts, and the multi-step discipline. Ends with the worksheet drawing exercises on paper.",
@@ -4584,23 +4746,39 @@ const SESSION_MAX = 5; // v2.13: max questions per drill session (short sets, bi
 const CHAPTERS=[
   {id:"prelim",ico:"🌱",name:"Preliminaries",sub:"The pre-gen-chem foundation — start here if anything feels shaky",topics:["p_atom","p_ptable","p_ions","p_bondtypes","p_formulas"]},
   {id:"ch1",ico:"⚗️",name:"Chapter 1 — General Chemistry Review",sub:"Week 1 · Klein Ch 1 · QUIZ THU 8/27 — full quiz scope incl. orbitals & isomers",topics:["valence","lewis","formal","polarity","hybrid","imf","orbitals","isomers"]},
-  {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Week 2 (NOW, finish by Aug 30) · bond-line, functional groups, resonance, curved arrows",topics:["bondline","fgroups","resonance","arrows"]},
-  {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"Week 3 (starts Aug 31) · pKa ladder, ARIO, Lewis acids/bases",topics:["acidbase1","acidbase2","lewisab"]},
-  {id:"ch4",ico:"⛰️",name:"Chapter 4 — Alkanes & Cycloalkanes",sub:"Week 4 (starts Sep 7) · read ahead only if Ch 1–3 are solid · Exam 1 covers Ch 1–4 (~Sep 15)",topics:["alkanes","conform","chair"]},
+  {id:"ch2",ico:"✏️",name:"Chapter 2 — Molecular Representations",sub:"Review in one order: build the structure → identify groups → move electrons → verify the contributor",topics:["bondline","fgroups","arrows","resonance"]},
+  {id:"ch3",ico:"🍋",name:"Chapter 3 — Acids & Bases",sub:"CURRENT · Quiz Thu Sep 10 · pKa, proton transfer, favourability, ARIO and Lewis/Brønsted distinctions",topics:["acidbase1","acidbase2"]},
+  {id:"ch4",ico:"⛰️",name:"Chapter 4 — Alkanes & Cycloalkanes",sub:"NEXT · begins after the Chapter 3 quiz · naming, conformations and cyclohexane chairs",topics:["alkanes","conform","chair"]},
 ];
 /* which chapter is course-current right now, so Practice can lead with it */
 function currentChapterId(){
   const wk=Math.max(courseWeek(),1);
-  return wk<=1?"ch1":wk===2?"ch2":wk===3?"ch3":"ch4";
+  const row=[...SEMESTER].reverse().find(x=>x.wk<=wk),m=row&&row.ch.match(/^Ch\s+(\d+)/i);
+  return m?"ch"+m[1]:(wk<=1?"ch1":"ch4");
 }
 VIEWS.practice = (v) => {
-  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>Choose a practice mode</h2><p class="muted">For the Chapter 2 quiz, start with Resonance Lab: it checks the arrows and the contributor you build. Drill = quick reps. Mastery = '+MASTERY_N+' cold questions, perfect and unguessed.</p>'));
+  const practiceCp=nextCheckpoint();
+  const ch3Current=!!(practiceCp&&(practiceCp.topics||[]).includes("acidbase1")&&daysTo(practiceCp.date)>=0&&daysTo(practiceCp.date)<=7);
+  v.appendChild(el("div",{class:"card"},'<span class="tag violet">🎯 Practice</span><h2>'+(ch3Current?'Chapter 3 is current':'Choose one practice path')+'</h2><p class="muted">'+(ch3Current?'Quiz Thursday: work the acid/base set first. Chapter 2 is organized below as one numbered review path when you need it.':'Use the current chapter first. Older chapters stay available as compact review paths.')+'</p>'));
+
+  if(ch3Current){
+    const st=FOCUS_SETS.find(x=>x.id==="lecture-ab1"),pool=focusPool(st),done=focusSeen(st);
+    const current=el("div",{class:"card teal practice-current"});
+    current.innerHTML='<div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap"><div style="flex:1;min-width:220px"><span class="tag coral">CURRENT · QUIZ '+fmtDay(practiceCp.date)+'</span><h2 style="margin:7px 0 4px">🍋 Chapter 3: acids & bases</h2><p class="muted" style="margin:0 0 8px">One ordered set from Thursday\'s lecture: proton transfer → arrow placement → pKa table → reaction direction → base ranking. '+done+'/'+pool.length+' seen.</p></div><span class="tag gold">'+daysTo(practiceCp.date)+'d</span></div>';
+    current.appendChild(el("button",{class:"btn coral",onclick:()=>startFocusDrill("lecture-ab1")},done?'Continue / restart Chapter 3 set →':'Start Chapter 3 set →'));
+    v.appendChild(current);
+  }
 
   const quick=el("div",{class:"practice-quick-grid"});
+  const bondLab=el("div",{class:"card cream"});
+  bondLab.innerHTML='<h3>✍️ Bond-Line Lab</h3><p class="muted" style="margin:4px 0 8px">'+BONDLINE_MOLECULES.length+' checked skeletons · carbons and C–H stay implicit.</p>';
+  bondLab.appendChild(el("button",{class:"btn teal",onclick:()=>go("bondlab")},"Open Bond-Line Lab →"));
+
   const resLab=el("div",{class:"card teal"});
   const cleanRes=(S.resRuns||[]).filter(r=>r.cold&&r.clean).length;
   resLab.innerHTML='<span class="tag coral">Quiz core · generate, don\'t recognize</span><h3>↪️ Resonance Lab</h3><p style="margin:4px 0 8px">'+S.resDone.length+'/'+RESONANCE_TARGETS.length+' checked transformations · draw curved arrows, then build the next contributor.</p><p class="muted" style="margin:4px 0 8px">Audits arrow tails/heads, bond orders, lone pairs, charges, charge conservation, and electron-pair conservation.'+(cleanRes?' '+cleanRes+' clean cold run'+(cleanRes===1?'':'s')+' recorded.':'')+'</p>';
   resLab.appendChild(el("button",{class:"btn gold",onclick:()=>go("reslab")},"Open Resonance Lab →"));
+  quick.appendChild(bondLab);
   quick.appendChild(resLab);
 
   const lab=el("div",{class:"card cream"});
@@ -4608,19 +4786,14 @@ VIEWS.practice = (v) => {
   lab.appendChild(el("button",{class:"btn teal",onclick:()=>go("lab")},"Open Lewis Lab →"));
   quick.appendChild(lab);
 
-  const bondLab=el("div",{class:"card cream"});
-  bondLab.innerHTML='<h3>✍️ Bond-Line Lab</h3><p class="muted" style="margin:4px 0 8px">'+BONDLINE_MOLECULES.length+' checked skeletons · carbons and C–H stay implicit.</p>';
-  bondLab.appendChild(el("button",{class:"btn teal",onclick:()=>go("bondlab")},"Open Bond-Line Lab →"));
-  quick.appendChild(bondLab);
-
   const missedN=[...new Set(S.missed)].length;
   if(missedN){
     const mr=el("div",{class:"card cream"});
     mr.innerHTML='<h3>🔥 Review misses</h3><p class="muted" style="margin:4px 0 8px">'+missedN+' wrong or shaky across all chapters.</p>';
     mr.appendChild(el("button",{class:"btn coral",onclick:()=>startDrill("__missed")},"Review missed ("+missedN+") →"));
-    quick.appendChild(mr);
+    v.appendChild(mr);
   }
-  v.appendChild(quick);
+  v.appendChild(homeFold("Drawing labs","Bond-line, resonance and Lewis construction",[quick]));
 
   /* v3.28: focus sets sit ABOVE the chapter list — the point of one is that you can reach it
      without knowing which chapter it lives in. */
@@ -4637,7 +4810,7 @@ VIEWS.practice = (v) => {
     const fd=el("details",{class:"mini-details"});fd.innerHTML='<summary>What this set covers</summary><p class="muted">'+st.blurb+'</p>';fc.appendChild(fd);
     focusCards.push(fc);
   });
-  if(focusCards.length)v.appendChild(homeFold("Focused sets","Resonance, curved arrows and bond angles",focusCards));
+  if(focusCards.length)v.appendChild(homeFold("Focused sets","Optional targeted sets — open only when you know the gap",focusCards));
   /* v3.23: PER-CHAPTER. Course-current chapter leads; each topic gets one row carrying both
      its drill progress and its mastery status, instead of two separate flat lists. */
   const cur=currentChapterId();
@@ -4672,6 +4845,10 @@ VIEWS.practice = (v) => {
   const REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   if(!S.practiceOpen || typeof S.practiceOpen!=="object"){
     S.practiceOpen={}; CHAPTERS.forEach(c=>{ S.practiceOpen[c.id]=(c.id===lead||c.id===cur); });
+  }
+  if(!safeStore.get("practiceLayoutV358",false)){
+    S.practiceOpen[cur]=true; S.practiceOpen[lead]=true;
+    safeStore.set("practiceOpen",S.practiceOpen); safeStore.set("practiceLayoutV358",true);
   }
   const persistOpen=()=>safeStore.set("practiceOpen",S.practiceOpen);
   const anyOpen=()=>CHAPTERS.some(c=>S.practiceOpen[c.id]);
@@ -4715,6 +4892,18 @@ VIEWS.practice = (v) => {
       '</div></div>';
     const body=el("div",{class:"chbody"});
 
+    if(ch.id==="ch2"){
+      const path=el("div",{class:"card ch2-path"});
+      path.innerHTML='<span class="tag teal">CHAPTER 2 REVIEW</span><h3 style="margin:7px 0 0">Use this order—do not hunt through the bank</h3><p class="ch2-path-intro">Each step supplies what the next step assumes. Stop after the first step that exposes a real gap.</p><div class="ch2-steps"></div>';
+      const steps=path.querySelector(".ch2-steps");
+      const addStep=(n,title,copy,label,action)=>{const step=el("div",{class:"ch2-step"});step.innerHTML='<span class="ch2-step-num">'+n+'</span><div class="ch2-step-copy"><b>'+title+'</b><span>'+copy+'</span></div>';step.appendChild(el("button",{class:"btn ghost small",onclick:action},label));steps.appendChild(step);};
+      addStep(1,"Build the skeleton","Count vertices, preserve branches and bond orders.","Bond-Line Lab",()=>go("bondlab"));
+      addStep(2,"Name every functional group","Scan C=O first, then its neighbors; inspect the whole molecule.","Structure scan",()=>startFocusDrill("functional-groups-diagrams"));
+      addStep(3,"Place curved arrows","Tail starts on electrons; head shows their destination; protect the octet.","Arrow rules",()=>startFocusDrill("arrows"));
+      addStep(4,"Build the next contributor","Draw the arrows, update bonds/lone pairs/charges, then audit the result.","Resonance Lab",()=>go("reslab"));
+      body.appendChild(path);
+    }
+
     chTopics.forEach((k,ri)=>{
       const t=TOPICS[k];
       const qs=QUESTIONS.filter(q=>q.topic===k&&q.type!=="written");
@@ -4731,7 +4920,8 @@ VIEWS.practice = (v) => {
         /* v3.24: Claude's per-topic read, where he's actually choosing what to drill */
         (function(){ const a=(CLAUDE_ASSESSMENT.topics||{})[k]; if(!a) return "";
           const L=LEVEL_STYLE[a.level]||{ico:"•",label:a.level};
-          return '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem"><b>'+L.ico+' Claude: '+L.label+'</b> — tap for why</summary><div class="why" style="margin-top:6px">'+a.note+'<p class="muted" style="margin:6px 0 0;font-size:.75rem">Written '+CLAUDE_ASSESSMENT.updated+'.</p></div></details>'; })();
+          const old=assessmentAgeDays()>4;
+          return '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:.82rem"><b>'+(old?'🗂️ Archived Claude note · '+CLAUDE_ASSESSMENT.updated:L.ico+' Claude: '+L.label)+'</b> — tap for context</summary><div class="why" style="margin-top:6px">'+a.note+'<p class="muted" style="margin:6px 0 0;font-size:.75rem">Written '+CLAUDE_ASSESSMENT.updated+'. '+(old?'Historical context only; use the current checkpoint and your newer work for decisions.':'')+'</p></div></details>'; })();
       if(qs.length){
         const br=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"});
         br.appendChild(el("button",{class:"btn small",onclick:()=>{ if(k==="lewis"){go("lab");} else {startDrill(k);} }},"🎯 Drill"));
@@ -4849,12 +5039,13 @@ function readinessFor(cp){
   const untouched=testable.filter(k=>topicCleanPct(k)===null);
   const mastered=testable.filter(k=>masteryDaysFor(k).length>=2);
   const weakest=testable.filter(k=>topicCleanPct(k)!==null).sort((a,b)=>topicCleanPct(a)-topicCleanPct(b)).slice(0,3);
-  const lastScoped=S.diags.slice().reverse().find(d=>d.type==="scope");
-  const diagOK=!!lastScoped&&lastScoped.pct>=80;
+  const lastScopedAny=S.diags.slice().reverse().find(d=>d.type==="scope");
+  const lastScoped=S.diags.slice().reverse().find(d=>d.type==="scope"&&d.diagVersion>=READINESS_DIAG_VERSION&&sameTopicScope(d.scopeTopics,testable));
+  const diagOK=!!lastScoped&&lastScoped.passed===true&&lastScoped.pct>=80&&!(lastScoped.guessedRight>0)&&lastScoped.criticalTotal>0&&lastScoped.criticalPassed===lastScoped.criticalTotal&&!(lastScoped.topicGaps||[]).length;
   const cleanOK=avg!==null&&avg>=80;
   const ready=cleanOK&&diagOK&&!untouched.length;
   const d=daysTo(cp.date);
-  return {scope,testable,untestable,untouched,avg,mastered,weakest,lastScoped,diagOK,cleanOK,ready,days:d};
+  return {scope,testable,untestable,untouched,avg,mastered,weakest,lastScoped,lastScopedAny,diagOK,cleanOK,ready,days:d};
 }
 function allCheckpoints(){
   const list=[];
@@ -4864,7 +5055,7 @@ function allCheckpoints(){
 }
 VIEWS.exam = (v) => {
   /* v3.23: readiness board — every quiz/exam/final, not just the next one */
-  v.appendChild(el("div",{class:"card"},'<span class="tag gold">🚦 Readiness</span><h2>Am I ready — for each one?</h2><p class="muted">Two layers. <b>The gate</b> is mechanical: ≥80% clean across a checkpoint\'s scope AND a scoped diagnostic ≥80%, with no scope topic untouched (clean % excludes anything you got right but flagged 🎲). <b>Claude\'s read</b> is judgment — written from your reports, your typed rationales and your handwritten work, which the numbers can\'t see.</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">🚦 Readiness</span><h2>Am I ready — for each one?</h2><p class="muted">Two layers. <b>The gate</b> is mechanical: ≥80% clean across the checkpoint scope, no topic untouched, and a matching v3.56+ scoped diagnostic with ≥80% raw, zero guessed-rights, every tested area passing, and every critical construction/transfer task first-audit clean. A high total can no longer hide a failed essential skill. <b>Claude\'s read</b> adds judgment from your reports, rationales, and handwritten work.</p>'));
   (function(){
     const f=assessmentFreshness();
     const c=el("div",{class:"card"+(assessmentAgeDays()<=4?" cream":"")});
@@ -4885,12 +5076,12 @@ VIEWS.exam = (v) => {
       '<span class="tag '+(R.days<=7&&!past?"coral":"violet")+'">'+when+'</span></div>'+
       '<p style="margin:8px 0 4px'+(R.ready&&!past?';opacity:.92':'')+'"><b>Clean across scope: '+(R.avg===null?"— (no reps yet)":R.avg+"%")+'</b>'+
         ' · '+R.mastered.length+'/'+R.testable.length+' topics mastered'+
-        ' · scoped diagnostic: '+(R.lastScoped?R.lastScoped.pct+"% ("+fmtDay(R.lastScoped.date)+")":"<b>none yet</b>")+'</p>'+
+        ' · rigorous scoped diagnostic: '+(R.lastScoped?R.lastScoped.pct+"% · "+R.lastScoped.criticalPassed+"/"+R.lastScoped.criticalTotal+" critical ("+fmtDay(R.lastScoped.date)+")":"<b>none for this exact scope yet</b>")+'</p>'+ 
       '<p class="'+(R.ready&&!past?'':'muted')+'" style="margin:4px 0 0;font-size:.85rem">'+
         (past?'Done — kept here for the record.':
          R.ready?'✅ Gate cleared. Maintain, don\'t cram.':
          '<b>Blocking:</b> '+[ (!R.cleanOK?(R.avg===null?'no reps on this scope yet':'clean % is '+R.avg+', needs 80'):null),
-                               (!R.diagOK?'no scoped diagnostic ≥80% yet':null),
+                               (!R.diagOK?(R.lastScoped?'diagnostic needs ≥80%, zero guessed-rights, every tested area passing, and every critical task clean':'take the new homework-level diagnostic for this exact scope'):null),
                                (R.untouched.length?R.untouched.length+' scope topic'+(R.untouched.length===1?'':'s')+' never attempted':null)
                              ].filter(Boolean).join(' · '))+'</p>'+
       (!past&&R.weakest.length?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">Weakest in scope: '+R.weakest.map(k=>(TOPICS[k]?.ico||"")+" "+(TOPICS[k]?.name||k)+" "+(topicCleanPct(k))+"%").join(" · ")+'</p>':'')+
@@ -4915,7 +5106,7 @@ VIEWS.exam = (v) => {
   // v3.0: the every-2-day diagnostics + editable next-quiz target
   const cp = nextCheckpoint();
   const dg = el("div",{class:"card cream"});
-  dg.innerHTML='<h3>🩺 Every-2-Day Diagnostics (v3.0)</h3><p class="muted" style="margin:4px 0 8px">Two alternating modes, cold: <b>📚 Cumulative</b> = everything the course has covered so far (wk '+Math.max(courseWeek(),1)+'). <b>🎯 Scoped</b> = only what the next assessment covers'+(cp?' — <b>'+cp.name+' in '+daysTo(cp.date)+' day'+(daysTo(cp.date)===1?'':'s')+'</b> ('+fmtDay(cp.date)+')':'')+'. Each ends with a gap map, ONE repair, and 2 written items (UID\'d) saved for Claude\'s review. Guessed-right answers stay in rotation as shaky.</p>';
+  dg.innerHTML='<h3>🩺 Homework-level readiness diagnostics (v3.56)</h3><p class="muted" style="margin:4px 0 8px">Ten cold items when the bank supports it: no tier-0 trivia, mostly tier 2/3, with two production items. <b>🎯 Scoped</b> matches the next assessment; Chapter 2 requires a checked bond-line build, larger multi-group structures, contributor ranking, an exact curved-arrow + product build, and hybrid/partial-charge transfer. Passing means ≥80%, no guessed-rights, every tested area passing, and every critical task clean.</p>';
   const dgr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   dgr.appendChild(el("button",{class:"btn teal",onclick:()=>startDiag2("cum")},"📚 Cumulative now"));
   dgr.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2("scope")},"🎯 Scoped now"));
@@ -4988,21 +5179,24 @@ VIEWS.drill = (v) => {
     if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec") && D.byTopic){
       const type=D.topic==="__cum"?"cum":(D.topic==="__lec"?"lec":"scope");
       const rep=gapReport(D.byTopic);
+      const critical=diagCriticalAudit(D),criticalPassed=critical.filter(x=>x.ok).length,criticalOK=!critical.length||criticalPassed===critical.length;
+      const rigorous=type!=="lec"&&D.diagVersion>=READINESS_DIAG_VERSION;
+      const solid = pct>=80 && !(D.guessedRight>0) && (!rigorous||(criticalOK&&!rep.gaps.length));
       D.runId=D.runId||makeRunId("diag-"+type);
       if(!S.diags.some(x=>x.runId===D.runId)){
-        S.diags.push({runId:D.runId,date:todayStr(), type, scope:D.scopeName, score:scR, total:scT, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0});
+        S.diags.push({runId:D.runId,date:todayStr(), type, scope:D.scopeName, scopeTopics:D.scopeTopics||[], score:scR, total:scT, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0, diagVersion:D.diagVersion||1, criticalTotal:critical.length, criticalPassed, criticalMisses:critical.filter(x=>!x.ok).map(x=>({id:x.id,role:x.role,detail:x.detail})),topicGaps:rep.gaps.slice(),passed:solid});
         if(S.diags.length>60) S.diags=S.diags.slice(-60);
         save();
       }
-      const solid = pct>=80 && !(D.guessedRight>0);
       if(solid) confetti();
       const c=el("div",{class:"card"+(solid?" teal":"")});
       const nm=k=>TOPICS[k]?.name||k;
       const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
       c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
-        '<h2>'+scR+' / '+scT+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+
-        '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+
-        '<div class="why">'+(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Clean board. Next diagnostic unlocks in 2 days — go live your life.')+'</div>'+
+        '<h2>'+scR+' / '+scT+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+ 
+        (rigorous?'<div class="why" style="margin:8px 0"><b>Readiness gate: '+criticalPassed+'/'+critical.length+' critical tasks clean · '+(rep.gaps.length?rep.gaps.length+' tested area'+(rep.gaps.length===1?'':'s')+' below its screen':'every tested area passed')+'.</b> '+(criticalOK?'Every essential task passed first-audit clean and unflagged.':'Still blocking: '+critical.filter(x=>!x.ok).map(x=>x.role+' ('+x.detail+')').join(' · '))+'.</div>':'')+
+        '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+ 
+        '<div class="why">'+(!solid?'<b>ONE repair:</b> '+(critical.find(x=>!x.ok)?.role||nm(rep.gaps[0]||Object.keys(D.byTopic)[0]))+' — repair that exact skill, then retake a new cold diagnostic.':(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Readiness diagnostic cleared. Maintain with spaced mixed practice; do not inflate volume just to chase a score.'))+'</div>'+ 
         (S.diags.length>=2?'<p class="muted" style="margin:6px 0 0;font-size:.85em">History: '+S.diags.slice(-5).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ")+'</p>':'');
       const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"});
       if(rep.gaps.length) row.appendChild(el("button",{class:"btn teal",onclick:()=>{S.drill=null;startDrill(rep.gaps[0]);}},"🔧 Repair "+nm(rep.gaps[0])+" now"));
@@ -5105,6 +5299,7 @@ VIEWS.drill = (v) => {
   }
   const c = el("div",{class:"card"});
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+ 
+    (D.diagVersion?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>'+((D.diagCriticalIds||[]).includes(q.id)?'🔒 Critical readiness task':'Readiness sample')+':</b> '+esc((D.diagRoles||{})[q.id]||"homework-level transfer")+'</p>':'')+
     '<div class="qprompt">'+q.prompt+'</div>';
   const structureDone=!!(D.structureBuilt&&D.structureBuilt[q.id]===q.drawMol);
   if(q.drawMol){
@@ -5145,6 +5340,21 @@ VIEWS.drill = (v) => {
       ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{snapshotDrill(S.drill.i);S.drill=null;go("home");}},"⏸ pause round — saved, resume from Home"));
       v.appendChild(ctl);
       return;
+    }
+  }
+  const resRequired=(D.diagResonanceRequirements||{})[q.id];
+  const resEvidence=resRequired&&(D.resLabEvidence||{})[q.id];
+  if(resRequired){
+    const target=resTarget(resRequired),passed=!!resEvidence&&resEvidence.key===resRequired&&resEvidence.passed;
+    const gate=el("div",{class:"why",style:"margin:6px 0 10px"});
+    gate.innerHTML='<b>Curved-arrow construction first: '+(passed?'exact transformation passed':'not yet checked')+'.</b> Draw every arrow with a visible tail and head, then build the complete next contributor on the same bond-line skeleton. The audit checks arrow source/destination, bond orders, lone pairs, formal charges, net charge, and electron-pair conservation.'+(passed&&!resEvidence.clean?'<br><b style="color:var(--coral)">You corrected this after an audit miss, so this critical task is learned practice—not clean readiness evidence for this run.</b>':passed?'<br><b style="color:var(--ok)">First-audit clean ✓</b>':'');
+    c.appendChild(gate);
+    if(!passed){
+      c.appendChild(el("button",{class:"btn coral small",style:"margin:0 0 8px",onclick:()=>{snapshotDrill(D.i);startResLab(resRequired,false,"drill");}},"↪️ Draw arrows + build "+(target?.name||resRequired)+" →"));
+      const _rt=resTile(q.topic);if(_rt)c.appendChild(_rt);v.appendChild(c);
+      const ctl=el("div",{class:"center",style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center"});
+      if((D.log||[]).length)ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=D.log.length-1;render();}},"👀 see my previous answers"));
+      ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{snapshotDrill(S.drill.i);S.drill=null;go("home");}},"⏸ pause round — saved, resume from Home"));v.appendChild(ctl);return;
     }
   }
   const fb = el("div");
@@ -5692,7 +5902,19 @@ function runBondAudit(){
   const wanted={C:4,O:2,"O⁻":1,OH:1,N:3,NH2:1,Cl:1,Br:1,F:1};B.atoms.forEach(a=>{const o=bondOrderFor(B,a),max=wanted[a.el]||4;if(o>max)fails.push(a.el+" exceeds its bond-line valence (bond order "+o+", maximum "+max+").");if(a.el!=="C"&&o!==max)fails.push(a.el+" must show bond order "+max+" in this target; it currently shows "+o+".");});
   if(!bondGraphMatches(m,B))fails.push("Exact graph: at least one atom has the wrong neighbour or bond order for "+m.formula+".");
   B.auditBox.innerHTML="";
-  if(!fails.length){confetti();if(!S.bondDone.includes(m.key))S.bondDone.push(m.key);if(B.returnTo==="drill"&&S.drill&&B.returnQuestionId){const map=S.drill.bondStructuresBuilt=S.drill.bondStructuresBuilt||{},arr=map[B.returnQuestionId]=map[B.returnQuestionId]||[];if(!arr.includes(m.key))arr.push(m.key);snapshotDrill(S.drill.i);}save();const c=el("div",{class:"card teal"},'<h2>✓ '+m.name+' — exact skeleton match</h2><p>Inventory ✓ · connected graph ✓ · bond orders ✓ · carbon valence/implied H ✓ · heteroatom labels ✓</p>');c.appendChild(el("button",{class:"btn gold",onclick:leaveBondLab},B.returnTo==="drill"?"Back to question →":"Back to structures →"));B.auditBox.appendChild(c);}else{B.fails++;B.auditBox.appendChild(el("div",{class:"card cream"},'<h3>Check these parts</h3><ul class="audit">'+fails.map(f=>'<li class="fail">'+f+'</li>').join("")+'</ul>'+(B.fails>=2?'<div class="why"><b>Hint:</b> '+m.hint+'</div>':"")));}
+  if(!fails.length){
+    confetti();if(!S.bondDone.includes(m.key))S.bondDone.push(m.key);
+    if(B.returnTo==="drill"&&S.drill&&B.returnQuestionId){
+      const map=S.drill.bondStructuresBuilt=S.drill.bondStructuresBuilt||{},arr=map[B.returnQuestionId]=map[B.returnQuestionId]||[];if(!arr.includes(m.key))arr.push(m.key);
+      const evidence=S.drill.bondBuildEvidence=S.drill.bondBuildEvidence||{},ev=evidence[B.returnQuestionId]=evidence[B.returnQuestionId]||[];
+      const old=ev.find(x=>x.key===m.key),rec={key:m.key,clean:B.fails===0};if(!old)ev.push(rec);
+      snapshotDrill(S.drill.i);
+    }
+    save();const c=el("div",{class:"card teal"},'<h2>✓ '+m.name+' — exact skeleton match</h2><p>Inventory ✓ · connected graph ✓ · bond orders ✓ · carbon valence/implied H ✓ · heteroatom labels ✓'+(B.returnTo==="drill"&&B.fails===0?' · first-audit clean ✓':'')+'</p>');c.appendChild(el("button",{class:"btn gold",onclick:leaveBondLab},B.returnTo==="drill"?"Back to question →":"Back to structures →"));B.auditBox.appendChild(c);
+  }else{
+    if(B.returnTo==="drill"&&S.drill&&B.returnQuestionId){const evidence=S.drill.bondBuildEvidence=S.drill.bondBuildEvidence||{},ev=evidence[B.returnQuestionId]=evidence[B.returnQuestionId]||[];if(!ev.some(x=>x.key===m.key))ev.push({key:m.key,clean:false});snapshotDrill(S.drill.i);}
+    B.fails++;B.auditBox.appendChild(el("div",{class:"card cream"},'<h3>Check these parts</h3><ul class="audit">'+fails.map(f=>'<li class="fail">'+f+'</li>').join("")+'</ul>'+(B.fails>=2?'<div class="why"><b>Hint:</b> '+m.hint+'</div>':"")));
+  }
 }
 
 /* ---- v3.46 CHECKED RESONANCE LAB ----
@@ -5711,9 +5933,10 @@ function resExpectedGraph(t){
 function resNetCharge(g){return g.nodes.reduce((s,n)=>s+(n.charge||0),0);}
 function resElectronPairs(g){return g.bonds.reduce((s,b)=>s+b.order,0)+g.nodes.reduce((s,n)=>s+(n.lp||0),0);}
 function resTarget(key){return RESONANCE_TARGETS.find(t=>t.key===key);}
-function startResLab(key,guided=true){
+function startResLab(key,guided=true,returnTo=null){
   const target=resTarget(key);if(!target)return;
-  S.resLab={target,guided:!!guided,arrows:[],pending:null,product:resCloneGraph(target.graph),editSel:null,fails:0,audit:null,msg:"Tap an electron source: a lone pair or a π bond."};
+  const returnQuestionId=returnTo==="drill"&&S.drill&&S.drill.queue?(S.drill.queue[S.drill.i]?.id||""):"";
+  S.resLab={target,guided:!!guided,returnTo,returnQuestionId,arrows:[],pending:null,product:resCloneGraph(target.graph),editSel:null,fails:0,audit:null,msg:"Tap an electron source: a lone pair or a π bond."};
   go("reslab");
 }
 function startResRun(cold){
@@ -5722,7 +5945,8 @@ function startResRun(cold){
   startResLab(S.resRun.queue[0],!cold);
 }
 function resumeResRun(){const R=S.resRun;if(!R||R.complete)return;startResLab(R.queue[R.i],!R.cold);}
-function leaveResLab(){S.resLab=null;go("reslab");}
+function leaveResLab(){const back=S.resLab&&S.resLab.returnTo;S.resLab=null;if(back==="drill"&&S.drill)go("drill");else go("reslab");}
+function finishResLabStep(){if(S.resLab&&S.resLab.returnTo==="drill"&&S.drill)return leaveResLab();advanceResRun();}
 function finishResRun(){
   const run=S.resRun;if(!run)return;
   const rec={id:run.id,ts:Date.now(),date:todayStr(),cold:!!run.cold,clean:!!run.clean,total:run.queue.length};
@@ -5852,7 +6076,11 @@ function resAuditTarget(){
 }
 function runResAudit(){
   const R=S.resLab;if(!R)return;const a=resAuditTarget();R.audit=a;
-  if(!a.ok){R.fails++;if(S.resRun&&!S.resRun.complete)S.resRun.clean=false;render();return;}
+  if(!a.ok){
+    if(R.returnTo==="drill"&&S.drill&&R.returnQuestionId){const ev=S.drill.resLabEvidence=S.drill.resLabEvidence||{};if(!ev[R.returnQuestionId])ev[R.returnQuestionId]={key:R.target.key,clean:false,passed:false};snapshotDrill(S.drill.i);}
+    R.fails++;if(S.resRun&&!S.resRun.complete)S.resRun.clean=false;render();return;
+  }
+  if(R.returnTo==="drill"&&S.drill&&R.returnQuestionId){const ev=S.drill.resLabEvidence=S.drill.resLabEvidence||{},old=ev[R.returnQuestionId];if(old)old.passed=true;else ev[R.returnQuestionId]={key:R.target.key,clean:R.fails===0,passed:true};snapshotDrill(S.drill.i);}
   if(!S.resDone.includes(R.target.key))S.resDone.push(R.target.key);save();render();
 }
 function resResetProduct(){const R=S.resLab;if(!R)return;R.product=resCloneGraph(R.target.graph);R.editSel=null;R.audit=null;render();}
@@ -5864,7 +6092,7 @@ function resAuditFeedback(){
   const row=el("div",{class:"res-checklist"});checks.forEach(([k,label])=>row.appendChild(el("div",{class:"res-check "+(a[k]?"ok":"bad")},(a[k]?"✓ ":"✗ ")+label)));box.appendChild(row);
   if(a.ok){
     const c=el("div",{class:"card teal"},'<span class="tag gold">Exact transformation passed</span><h2>Arrows and contributor agree</h2><p><b>Ranking:</b> '+R.target.ranking+'</p><p><b>Hybrid:</b> '+R.target.hybrid+'</p><p class="muted">This records a completed build. It counts as a clean cold-run step only when the whole sequence was started in cold mode and no audit failed.</p>');
-    c.appendChild(el("button",{class:"btn gold",onclick:advanceResRun},S.resRun&&!S.resRun.complete?(S.resRun.i===S.resRun.queue.length-1?"Finish sequence →":"Next pattern →"):"Back to targets →"));box.appendChild(c);
+    c.appendChild(el("button",{class:"btn gold",onclick:finishResLabStep},R.returnTo==="drill"?"Back to diagnostic question →":S.resRun&&!S.resRun.complete?(S.resRun.i===S.resRun.queue.length-1?"Finish sequence →":"Next pattern →"):"Back to targets →"));box.appendChild(c);
   }else{
     const failed=[];if(!a.arrowOk)failed.push("At least one arrow has the wrong tail or head, or the arrow count is wrong.");if(!a.structureOk)failed.push("At least one bond order, lone-pair count, or atom-specific charge is wrong.");if(!a.chargeOk)failed.push("The total formal charge changed; resonance cannot change net charge.");if(!a.pairsOk)failed.push("The total number of tracked electron pairs changed; move pairs rather than creating or deleting them.");
     box.appendChild(el("div",{class:"card cream"},'<h3>Audit found '+failed.length+' problem'+(failed.length===1?'':'s')+'</h3><ul class="audit">'+failed.map(x=>'<li class="fail">'+x+'</li>').join("")+'</ul>'+(R.fails>=2?'<div class="why"><b>One next move:</b> '+R.target.hint+'</div>':'')));
@@ -5887,7 +6115,7 @@ VIEWS.reslab=(v)=>{
     return;
   }
   const t=R.target,run=S.resRun&&!S.resRun.complete?S.resRun:null;
-  const head=el("div",{class:"card"});head.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><div style="flex:1"><span class="tag '+(run&&run.cold?'coral':'violet')+'">'+(run?(run.cold?'Cold sequence':'Guided sequence')+' · '+(run.i+1)+'/'+run.queue.length:'Guided target')+'</span><h2>'+t.name+'</h2><p class="mono" style="font-size:1.05rem">'+t.formula+'</p></div>'+(R.guided?'<span class="tag gold">'+t.pattern+' · '+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span>':'')+'</div><p>'+t.prompt+'</p><p class="muted"><b>Rule:</b> atom connectivity is locked. Only electrons move. Build the complete next contributor—not the resonance hybrid.</p>';v.appendChild(head);
+  const head=el("div",{class:"card"});head.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><div style="flex:1"><span class="tag '+(R.returnTo==="drill"||run&&run.cold?'coral':'violet')+'">'+(R.returnTo==="drill"?'Cold diagnostic build':run?(run.cold?'Cold sequence':'Guided sequence')+' · '+(run.i+1)+'/'+run.queue.length:'Guided target')+'</span><h2>'+t.name+'</h2><p class="mono" style="font-size:1.05rem">'+t.formula+'</p></div>'+(R.guided?'<span class="tag gold">'+t.pattern+' · '+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span>':'')+'</div><p>'+t.prompt+'</p><p class="muted"><b>Rule:</b> atom connectivity is locked. Only electrons move. Build the complete next contributor—not the resonance hybrid.</p>';v.appendChild(head);
   const grid=el("div",{class:"res-grid"});
   const source=el("div",{class:"res-stage"});source.innerHTML='<h3>1 · Draw curved arrow'+(t.arrowCount===1?'':'s')+'</h3><p class="muted" style="margin:0">Tap source → destination for each electron pair. <b style="color:#8f2028">○ tail ring = source · ▶ arrowhead = destination</b></p>';
   const ssvg=document.createElementNS("http://www.w3.org/2000/svg","svg");ssvg.setAttribute("class","res-svg");ssvg.setAttribute("aria-label","Starting resonance contributor and curved arrows");source.appendChild(ssvg);
@@ -5899,7 +6127,7 @@ VIEWS.reslab=(v)=>{
   const sel=R.editSel,bar=el("div",{class:"res-toolbar"});bar.appendChild(el("span",{class:"muted",style:"width:100%"},sel?(sel.kind==="bond"?"Selected bond "+sel.id.toUpperCase().replace("-","–"):"Selected atom "+sel.id.toUpperCase()):"Select an atom or bond above."));
   [["Bond −","bond",-1],["Bond +","bond",1],["Charge −","charge",-1],["Charge +","charge",1],["LP −","lp",-1],["LP +","lp",1]].forEach(([label,kind,d])=>bar.appendChild(el("button",{class:"tool",disabled:!sel||(kind==="bond")!==(sel.kind==="bond"),onclick:()=>resAdjust(kind,d)},label)));
   bar.appendChild(el("button",{class:"tool",onclick:resResetProduct},"Reset contributor"));product.appendChild(bar);grid.appendChild(product);v.appendChild(grid);
-  const row=el("div",{class:"card",style:"margin-top:12px"});row.innerHTML='<h3>3 · Audit before ranking</h3><p class="muted">The checker will verify arrow source/head, exact next contributor, conserved net charge, and conserved electron pairs.</p>';row.appendChild(el("button",{class:"btn coral",onclick:runResAudit},"Check arrows + contributor"));row.appendChild(el("button",{class:"btn ghost small",style:"margin-left:8px",onclick:leaveResLab},"← targets"));v.appendChild(row);
+  const row=el("div",{class:"card",style:"margin-top:12px"});row.innerHTML='<h3>3 · Audit before ranking</h3><p class="muted">The checker will verify arrow source/head, exact next contributor, conserved net charge, and conserved electron pairs.</p>';row.appendChild(el("button",{class:"btn coral",onclick:runResAudit},"Check arrows + contributor"));row.appendChild(el("button",{class:"btn ghost small",style:"margin-left:8px",onclick:leaveResLab},R.returnTo==="drill"?"← diagnostic question":"← targets"));v.appendChild(row);
   const fb=resAuditFeedback();if(fb)v.appendChild(fb);drawResGraph(ssvg,t.graph,"source");drawResGraph(psvg,R.product,"edit");
 };
 
