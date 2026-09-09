@@ -6,7 +6,13 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.59  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.60  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07
+  v3.60 (2026-09-09, Wed): SCHEDULE CORRECTION — Gabe: "Exam is actually on September 15. No
+        Quiz chapter 3 tomorrow." Ch 3 quiz CANCELLED: removed from KNOWN_QUIZZES + deadlines and
+        migrated out of stored checkpoints (tombstone with fresh setAt so the cancellation wins the
+        cloud sync). EXAM 1 CONFIRMED Tue 9/15: deadline un-estimated; scope +fgroups/arrows/lewisab.
+        Ch 3 sprint replaced by a six-day EXAM 1 SPRINT (one job a day; ends with an early night; no
+        new analysis on exam morning per the standing 2-hour rule). Sprint header now says EXAM.
   v3.59 (2026-09-08, Tue lecture — qualitative acid/base): ARIO IN ANGER. 39 items (ab3-/lw-)
         covering what today's lecture added beyond the existing 74 acid-base items: the full
         priority ladder with her two extras (CHARGE handled before ARIO, STERICS after it),
@@ -1303,7 +1309,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">CHAPTER 3</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.59</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.60</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1383,7 +1389,7 @@ function mergeRemote(remote){
   (remote.attempts||[]).forEach(a=>{ if(!ak.has(a.id+"|"+a.ts)){ S.attempts.push(a); ak.add(a.id+"|"+a.ts); } });
   S.attempts.sort((a,b)=>a.ts-b.ts); if(S.attempts.length>5000) S.attempts=S.attempts.slice(-5000);
   rebuildQstatsFromAttempts();
-  if (remote.nextQuiz && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz;
+  if (remote.nextQuiz && remote.nextQuiz.date!=="2026-09-10" && (remote.nextQuiz.setAt||"") > (S.nextQuiz.setAt||"")) S.nextQuiz = remote.nextQuiz; // v3.60: never re-import the cancelled Ch 3 quiz from a stale cloud copy
   if (remote.pausedDrill && (!S.pausedDrill || (remote.pausedDrill.ts||0) > (S.pausedDrill.ts||0))) S.pausedDrill = remote.pausedDrill; // v3.4.1: latest pause wins — resume on any device
   if (remote.pausedMastery && (!S.pausedMastery || (remote.pausedMastery.ts||0) > (S.pausedMastery.ts||0))) S.pausedMastery = remote.pausedMastery; // v3.14: mastery pause syncs the same way
 }
@@ -1571,11 +1577,11 @@ const SEMESTER = [ // courseWeek -> topics INTRODUCED that week (app-bank keys o
   {wk:1,  start:"2026-08-17", ch:"Ch 1 (gen-chem review)", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf"]},
   {wk:2,  start:"2026-08-24", ch:"Ch 2 (molecular representation)", topics:["bondline","fgroups","resonance","arrows"]}, // v3.13: fgroups introduced in lecture 3 (Tue 8/25); v3.29: arrows now has a bank, so it counts as covered
   {wk:3,  start:"2026-08-31", ch:"Ch 3 (acids/bases)", topics:["acidbase1","acidbase2"]},
-  {wk:4,  start:"2026-09-07", ch:"Ch 3 (acids/bases) · quiz week", topics:["acidbase1","acidbase2"]}, // Gabe 9/7: still on Ch 3; quiz Thu 9/10
+  {wk:4,  start:"2026-09-07", ch:"Ch 3 (acids/bases) → Ch 4 Thu", topics:["acidbase1","acidbase2"]}, // v3.60: Ch 3 quiz CANCELLED; Ch 4 (leveling effect) opens Thu 9/10; EXAM 1 Tue 9/15
   {wk:5,  start:"2026-09-14", ch:"Ch 4 (alkanes/cycloalkanes)", topics:[]}, // bank items TBD (future version)
 ];
 const CHECKPOINTS = [ // fixed, from the verified schedule; quizzes come via S.nextQuiz
-  {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf","bondline","resonance","acidbase1","acidbase2"]},
+  {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf","bondline","fgroups","arrows","resonance","acidbase1","acidbase2","lewisab"]}, // v3.60: date CONFIRMED (Gabe 9/9); +fgroups/arrows/lewisab — those banks exist now and Ch 2-3 are in scope
   {name:"Exam 2",   date:"2026-10-20", topics:null}, // null = cumulative at that date
   {name:"Exam 3",   date:"2026-11-10", topics:null},
   {name:"Final (comprehensive)", date:"2026-12-15", topics:null},
@@ -3698,7 +3704,7 @@ const S = {
   masteryDays: safeStore.get("masteryDays", {}), // v3.16: {topicKey:[dates]} — the same bar, now for EVERY topic. formal stays mirrored to fcMastery for back-compat.
   lastEval: safeStore.get("lastEval", null),  // {date,pct,gaps[],solid[],kind} — most recent evaluator/diagnostic gap map
   diags:    safeStore.get("diags", []),       // v3.0: [{date,type:"cum"|"scope",scope,score,total,byTopic,guessedRight}]
-  nextQuiz: safeStore.get("nextQuiz", {name:"Ch 3 Quiz",date:"2026-09-10",topics:["acidbase1","acidbase2"]}),
+  nextQuiz: safeStore.get("nextQuiz", {name:"(no quiz scheduled)",date:"",topics:[],cancelled:true}), // v3.60: Ch 3 quiz CANCELLED (Gabe 9/9) — empty date means nextCheckpoint() falls through to the fixed exams
   wrLog:    safeStore.get("wrLog", []),       // v3.0: written answers + rationales [{ts,uid|id,text,guessed,ok,pendingReview}] (cap 120)
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
@@ -3789,12 +3795,16 @@ function resumeMastery(){ const p=S.pausedMastery; if(!p) return;
   go("mastery");
 }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-/* v3.58: existing Gabe/Sam profiles may still hold the expired Ch 1/Ch 2 checkpoint.
-   During the verified Ch 3 quiz window, migrate only an older quiz date; a newer manual
-   checkpoint always wins. Persist locally now so every routing surface agrees this load. */
-const CH3_QUIZ={name:"Ch 3 Quiz",date:"2026-09-10",topics:["acidbase1","acidbase2"]};
-if(todayStr()<=CH3_QUIZ.date&&(!S.nextQuiz||!S.nextQuiz.date||S.nextQuiz.date<CH3_QUIZ.date)){
-  S.nextQuiz={...CH3_QUIZ,setAt:new Date().toISOString()};
+/* v3.60: THE CH 3 QUIZ IS CANCELLED (Gabe, 9/9: "Exam is actually on September 15. No Quiz
+   chapter 3 tomorrow."). The old v3.58 block here force-seeded that quiz on every load, so
+   existing profiles — local AND cloud — still carry it. Migrate it OUT: any stored checkpoint
+   dated 2026-09-10 is the cancelled quiz; replace it with a date-empty tombstone so
+   nextCheckpoint() falls through to Exam 1 (Tue 2026-09-15, cumulative Ch 1-4). The tombstone
+   carries a fresh setAt so the cloud-sync last-writer-wins rule propagates the CANCELLATION to
+   other devices instead of letting a stale cloud copy resurrect the quiz. A manual checkpoint
+   with any other date is Gabe's own edit and is left alone. */
+if(S.nextQuiz&&S.nextQuiz.date==="2026-09-10"){
+  S.nextQuiz={name:"(no quiz scheduled)",date:"",topics:[],cancelled:true,setAt:new Date().toISOString()};
   safeStore.set("nextQuiz",S.nextQuiz);
 }
 /* v3.29: a checkpoint whose date has passed silently corrupts every readiness number and
@@ -3807,7 +3817,7 @@ if(todayStr()<=CH3_QUIZ.date&&(!S.nextQuiz||!S.nextQuiz.date||S.nextQuiz.date<CH
    falls through to the fixed exams, whose scope is cumulative. */
 const KNOWN_QUIZZES=[
   {name:"Ch 2 Quiz",date:"2026-09-03",topics:["bondline","fgroups","resonance","arrows"]},
-  {name:"Ch 3 Quiz (est. — confirm date)",date:"2026-09-10",topics:["acidbase1","acidbase2","lewisab"]},
+  /* v3.60: Ch 3 quiz row REMOVED — cancelled 9/9. Succession now falls through to Exam 1. */
 ];
 (function rollForwardCheckpoint(){ try{
   /* A checkpoint is 'past' the day AFTER it, or the same evening — his assessments are in
@@ -4147,8 +4157,7 @@ VIEWS.home = (v) => {
     {d:"2026-08-28",n:"Drop deadline (partial refund)"},
     {d:"2026-08-30",n:"Ch 2 WileyPLUS HW",note:"date est. — check Canvas",est:1},
     {d:"2026-09-07",n:"Drop deadline (no record)"},
-    {d:"2026-09-10",n:"Ch 3 QUIZ — Thursday",note:"Acids/bases · pKa, proton transfer, favourability and ARIO",big:1},
-    {d:"2026-09-15",n:"EXAM 1 — wk of Sep 14 (likely Thu 9/17)",note:"Ch 1–4 · lowest of 3 exams dropped",est:1,big:1},
+    {d:"2026-09-15",n:"EXAM 1 — Tue Sep 15 (CONFIRMED)",note:"Ch 1–4 · lowest of 3 exams dropped · Ch 3 quiz was cancelled",big:1},
     {d:"2026-10-20",n:"EXAM 2 — wk of Oct 19",est:1,big:1},
     {d:"2026-11-10",n:"EXAM 3 — wk of Nov 9",est:1,big:1},
     {d:"2026-11-16",n:"Last day to withdraw (W)"},
@@ -4414,20 +4423,27 @@ const SPRINT_CH2={ quiz:"2026-09-03", name:"Ch 2 Quiz", hdr:"🎯 Ch 2 Sprint", 
   {d:"2026-09-01", ico:"🧭", t:"Lecture-6 set: lone pairs & ranking", why:"Today's lecture, drilled while it's fresh — localized vs delocalized, the ring exception, ranking rules, the five patterns. Then run the cold scoped diagnostic from the Home banner tonight.", act:{kind:"focus", id:"lecture6"}},
   {d:"2026-09-02", ico:"⚖️", t:"Cold diagnostic (if not done) + resonance mastery + review misses", why:"The scoped diagnostic is the readiness gate — take it cold if last night slipped. Then the mastery check: six cold questions, all right first try, nothing flagged. Then the missed pile, and the dr- drawing items once more ON PAPER.", act:{kind:"mastery", id:"resonance"}},
 ]};
-/* v3.59: second sprint. Two days to the (est.) Ch 3 quiz; same one-job-a-day contract. */
-const SPRINT_CH3={ quiz:"2026-09-10", name:"Ch 3 Quiz", hdr:"🍋 Ch 3 Sprint",
-  sub:"Two days to Thursday (date still est. — confirm on Canvas). ARIO runs on everything from the last three weeks: formal charge feeds it, resonance decides it, orbitals break the ties.", days:[
-  {d:"2026-09-08", ico:"⚖️", t:"Today's lecture: the ARIO ladder, end to end", why:"Charge first, atom (row/column/chained), resonance EXTENT, induction's one-carbon cutoff, orbital %-p, sterics last — plus Lewis acids/bases (first drillable items) and her label-your-ranking rule.", act:{kind:"focus", id:"ario"}},
-  {d:"2026-09-09", ico:"🏁", t:"Cold scoped diagnostic + repair + leveling pre-read", why:"The diagnostic is the readiness gate. Repair what it flags, clear the missed pile, then read the leveling-effect section — she said it causes a lot of exam mistakes, and it's Thursday's opener.", act:{kind:"diag"}},
+/* v3.60: the Ch 3 quiz was CANCELLED and Exam 1 CONFIRMED for Tue 9/15 (Gabe, 9/9). The
+   two-day quiz sprint is replaced by a six-day exam runway — same one-job-a-day contract.
+   Exam 1 is cumulative Ch 1-4; she drops the lowest of three exams, but this is the
+   foundational one. Last graded signal: Ch 1 quiz 18/20. Ch 2 quiz result still unknown. */
+const SPRINT_EXAM1={ quiz:"2026-09-15", name:"Exam 1", what:"exam", hdr:"🏆 Exam 1 Sprint",
+  sub:"Six days, one job a day, cumulative Ch 1–4. The cold diagnostics are the steering wheel: they tell us where points are leaking, and the repair days plug the leaks.", days:[
+  {d:"2026-09-09", ico:"⚖️", t:"ARIO set + leveling pre-read", why:"Yesterday's lecture drilled while it's fresh — the whole qualitative ladder plus Lewis acids/bases. Then 10 minutes reading about the leveling effect: it opens tomorrow's lecture and she called it an exam-mistake generator by name. Make Thursday a second exposure, not a first.", act:{kind:"focus", id:"ario"}},
+  {d:"2026-09-10", ico:"🏁", t:"Lecture day → cold diagnostic tonight", why:"Ch 4 opens today (leveling effect). Tonight: the cold diagnostic — with the exam as the next checkpoint it now covers EVERYTHING from Ch 1-3, so the score is a real exam-readiness number, not a chapter grade.", act:{kind:"diag"}},
+  {d:"2026-09-11", ico:"🔧", t:"Repair day — worst topics + missed pile", why:"Whatever last night's diagnostic flagged red gets drilled first; then clear every question in the missed pile. Five days out, repair beats coverage.", act:{kind:"drill", id:"__missed"}},
+  {d:"2026-09-12", ico:"✍️", t:"Paper day — draw and rank like the exam", why:"Resonance structures, hybrids, and full ARIO rankings ON PAPER in her format (label strongest → weakest — she marks ambiguous rankings wrong). The resonance mastery check is the gate: six cold, all clean.", act:{kind:"mastery", id:"resonance"}},
+  {d:"2026-09-13", ico:"🏁", t:"Second cold diagnostic — measure the repair", why:"Same instrument as Thursday's. The delta between the two runs is the week's real product. Anything still red becomes tomorrow's short list — nothing else does.", act:{kind:"diag"}},
+  {d:"2026-09-14", ico:"🌙", t:"Light review + EARLY NIGHT", why:"Cheat sheet and the missed pile only; nothing new after dinner. Your only sub-7-hour night in your best sleep week on record was a cram night — don't donate exam points to one the night before the exam that matters.", act:{kind:"drill", id:"__missed"}},
 ]};
-function sprintCard(v){ [SPRINT_CH3, SPRINT_CH2].forEach(SP=>renderOneSprint(v,SP)); }
+function sprintCard(v){ [SPRINT_EXAM1, SPRINT_CH2].forEach(SP=>renderOneSprint(v,SP)); }
 function renderOneSprint(v, SP){
   const t=todayStr(); if(t>SP.quiz) return;
   const wrap=el("div",{class:"card teal"});
   const dLeft=daysTo(SP.quiz);
   wrap.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap">'+
     '<h2 style="flex:1;margin:0">'+(SP.hdr||("🎯 "+SP.name+" Sprint"))+'</h2>'+
-    '<span class="tag gold">'+(dLeft<=0?"QUIZ TODAY":dLeft+" day"+(dLeft===1?"":"s")+" to the quiz")+'</span></div>'+
+    '<span class="tag gold">'+(dLeft<=0?(SP.what||"quiz").toUpperCase()+" TODAY":dLeft+" day"+(dLeft===1?"":"s")+" to the "+(SP.what||"quiz"))+'</span></div>'+
     '<p style="margin:8px 0 0;opacity:.92;font-size:.88rem">'+esc(SP.sub||"One job a day to the quiz.")+'</p>';
   v.appendChild(wrap);
   SP.days.forEach(d=>{
@@ -5188,7 +5204,7 @@ VIEWS.exam = (v) => {
   const dgr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   dgr.appendChild(el("button",{class:"btn teal",onclick:()=>startDiag2("cum")},"📚 Cumulative now"));
   dgr.appendChild(el("button",{class:"btn coral",onclick:()=>startDiag2("scope")},"🎯 Scoped now"));
-  dgr.appendChild(el("button",{class:"btn ghost small",onclick:()=>editNextQuiz()},"✎ next quiz: "+S.nextQuiz.name+" · "+fmtDay(S.nextQuiz.date)));
+  dgr.appendChild(el("button",{class:"btn ghost small",onclick:()=>editNextQuiz()},"✎ next quiz: "+(S.nextQuiz&&S.nextQuiz.date?S.nextQuiz.name+" · "+fmtDay(S.nextQuiz.date):"none scheduled — set one")));
   dg.appendChild(dgr);
   if(S.diags.length){ dg.appendChild(el("p",{class:"muted",style:"margin:8px 0 0;font-size:.85em"},"History: "+S.diags.slice(-6).map(d=>(d.type==="cum"?"📚":d.type==="lec"?"📝":"🎯")+d.pct+"% ("+fmtDay(d.date)+")").join(" · "))); }
   v.appendChild(dg);
