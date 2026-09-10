@@ -6,7 +6,22 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.60  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.62  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09
+  v3.62 (2026-09-10, Thu): OFFICIAL EXAM 1 INTEL — Gabe posted Ciesla's topic-list PDF + the Canvas
+        "Exam 1: Part A" page. Part A: 40 MC / 80 min / Tue 2:10 in lab; periodic table + EN + pKa
+        PROVIDED; ONE handwritten double-sided 5×8 index card ALLOWED. Built: exam-format card +
+        topic-list→app-home checklist on the Exam tab; 5×8 index-card blueprint on the Cheat tab;
+        sprint days 9/12+9/14 now draft/finalize the card; 11 ex1- items filling the list's gaps
+        (orbital diagrams sp/sp²/sp³, bond length vs overlap, base ranking = reverse ARIO,
+        equilibrium via base stability). Leveling-effect depth waits on today's Ch 4 lecture.
+  v3.61 (2026-09-09, Wed): CLEAR ARROWHEADS + VITAMIN-C CHARGE WALK. Replaced the
+        remaining filled Resonance Lab wedges with compact open chevrons backed by a white
+        separation halo, so an arrowhead no longer covers the destination atom or bond. Arrow
+        shafts, source rings, atom-edge stopping, and outward curves remain visible at narrow
+        widths. Added a three-state, molecule-shaped vitamin-C walkthrough and two consecutive
+        checked ascorbate transformations: O3− → C2−, then C2− → carbonyl O1−. Each transition
+        requires two arrows and an exact contributor audit. Existing questions remain intact.
+        Local official and upload copies are ready; DEPLOY PENDING.
   v3.60 (2026-09-09, Wed): SCHEDULE CORRECTION — Gabe: "Exam is actually on September 15. No
         Quiz chapter 3 tomorrow." Ch 3 quiz CANCELLED: removed from KNOWN_QUIZZES + deadlines and
         migrated out of stored checkpoints (tombstone with fresh setAt so the cancellation wins the
@@ -937,9 +952,22 @@
   .res-check{background:#f0f3f4;border:1px solid var(--line);border-radius:8px;padding:7px;text-align:center;font-size:.75rem;font-weight:700}
   .res-check.ok{background:var(--success-bg);color:var(--ok);border-color:#a8cbb5}
   .res-check.bad{background:var(--danger-bg);color:#81242c;border-color:#d4a0a4}
+  .res-walk-controls{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 2px}
+  .res-walk-svg{display:block;width:100%;height:auto;max-height:390px;background:#fff;border-radius:8px}
+  .res-walk-svg .rw-bond{stroke:#1d272c;stroke-width:3;stroke-linecap:round;fill:none}
+  .res-walk-svg .rw-quiet{stroke:#8b969c;stroke-width:2.4;stroke-linecap:round;fill:none}
+  .res-walk-svg .rw-active{stroke:#245c9d;stroke-width:4;stroke-linecap:round;fill:none}
+  .res-walk-svg .rw-arrow{stroke:#a5222d;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;fill:none;vector-effect:non-scaling-stroke;marker-end:url(#rw-head)}
+  .res-walk-svg .rw-arrow-halo{stroke:#fff;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;fill:none;vector-effect:non-scaling-stroke}
+  .res-walk-svg .rw-atom{font:800 27px var(--sans);fill:#1d272c}
+  .res-walk-svg .rw-id{font:800 16px var(--sans);fill:#245c9d}
+  .res-walk-svg .rw-note{font:800 15px var(--sans);fill:#a5222d}
+  .res-walk-svg .rw-electron{fill:#a5222d}
+  .res-walk-status{min-height:1.7em;text-align:center;font-weight:700;color:#81242c;margin:4px 0 0}
   @media(max-width:720px){
     .res-grid{grid-template-columns:1fr}
     .res-svg{min-height:230px}
+    .res-walk-svg{max-height:none}
     .res-checklist{grid-template-columns:1fr 1fr}
   }
   .tooltray{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -1309,7 +1337,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">CHAPTER 3</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.60</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.62</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -3503,6 +3531,21 @@ const QUESTIONS = [
 {id:"SIM-RB7-20260902-06",topic:"fgroups",type:"blanks",diff:3,prompt:"A carboxylic acid is converted to a primary amide. Which IR changes help distinguish the product even though both compounds contain a carbonyl?",template:"The very broad acid O–H absorption around {{0}} cm⁻¹ should disappear. An amide N–H absorption near {{1}} cm⁻¹ should appear, and the carbonyl band should {{2}} because the product still contains C=O.",fields:[{label:"acid O–H range",kind:"select",choices:["2500–3300","1600–1680","2100–2260"],answer:"2500–3300"},{label:"amide N–H region",kind:"select",choices:["3300–3500","1000–1250","2100–2260"],answer:"3300–3500"},{label:"carbonyl fate",kind:"select",choices:["remain, usually at a shifted position","vanish completely","become an O–H band"],answer:"remain, usually at a shifted position"}],why:"Functional-group conversion does not always eliminate every peak class. Acid and amide both contain C=O, so loss of the acid O–H envelope and appearance of N–H are more diagnostic than demanding total carbonyl disappearance."},
 {id:"SIM-RB7-20260902-07",topic:"fgroups",type:"mc",diff:3,prompt:"Ethyl acetate is hydrolyzed to ethanol and acetic acid. Why would “all C=O absorption disappears” be a poor completion criterion?",choices:["Acetic acid still contains a carbonyl, so a C=O band remains even after the ester is consumed","Ethanol contains a hidden nitrile","Hydrolysis never changes functional groups","IR cannot detect carbonyl bonds"],answer:0,why:"The ester reactant has C=O, but so does the carboxylic-acid product. The carbonyl position and O–H region change, yet complete disappearance of every carbonyl band is not expected. Always derive the diagnostic signal from both sides of the reaction."},
 {id:"SIM-RB7-20260902-08",topic:"fgroups",type:"mc",diff:3,prompt:"When comparing a time series of polymer IR spectra, what is the most reliable way to judge whether the acetate C=O band is truly shrinking?",choices:["Compare its intensity or area with an unchanged backbone reference band collected under consistent conditions","Compare only the tallest peak in each independently rescaled plot","Ignore the baseline and sample thickness","Use the color of the plotted line as the conversion measure"],answer:0,why:"Absolute absorbance changes with sample thickness, concentration, and instrument settings. An invariant internal band gives a reference, so a falling acetate-C=O/reference ratio better reflects chemical conversion."},
+/* ============ v3.62 — OFFICIAL EXAM 1 TOPIC LIST gap-fill (posted to Canvas, filed 9/10) ============
+   Her list names skills the bank was thin on: orbital DIAGRAMS of carbon (sp/sp2/sp3),
+   bond length from orbital overlap, ranking BASES structurally (reverse ARIO — "least
+   stable lone pair = strongest base"), equilibrium position judged from the bases. */
+{id:"ex1-01",topic:"orbitals",type:"mc",diff:1,prompt:"ORBITAL DIAGRAM: an sp³ carbon (like the C in CH₄) offers what orbitals for bonding?",choices:["Four equivalent sp³ hybrids, one electron in each","Two sp³ hybrids and two untouched p orbitals","One s and three p orbitals, unhybridized","Three sp³ hybrids and one unhybridized p"],answer:0,why:"<b>Four sp³ hybrids, each half-filled.</b> All four valence orbitals (one 2s + three 2p) mix; each hybrid points at a tetrahedron corner and holds one electron ready to pair into a sigma bond. Nothing is left unhybridized — that is WHY sp³ carbons cannot join a pi system."},
+{id:"ex1-02",topic:"orbitals",type:"mc",diff:2,prompt:"ORBITAL DIAGRAM: an sp² carbon (like each C in ethylene, H₂C=CH₂) has what electron arrangement?",choices:["Three sp² hybrids (sigma bonds) + ONE unhybridized p that makes the pi bond","Four sp² hybrids","Two sp² hybrids + two p orbitals","Three sp² hybrids, all lone pairs"],answer:0,why:"<b>3 hybrids + 1 leftover p.</b> Only two p orbitals join the mix; the third p stands perpendicular to the sp² plane, and side-on overlap of neighbouring p's IS the pi bond. Her exam list asks you to DRAW this — practice sketching the three trigonal hybrids with the p as a dumbbell standing through the plane."},
+{id:"ex1-03",topic:"orbitals",type:"mc",diff:2,prompt:"ORBITAL DIAGRAM: an sp carbon (like each C in acetylene, HC≡CH) keeps how many unhybridized p orbitals, and what do they do?",choices:["TWO — at right angles to each other, making the TWO pi bonds of the triple bond","One — it makes the whole triple bond","None — sp uses everything","Three — sp is just the s orbital"],answer:0,why:"<b>Two leftover p's, orthogonal, one pi bond each.</b> A triple bond = 1 sigma (sp–sp head-on) + 2 pi (the two p pairs). The same picture explains why a delocalized lone pair needs a FREE p — an atom already using its p for a pi bond has no spare one in the plane (the ring exception from Lecture 6)."},
+{id:"ex1-04",topic:"orbitals",type:"blanks",diff:2,prompt:"Count the pieces of each carbon's orbital diagram.",template:"An sp² carbon: {{0}} hybrid orbitals + {{1}} unhybridized p. An sp carbon: {{2}} hybrids + {{3}} unhybridized p's. Total orbitals always = {{4}} (one 2s + three 2p).",fields:[{label:"sp2 hybrids",kind:"num",answer:3},{label:"sp2 p",kind:"num",answer:1},{label:"sp hybrids",kind:"num",answer:2},{label:"sp p",kind:"num",answer:2},{label:"total",kind:"num",answer:4}],why:"The bookkeeping never changes: <b>hybrids + leftover p's = 4</b>. sp³ = 4+0, sp² = 3+1, sp = 2+2. If your drawn diagram breaks that sum, an orbital is missing or duplicated."},
+{id:"ex1-05",topic:"orbitals",type:"mc",diff:2,prompt:"BOND LENGTH from overlap (on her list verbatim): compare the C–C SIGMA bond made by sp³–sp² overlap with one made by sp³–sp overlap. Which sigma bond is SHORTER?",choices:["The sp³–sp one — more s-character holds the bonding electrons closer to the nucleus, pulling the atoms in","The sp³–sp² one — fewer pi bonds means shorter sigma","They are identical — sigma is sigma","Cannot compare without bond energies"],answer:0,why:"<b>More s-character → shorter, stronger sigma.</b> An sp orbital is 50% s — short and close to the nucleus (the same fact that made the alkyne C–H acidic in ARIO's O step). Shorter orbital → shorter bond. Same logic ladder, two exam questions."},
+{id:"ex1-06",topic:"orbitals",type:"mc",diff:1,prompt:"As s-character increases (sp³ → sp² → sp), bonds made by that orbital get:",choices:["Shorter and stronger","Longer and weaker","Longer and stronger","Unchanged — hybridization only affects angles"],answer:0,why:"The s orbital is the smallest, nucleus-hugging one; the more of it in the mix, the shorter the hybrid reaches and the tighter it binds. That is the whole bond-length-vs-orbital story her list asks for — one sentence."},
+{id:"ex1-07",topic:"acidbase2",type:"mc",diff:2,prompt:"RANKING BASES structurally (her list: 'the strongest base will have the least stable lone pair'). Without a pKa table, the STRONGEST base is the one whose lone pair is:",choices:["LEAST stabilized — high-energy, hungry to grab a proton","Most stabilized — comfort makes strength","On the biggest atom, always","In a resonance system, always"],answer:0,why:"<b>Base ranking is ARIO in reverse.</b> Everything that makes a conjugate base STABLE (good atom, resonance, induction, low-energy orbital) makes it a WEAK base — a comfortable lone pair has no reason to react. The least-stable lone pair is the most available one, so it is the strongest base."},
+{id:"ex1-08",topic:"acidbase2",type:"mc",diff:2,prompt:"Hydroxide (HO⁻) vs hydrosulfide (HS⁻): which is the stronger BASE?",choices:["HO⁻ — the charge sits on a SMALLER atom, less stable lone pair, more reactive","HS⁻ — sulfur is bigger, so it is a stronger base","They tie — same column","HS⁻ — sulfur is less electronegative"],answer:0,why:"Flip the acid answer. H₂S is the stronger ACID because big, diffuse S⁻ is the more STABLE anion — which is exactly why S⁻ is the WEAKER base. Concentrated charge on little oxygen = less stable = stronger base. One fact, two directions; the exam can ask either."},
+{id:"ex1-09",topic:"acidbase2",type:"mc",diff:3,prompt:"Ethoxide (CH₃CH₂O⁻) vs acetate (CH₃CO₂⁻): both put charge on oxygen. Which is the stronger BASE?",choices:["Ethoxide — no resonance, its lone pair is stuck on one O, less stable, more reactive","Acetate — resonance makes it stronger","They tie — Atom step, both oxygen","Acetate — two oxygens means double the basicity"],answer:0,why:"Atom ties (O vs O) → Resonance decides, in reverse: acetate's charge is SPREAD over two oxygens (stable → weak base); ethoxide's is stuck on one (unstable → strong base). Matches the pKa view: ethanol 16 vs acetic acid 4.8 — the weaker acid owns the stronger conjugate base."},
+{id:"ex1-10",topic:"acidbase2",type:"mc",diff:2,prompt:"Complete the master rule: every structural feature that STABILIZES a conjugate base (ARIO) makes that species, viewed as a base, …",choices:["weaker","stronger","more nucleophilic but equally basic","unchanged — acidity and basicity are unrelated"],answer:0,why:"Acid strength and conjugate-base strength are one seesaw: stable anion ⇔ strong parent acid ⇔ weak base. Run ARIO once and read it in whichever direction the question asks — she wrote BOTH directions on the topic list."},
+{id:"ex1-11",topic:"acidbase1",type:"mc",diff:2,prompt:"EQUILIBRIUM POSITION judged from the BASES (her list's second phrasing): an acid–base equilibrium favors the side holding…",choices:["the MORE STABLE (weaker) base","the stronger base","the stronger acid","whichever side has water"],answer:0,why:"Same coin as 'favor the weakest acid / highest pKa' — the weakest acid and the most stable base sit on the SAME side. Two phrasings on her list, one fact: equilibrium slides downhill to the most comfortable pair."},
 /* ================= v3.59 — ARIO IN ANGER (Lecture, Tue 9/8) =================
    Qualitative acid ranking, from today's lecture + worksheets. The bank already held 74
    acid-base items (pKa mechanics, ARIO letters, favourability); these 40 add what today
@@ -3675,6 +3718,16 @@ const RESONANCE_TARGETS=[
    graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:124},{id:"m",el:"C",label:"CH₃",x:88,y:190},{id:"o1",el:"O",label:"O",x:178,y:38,lp:2},{id:"o2",el:"O",label:"O",x:310,y:150,lp:3,charge:-1}],bonds:[{a:"c",b:"m",order:1},{a:"c",b:"o1",order:2},{a:"c",b:"o2",order:1}]},
    arrows:[{from:"lp:o2",to:"bond:c-o2"},{from:"bond:c-o1",to:"atom:o1"}],result:{bonds:{"c-o1":1,"c-o2":2},nodes:{o1:{lp:3,charge:-1},o2:{lp:2,charge:0}}},
    hint:"Negative O lone pair → C–O; old C=O π bond → the other O.",ranking:"The two contributors are equivalent and equally significant.",hybrid:"Both C–O bonds are equivalent with bond order about 1.5; each oxygen carries partial negative charge."},
+  {key:"ascorbate-o3-to-c2",name:"Vitamin C charge walk · move 1",formula:"O₃⁻–C₃=C₂–C₁=O₁",pattern:"allylic lone pair · step 1 of 2",arrowCount:2,
+   prompt:"Move the C3-oxygen lone pair into the ring and move the adjacent C3=C2 π pair onto C2. Build the carbon-centered contributor.",
+   graph:{nodes:[{id:"or",el:"O",label:"O",x:205,y:30,lp:2},{id:"c1",el:"C",label:"C₁",x:292,y:82},{id:"o1",el:"O",label:"O₁",x:368,y:40,lp:2},{id:"c2",el:"C",label:"C₂",x:282,y:174},{id:"o2",el:"O",label:"OH",x:350,y:232,lp:2},{id:"c3",el:"C",label:"C₃",x:170,y:174},{id:"o3",el:"O",label:"O₃",x:128,y:252,lp:3,charge:-1},{id:"c4",el:"C",label:"C",x:103,y:82},{id:"r",el:"C",label:"R",x:35,y:40}],bonds:[{a:"or",b:"c1",order:1},{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:2},{a:"c3",b:"c4",order:1},{a:"c4",b:"or",order:1},{a:"c1",b:"o1",order:2},{a:"c2",b:"o2",order:1},{a:"c3",b:"o3",order:1},{a:"c4",b:"r",order:1}]},
+   arrows:[{from:"lp:o3",to:"bond:c3-o3"},{from:"bond:c2-c3",to:"atom:c2"}],result:{bonds:{"c3-o3":2,"c2-c3":1},nodes:{o3:{lp:2,charge:0},c2:{lp:1,charge:-1}}},
+   hint:"Two arrows together: O3 lone pair → O3–C3; C3=C2 π pair → C2. Stop at the middle contributor with C2⁻.",ranking:"This carbon-centered contributor is less favorable than the oxygen-centered contributors, but it legally connects them.",hybrid:"The negative charge can travel through the uninterrupted O3–C3–C2–C1–O1 conjugated path."},
+  {key:"ascorbate-c2-to-o1",name:"Vitamin C charge walk · move 2",formula:"O₃=C₃–C₂⁻–C₁=O₁",pattern:"allylic lone pair · step 2 of 2",arrowCount:2,
+   prompt:"Use the C2 lone pair to make C2=C1 while the C1=O1 π pair moves onto O1. Build the carbonyl-oxygen contributor.",
+   graph:{nodes:[{id:"or",el:"O",label:"O",x:205,y:30,lp:2},{id:"c1",el:"C",label:"C₁",x:292,y:82},{id:"o1",el:"O",label:"O₁",x:368,y:40,lp:2},{id:"c2",el:"C",label:"C₂",x:282,y:174,lp:1,charge:-1},{id:"o2",el:"O",label:"OH",x:350,y:232,lp:2},{id:"c3",el:"C",label:"C₃",x:170,y:174},{id:"o3",el:"O",label:"O₃",x:128,y:252,lp:2},{id:"c4",el:"C",label:"C",x:103,y:82},{id:"r",el:"C",label:"R",x:35,y:40}],bonds:[{a:"or",b:"c1",order:1},{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:1},{a:"c3",b:"c4",order:1},{a:"c4",b:"or",order:1},{a:"c1",b:"o1",order:2},{a:"c2",b:"o2",order:1},{a:"c3",b:"o3",order:2},{a:"c4",b:"r",order:1}]},
+   arrows:[{from:"lp:c2",to:"bond:c1-c2"},{from:"bond:c1-o1",to:"atom:o1"}],result:{bonds:{"c1-c2":2,"c1-o1":1},nodes:{c2:{lp:0,charge:0},o1:{lp:3,charge:-1}}},
+   hint:"Two arrows together: C2 lone pair → C2–C1; C1=O1 π pair → O1. The charge ends on the carbonyl oxygen.",ranking:"The oxygen-centered contributors are more favorable than the carbon-centered bridge because oxygen stabilizes negative charge better than carbon.",hybrid:"Electron density is delocalized across O3–C3–C2–C1–O1; the sigma framework never moves."},
   {key:"nitrile-anion",name:"Move charge onto nitrogen",formula:"CH₃–CH⁻–C≡N",pattern:"allylic lone pair",arrowCount:2,
    prompt:"Make the C=C bond and move one nitrile π pair onto nitrogen.",
    graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:56,y:172},{id:"ca",el:"C",label:"CH",x:145,y:112,lp:1,charge:-1},{id:"cn",el:"C",label:"C",x:255,y:112},{id:"n",el:"N",label:"N",x:350,y:112,lp:1}],bonds:[{a:"m",b:"ca",order:1},{a:"ca",b:"cn",order:1},{a:"cn",b:"n",order:3}]},
@@ -4432,9 +4485,9 @@ const SPRINT_EXAM1={ quiz:"2026-09-15", name:"Exam 1", what:"exam", hdr:"🏆 Ex
   {d:"2026-09-09", ico:"⚖️", t:"ARIO set + leveling pre-read", why:"Yesterday's lecture drilled while it's fresh — the whole qualitative ladder plus Lewis acids/bases. Then 10 minutes reading about the leveling effect: it opens tomorrow's lecture and she called it an exam-mistake generator by name. Make Thursday a second exposure, not a first.", act:{kind:"focus", id:"ario"}},
   {d:"2026-09-10", ico:"🏁", t:"Lecture day → cold diagnostic tonight", why:"Ch 4 opens today (leveling effect). Tonight: the cold diagnostic — with the exam as the next checkpoint it now covers EVERYTHING from Ch 1-3, so the score is a real exam-readiness number, not a chapter grade.", act:{kind:"diag"}},
   {d:"2026-09-11", ico:"🔧", t:"Repair day — worst topics + missed pile", why:"Whatever last night's diagnostic flagged red gets drilled first; then clear every question in the missed pile. Five days out, repair beats coverage.", act:{kind:"drill", id:"__missed"}},
-  {d:"2026-09-12", ico:"✍️", t:"Paper day — draw and rank like the exam", why:"Resonance structures, hybrids, and full ARIO rankings ON PAPER in her format (label strongest → weakest — she marks ambiguous rankings wrong). The resonance mastery check is the gate: six cold, all clean.", act:{kind:"mastery", id:"resonance"}},
+  {d:"2026-09-12", ico:"✍️", t:"Paper day — draw, rank, and DRAFT THE INDEX CARD", why:"Resonance structures, hybrids, and full ARIO rankings ON PAPER in her format (label strongest → weakest — she marks ambiguous rankings wrong). Then draft your allowed 5×8 card from the Cheat-tab blueprint — writing it is a study pass. Mastery check is the gate: six cold, all clean.", act:{kind:"mastery", id:"resonance"}},
   {d:"2026-09-13", ico:"🏁", t:"Second cold diagnostic — measure the repair", why:"Same instrument as Thursday's. The delta between the two runs is the week's real product. Anything still red becomes tomorrow's short list — nothing else does.", act:{kind:"diag"}},
-  {d:"2026-09-14", ico:"🌙", t:"Light review + EARLY NIGHT", why:"Cheat sheet and the missed pile only; nothing new after dinner. Your only sub-7-hour night in your best sleep week on record was a cram night — don't donate exam points to one the night before the exam that matters.", act:{kind:"drill", id:"__missed"}},
+  {d:"2026-09-14", ico:"🌙", t:"Rewrite the index card clean + EARLY NIGHT", why:"Final copy of the 5×8 card (name on it!), missed pile only, nothing new after dinner. Pacing note for tomorrow: 40 MC in 80 min — 2 minutes each, mark and move. Your only sub-7-hour night in your best sleep week was a cram night — don't donate exam points to one now.", act:{kind:"drill", id:"__missed"}},
 ]};
 function sprintCard(v){ [SPRINT_EXAM1, SPRINT_CH2].forEach(SP=>renderOneSprint(v,SP)); }
 function renderOneSprint(v, SP){
@@ -5148,6 +5201,21 @@ function allCheckpoints(){
   return list.sort((a,b)=>a.date<b.date?-1:1);
 }
 VIEWS.exam = (v) => {
+  /* v3.62: OFFICIAL exam intel, straight from Canvas (posted ~9/10). */
+  v.appendChild(el("div",{class:"card coral"},
+    '<span class="tag gold">📋 OFFICIAL · from Canvas</span><h2>Exam 1 — the actual format</h2>'+
+    '<p style="margin:6px 0"><b>Part A: 40 multiple-choice · 80 minutes — 2 min/question · Tue 2:10 PM, given during lab time.</b> (Overview says 2 pts each; the Canvas header says 60 pts — flagged, does not change prep.) "Part A" implies a Part B — expect free-response on paper; watch Canvas.</p>'+
+    '<p style="margin:6px 0"><b>Provided:</b> periodic table, electronegativity values, any needed pKa values — so do NOT memorize pKa numbers; memorize how to USE them.</p>'+
+    '<p style="margin:6px 0"><b>Allowed: ONE handwritten, double-sided 5×8″ index card with your name on it.</b> The 📌 Cheat tab has a blueprint of what belongs on it. Writing the card by hand IS a study pass — draft it Saturday, finalize Monday.</p>'+
+    '<p class="muted" style="margin:6px 0 0;font-size:.85rem">Pacing drill: 2 minutes per question. If one passes the 2-minute mark, mark it and move — 40 × 2 leaves zero slack.</p>'));
+  v.appendChild(el("div",{class:"card"},
+    '<span class="tag violet">📜 Her official topic list ("not exhaustive — the main topics")</span><h2>Every bullet → where it lives in the app</h2>'+
+    '<p class="muted" style="margin:4px 0 8px;font-size:.85rem">Condensed from the posted PDF. Nothing on it is outside the bank except leveling-effect DEPTH (today\'s lecture — items land after the transcript).</p>'+
+    '<table class="cheat"><tr><th>Ch</th><th>She expects you to…</th><th>App home</th></tr>'+
+    '<tr><td class="mono">1</td><td>Why covalent bonds form · hybridization of C/N/O · DRAW orbital diagrams (sp/sp²/sp³) · electron-group vs molecular geometry · formal charges · bond + molecular polarity, dipole direction · pi vs sigma WITH drawings · bond strength/length vs type and vs overlap (sp–sp² vs sp–sp) · IMFs → b.p./m.p.</td><td>Drills: hybrid, formal, polarity, imf · 📐 Bond-angle set · NEW ex1- orbital-diagram items</td></tr>'+
+    '<tr><td class="mono">2</td><td>Convert condensed ⇄ bond-line ⇄ Lewis · correct angles + heteroatom H\'s in skeletal · functional groups · draw resonance structures + rank contributors · structures are hypothetical, the HYBRID is real · draw the hybrid with δ+/δ−</td><td>🔀 Condense set · fgroups drill · 🧭 Lecture-6 set · Resonance Lab</td></tr>'+
+    '<tr><td class="mono">3</td><td>Brønsted AND Lewis definitions · spot conjugate pairs · will the reaction occur (pKa) · most acidic proton via conjugate-base stability (ARIO) · most BASIC compound via lone-pair availability · curly arrows for proton transfer · pick acids/bases for a job using pKa · LEVELING EFFECT in water · equilibrium position from pKa AND from base stability</td><td>⚖️ ARIO set · lw- Lewis items · AB3-arw arrow items · NEW ex1- base-ranking items · leveling: today\'s lecture</td></tr>'+
+    '</table>'));
   /* v3.23: readiness board — every quiz/exam/final, not just the next one */
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">🚦 Readiness</span><h2>Am I ready — for each one?</h2><p class="muted">Two layers. <b>The gate</b> is mechanical: ≥80% clean across the checkpoint scope, no topic untouched, and a matching v3.56+ scoped diagnostic with ≥80% raw, zero guessed-rights, every tested area passing, and every critical construction/transfer task first-audit clean. A high total can no longer hide a failed essential skill. <b>Claude\'s read</b> adds judgment from your reports, rationales, and handwritten work.</p>'));
   (function(){
@@ -6038,6 +6106,11 @@ function startResRun(cold){
   S.resRun={id:"res-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),queue:RESONANCE_TARGETS.map(t=>t.key),i:0,cold:!!cold,clean:true,complete:false};
   startResLab(S.resRun.queue[0],!cold);
 }
+function startAscorbateWalk(){
+  const queue=["ascorbate-o3-to-c2","ascorbate-c2-to-o1"];
+  S.resRun={id:"res-vitc-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),queue,i:0,cold:false,clean:true,complete:false,label:"Vitamin C charge walk"};
+  startResLab(queue[0],true);
+}
 function resumeResRun(){const R=S.resRun;if(!R||R.complete)return;startResLab(R.queue[R.i],!R.cold);}
 function leaveResLab(){const back=S.resLab&&S.resLab.returnTo;S.resLab=null;if(back==="drill"&&S.drill)go("drill");else go("reslab");}
 function finishResLabStep(){if(S.resLab&&S.resLab.returnTo==="drill"&&S.drill)return leaveResLab();advanceResRun();}
@@ -6123,8 +6196,10 @@ function resArrowGeometry(R,g,a,i){
 function resSvgNode(tag,attrs,parent){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));(parent||document).appendChild(e);return e;}
 function drawResGraph(svg,g,mode){
   const R=S.resLab,NS="http://www.w3.org/2000/svg";svg.innerHTML="";svg.setAttribute("viewBox","-12 -14 424 304");svg.setAttribute("role","group");
-  const defs=document.createElementNS(NS,"defs"),marker=document.createElementNS(NS,"marker"),tip=document.createElementNS(NS,"path"),markerId="res-tip-"+mode;
-  marker.setAttribute("id",markerId);marker.setAttribute("viewBox","0 0 12 12");marker.setAttribute("refX","10.5");marker.setAttribute("refY","6");marker.setAttribute("markerWidth","11");marker.setAttribute("markerHeight","11");marker.setAttribute("markerUnits","userSpaceOnUse");marker.setAttribute("orient","auto");tip.setAttribute("d","M 1.5 1.5 L 10.5 6 L 1.5 10.5 L 4 6 Z");tip.setAttribute("fill","#a5222d");tip.setAttribute("stroke","#fff");tip.setAttribute("stroke-width","1.5");tip.setAttribute("paint-order","stroke fill");marker.appendChild(tip);defs.appendChild(marker);svg.appendChild(defs);
+  const defs=document.createElementNS(NS,"defs"),marker=document.createElementNS(NS,"marker"),markerId="res-tip-"+mode;
+  marker.setAttribute("id",markerId);marker.setAttribute("viewBox","0 0 10 10");marker.setAttribute("refX","9");marker.setAttribute("refY","5");marker.setAttribute("markerWidth","10");marker.setAttribute("markerHeight","10");marker.setAttribute("markerUnits","userSpaceOnUse");marker.setAttribute("orient","auto");
+  const headPath="M 1.5 1.5 L 9 5 L 1.5 8.5",headHalo=document.createElementNS(NS,"path"),head=document.createElementNS(NS,"path");
+  [[headHalo,"#fff","5"],[head,"#a5222d","2"]].forEach(([p,stroke,width])=>{p.setAttribute("d",headPath);p.setAttribute("fill","none");p.setAttribute("stroke",stroke);p.setAttribute("stroke-width",width);p.setAttribute("stroke-linecap","round");p.setAttribute("stroke-linejoin","round");marker.appendChild(p);});defs.appendChild(marker);svg.appendChild(defs);
   g.bonds.forEach(b=>{
     const A=g.nodes.find(n=>n.id===b.a),C=g.nodes.find(n=>n.id===b.b);if(!A||!C)return;
     const key=b.key||resBondKey(b.a,b.b);
@@ -6139,7 +6214,7 @@ function drawResGraph(svg,g,mode){
   const arrowGeometry=mode==="source"?R.arrows.map((a,i)=>resArrowGeometry(R,g,a,i)):[];
   if(mode==="source")arrowGeometry.forEach(path=>{
     resSvgNode("path",{d:path.d,fill:"none",stroke:"#fff","stroke-width":"8","stroke-linecap":"round","stroke-linejoin":"round","vector-effect":"non-scaling-stroke","aria-hidden":"true"},svg);
-    resSvgNode("path",{d:path.d,fill:"none",stroke:"#a5222d","stroke-width":"3","stroke-linecap":"round","stroke-linejoin":"round","vector-effect":"non-scaling-stroke","marker-end":"url(#"+markerId+")","aria-hidden":"true"},svg);
+    resSvgNode("path",{d:path.d,fill:"none",stroke:"#a5222d","stroke-width":"2.75","stroke-linecap":"round","stroke-linejoin":"round","vector-effect":"non-scaling-stroke","marker-end":"url(#"+markerId+")","aria-hidden":"true"},svg);
   });
   g.nodes.forEach(n=>{
     const selected=mode==="edit"&&R.editSel&&R.editSel.kind==="atom"&&R.editSel.id===n.id;
@@ -6193,16 +6268,49 @@ function resAuditFeedback(){
   }
   return box;
 }
+function buildAscorbateWalkthrough(){
+  const wrap=el("div",{class:"card cream"});
+  wrap.innerHTML='<span class="tag violet">Diagram first · then build it</span><h3 style="margin:8px 0 2px">Vitamin C: move the charge one neighbor at a time</h3><p class="muted" style="margin:0">Use the three buttons to follow the same atom framework. Red tail = where the pair starts; compact open head = where it lands.</p>';
+  const controls=el("div",{class:"res-walk-controls","aria-label":"Vitamin C resonance stages"}),svg=document.createElementNS("http://www.w3.org/2000/svg","svg"),status=el("p",{class:"res-walk-status","aria-live":"polite"});
+  svg.setAttribute("class","res-walk-svg");svg.setAttribute("viewBox","0 0 620 390");svg.setAttribute("role","img");svg.setAttribute("aria-label","Step-through diagram of charge delocalization across the vitamin C ring");
+  const buttons=["1 · O₃⁻ → C₂⁻","2 · C₂⁻ → O₁⁻","3 · Final contributor"].map((label,i)=>{const b=el("button",{class:"tool"+(i===0?" on":""),type:"button","aria-pressed":i===0?"true":"false"},label);controls.appendChild(b);return b;});
+  wrap.appendChild(controls);wrap.appendChild(svg);wrap.appendChild(status);
+  const ln=(x1,y1,x2,y2,cls="rw-bond")=>'<line class="'+cls+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"></line>';
+  const tx=(x,y,s,cls="rw-atom",anchor="middle")=>'<text class="'+cls+'" x="'+x+'" y="'+y+'" text-anchor="'+anchor+'">'+s+'</text>';
+  const dots=(x,y)=>'<circle class="rw-electron" cx="'+x+'" cy="'+y+'" r="4"></circle><circle class="rw-electron" cx="'+(x+13)+'" cy="'+y+'" r="4"></circle>';
+  const arr=d=>'<path class="rw-arrow-halo" d="'+d+'"></path><path class="rw-arrow" d="'+d+'"></path>';
+  const defs='<defs><marker id="rw-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.5 1.5 L9 5 L1.5 8.5" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1.5 1.5 L9 5 L1.5 8.5" fill="none" stroke="#a5222d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></marker></defs>';
+  const base=()=>[
+    defs,ln(180,125,275,82,"rw-quiet"),ln(275,82,382,130,"rw-quiet"),ln(382,130,340,240),ln(340,240,215,240),ln(215,240,180,125,"rw-quiet"),ln(180,125,95,82,"rw-quiet"),tx(278,72,"O"),tx(135,72,"side chain","rw-id"),ln(340,240,375,325,"rw-quiet"),tx(392,356,"OH"),tx(215,273,"C₃","rw-id"),tx(340,273,"C₂","rw-id"),tx(392,122,"C₁","rw-id")
+  ].join("");
+  const stages=[
+    ()=>base()+[
+      ln(215,240,182,337),tx(171,373,"O"),tx(193,348,"−","rw-atom","start"),dots(123,341),ln(225,230,330,230,"rw-active"),ln(382,130,500,130,"rw-active"),ln(382,142,500,142,"rw-active"),tx(530,145,"O"),arr("M136 337 Q151 285 201 289"),arr("M276 224 Q316 194 334 219"),tx(145,289,"①","rw-note"),tx(302,190,"②","rw-note")
+    ].join(""),
+    ()=>base()+[
+      ln(205,236,171,335,"rw-active"),ln(219,242,185,341,"rw-active"),tx(165,373,"O"),dots(325,305),tx(353,311,"−","rw-atom","start"),ln(382,130,500,130,"rw-active"),ln(382,142,500,142,"rw-active"),tx(530,145,"O"),arr("M339 300 Q402 278 370 194"),arr("M438 122 Q480 88 511 116"),tx(381,259,"①","rw-note"),tx(472,86,"②","rw-note")
+    ].join(""),
+    ()=>base()+[
+      ln(205,236,171,335,"rw-active"),ln(219,242,185,341,"rw-active"),tx(165,373,"O"),ln(329,231,371,125,"rw-active"),ln(382,130,500,130,"rw-active"),tx(530,145,"O"),tx(552,120,"−","rw-atom","start"),dots(522,88)
+    ].join("")
+  ];
+  const messages=["① O₃ lone pair makes O₃=C₃. ② The adjacent C₃=C₂ π pair becomes the lone pair on C₂.","① The C₂ lone pair makes C₂=C₁. ② The adjacent C₁=O₁ π pair becomes the lone pair on O₁.","Finished: the atoms and σ bonds did not move. The same −1 charge is now on the carbonyl oxygen."];
+  const show=i=>{svg.innerHTML=stages[i]();status.textContent=messages[i];buttons.forEach((b,j)=>{b.classList.toggle("on",i===j);b.setAttribute("aria-pressed",i===j?"true":"false");});};
+  buttons.forEach((b,i)=>b.addEventListener("click",()=>show(i)));show(0);
+  const goBtn=el("button",{class:"btn coral",style:"margin-top:8px",onclick:startAscorbateWalk},"Now draw both vitamin-C moves →");wrap.appendChild(goBtn);
+  return wrap;
+}
 VIEWS.reslab=(v)=>{
   const R=S.resLab;
   if(!R){
     const complete=S.resDone.filter(k=>resTarget(k)).length,clean=(S.resRuns||[]).filter(r=>r.cold&&r.clean).length;
     v.appendChild(el("div",{class:"card teal"},'<span class="tag coral">Resonance Lab · '+RESONANCE_TARGETS.length+' checked transformations</span><h2>Draw the arrows. Build what they produce.</h2><p>Tap where an electron pair starts, then where it ends. In the second panel, edit bond orders, lone pairs, and charges on the same locked atom framework. The audit checks both panels independently.</p><div class="why"><b>Fast test routine:</b> ① find a movable pair or nearby C⁺ · ② draw one legal pattern · ③ rebuild bonds/LP/charges · ④ confirm same atoms, same net charge, same electron-pair count · ⑤ rank: octets → fewer charges → favorable charge placement.</div><p class="muted" style="margin-top:8px">Completion: <b>'+complete+'/'+RESONANCE_TARGETS.length+'</b> · clean cold sequences: <b>'+clean+'</b>. Completion is practice evidence; only an entire first-audit-clean cold sequence is labeled cold readiness evidence.</p>'));
     if(S.resRun&&S.resRun.complete){const x=S.resRun.result;v.appendChild(el("div",{class:"card "+(x.cold&&x.clean?"teal":"cream")},'<h3>'+(x.cold?(x.clean?'✓ Clean cold sequence':'Cold sequence completed with corrections'):'✓ Guided sequence completed')+'</h3><p class="muted">'+x.total+' transformations finished. '+(x.cold&&x.clean?'Every target passed on its first audit. This is readiness evidence, not a permanent mastery claim.':x.cold?'Run it cold again after fixing the missed pattern(s).':'Now repeat the set cold—with pattern names and hints hidden.')+'</p>'));}
-    const actions=el("div",{class:"card"});actions.innerHTML='<h3>One next action</h3><p class="muted">'+(complete<RESONANCE_TARGETS.length?'Run the guided sequence once, in order. It teaches all five handout patterns with eight test-relevant molecules.':'Run the full set cold. The pattern label and starter hint stay hidden until after the audit.')+'</p>';
+    const actions=el("div",{class:"card"});actions.innerHTML='<h3>One next action</h3><p class="muted">'+(complete<RESONANCE_TARGETS.length?'Run the guided sequence once, in order. It teaches all five handout patterns through ten checked transformations.':'Run the full set cold. The pattern label and starter hint stay hidden until after the audit.')+'</p>';
     if(S.resRun&&!S.resRun.complete)actions.appendChild(el("button",{class:"btn coral",style:"margin-right:8px",onclick:resumeResRun},"Resume sequence · "+(S.resRun.i+1)+"/"+S.resRun.queue.length+" →"));
     actions.appendChild(el("button",{class:"btn "+(complete<RESONANCE_TARGETS.length?"coral":"ghost"),style:"margin-right:8px",onclick:()=>startResRun(false)},complete<RESONANCE_TARGETS.length?"Start guided sequence →":"Review guided →"));
-    const coldBtn=el("button",{class:"btn "+(complete===RESONANCE_TARGETS.length?"gold":"ghost"),disabled:complete!==RESONANCE_TARGETS.length,onclick:()=>startResRun(true)},complete===RESONANCE_TARGETS.length?"Start cold sequence →":"Cold sequence unlocks at 8/8");actions.appendChild(coldBtn);v.appendChild(actions);
+    const coldBtn=el("button",{class:"btn "+(complete===RESONANCE_TARGETS.length?"gold":"ghost"),disabled:complete!==RESONANCE_TARGETS.length,onclick:()=>startResRun(true)},complete===RESONANCE_TARGETS.length?"Start cold sequence →":"Cold sequence unlocks at "+RESONANCE_TARGETS.length+"/"+RESONANCE_TARGETS.length);actions.appendChild(coldBtn);v.appendChild(actions);
+    v.appendChild(buildAscorbateWalkthrough());
     const ref=el("div",{class:"card cream"});ref.innerHTML='<details><summary><b>Handout quick reference · five legal one-step patterns</b></summary><ol class="audit"><li>Lone pair next to a π bond: pair makes a π bond while the old π pair moves.</li><li>Allylic carbocation: the neighboring π pair shifts toward C⁺.</li><li>Lone pair next to C⁺: the pair makes the missing bond.</li><li>π bond between atoms of different electronegativity: move the pair to the more electronegative atom.</li><li>Conjugated π bonds in a ring: shift every π pair together in one direction.</li></ol><div class="why"><b>Always:</b> arrows start at electrons; atoms and sigma connectivity stay fixed; total charge and electron pairs stay constant. A conjugated lone pair occupies a p orbital; a localized pair follows the atom\'s hybridization. Rank contributors by octets → fewer charges → favorable charge placement. The hybrid uses partial bonds/charges; it is not another contributor.</div></details>';
     ref.appendChild(el("button",{class:"btn ghost small",style:"margin-top:10px",onclick:()=>{S.learnCh="ch2";S.learnTopic="fgroups";go("learn");}},"Open the handout's functional-group reference →"));v.appendChild(ref);
     RESONANCE_TARGETS.forEach((t,i)=>{const done=S.resDone.includes(t.key),c=el("div",{class:"card "+(done?"cream":"")});c.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><h3 style="flex:1;margin:0">'+(i+1)+'. '+t.name+(done?' <span style="color:var(--ok)">✓</span>':'')+'</h3><span class="tag violet">'+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span></div><p class="mono" style="margin:6px 0">'+t.formula+'</p><p class="muted">'+t.pattern+'</p>';c.appendChild(el("button",{class:"btn "+(done?"ghost":"teal"),onclick:()=>{S.resRun=null;startResLab(t.key,true);}},done?"Rebuild":"Practice this pattern"));v.appendChild(c);});
@@ -6211,7 +6319,7 @@ VIEWS.reslab=(v)=>{
   const t=R.target,run=S.resRun&&!S.resRun.complete?S.resRun:null;
   const head=el("div",{class:"card"});head.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><div style="flex:1"><span class="tag '+(R.returnTo==="drill"||run&&run.cold?'coral':'violet')+'">'+(R.returnTo==="drill"?'Cold diagnostic build':run?(run.cold?'Cold sequence':'Guided sequence')+' · '+(run.i+1)+'/'+run.queue.length:'Guided target')+'</span><h2>'+t.name+'</h2><p class="mono" style="font-size:1.05rem">'+t.formula+'</p></div>'+(R.guided?'<span class="tag gold">'+t.pattern+' · '+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span>':'')+'</div><p>'+t.prompt+'</p><p class="muted"><b>Rule:</b> atom connectivity is locked. Only electrons move. Build the complete next contributor—not the resonance hybrid.</p>';v.appendChild(head);
   const grid=el("div",{class:"res-grid"});
-  const source=el("div",{class:"res-stage"});source.innerHTML='<h3>1 · Draw curved arrow'+(t.arrowCount===1?'':'s')+'</h3><p class="muted" style="margin:0">Tap source → destination for each electron pair. <b style="color:#8f2028">○ tail ring = source · ▶ arrowhead = destination</b></p>';
+  const source=el("div",{class:"res-stage"});source.innerHTML='<h3>1 · Draw curved arrow'+(t.arrowCount===1?'':'s')+'</h3><p class="muted" style="margin:0">Tap source → destination for each electron pair. <b style="color:#8f2028">○ tail ring = source · open arrowhead = destination</b></p>';
   const ssvg=document.createElementNS("http://www.w3.org/2000/svg","svg");ssvg.setAttribute("class","res-svg");ssvg.setAttribute("aria-label","Starting resonance contributor and curved arrows");source.appendChild(ssvg);
   const sb=el("div",{class:"res-toolbar","aria-label":"Bond targets for curved arrows"});sb.appendChild(el("span",{class:"muted"},"Bond targets:"));t.graph.bonds.forEach(b=>{const label=resBondControlLabel(t.graph,b);sb.appendChild(el("button",{class:"tool","aria-label":"Use "+label+" bond target",onclick:()=>resHandlePoint("bond",resBondKey(b.a,b.b))},label));});source.appendChild(sb);
   source.appendChild(el("p",{class:"res-status"},R.msg));const st=el("div",{class:"res-toolbar"});st.appendChild(el("button",{class:"tool",disabled:!R.pending&&!R.arrows.length,onclick:resUndoArrow},R.pending?"Cancel start":"Undo arrow"));st.appendChild(el("button",{class:"tool",onclick:()=>{R.arrows=[];R.pending=null;R.msg="Tap an electron source: a lone pair or a π bond.";R.audit=null;render();}},"Clear arrows"));source.appendChild(st);grid.appendChild(source);
@@ -6276,6 +6384,14 @@ VIEWS.learn = (v) => {
 };
 VIEWS.cheat = (v) => {
   v.appendChild(el("div",{class:"card"},'<span class="tag gold">Pin these</span><h2>The whole gen-chem bridge on one page</h2>'));
+  /* v3.62 — the 5×8 index-card blueprint (one handwritten double-sided card is ALLOWED on Exam 1). */
+  v.appendChild(el("div",{class:"card coral"},
+    '<h3>📇 Your 5×8″ exam index card — what to hand-copy</h3>'+
+    '<p class="muted" style="margin:4px 0 8px;font-size:.85rem">One handwritten, double-sided card is allowed (name on it). Periodic table, EN values and pKa values are PROVIDED — waste zero ink on those. Copy rules and ladders, not data.</p>'+
+    '<table class="cheat"><tr><th>SIDE 1 — Ch 1</th><th>SIDE 2 — Ch 2 + 3</th></tr>'+
+    '<tr><td>· VSEPR table: SN → e-geometry → shape → angle (109.5 / 120 / 180 / 107 / 104.5) + "lone pairs squeeze the angle"<br>· FC = valence − sticks − dots<br>· Hybrid diagrams: sp³ = 4+0p · sp² = 3+1p · sp = 2+2p (sketch all three!)<br>· %s: 25/33/50 → more s = shorter, stronger, holds charge better<br>· Dipole: arrow toward δ−; symmetric shapes cancel<br>· IMF ladder: H-bond &gt; dipole–dipole &gt; dispersion (bigger = higher b.p.); phase changes break IMFs, never bonds</td>'+
+    '<td>· The 5 resonance patterns (name + arrow count)<br>· Ranking: octets → fewest charges → charge placement · conservation of charge every step<br>· sp³ = brick wall · ring heteroatom already π-bonded → lone pair LOCALIZED<br>· Delocalized LP → free p orbital, NOT in steric number<br>· ARIO + charge first, sterics last · same row = EN, same column = SIZE · COUNT resonance structures · induction dies past ~1 C<br>· Bases = ARIO reversed: least stable lone pair = strongest base<br>· Equilibrium → weakest acid / most stable base side (highest pKa wins)<br>· Leveling: in water nothing stronger than H₃O⁺ / ⁻OH survives<br>· Proton transfer = 2 arrows: lone pair→H, then H–A bond→A</td></tr></table>'+
+    '<p class="muted" style="margin:6px 0 0;font-size:.82rem">Draft it Saturday (sprint day 4), rewrite it clean Monday. The rewrite is deliberate — copying is retrieval practice.</p>'));
   /* v3.59 — quiz-week card: the full qualitative-acidity ladder from the 9/8 lecture. */
   v.appendChild(el("div",{class:"card teal"},
     '<h3>Ranking acids without pKa — the full ladder (9/8 lecture)</h3>'+
