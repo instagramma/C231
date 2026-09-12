@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.65  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.66  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.66 (2026-09-12, Sat): AROMATIC ATTACHMENT REPAIR. Nine related layouts now attach
+        side groups to actual ring carbon vertices. Para/ortho relationships and electron dots
+        remain explicit. No question IDs, choices, answer keys, or learner storage changed.
   v3.65 (2026-09-12, Sat): BOND-LINE FIRST. Replaced condensed-only displays on 45 Chapter 3
         cards with 93 validated graph drawings. Formula references remain optional; Lewis Lab
         is unchanged. Corrected phenoxide bond orders/lone pairs and anisole attachment. IDs,
@@ -1363,7 +1366,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">CHAPTER 3</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.65</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
+  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.66</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2087,6 +2090,13 @@ function courseStructureDiagram(kind,description,caption){
   const C=(x,y,s)=>A(x,y,s,'charge');
   const I=(x,y,s)=>A(x,y,s,'index');
   const carbonylUp=(x,y)=>L(x-6,y-4,x-6,y-58)+L(x+6,y-4,x+6,y-58)+O(x,y-82);
+  // v3.66: horizontal substituents need actual left/right carbon vertices, not ring-edge midpoints.
+  const flatBenzene=(cx,cy,r)=>{
+    const pts=Array.from({length:6},(_,i)=>[cx+r*Math.cos(i*Math.PI/3),cy+r*Math.sin(i*Math.PI/3)]);
+    const inner=pts.map(([x,y])=>[cx+.79*(x-cx),cy+.79*(y-cy)]);
+    return PG(pts.map(p=>p.join(',')).join(' '))+[0,2,4].map(i=>L(...inner[i],...inner[(i+1)%6])).join('');
+  };
+  const clearCarbonyl=(x,y)=>L(x-6,y-4,x-6,y-58)+L(x+6,y-4,x+6,y-58)+A(x,y-82,'O','atom oxygen')+DP(x-35,y-82)+DP(x+24,y-82);
   let body='', view='0 0 460 240';
 
   if(kind==='propanol') body=P('35,145 125,85 215,145')+L(215,145,265,112)+O(290,105)+L(310,94,350,69)+A(374,62,'H','atom hydrogen');
@@ -2128,15 +2138,15 @@ function courseStructureDiagram(kind,description,caption){
 
   if(kind==='paracetamol'){
     view='0 0 620 270';
-    body=PG('255,48 340,97 340,193 255,242 170,193 170,97')+L(263,62,325,99)+L(325,186,255,226)+L(186,186,186,104)+L(170,145,108,145)+O(78,145)+L(57,132,24,111)+A(8,98,'H','atom hydrogen')+L(340,145,392,145)+N(421,145)+L(421,116,421,76)+A(421,53,'H','atom hydrogen')+L(446,145,496,145)+carbonylUp(496,145)+L(496,145,603,198);
+    body=flatBenzene(255,145,85)+L(170,145,108,145)+O(78,145)+L(57,132,32,116)+A(16,104,'H','atom hydrogen')+L(340,145,392,145)+A(421,145,'N','atom nitrogen')+DP(418,174)+L(421,116,421,76)+A(421,53,'H','atom hydrogen')+L(446,145,496,145)+clearCarbonyl(496,145)+L(496,145,603,198);
   }
   if(kind==='aspirin'){
-    view='0 0 650 285';
-    body=PG('275,72 360,121 360,217 275,266 190,217 190,121')+L(283,86,345,123)+L(345,210,275,250)+L(206,210,206,128)+L(230,95,190,56)+O(166,37)+L(143,37,96,37)+carbonylUp(96,37)+L(96,37,18,76)+L(360,121,420,88)+carbonylUp(420,88)+L(420,88,490,88)+O(518,88)+L(541,75,575,51)+A(596,39,'H','atom hydrogen');
+    view='0 -90 650 390';
+    body=PG('275,72 360,121 360,217 275,266 190,217 190,121')+L(283,86,345,123)+L(345,210,275,250)+L(206,210,206,128)+L(275,72,216,38)+O(190,24)+L(164,24,96,24)+clearCarbonyl(96,24)+L(96,24,18,76)+L(360,121,420,88)+clearCarbonyl(420,88)+L(420,88,490,88)+O(518,88)+L(541,75,575,51)+A(596,39,'H','atom hydrogen');
   }
   if(kind==='vanillin'){
-    view='0 0 620 270';
-    body=PG('265,48 350,97 350,193 265,242 180,193 180,97')+L(273,62,335,99)+L(335,186,265,226)+L(196,186,196,104)+L(350,145,420,145)+carbonylUp(420,145)+L(420,145,510,145)+A(540,145,'H','atom hydrogen')+L(222,73,175,34)+O(148,19)+L(123,19,70,19)+L(180,193,122,226)+O(96,240)+L(73,230,34,208)+A(14,196,'H','atom hydrogen');
+    view='0 -15 620 295';
+    body=PG('265,48 350,97 350,193 265,242 180,193 180,97')+L(273,62,335,99)+L(335,186,265,226)+L(196,186,196,104)+L(350,97,420,97)+clearCarbonyl(420,97)+L(420,97,510,97)+A(540,97,'H','atom hydrogen')+L(180,97,146,77)+O(120,62)+L(94,62,42,28)+L(180,193,122,226)+O(96,240)+L(73,230,34,208)+A(14,196,'H','atom hydrogen');
   }
 
   if(kind==='allyl-cation-pair'||kind==='allyl-anion-pair'||kind==='allyl-radical-pair'){
@@ -2165,7 +2175,7 @@ function courseStructureDiagram(kind,description,caption){
   if(kind==='nitromethane') body=L(25,150,152,150)+A(188,150,'N','atom nitrogen')+C(210,120,'⊕')+L(185,122,185,67)+L(197,122,197,67)+O(191,43)+I(191,15,'3')+L(216,150,290,150)+O(322,150)+C(350,121,'⊖')+I(322,192,'1')+I(188,192,'2');
   if(kind==='acetanilide'){
     view='0 0 650 270';
-    body=PG('160,45 240,91 240,179 160,225 80,179 80,91')+L(168,59,225,93)+L(225,172,160,209)+L(96,172,96,98)+L(240,135,300,135)+N(330,135)+I(330,177,'1')+L(330,106,330,66)+A(330,43,'H','atom hydrogen')+L(360,135,430,135)+carbonylUp(430,135)+I(430,42,'2')+L(430,135,625,205);
+    body=flatBenzene(160,135,80)+L(240,135,300,135)+A(330,135,'N','atom nitrogen')+DP(354,156)+I(330,187,'1')+L(330,106,330,66)+A(330,43,'H','atom hydrogen')+L(360,135,430,135)+clearCarbonyl(430,135)+I(430,17,'2')+L(430,135,625,205);
   }
   if(kind==='lda') body=N(230,120)+C(272,92,'⊖')+L(202,112,145,80)+L(145,80,55,35)+L(145,80,55,155)+L(258,112,315,80)+L(315,80,405,35)+L(315,80,405,155)+I(230,168,'2');
   if(kind==='protonated-ether') body=L(25,160,170,112)+A(215,105,'O','atom oxygen')+C(242,70,'⊕')+LP1(215,105)+L(215,76,215,38)+A(215,18,'H','atom hydrogen')+L(255,112,325,75)+L(325,75,435,145)+I(215,158,'2');
@@ -2203,8 +2213,8 @@ function courseStructureDiagram(kind,description,caption){
   }
   if(kind==='benzoate-pair'){
     view='0 0 900 330';
-    body=I(155,25,'1')+PG('145,75 215,115 215,195 145,235 75,195 75,115')+L(153,87,202,117)+L(202,189,145,221)+L(89,189,89,121)+L(215,155,275,155)+L(269,150,269,91)+L(281,150,281,91)+O(275,66)+L(275,155,330,190)+O(359,200)+C(390,170,'⊖')+
-      A(450,165,'↔','resarrow')+I(725,25,'2')+PG('645,75 715,115 715,195 645,235 575,195 575,115')+L(653,87,702,117)+L(702,189,645,221)+L(589,189,589,121)+L(715,155,770,155)+L(770,155,815,115)+O(840,96)+C(868,67,'⊖')+L(775,160,820,198)+L(767,169,812,207)+O(841,220);
+    body=I(155,25,'1')+flatBenzene(145,155,70)+L(215,155,275,155)+clearCarbonyl(275,155)+L(275,155,330,190)+A(359,200,'O','atom oxygen')+LP3(359,200)+C(398,167,'⊖')+
+      A(450,165,'↔','resarrow')+I(725,25,'2')+flatBenzene(645,155,70)+L(715,155,775,155)+L(775,155,775,100)+A(775,73,'O','atom oxygen')+DP(740,73)+DP(799,73)+DP(769,47)+C(826,42,'⊖')+L(781,151,836,178)+L(773,164,828,191)+A(859,200,'O','atom oxygen')+DP(843,234)+DP(876,182);
   }
   if(kind==='acetone-enolate-pair'){
     view='0 0 700 270';
@@ -2236,15 +2246,15 @@ function courseStructureDiagram(kind,description,caption){
   }
   if(kind==='benzonitrile'){
     view='0 0 620 280';
-    body=PG('220,50 310,102 310,198 220,250 130,198 130,102')+L(228,64,295,104)+L(295,191,220,234)+L(146,191,146,109)+L(310,150,390,150)+L(390,139,510,139)+L(390,150,510,150)+L(390,161,510,161)+A(548,150,'N','atom nitrogen')+LP1(548,150);
+    body=flatBenzene(220,150,90)+L(310,150,390,150)+L(390,139,510,139)+L(390,150,510,150)+L(390,161,510,161)+A(548,150,'N','atom nitrogen')+LP1(548,150);
   }
   if(kind==='p-methoxyacetophenone'){
-    view='0 0 720 300';
-    body=PG('300,50 390,102 390,198 300,250 210,198 210,102')+L(308,64,375,104)+L(375,191,300,234)+L(226,191,226,109)+L(210,150,148,150)+O(118,150)+L(90,150,18,105)+L(390,150,465,150)+carbonylUp(465,150)+L(465,150,690,220);
+    view='0 0 620 280';
+    body=flatBenzene(300,150,90)+L(210,150,148,150)+O(118,150)+L(90,150,25,112)+L(390,150,465,150)+clearCarbonyl(465,150)+L(465,150,565,208);
   }
   if(kind==='p-aminobenzaldehyde'){
     view='0 0 720 300';
-    body=PG('300,50 390,102 390,198 300,250 210,198 210,102')+L(308,64,375,104)+L(375,191,300,234)+L(226,191,226,109)+L(210,150,150,150)+A(105,150,'NH₂','atom nitrogen')+LP1(105,150)+L(390,150,465,150)+carbonylUp(465,150)+L(465,150,610,150)+A(650,150,'H','atom hydrogen');
+    body=flatBenzene(300,150,90)+L(210,150,150,150)+A(105,150,'NH₂','atom nitrogen')+LP1(105,150)+L(390,150,465,150)+clearCarbonyl(465,150)+L(465,150,610,150)+A(650,150,'H','atom hydrogen');
   }
   if(kind==='resonance-path-candidates'){
     view='0 0 720 500';
@@ -2255,7 +2265,7 @@ function courseStructureDiagram(kind,description,caption){
   }
   if(kind==='benzyl-cation'){
     view='0 0 620 290';
-    body=PG('230,50 320,102 320,198 230,250 140,198 140,102')+L(238,64,305,104)+L(305,191,230,234)+L(156,191,156,109)+L(320,150,405,150)+A(450,150,'CH₂','atom')+C(500,112,'⊕');
+    body=flatBenzene(230,150,90)+L(320,150,405,150)+A(450,150,'CH₂','atom')+C(500,112,'⊕');
   }
   if(kind==='acetate-pair'){
     view='0 0 720 280';
