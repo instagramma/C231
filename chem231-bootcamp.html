@@ -6,7 +6,17 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.77  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.78  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.78 (2026-09-13, Sun): BUILD RANKINGS; DO NOT RECOGNIZE A COMPLETE ANSWER.
+        Every full-order ranking blank now presents shuffled individual tiles and numbered
+        weakest/strongest endpoints instead of a dropdown containing complete candidate
+        rankings. Learners drag tiles to exact positions on desktop or tap them in sequence
+        on phones; placed tiles can be removed, swapped by dragging, or reset. The reported
+        X–H comparison keeps each name and formula on its tile while its bond-line structures
+        remain visible above. One shared renderer covers all eight full-ranking questions and
+        preserves their answer keys, attempt records, flags, hints, and scoring. Local QA passed
+        both strongest→weakest and weakest→strongest layouts plus a correct graded submission.
+        DEPLOY PENDING; awaiting learner evidence.
   v3.77 (2026-09-13, Sun): GENERATED PRACTICE STARTS FROM THE CHEMISTRY OBJECT.
         Generated transfer items now identify themselves as a new example and state whether
         the learner is reading a reaction, comparing separate structures, or working with one
@@ -16,6 +26,7 @@
         reconstruction does not. All 32 generated Chapter-3 transfer cards now pass a
         visible-chemistry audit. Adaptive sets cool down exact repeats and generated siblings
         derived from the same source; “Practice 5 more” rotates beyond the first guided five.
+        Public v3.77 (deployed 2026-09-13 11:41 PDT, commit fa83840); awaiting learner evidence.
   v3.76 (2026-09-12, Sat): FLAG A QUESTION FOR REVIEW, NOT AS REASONING.
         Every question now has a dedicated 🚩 toggle. Its note field stays hidden until the
         flag is enabled; the flag, note, question, submitted answer, hint use, and attempt
@@ -31,7 +42,7 @@
         Lesson practice returns to the next lesson; it is not scored as mastery. Fixed the
         resonance-only sigma-bond restriction leaking into proton-transfer instruction,
         phenol cropping, secondary-N hydrogen omissions, and the cyclohexanone enolate.
-        DEPLOY PENDING; awaiting learner evidence.
+        Public v3.77 (deployed 2026-09-13 11:41 PDT, commit fa83840); awaiting learner evidence.
   v3.74 (2026-09-12, Sat): GUIDED PRACTICE NOW HANDS OFF TO PROVE.
         Rewrote the Chapter 3 fill-in prompts that read like lecture-card nicknames instead
         of questions. The water-leveling card now names the strong-acid and strong-base
@@ -42,14 +53,14 @@
         ordinary round result gives one numbered action and returns to Today for the next step;
         the vague “Another topic” exit is gone. Atom trends, chlorinated acetic acids, and
         the orbital ladder state the exact job before answer controls open.
-        Answers and scoring are unchanged. DEPLOY PENDING; awaiting learner evidence.
+        Answers and scoring are unchanged. Public v3.77 (deployed 2026-09-13 11:41 PDT, commit fa83840); awaiting learner evidence.
   v3.72 (2026-09-12, Sat): BOND-LINE FIRST FOR THE ACTIVE CHAPTER-3 TRANSFER FLIGHT.
         Five high-priority questions that still relied on condensed text now lead with checked,
         code-native skeletal drawings: the imine H-position comparison, propargyl alcohol,
         cyclic ketone versus imine, the three-amine basicity comparison, and propanol
         protonation/deprotonation. Carbon-bound H is shown only when it controls the decision;
         heteroatoms, lone pairs, bond orders, and charges remain explicit. Condensed names stay
-        available as support. No answer keys or scoring changed. DEPLOY PENDING; awaiting learner evidence.
+        available as support. No answer keys or scoring changed. Public v3.77 (deployed 2026-09-13 11:41 PDT, commit fa83840); awaiting learner evidence.
   v3.71 (2026-09-12, Sat): VIDEO STAYS INSIDE THE FLIGHTPATH. The one recommended
         Learn-step video now plays in a responsive, privacy-enhanced embedded player instead
         of opening another site first. Exact Khan Academy videos use their official YouTube
@@ -1401,6 +1412,24 @@ nav button.active .ico{opacity:1}
 .review-flag-toggle.on{background:#ffe8ad;border-color:#9a6500;color:#4d3200}
 .review-flag-note{display:none;width:100%;min-height:76px;margin-top:8px;resize:vertical}
 .review-flag-note.open{display:block}
+.rank-builder{display:block;line-height:1.35;margin:.65rem 0 1rem;padding:.8rem;border:1px solid #b9c8ce;border-radius:12px;background:#f8fafb}
+.rank-builder-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:.65rem}
+.rank-builder-head b{font-size:.9rem;color:var(--teal-dk)}
+.rank-builder-head span{display:block;font-size:.74rem;color:var(--muted-tx);margin-top:2px}
+.rank-slots{display:grid;grid-template-columns:repeat(4,minmax(76px,1fr));gap:7px;align-items:stretch}
+.rank-slot{min-height:78px;border:2px dashed #91a4ad;border-radius:9px;background:#fff;padding:5px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,background .15s}
+.rank-slot.drag-over{border-color:var(--teal);background:var(--accent-bg)}
+.rank-slot-label{font-size:.65rem;font-weight:800;color:var(--muted-tx);text-align:center;text-transform:uppercase;letter-spacing:.03em}
+.rank-empty{display:grid;place-items:center;flex:1;color:#7b898f;font-size:.72rem;text-align:center}
+.rank-bank{display:flex;gap:7px;flex-wrap:wrap;min-height:54px;margin-top:.7rem;padding:.55rem;border:1px solid #ccd5d9;border-radius:9px;background:#fff}
+.rank-bank.drag-over{border-color:var(--teal);background:var(--accent-bg)}
+.rank-tile{min-height:42px;border:1px solid #8ca0aa;border-radius:8px;background:#fff;color:var(--ink);padding:7px 10px;font:800 .82rem/1.25 var(--sans);cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.08);touch-action:manipulation}
+.rank-tile:hover{background:#edf5f8;border-color:var(--teal)}
+.rank-tile:active{cursor:grabbing}
+.rank-slot .rank-tile{width:100%;height:100%;padding:6px}
+.rank-builder-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:.55rem}
+.rank-builder-actions small{color:var(--muted-tx);font-size:.68rem;line-height:1.35}
+.rank-reset{min-height:34px;padding:5px 9px;font-size:.72rem}
 .choices{gap:10px}
 .choice{
   min-height:48px;
@@ -1482,6 +1511,11 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
   .deadline-row{grid-template-columns:48px minmax(0,1fr);gap:3px 8px;margin:12px 0!important}
   .deadline-when{grid-column:2;justify-self:start;margin:2px 0 0}
   .home-section>summary{padding:.8rem 1rem}
+  .rank-builder{padding:.65rem}
+  .rank-slots{gap:4px}
+  .rank-slot{min-height:82px;padding:3px}
+  .rank-slot-label{font-size:.56rem}
+  .rank-tile{font-size:.72rem;padding:6px 7px}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -1557,7 +1591,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.77</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.78</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -4046,7 +4080,7 @@ const EXAM1_AB_SOURCE_QUESTIONS = [
 {id:"SIM-AB8-20260911-05",sourceModelIds:["EXACT-AB8-20260911-06","EXACT-AB8-20260911-11"],flightLeg:"transfer",topic:"acidbase1",type:"blanks",diff:2,prompt:"Assign the four roles in CH₃OH + NH₂⁻ ⇌ CH₃O⁻ + NH₃.",template:"CH₃OH = {{0}}; NH₂⁻ = {{1}}; CH₃O⁻ = {{2}}; NH₃ = {{3}}.",fields:[{label:"methanol",kind:"select",choices:["acid","base","conjugate acid","conjugate base"],answer:"acid"},{label:"amide ion",kind:"select",choices:["base","acid","conjugate acid","conjugate base"],answer:"base"},{label:"methoxide",kind:"select",choices:["conjugate base","conjugate acid","acid","base"],answer:"conjugate base"},{label:"ammonia",kind:"select",choices:["conjugate acid","conjugate base","acid","base"],answer:"conjugate acid"}],why:"Methanol loses H⁺; amide gains H⁺. Role labels follow the proton, not the element."},
 {id:"SIM-AB8-20260911-06",sourceModelIds:["EXACT-AB8-20260911-07","EXACT-AB8-20260911-08"],flightLeg:"transfer",topic:"acidbase1",type:"mc",diff:2,prompt:"Methoxide is mixed with phenol: CH₃O⁻ + PhOH ⇌ CH₃OH + PhO⁻. Which side is favored? (pKₐ phenol≈10; methanol≈16)",choices:["Products; methanol is the higher-pKa, weaker acid","Reactants; phenol is resonance-stabilized","Reactants; methoxide is weaker than phenoxide","Exactly equal"],answer:0,why:"The reaction runs from the lower-pKa acid phenol to the higher-pKa acid methanol. It also converts strong methoxide into weaker resonance-stabilized phenoxide."},
 {id:"SIM-AB8-20260911-07",sourceModelIds:["EXACT-AB8-20260911-09","EXACT-AB8-20260911-29"],flightLeg:"transfer",topic:"acidbase1",type:"mc",diff:3,prompt:"Predict the equilibrium: CH₃CH₂OH (pKₐ 16) + NH₂⁻ ⇌ CH₃CH₂O⁻ + NH₃ (pKₐ 38).",choices:["Products; NH₃ is the much higher-pKa, weaker acid","Reactants; ethanol is the weaker acid","Reactants; amide is a weak base","Products; because ethoxide is the stronger base"],answer:0,why:"Equilibrium strongly favors the higher-pKa acid NH₃ and its paired weaker base ethoxide. The reaction moves away from the much stronger amide base."},
-{id:"SIM-AB8-20260911-08",sourceModelIds:["EXACT-AB8-20260911-10","EXACT-AB8-20260911-42"],flightLeg:"transfer",topic:"acidbase2",type:"blanks",diff:3,prompt:"Rank matched X–H acids from strongest to weakest: RSH, ROH, RNH₂, RCH₃.",template:"Strongest → weakest: {{0}}. S beats O by the {{1}} rule; O beats N and C by the same-row {{2}} rule.",fields:[{label:"ranking",kind:"select",choices:["RSH > ROH > RNH₂ > RCH₃","ROH > RSH > RNH₂ > RCH₃","RCH₃ > RNH₂ > ROH > RSH"],answer:"RSH > ROH > RNH₂ > RCH₃"},{label:"S vs O",kind:"select",choices:["size/polarizability","electronegativity","orbital"],answer:"size/polarizability"},{label:"O vs N/C",kind:"select",choices:["electronegativity","size","sterics"],answer:"electronegativity"}],why:"There is no single “more electronegative always wins” rule across the table. Use size down a column and electronegativity across a row, always on the conjugate-base charge atom."},
+{id:"SIM-AB8-20260911-08",sourceModelIds:["EXACT-AB8-20260911-10","EXACT-AB8-20260911-42"],flightLeg:"transfer",topic:"acidbase2",type:"blanks",diff:3,prompt:"Rank matched X–H acids from strongest to weakest: RSH, ROH, RNH₂, RCH₃.",template:"Strongest → weakest: {{0}}. S beats O by the {{1}} rule; O beats N and C by the same-row {{2}} rule.",fields:[{label:"ranking",kind:"select",choices:["RSH > ROH > RNH₂ > RCH₃","ROH > RSH > RNH₂ > RCH₃","RCH₃ > RNH₂ > ROH > RSH"],answer:"RSH > ROH > RNH₂ > RCH₃",tileLabels:{"RSH":"thiol · R–SH","ROH":"alcohol · R–OH","RNH₂":"amine · R–NH₂","RCH₃":"alkane · R–H"}},{label:"S vs O",kind:"select",choices:["size/polarizability","electronegativity","orbital"],answer:"size/polarizability"},{label:"O vs N/C",kind:"select",choices:["electronegativity","size","sterics"],answer:"electronegativity"}],why:"There is no single “more electronegative always wins” rule across the table. Use size down a column and electronegativity across a row, always on the conjugate-base charge atom."},
 {id:"SIM-AB8-20260911-09",sourceModelIds:["EXACT-AB8-20260911-12","EXACT-AB8-20260911-53"],flightLeg:"transfer",topic:"acidbase2",type:"mc",diff:3,prompt:"Which N–H compound is more acidic?"+examChemPair("Direct conjugation gate","H₂N–C≡N","H₂N–CH₂–C≡N"),choices:["A; its anion is directly conjugated with the nitrile and can place −1 on nitrile N","B; the extra sp³ carbon creates more resonance","B; its acidic H is on an sp atom","They tie because both contain C≡N"],answer:0,why:"A gives ⁻HN–C≡N ↔ HN=C=N⁻. In B, the intervening CH₂ is an sp³ brick wall; only weaker induction remains. Point to the atom holding H before invoking hybridization."},
 {id:"SIM-AB8-20260911-10",sourceModelIds:["EXACT-AB8-20260911-13"],flightLeg:"transfer",topic:"acidbase2",type:"mc",diff:3,prompt:"Cycloheptatriene has one sp³ CH₂ interrupting three double bonds. Does removing an H from that CH₂ give the same 6π aromatic stabilization as cyclopentadiene?",choices:["No; the resulting seven-membered anion has 8π electrons, not the stabilized 6π cyclopentadienyl pattern","Yes; every ring anion is aromatic","Yes; seven atoms always delocalize better","No; carbon cannot hold negative charge"],answer:0,why:"This is a genuine structure change, not label swapping. Cyclopentadienyl anion has 6π electrons; the analogous cycloheptatrienyl anion would have 8π and does not receive the same aromatic stabilization."},
 {id:"SIM-AB8-20260911-11",sourceModelIds:["EXACT-AB8-20260911-14","EXACT-AB8-20260911-50"],flightLeg:"transfer",topic:"acidbase2",type:"mc",diff:3,prompt:"Which is more acidic: the central C–H of acetylacetone or the S–H of ethanethiol?",choices:["Acetylacetone's central H; its conjugate base delocalizes over carbon and two oxygens, an effect large enough to beat localized thiolate","Ethanethiol; Atom always ends the comparison before resonance","Ethanethiol; acetylacetone cannot form an enolate","They tie"],answer:0,why:"A 1,3-dicarbonyl enolate is exceptionally stabilized by an extended O/C/O resonance system. This is another reminder that ARIO weighs actual stabilization; it is not a rigid stop sign when established acidity landmarks or data resolve a conflict."},
@@ -4689,6 +4723,74 @@ const KNOWN_QUIZZES=[
 const $ = sel => document.querySelector(sel);
 const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else if(v===false||v==null){} else e.setAttribute(k,v===true?"":v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* v3.78: a complete ranking hidden inside a select is recognition-by-elimination: every
+   possible order is already visible. Turn every full-order ranking blank into a small
+   construct-the-sequence task instead. Drag works with a mouse; tap-to-place is the phone
+   path. The hidden input preserves the existing grader, attempt log, and stored answer shape. */
+function isRankingOrderField(f){
+  return !!(f&&(f.kind==="order"||(f.kind==="select"&&String(f.label).toLowerCase()==="ranking"&&/\s[<>]\s/.test(String(f.answer)))));
+}
+function makeRankingControl(f){
+  const answer=String(f.answer),sep=answer.includes(" < ")?" < ":" > ",items=answer.split(sep).map(x=>x.trim());
+  const ctl=el("input",{type:"hidden","aria-label":f.label});
+  const wrap=el("span",{class:"rank-builder"});
+  const head=el("span",{class:"rank-builder-head"});
+  head.appendChild(el("span",{},"<b>Build the order yourself</b><span>Drag a tile into a numbered spot, or tap tiles in sequence.</span>"));
+  const endpoints=sep===" > "?["Strongest","Weakest"]:["Weakest","Strongest"];
+  head.appendChild(el("span",{style:"text-align:right;font-weight:800"},endpoints[0]+" → "+endpoints[1]));
+  wrap.appendChild(head);
+  const slots=Array(items.length).fill(null);
+  let bank=shuffle(items);
+  if(bank.join("|")===items.join("|")&&bank.length>1)bank=bank.slice(1).concat(bank[0]);
+  let locked=false,dragValue="";
+  const slotRow=el("span",{class:"rank-slots","aria-label":endpoints[0]+" to "+endpoints[1]+" ordering slots"});
+  const bankEl=el("span",{class:"rank-bank","aria-label":"Unplaced ranking tiles"});
+  const actions=el("span",{class:"rank-builder-actions"});
+  const status=el("small",{"aria-live":"polite"},items.length+" tiles left to place");
+  const reset=el("button",{type:"button",class:"btn ghost rank-reset"},"Reset order");
+  actions.appendChild(status);actions.appendChild(reset);
+  wrap.appendChild(slotRow);wrap.appendChild(bankEl);wrap.appendChild(actions);wrap.appendChild(ctl);
+  const label=value=>(f.tileLabels&&f.tileLabels[value])||value;
+  function sync(){const placed=slots.filter(x=>x!==null).length,value=placed===items.length?slots.join(sep):"";ctl.value=value;ctl.setAttribute("value",value);ctl.dataset.rankValue=value;status.textContent=placed+" of "+items.length+" placed";}
+  function remove(value){const i=slots.indexOf(value);if(i>=0)slots[i]=null;bank=bank.filter(x=>x!==value);}
+  function place(value,index){
+    if(locked||!items.includes(value))return;
+    const from=slots.indexOf(value),displaced=slots[index];
+    if(from>=0)slots[from]=null;else bank=bank.filter(x=>x!==value);
+    if(displaced&&displaced!==value){
+      if(from>=0)slots[from]=displaced;else if(!bank.includes(displaced))bank.push(displaced);
+    }
+    slots[index]=value;draw();
+  }
+  function returnToBank(value){if(locked)return;remove(value);if(!bank.includes(value))bank.push(value);draw();}
+  function tile(value,inSlot=false){
+    const b=el("button",{type:"button",class:"rank-tile",draggable:"true","data-rank-value":value,"aria-label":label(value)+(inSlot?", placed; tap to remove":", unplaced; tap to put in the next open spot")},label(value));
+    b.addEventListener("dragstart",e=>{if(locked){e.preventDefault();return;}dragValue=value;e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",value);});
+    b.addEventListener("dragend",()=>{dragValue="";wrap.querySelectorAll(".drag-over").forEach(x=>x.classList.remove("drag-over"));});
+    b.addEventListener("click",()=>{if(inSlot)returnToBank(value);else{const i=slots.indexOf(null);if(i>=0)place(value,i);}});
+    return b;
+  }
+  function droppable(node,onDrop){
+    node.addEventListener("dragover",e=>{if(locked)return;e.preventDefault();node.classList.add("drag-over");});
+    node.addEventListener("dragleave",()=>node.classList.remove("drag-over"));
+    node.addEventListener("drop",e=>{if(locked)return;e.preventDefault();node.classList.remove("drag-over");onDrop(e.dataTransfer.getData("text/plain")||dragValue);});
+  }
+  function draw(){
+    slotRow.replaceChildren();bankEl.replaceChildren();
+    slots.forEach((value,i)=>{
+      const s=el("span",{class:"rank-slot","data-rank-slot":String(i)});
+      s.appendChild(el("span",{class:"rank-slot-label"},(i+1)+(i===0?" · "+endpoints[0]:i===items.length-1?" · "+endpoints[1]:"")));
+      if(value)s.appendChild(tile(value,true));else s.appendChild(el("span",{class:"rank-empty"},"drop or tap"));
+      droppable(s,v=>place(v,i));slotRow.appendChild(s);
+    });
+    bank.forEach(value=>bankEl.appendChild(tile(value,false)));
+    droppable(bankEl,returnToBank);reset.disabled=locked||(!slots.some(Boolean));sync();
+  }
+  reset.addEventListener("click",()=>{if(locked)return;bank=shuffle(items);if(bank.join("|")===items.join("|")&&bank.length>1)bank=bank.slice(1).concat(bank[0]);slots.fill(null);draw();});
+  ctl._setDisabled=value=>{locked=!!value;wrap.querySelectorAll("button").forEach(b=>b.disabled=locked);};
+  ctl._widget=wrap;draw();return ctl;
+}
 function confetti(){ const c=$("#confetti"); const em=["🎉","⚗️","✨","🧪","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
 function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
 function assistedRightNotGuessed(topic){return (S.attempts||[]).filter(a=>a.ok&&!a.g&&((a.h||0)>0||a.rf)&&(!topic||a.t===topic)).length;}
@@ -6932,26 +7034,28 @@ VIEWS.drill = (v) => {
     const rx=/\{\{(\d+)\}\}/g; let last=0,match;
     while((match=rx.exec(q.template))){
       const span=el("span"); span.innerHTML=q.template.slice(last,match.index); line.appendChild(span);
-      const i=Number(match[1]),f=q.fields[i]; let ctl;
-      if(f.kind==="select"){
+      const i=Number(match[1]),f=q.fields[i]; let ctl,displayCtl;
+      if(isRankingOrderField(f)){
+        ctl=makeRankingControl(f);displayCtl=ctl._widget;
+      }else if(f.kind==="select"){
         ctl=el("select",{class:"answerbox",style:"width:auto;min-width:110px;padding:8px;margin:0 4px","aria-label":f.label});
         ctl.appendChild(el("option",{value:""},"choose"));
         f.choices.forEach(x=>ctl.appendChild(el("option",{value:String(x)},String(x))));
       }else{
         ctl=el("input",{class:"answerbox",type:"text",inputmode:f.kind==="num"?"numeric":"text",placeholder:f.kind==="num"?"#":"answer",style:"width:"+(f.width||90)+"px;margin:0 4px","aria-label":f.label});
       }
-      controls[i]=ctl; line.appendChild(ctl); last=rx.lastIndex;
+      controls[i]=ctl; line.appendChild(displayCtl||ctl); last=rx.lastIndex;
     }
     const tail=el("span");tail.innerHTML=q.template.slice(last);line.appendChild(tail);
     const sub=el("button",{class:"btn",onclick:()=>{
       if(D.answered)return;
-      const vals=q.fields.map((f,i)=>(controls[i]?.value||"").trim());
+      const vals=q.fields.map((f,i)=>(controls[i]?.dataset?.rankValue||controls[i]?.value||"").trim());
       if(vals.some(v=>v===""))return;
       const norm=s=>String(s).toLowerCase().replace(/²/g,"2").replace(/³/g,"3").replace(/°/g,"").replace(/[\s.]/g,"");
       const ok=q.fields.every((f,i)=>f.kind==="num"?Math.abs(Number(vals[i])-Number(f.answer))<=(f.tolerance||0):(f.accept||[f.answer]).some(a=>norm(a)===norm(vals[i])));
       const correct=q.fields.map(f=>f.label+": "+f.answer).join(" · ");
       const submitted=q.fields.map((f,i)=>f.label+": "+vals[i]).join(" · ");
-      controls.forEach(x=>x.disabled=true);sub.disabled=true;
+      controls.forEach(x=>{x.disabled=true;if(x._setDisabled)x._setDisabled(true);});sub.disabled=true;
       finish(ok,"<b class='mono'>"+correct+"</b>",undefined,submitted);
     }},"Check all blanks");
     c.appendChild(line);c.appendChild(sub);
