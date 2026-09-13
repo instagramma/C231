@@ -6,7 +6,17 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.78  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.79  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.79 (2026-09-13, Sun): EVERY QUESTION IDENTIFIES ITSELF.
+        Every live question and read-only answer replay now shows its permanent question ID
+        directly below the status tag with a one-tap Copy ID button. The control copies only
+        the stable UID so Gabe can paste it into a chat without reconstructing or screenshotting
+        the prompt. The answer replay also reconciles its flag display with the persistent Review
+        Queue, so a currently active flag and its note remain visible even if an older round-log
+        snapshot omitted the flag bit. The reported thiol/ammonia item now distinguishes a
+        stronger acid being eager to react from the weaker-acid side predominating at equilibrium.
+        Phone-width flag, copy, replay, bank, flightpath, and arrow QA passed. DEPLOY PENDING;
+        awaiting learner evidence.
   v3.78 (2026-09-13, Sun): BUILD RANKINGS; DO NOT RECOGNIZE A COMPLETE ANSWER.
         Every full-order ranking blank now presents shuffled individual tiles and numbered
         weakest/strongest endpoints instead of a dropdown containing complete candidate
@@ -16,7 +26,7 @@
         remain visible above. One shared renderer covers all eight full-ranking questions and
         preserves their answer keys, attempt records, flags, hints, and scoring. Local QA passed
         both strongest→weakest and weakest→strongest layouts plus a correct graded submission.
-        DEPLOY PENDING; awaiting learner evidence.
+        Public v3.78 (deployed 2026-09-13 14:09 PDT, commit c70df2b); awaiting learner evidence.
   v3.77 (2026-09-13, Sun): GENERATED PRACTICE STARTS FROM THE CHEMISTRY OBJECT.
         Generated transfer items now identify themselves as a new example and state whether
         the learner is reading a reaction, comparing separate structures, or working with one
@@ -1386,6 +1396,9 @@ nav button.active .ico{opacity:1}
 
 /* Question reading and answering are the app's main job. */
 .qprompt{font-size:1.06rem;line-height:1.62;margin:12px 0 16px}
+.question-id-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:8px 0 2px;color:var(--muted-tx);font-size:.72rem}
+.question-id-row code{font:700 .72rem/1.3 var(--mono);color:#34434b;background:#f1f4f5;border:1px solid #c9d3d8;border-radius:6px;padding:4px 7px;overflow-wrap:anywhere}
+.question-id-copy{min-height:30px;padding:4px 8px;font-size:.68rem}
 .question-orientation{border:1px solid #b9c8ce;border-left:5px solid var(--teal);border-radius:10px;background:#f5f9fb;padding:.72rem .8rem;margin:10px 0 12px}
 .question-orientation-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .question-orientation-head b{font-size:.9rem}
@@ -1591,7 +1604,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.78</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.79</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -4027,7 +4040,7 @@ const EXAM1_AB_SOURCE_QUESTIONS = [
 {id:"EXACT-AB8-20260911-06",sourceAssetUids:["ASSET-AB8-20260911-06"],sourceFiles:["06-cyclohexanone-role-labeling.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"mechanism",topic:"acidbase1",type:"blanks",diff:2,prompt:"Map all four Brønsted roles for cyclohexanone + LDA ⇌ enolate + diisopropylamine.",template:"Cyclohexanone is the {{0}}; LDA is the {{1}}; the enolate is the {{2}}; diisopropylamine is the {{3}}.",fields:[{label:"cyclohexanone",kind:"select",choices:["acid","base","conjugate acid","conjugate base"],answer:"acid"},{label:"LDA",kind:"select",choices:["base","acid","conjugate acid","conjugate base"],answer:"base"},{label:"enolate",kind:"select",choices:["conjugate base","conjugate acid","acid","base"],answer:"conjugate base"},{label:"amine product",kind:"select",choices:["conjugate acid","conjugate base","acid","base"],answer:"conjugate acid"}],why:"Track H, not labels: cyclohexanone loses H⁺ → acid and enolate conjugate base. LDA gains H⁺ → base and diisopropylamine conjugate acid."},
 {id:"EXACT-AB8-20260911-07",sourceAssetUids:["ASSET-AB8-20260911-07"],sourceFiles:["07-ethanol-phenol-equilibrium.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"equilibrium",topic:"acidbase1",type:"blanks",diff:2,prompt:"Compare two hydroxide equilibria using the shown pKa values."+examChem("Two reactions","EtOH (16) + OH⁻ ⇌ EtO⁻ + H₂O (15.7)<br>PhOH (10) + OH⁻ ⇌ PhO⁻ + H₂O (15.7)","Equilibrium favors the side with the higher-pKa, weaker acid."),template:"The ethanol reaction favors {{0}}. The phenol reaction favors {{1}}. The difference comes from {{2}} stabilization of phenoxide.",fields:[{label:"ethanol",kind:"select",choices:["reactants","products"],answer:"reactants"},{label:"phenol",kind:"select",choices:["products","reactants"],answer:"products"},{label:"phenoxide",kind:"select",choices:["resonance","steric","orbital only"],answer:"resonance"}],why:"EtOH (16) is slightly weaker than water (15.7), so its reaction stays slightly left. Phenol (10) is much stronger than water, so hydroxide deprotonates it strongly to resonance-stabilized phenoxide."},
 {id:"EXACT-AB8-20260911-08",sourceAssetUids:["ASSET-AB8-20260911-08"],sourceFiles:["08-hydroquinone-hydroxide-equilibrium.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"equilibrium",topic:"acidbase2",type:"mc",diff:2,prompt:"Hydroquinone reacts with hydroxide. Which side is favored for the first deprotonation?"+examChem("Hydroquinone + hydroxide","HO–C₆H₄–OH + OH⁻ ⇌ HO–C₆H₄–O⁻ + H₂O","The anion is phenoxide-like and remains conjugated with the ring."),choices:["Products, because the monoanion is resonance-stabilized and hydroquinone is more acidic than water","Reactants, because every O–H acid is weaker than water","Products, because resonance makes the monoanion the stronger base","Neither; phenolic H cannot transfer"],answer:0,why:"The monoanion spreads negative charge into the aromatic system, making its parent phenol more acidic than water. Equilibrium therefore favors the weaker acid/base pair on the product side."},
-{id:"EXACT-AB8-20260911-09",sourceAssetUids:["ASSET-AB8-20260911-09"],sourceFiles:["09-thiol-ammonia-equilibrium.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"equilibrium",topic:"acidbase1",type:"mc",diff:2,prompt:"Predict the equilibrium."+examChem("Thiol + ammonia","RSH (pKₐ 10.2) + NH₃ ⇌ RS⁻ + NH₄⁺ (pKₐ 9.3)","Compare the acid on each side."),choices:["Reactants; the thiol is the higher-pKa, weaker acid","Products; ammonium is the lower-pKa, stronger acid","Products; thiolate is more stable than ammonia","Exactly equal"],answer:0,why:"Equilibrium favors the higher-pKa acid. RSH at 10.2 is weaker than NH₄⁺ at 9.3, so reactants predominate. K≈10^(9.3−10.2)≈0.13."},
+{id:"EXACT-AB8-20260911-09",sourceAssetUids:["ASSET-AB8-20260911-09"],sourceFiles:["09-thiol-ammonia-equilibrium.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"equilibrium",topic:"acidbase1",type:"mc",diff:2,prompt:"Predict the equilibrium."+examChem("Thiol + ammonia","RSH (pKₐ 10.2) + NH₃ ⇌ RS⁻ + NH₄⁺ (pKₐ 9.3)","Compare the acid on each side."),choices:["Reactants; the thiol is the higher-pKa, weaker acid","Products; ammonium is the lower-pKa, stronger acid","Products; thiolate is more stable than ammonia","Exactly equal"],answer:0,why:"A stronger acid is more eager to react, not more favored to remain. NH₄⁺ (pKₐ 9.3) is the stronger acid, so equilibrium shifts away from the product side that contains it. RSH (pKₐ 10.2) is the weaker acid, so reactants predominate. K≈10^(9.3−10.2)≈0.13."},
 {id:"EXACT-AB8-20260911-10",sourceAssetUids:["ASSET-AB8-20260911-10"],sourceFiles:["10-amine-thiol-acidity-atom-comparison.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"stability",topic:"acidbase2",type:"mc",diff:2,prompt:"Which labeled proton is more acidic?"+examChemPair("Atom comparison","R–N<sup>H₁</sup>–R","R–S–H₂","Removing H⁺ leaves the bonding pair on N or S."),choices:["H₂ on sulfur, because larger sulfur better stabilizes negative charge than nitrogen","H₁ on nitrogen, because nitrogen is more electronegative than sulfur","H₁ because smaller atoms always win","They tie because both are heteroatoms"],answer:0,why:"Chain the Atom rule through oxygen: O⁻ is more stable than N⁻ across a row, while S⁻ is more stable than O⁻ down a column. Therefore S⁻ is more stable than N⁻, so S–H is the stronger acid."},
 {id:"EXACT-AB8-20260911-11",sourceAssetUids:["ASSET-AB8-20260911-11"],sourceFiles:["11-phenol-hydroxide-role-labeling-correct.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"mechanism",topic:"acidbase1",type:"blanks",diff:2,prompt:"Assign every role in PhOH + OH⁻ ⇌ PhO⁻ + H₂O.",template:"PhOH = {{0}}; OH⁻ = {{1}}; PhO⁻ = {{2}}; H₂O = {{3}}.",fields:[{label:"PhOH",kind:"select",choices:["acid","base","conjugate acid","conjugate base"],answer:"acid"},{label:"OH−",kind:"select",choices:["base","acid","conjugate acid","conjugate base"],answer:"base"},{label:"PhO−",kind:"select",choices:["conjugate base","conjugate acid","acid","base"],answer:"conjugate base"},{label:"H2O",kind:"select",choices:["conjugate acid","conjugate base","acid","base"],answer:"conjugate acid"}],why:"Phenol loses H⁺; hydroxide gains it. Each product is the corresponding conjugate partner."},
 {id:"EXACT-AB8-20260911-12",sourceAssetUids:["ASSET-AB8-20260911-12"],sourceFiles:["12-nitrile-alpha-proton-resonance-acidity.png"],sourceBatch:"2026-09-07-ch3-acid-base-batch1",flightLeg:"stability",topic:"acidbase2",type:"mc",diff:3,prompt:"Which proton is more acidic?"+examChem("Nitrile distance check","H<sub>red</sub>–CH₂–CH(H<sub>blue</sub>)–C≡N","Blue is alpha to the nitrile; red is one carbon farther away."),choices:["Blue, because its conjugate base has R–C⁻–C≡N ↔ R–C=C=N⁻","Red, because farther charge has more room","Blue, because the H itself is sp-hybridized","Red, because nitriles destabilize all nearby anions"],answer:0,why:"The new lone pair from blue-H removal is directly adjacent to C≡N and can reach nitrogen by resonance. The red-site anion is separated from the nitrile by an sp³ carbon."},
@@ -4141,7 +4154,7 @@ const CH23_CLEAR_QUESTION_UPGRADES={
     prompt:"Map all four Brønsted roles in the reaction shown. Each molecule is given as both a name and a bond-line structure."+courseStructureDiagram("cyclohexanone-lda-roles","Cyclohexanone with an explicit alpha hydrogen reacts with bond-line LDA to form an enolate and diisopropylamine","Cyclohexanone + LDA → enolate + diisopropylamine")
   },
   "EXACT-AB8-20260911-09":{
-    prompt:"Predict which side is favored. The acid on each side is named and its pKₐ is printed directly beside that species."+courseStructureDiagram("thiol-ammonia-equilibrium","An alkyl thiol and ammonia are in equilibrium with an alkyl thiolate and ammonium; each acid has its pKa attached to its label","Compare the acid on the left with the acid on the right; equilibrium favors the side with the weaker, higher-pKₐ acid")
+    prompt:"After equilibrium is reached, which side makes up most of the mixture: reactants or products? This asks where equilibrium lies—not which acid is more eager to donate H⁺."+courseStructureDiagram("thiol-ammonia-equilibrium","An alkyl thiol and ammonia are in equilibrium with an alkyl thiolate and ammonium; each acid has its pKa attached to its label","Compare the acid on the left with the acid on the right; equilibrium favors the side with the weaker, higher-pKₐ acid")
   },
   "EXACT-AB8-20260911-15":{
     prompt:"Trace the first deprotonation of the numbered ascorbic-acid structure shown. The structure stays visible while you choose each arrow destination."+ab8Shot("15-ascorbic-acid-most-acidic-proton.png",1614,1406,170,400,390,220,"Ascorbic acid bond-line structure in the same orientation used by this question")+examChem("Numbering key","O3–H–C3=C2(–O2H)–C1=O1","O3 is the lower-left enediol oxygen; C1 is the carbonyl carbon and O1 its oxygen.")
@@ -4722,6 +4735,27 @@ const KNOWN_QUIZZES=[
 /* ================= HELPERS ================= */
 const $ = sel => document.querySelector(sel);
 const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v); else if(v===false||v==null){} else e.setAttribute(k,v===true?"":v);}); if(html!==undefined&&html!=="") e.innerHTML=html; return e; };
+/* v3.79: the UID is learner-facing. It is the shortest reliable way to bring one exact
+   question into a chat, a review note, or a bug report without retyping its chemistry. */
+async function copyQuestionId(id,button){
+  let copied=false;
+  try{await navigator.clipboard.writeText(id);copied=true;}catch(e){}
+  if(!copied){
+    const input=el("textarea",{"aria-hidden":"true",style:"position:fixed;left:-9999px;top:0"});
+    input.value=id;document.body.appendChild(input);input.select();
+    try{copied=document.execCommand("copy");}catch(e){}
+    input.remove();
+  }
+  const original=button.textContent;button.textContent=copied?"✓ Copied":"Select ID";
+  if(!copied){const code=button.parentElement&&button.parentElement.querySelector("code");if(code){const range=document.createRange();range.selectNodeContents(code);const sel=getSelection();sel.removeAllRanges();sel.addRange(range);}}
+  setTimeout(()=>button.textContent=original,1600);
+}
+function questionIdRow(q){
+  const id=String(q&&q.id||"unknown-question"),row=el("div",{class:"question-id-row","data-question-id":id});
+  row.appendChild(el("span",{},"Question ID"));row.appendChild(el("code",{},esc(id)));
+  const copy=el("button",{type:"button",class:"btn ghost question-id-copy","aria-label":"Copy question ID "+id},"Copy ID");
+  copy.addEventListener("click",()=>copyQuestionId(id,copy));row.appendChild(copy);return row;
+}
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 /* v3.78: a complete ranking hidden inside a select is recognition-by-elimination: every
@@ -4989,7 +5023,7 @@ VIEWS.more = (v) => {
   c.appendChild(grid); v.appendChild(c);
   const account=el("section",{class:"card cream"});
   const status=cloudState==="synced"?"Cloud saved":cloudState==="qa"?"QA preview · not saved":cloudState==="offline"?"Local only":"Syncing";
-  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.76</p>';
+  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.79</p>';
   const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   if(PROFILE==="gabe"&&!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:ownerView},"View Sam"));
   if(!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:switchProfile},"Switch profile"));
@@ -6666,6 +6700,8 @@ VIEWS.drill = (v) => {
   if (D.reviewIdx!==undefined && D.reviewIdx!==null && (D.log||[]).length){
     const L=D.log, n=Math.max(0,Math.min(D.reviewIdx,L.length-1)), rec=L[n];
     const q=QUESTIONS.find(x=>x.id===rec.id);
+    const persistentFlag=(S.questionFlags||{})[rec.id]||{}, replayFlag=!!rec.rf||!!persistentFlag.active;
+    const replayFlagNote=String(rec.rn||persistentFlag.note||"").trim();
     /* Reaching the end of a completed flight's read-only review verifies that every miss in
        that run was shown with its key/rationale. This is the ≥80% routing requirement; a
        second complete attempt still routes even if the learner chooses not to review. */
@@ -6689,8 +6725,9 @@ VIEWS.drill = (v) => {
       (q&&q.type==="multiSelect"&&!rec.ok?'<p style="margin:2px 0">Correct selections: <b class="mono">'+esc(q.answer.map(i=>(q.choiceLabels||q.choices)[i]).join(", "))+'</b></p>':'')+
       (q&&(q.type==="num"||q.type==="text")&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String(q.answer))+'</b></p>':'')+
       (rec.note?'<div class="why" style="margin-top:8px"><b>Your reasoning at the time:</b> '+esc(rec.note)+'</div>':'')+
-      (rec.rf?'<div class="why" style="margin-top:8px;border-left-color:var(--gold)"><b>🚩 Flagged for review'+(rec.rn?':</b> '+esc(rec.rn):'</b>')+'</div>':'')+
+      (replayFlag?'<div class="why" style="margin-top:8px;border-left-color:var(--gold)"><b>🚩 Flagged for review'+(replayFlagNote?':</b> '+esc(replayFlagNote):'</b>')+'</div>':'')+
       (q&&q.why?'<div class="why" style="margin-top:8px">'+q.why+'</div>':'');
+    if(q)c.insertBefore(questionIdRow(q),c.querySelector(".qprompt"));
     v.appendChild(c);
     const nav=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px"});
     if(n>0) nav.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=n-1;render();}},"← earlier"));
@@ -6900,6 +6937,7 @@ VIEWS.drill = (v) => {
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+questionOrientation(q)+questionRepeatNotice(q)+ 
     (D.diagVersion?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>'+((D.diagCriticalIds||[]).includes(q.id)?'🔒 Critical readiness task':'Readiness sample')+':</b> '+esc((D.diagRoles||{})[q.id]||"homework-level transfer")+'</p>':'')+
     '<div class="qprompt">'+(q.arrowBoard?'Draw both curved arrows for this proton transfer, then choose the product or charge.':q.prompt)+'</div>';
+  c.insertBefore(questionIdRow(q),c.querySelector(".question-orientation, .qprompt"));
   if(q.arrowBoard)c.appendChild(el('div',{'data-proton-arrow-host':''}));
   addHintCoach(c,q,D);
   const structureDone=!!(D.structureBuilt&&D.structureBuilt[q.id]===q.drawMol);
