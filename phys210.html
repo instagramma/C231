@@ -3,10 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0B0F1A">
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.5  ·  built 2026-08-24
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.7  ·  built 2026-09-09, reskinned 2026-09-13
+  v2.7 (2026-09-13, Sun): DEEP SPACE + PURPOSE-FIRST NAV. New dark theme so a glance
+        tells you which course app you are in — CHEM 231 stays light paper, PHYS 210 is
+        night sky. Same typeface on purpose: the two apps remain one system. The bottom
+        bar drops from seven cramped tabs to five purpose-labelled ones (Today / Problem /
+        Drill / Plan / More), with Course Map, Cheat Sheet and Report moved behind More.
+        Graph figures deliberately keep a light panel — the SVGs are drawn in dark ink and
+        a physics graph should read the way it will on the exam. Appended stylesheet plus
+        the nav restructure only: question bank, Problem Lab engine, due-date logic,
+        storage and cloud sync are byte-for-byte unchanged. Archived v2.6 before editing.
+  v2.6 (2026-09-09, DEPLOY PENDING): SOURCE BANK + FIGURES — saved two Pearson homework questions,
+        added four close-transfer variants, inline SVG graph figures, and select-all support.
   v2.5 (2026-08-28): READABLE UI — the CHEM 231 v3.30 stylesheet layer ported over so both
         course apps look and read the same. Larger type, high-contrast cards, 44px+ controls,
         visible focus rings, mobile reflow. Appended stylesheet only: markup, logic, question
@@ -27,7 +39,7 @@
   · TRACK        — the day plan WITH DUE DATES; replace with
                    syllabus weeks once Janatpour posts it
   · QUESTIONS    — flat array, schema: id/topic/type/prompt/
-                   answer/choices?/tolerance?/why
+                   answer/choices?/tolerance?/figure?/why; type also supports "multi"
   · PROBLEMS     — Problem Lab: blank-page problems, step-gated
                    (setup → equation → algebra → number), each
                    step tagged so misses are tracked BY STEP TYPE
@@ -157,7 +169,11 @@
   .choice.picked-right{background:#CDEBCB;border-color:var(--ok)}
   .choice.picked-wrong{background:#F6CFC2;border-color:var(--coral)}
   .choice.reveal-right{background:#CDEBCB}
+  .choice.selected{background:var(--accent-bg);border-color:var(--teal);box-shadow:0 0 0 2px rgba(15,95,138,.14)}
   .choice:disabled{cursor:default}
+  .question-figure{margin:4px 0 16px;padding:12px;background:#fff;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+  .question-figure svg{display:block;width:100%;max-width:560px;height:auto;margin:auto}
+  .multi-hint{font-size:.78rem;color:var(--muted-tx);margin:-5px 0 10px;font-weight:700}
   input.answerbox{
     font-family:var(--mono);font-size:1.2rem;padding:10px 12px;border:2.5px solid var(--ink);
     border-radius:8px;width:130px;background:#fff;box-shadow:inset 2px 2px 0 rgba(27,34,51,.12);
@@ -529,6 +545,364 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 }
 
 </style>
+<style id="v27-deep-space">
+/* ============================================================================
+   v2.7 — DEEP SPACE (2026-09-13)
+   A dark theme so a glance tells you which course you are in, plus purpose-first
+   navigation (5 tabs + More) so seven destinations stop fighting for one bar.
+   The typeface is deliberately IDENTICAL to CHEM 231 — the two apps stay one
+   system; only the colour world differs. Appended stylesheet layer + a nav
+   restructure only: the question bank, Problem Lab engine, due-date logic,
+   storage and cloud sync are untouched. Archived v2.6 before editing.
+   ============================================================================ */
+:root{
+  color-scheme:dark;
+
+  --void:#0B0F1A;
+  --paper:#0B0F1A;
+  --paper2:#121A2A;
+  --surface:#141B2B;
+  --surface2:#1B2435;
+
+  --ink:#E6EDF7;
+  --sec-tx:#C6D2E6;
+  --muted-tx:#9BABC5;
+
+  --line:#263349;
+  --line-soft:#1E2A3D;
+
+  --ice:#5FD3F3;
+  --ice-dim:#8FE2FA;
+  --teal:#2B7FA8;
+  --teal-dk:#8FE2FA;
+
+  --ok:#4ADE9B;
+  --coral:#F2848C;
+  --gold:#F7C873;
+  --violet:#B79CF5;
+
+  --accent-bg:#152C3C;
+  --success-bg:#12301F;
+  --warning-bg:#33280F;
+  --danger-bg:#331A1F;
+
+  --shadow:none;
+  --shadow-sm:none;
+  --serif:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+/* ---------- the sky ---------- */
+html{font-size:17px;scroll-padding-bottom:88px;background:var(--void)}
+body{
+  background-color:var(--void);
+  background-image:
+    radial-gradient(ellipse 130% 55% at 50% -12%, rgba(64,132,190,.20), transparent 62%),
+    radial-gradient(1.2px 1.2px at 24px 36px, rgba(214,232,255,.32), transparent 0),
+    radial-gradient(1px 1px at 148px 92px, rgba(214,232,255,.22), transparent 0),
+    radial-gradient(1.3px 1.3px at 78px 176px, rgba(198,226,255,.26), transparent 0),
+    radial-gradient(1px 1px at 206px 214px, rgba(214,232,255,.18), transparent 0),
+    radial-gradient(1px 1px at 178px 32px, rgba(214,232,255,.14), transparent 0);
+  background-size:100% 640px, 260px 260px, 260px 260px, 260px 260px, 260px 260px, 260px 260px;
+  background-repeat:no-repeat, repeat, repeat, repeat, repeat, repeat;
+  color:var(--ink);
+  line-height:1.6;
+  text-rendering:optimizeLegibility;
+  padding-bottom:96px;
+}
+main{max-width:800px;padding:1.5rem 1.25rem 2.5rem}
+
+/* ---------- header ---------- */
+header{
+  align-items:center;
+  background:rgba(11,15,26,.86);
+  color:var(--ink);
+  border-bottom:1px solid var(--line);
+  padding:1rem 1.25rem;
+  backdrop-filter:saturate(150%) blur(8px);
+  -webkit-backdrop-filter:saturate(150%) blur(8px);
+}
+header h1{font-size:1.18rem;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+header h1 .flask{transform:none;margin-right:8px;filter:drop-shadow(0 0 7px rgba(95,211,243,.45))}
+header .countdown{
+  background:var(--accent-bg);
+  color:var(--ice-dim);
+  border:1px solid #2B4D66;
+  font-family:var(--sans);
+  font-size:.76rem;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:99px;
+}
+.menubtn{
+  background:var(--surface);
+  color:var(--sec-tx);
+  border:1px solid var(--line);
+  box-shadow:none;
+  font-family:var(--sans);
+  font-size:.78rem;
+  font-weight:700;
+  min-height:38px;
+  padding:7px 12px;
+  display:inline-flex;
+  align-items:center;
+  border-radius:99px;
+}
+.menubtn:active{transform:none;background:var(--surface2)}
+
+/* ---------- purpose-first bottom nav ---------- */
+nav{
+  background:rgba(12,17,28,.94);
+  border-top:1px solid var(--line);
+  backdrop-filter:saturate(150%) blur(12px);
+  -webkit-backdrop-filter:saturate(150%) blur(12px);
+}
+nav button{
+  min-height:76px;
+  border-right:none;
+  background:none;
+  color:var(--muted-tx);
+  font-family:var(--sans);
+  line-height:1.15;
+  padding:9px 2px 11px;
+  gap:3px;
+}
+nav button .ico{font-size:1.18rem;opacity:.72;line-height:1}
+nav button .nav-label{font-size:.73rem;font-weight:800;line-height:1.05}
+nav button .nav-purpose{font-size:.57rem;font-weight:650;line-height:1.05;opacity:.72;white-space:nowrap}
+nav button.active{
+  background:linear-gradient(180deg,rgba(95,211,243,.16),rgba(95,211,243,.03));
+  color:var(--ice-dim);
+  box-shadow:inset 0 2px 0 var(--ice);
+}
+nav button.active .ico{opacity:1;filter:drop-shadow(0 0 6px rgba(95,211,243,.5))}
+
+/* ---------- surfaces ---------- */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(0,0,0,.45);
+  padding:1.2rem 1.3rem;
+  margin-bottom:1.15rem;
+  color:var(--ink);
+}
+.card.cream{background:var(--surface2)}
+.card.teal{
+  background:var(--accent-bg);
+  border-color:#2E5A76;
+  color:var(--ink);
+}
+.card h2{font-size:1.24rem;font-weight:750;line-height:1.3;letter-spacing:-.01em;color:var(--ink)}
+.card h3{font-size:1.02rem;font-weight:750;line-height:1.35;color:var(--ink)}
+.muted{opacity:1;color:var(--muted-tx);font-size:.88rem;line-height:1.55}
+.mono{font-family:var(--mono)}
+hr{border:none;border-top:1px solid var(--line-soft)}
+
+/* ---------- labels ---------- */
+.tag{
+  background:var(--paper2);
+  color:var(--sec-tx);
+  border:1px solid var(--line);
+  font-size:.71rem;
+  font-weight:750;
+  letter-spacing:.045em;
+  line-height:1.35;
+  text-transform:uppercase;
+  padding:4px 9px;
+  border-radius:99px;
+  margin-bottom:.65rem;
+}
+.tag.gold{background:var(--warning-bg);color:var(--gold);border-color:#5A4517}
+.tag.coral{background:var(--danger-bg);color:var(--coral);border-color:#5E2C33}
+.tag.violet{background:#241F3D;color:var(--violet);border-color:#413566}
+.tag.teal{background:var(--accent-bg);color:var(--ice-dim);border-color:#2B4D66}
+
+/* ---------- controls ---------- */
+.btn{
+  min-height:44px;
+  background:var(--ice);
+  color:#07131B;
+  border:1px solid #7FDEF8;
+  border-radius:9px;
+  box-shadow:none;
+  padding:9px 14px;
+  font-family:var(--sans);
+  font-size:.9rem;
+  font-weight:750;
+  line-height:1.25;
+}
+.btn:active{transform:none;box-shadow:none;filter:brightness(.9)}
+.btn.ghost{background:transparent;color:var(--sec-tx);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface2)}
+.btn.gold{background:var(--warning-bg);color:var(--gold);border-color:#5A4517}
+.btn.coral{background:var(--danger-bg);color:var(--coral);border-color:#5E2C33}
+.btn.violet{background:#241F3D;color:var(--violet);border-color:#413566}
+.btn.small{min-height:38px;padding:7px 11px;font-size:.82rem}
+.btn:disabled{opacity:.42}
+.bigbtn{
+  min-height:54px;
+  background:var(--ice);
+  color:#07131B;
+  border:1px solid #7FDEF8;
+  border-radius:11px;
+  box-shadow:0 0 22px rgba(95,211,243,.16);
+  padding:14px 16px;
+  font-family:var(--sans);
+  font-size:1rem;
+  font-weight:800;
+}
+.bigbtn:active{transform:none;box-shadow:none;filter:brightness(.9)}
+
+/* ---------- question surface ---------- */
+.qprompt{font-size:1.06rem;line-height:1.62;margin:12px 0 16px;color:var(--ink)}
+.qprompt .formula{font-family:var(--mono);font-weight:700;color:var(--ice-dim)}
+.multi-hint{font-size:.78rem;color:var(--muted-tx);margin:-5px 0 10px;font-weight:700}
+.choices{gap:10px}
+.choice{
+  min-height:48px;
+  background:var(--surface2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:none;
+  padding:12px 14px;
+  font-size:.98rem;
+  line-height:1.45;
+  color:var(--ink);
+  font-family:var(--sans);
+}
+.choice:hover:not(:disabled){background:#222D42;border-color:#33506F}
+.choice.picked-right,.choice.reveal-right{background:var(--success-bg);border-color:#2E7A55;color:#D6FBE8}
+.choice.picked-wrong{background:var(--danger-bg);border-color:#7A3A42;color:#FBDDE0}
+input.answerbox,.answerbox{
+  min-height:44px;
+  background:var(--paper2);
+  color:var(--ink);
+  border:1px solid #37506B;
+  border-radius:9px;
+  box-shadow:none;
+  font-family:var(--sans);
+  font-size:1rem;
+  padding:9px 11px;
+}
+input.answerbox::placeholder{color:#6E7F99}
+input.answerbox:focus{border-color:var(--ice);outline:none;box-shadow:0 0 0 3px rgba(95,211,243,.2)}
+.why{
+  border-left:4px solid var(--ice);
+  background:var(--paper2);
+  border-radius:0 9px 9px 0;
+  padding:.75rem .9rem;
+  font-size:.92rem;
+  line-height:1.6;
+  color:var(--sec-tx);
+}
+.why b{color:var(--ice-dim)}
+.feedback-right{color:var(--ok);font-weight:800;font-family:var(--sans);font-size:1.05rem}
+.feedback-wrong{color:var(--coral);font-weight:800;font-family:var(--sans);font-size:1.05rem}
+
+/* Graph figures stay on a lit panel: the SVGs are drawn in dark ink, and a
+   physics graph reads the way it will on the exam — dark lines on light paper. */
+.question-figure{
+  margin:4px 0 16px;
+  padding:14px;
+  background:#EDF2F9;
+  border:1px solid #37506B;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(95,211,243,.10), 0 8px 20px rgba(0,0,0,.4);
+}
+.question-figure svg{display:block;width:100%;max-width:560px;height:auto;margin:auto}
+
+/* ---------- stats, progress, plan ---------- */
+.stat{background:var(--paper2);border:1px solid var(--line);border-radius:10px;box-shadow:none;padding:.9rem;text-align:left}
+.stat .n{font-family:var(--sans);font-size:1.45rem;font-weight:750;color:var(--ink)}
+.stat .l{color:var(--muted-tx);font-size:.78rem;font-weight:600;letter-spacing:0;text-transform:none;opacity:1}
+.progressbar{height:10px;background:#1C2740;border:none;border-radius:99px;overflow:hidden}
+.progressbar>div{background:linear-gradient(90deg,var(--teal),var(--ice));border-right:none}
+.daycard{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:none;padding:.8rem .9rem;color:var(--ink)}
+.daycard.today{background:var(--accent-bg);border-color:#2E5A76}
+.daycard.overdue{border-color:#7A3A42;box-shadow:none}
+.daycard.done{background:var(--success-bg);border-color:#2E7A55}
+.daycard.done::after{color:var(--ok)}
+.daycard .d{font-family:var(--sans);font-size:.76rem;color:var(--muted-tx);opacity:1;font-weight:650}
+.daycard .t{font-family:var(--sans);font-size:.9rem;font-weight:700;line-height:1.4;color:var(--ink)}
+.duetag{font-size:.7rem;border:1px solid var(--line);background:var(--paper2);color:var(--sec-tx);padding:3px 8px}
+.duetag.today-due{background:var(--warning-bg);color:var(--gold);border-color:#5A4517}
+.duetag.overdue{background:var(--danger-bg);color:var(--coral);border-color:#5E2C33}
+
+/* ---------- pills, tools, Problem Lab stepper ---------- */
+.pill{min-height:40px;background:var(--surface2);border:1px solid var(--line);border-radius:99px;box-shadow:none;padding:8px 13px;font-size:.84rem;font-weight:700;color:var(--sec-tx)}
+.pill.on{background:var(--accent-bg);color:var(--ice-dim);border-color:var(--ice)}
+.pill.done{background:var(--success-bg);color:var(--ok);border-color:#2E7A55}
+.step{font-size:.72rem;border:1px solid var(--line);background:var(--paper2);color:var(--muted-tx);padding:7px 4px;border-radius:9px;opacity:.55}
+.step.on{background:var(--accent-bg);color:var(--ice-dim);border-color:var(--ice);opacity:1}
+.step.ok{background:var(--success-bg);color:var(--ok);border-color:#2E7A55;opacity:1}
+.stepask{font-size:.98rem;line-height:1.6;color:var(--ink)}
+.givenbox{background:var(--paper2);border:1px solid var(--line);color:var(--sec-tx)}
+.givenbox .hl{color:var(--gold)}
+.tool{min-height:42px;border:1px solid var(--line);border-radius:9px;box-shadow:none;background:var(--surface2);color:var(--sec-tx);padding:8px 12px;font-family:var(--sans);font-size:.84rem;font-weight:700}
+.tool.on{background:#241F3D;color:var(--violet);border-color:var(--violet)}
+
+/* v2.7 — chips that carry a bright fill need dark ink, not the default light text.
+   These replaced hard-coded inline backgrounds so the theme stays overridable. */
+.pill.bright-gold{background:var(--gold);color:#1E1503;border-color:#D9A94F}
+.pill.bright-coral{background:var(--coral);color:#2A0C10;border-color:#D9666F}
+
+/* ---------- reference tables & report ---------- */
+table.cheat{font-size:.86rem;line-height:1.45;border-collapse:collapse;width:100%}
+table.cheat th,table.cheat td{border:1px solid var(--line);padding:8px 9px;text-align:left}
+table.cheat th{background:var(--accent-bg);color:var(--ice-dim);font-family:var(--sans);font-weight:750}
+table.cheat tr:nth-child(even){background:var(--paper2)}
+table.cheat td{color:var(--sec-tx)}
+textarea.report{
+  width:100%;font-size:.84rem;line-height:1.5;
+  background:var(--paper2);color:var(--ink);
+  border:1px solid #37506B;border-radius:9px;box-shadow:none;padding:10px;
+}
+
+/* ---------- More screen ---------- */
+.more-grid{display:grid;gap:10px;margin-top:.5rem}
+.more-link{
+  display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:12px;
+  width:100%;min-height:72px;padding:12px 14px;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  color:var(--ink);font:inherit;cursor:pointer;
+}
+.more-link:hover{background:var(--surface2);border-color:#33506F}
+.more-link-icon{font-size:1.32rem;text-align:center;line-height:1}
+.more-link-copy{min-width:0}
+.more-link b{display:block;font-size:.96rem;font-weight:750;color:var(--ink)}
+.more-link-sub{display:block;color:var(--muted-tx);font-size:.79rem;line-height:1.35;margin-top:2px}
+.more-link::after{content:"\203A";font-size:1.5rem;color:var(--muted-tx);line-height:1}
+.section-label{
+  color:var(--muted-tx);font-size:.72rem;font-weight:800;letter-spacing:.07em;
+  text-transform:uppercase;margin:1.25rem .15rem .55rem;
+}
+.section-label:first-child{margin-top:.25rem}
+
+/* ---------- focus ---------- */
+:is(a,button,input,textarea,select,[tabindex]):focus-visible{
+  outline:3px solid var(--ice);
+  outline-offset:3px;
+}
+
+@media(max-width:600px){
+  html{font-size:16px}
+  body{padding-bottom:100px}
+  main{padding:1rem .75rem 2rem}
+  header{padding:.75rem .85rem;gap:8px}
+  header h1{font-size:1.04rem}
+  .card{padding:1rem;margin-bottom:.9rem}
+  nav button{min-height:76px;padding-left:0;padding-right:0}
+  nav button .nav-label{font-size:.64rem}
+  nav button .nav-purpose{font-size:.5rem}
+  .more-link{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
 </head>
 <body>
 <header>
@@ -623,13 +997,19 @@ const TOPICS = {
   vecadd:  { name:"Vector addition",     ico:"➕" },
   kin1:    { name:"1D kinematics",       ico:"🏃" },
   kin2:    { name:"Kinematic equations", ico:"📈" },
+  graphs:  { name:"Motion graphs",       ico:"📊" },
   newton:  { name:"Newton's laws",       ico:"🍎" },
   diag:    { name:"Mixed diagnostic",    ico:"🧪" },
 };
 
 /* ================= QUESTION BANK =================
-   schema: {id, topic, type:"num"|"mc"|"text", prompt, answer, choices?, tolerance?, why}
+   schema: {id, topic, type:"num"|"mc"|"multi"|"text", prompt, answer, choices?, tolerance?, figure?, why}
    All generation-style where possible: you produce the number, no options to lean on. */
+const FIGURES = {
+  vtRise:'<svg viewBox="0 0 560 330" role="img" aria-label="Velocity versus time graph: a straight rising line begins at negative velocity at a, crosses zero at b, and ends at positive velocity at c"><defs><marker id="ar1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#1d272c"/></marker></defs><line x1="80" y1="275" x2="80" y2="35" stroke="#1d272c" stroke-width="3" marker-end="url(#ar1)"/><line x1="45" y1="170" x2="515" y2="170" stroke="#1d272c" stroke-width="3" marker-end="url(#ar1)"/><line x1="80" y1="265" x2="445" y2="65" stroke="#2aa72a" stroke-width="6"/><circle cx="80" cy="265" r="8" fill="#1d272c"/><circle cx="253" cy="170" r="8" fill="#1d272c"/><circle cx="445" cy="65" r="8" fill="#1d272c"/><g font-family="Georgia,serif" font-size="26" font-style="italic" fill="#1d272c"><text x="48" y="292">a</text><text x="246" y="203">b</text><text x="448" y="55">c</text><text x="50" y="34">vₓ</text><text x="520" y="193">t</text></g><text x="285" y="316" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#536169">The vertical value is velocity; the slope is acceleration.</text></svg>',
+  vtFall:'<svg viewBox="0 0 560 330" role="img" aria-label="Velocity versus time graph: a straight falling line begins at positive velocity at p, crosses zero at q, and ends at negative velocity at r"><defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#1d272c"/></marker></defs><line x1="80" y1="275" x2="80" y2="35" stroke="#1d272c" stroke-width="3" marker-end="url(#ar2)"/><line x1="45" y1="170" x2="515" y2="170" stroke="#1d272c" stroke-width="3" marker-end="url(#ar2)"/><line x1="80" y1="65" x2="445" y2="265" stroke="#d64045" stroke-width="6"/><circle cx="80" cy="65" r="8" fill="#1d272c"/><circle cx="253" cy="170" r="8" fill="#1d272c"/><circle cx="445" cy="265" r="8" fill="#1d272c"/><g font-family="Georgia,serif" font-size="26" font-style="italic" fill="#1d272c"><text x="49" y="58">p</text><text x="246" y="203">q</text><text x="449" y="292">r</text><text x="50" y="34">vₓ</text><text x="520" y="193">t</text></g><text x="285" y="316" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#536169">Watch the sign of v, then the size of |v|.</text></svg>',
+  vtFlat:'<svg viewBox="0 0 560 290" role="img" aria-label="Velocity versus time graph: a horizontal line at positive velocity"><defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#1d272c"/></marker></defs><line x1="80" y1="235" x2="80" y2="35" stroke="#1d272c" stroke-width="3" marker-end="url(#ar3)"/><line x1="45" y1="215" x2="515" y2="215" stroke="#1d272c" stroke-width="3" marker-end="url(#ar3)"/><line x1="80" y1="100" x2="455" y2="100" stroke="#2e5eaa" stroke-width="6"/><g font-family="Georgia,serif" font-size="26" font-style="italic" fill="#1d272c"><text x="50" y="34">vₓ</text><text x="520" y="238">t</text></g><text x="285" y="274" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#536169">Horizontal on a v–t graph means constant velocity.</text></svg>'
+};
 const QUESTIONS = [
 /* --- units + conversions (feeds everything) --- */
 {id:"u1",topic:"units",type:"num",prompt:"Convert 72 km/h to m/s.",answer:20,why:"km/h → m/s: <b>divide by 3.6</b> (×1000 m/km ÷ 3600 s/h). 72 ÷ 3.6 = <b>20 m/s</b>. Physics answers live in m/s — this conversion is daily."},
@@ -691,6 +1071,13 @@ const QUESTIONS = [
 {id:"k7",topic:"kin1",type:"mc",prompt:"On a velocity-time graph, the AREA under the curve is the:",choices:["Displacement","Acceleration","Average speed","Jerk"],answer:0,why:"Area = v × t summed = <b>displacement</b>. Slope-and-area on the two graphs: four facts that answer every graph question the course will throw."},
 {id:"k8",topic:"kin1",type:"num",prompt:"Moving at 10 m/s, braking at 2 m/s². Time to stop = ? (s)",answer:5,why:"t = Δv/a = 10/2 = <b>5 s</b>."},
 {id:"k9",topic:"kin1",type:"mc",prompt:"'Uniform acceleration' means:",choices:["Velocity changes by equal amounts in equal times","Velocity is constant","The object moves equal distances each second","Speed only increases"],answer:0,why:"Uniform a → <b>Δv is the same every second</b> (distances are NOT — they grow). This is exactly when the kinematic equations apply, and only then."},
+/* --- saved homework sources + close transfer: speed, velocity, and motion graphs --- */
+{id:"g1",topic:"graphs",type:"multi",origin:"Pearson HW source · 2026-09-09",prompt:"Which statements about average speed are correct? <b>Select all that apply.</b>",choices:["The average speed can never be greater than the magnitude of the average velocity.","If the average speed is zero, then the average velocity must be zero.","The average speed is equal to the magnitude of the average velocity.","If the average velocity is zero, then the average speed must be zero.","The average speed can never be less than the magnitude of the average velocity."],answer:[1,4],why:"Average speed = total distance/Δt; |average velocity| = |displacement|/Δt. Because distance ≥ |displacement|, <b>average speed ≥ |average velocity|</b>. Zero distance forces zero displacement, but a round trip can have zero displacement and positive distance."},
+{id:"g2",topic:"graphs",type:"multi",origin:"Close transfer",prompt:"A cart travels 30 m east and then 30 m west in 12 s, ending where it began. Which statements must be true? <b>Select all that apply.</b>",choices:["Its total distance is 60 m.","Its displacement is 60 m.","Its average speed is 5 m/s.","Its average velocity is 0 m/s.","Its average speed is 0 m/s."],answer:[0,2,3],why:"Distance counts the whole path: 30 + 30 = <b>60 m</b>, so average speed = 60/12 = <b>5 m/s</b>. Displacement is final minus initial position = 0, so average velocity = <b>0 m/s</b>."},
+{id:"g3",topic:"graphs",type:"mc",origin:"Close transfer",prompt:"Average speed equals the magnitude of average velocity over an interval only when:",choices:["The object does not reverse direction along its path","The object returns to its starting point","The velocity is zero at least once","The acceleration is constant"],answer:0,why:"Equality requires distance = |displacement|. Along a straight line, that happens when no traveled distance is canceled by reversing direction. Returning to the start makes displacement zero while distance can be positive."},
+{id:"g4",topic:"graphs",type:"multi",origin:"Pearson HW source · 2026-09-09",prompt:"The graph shows a wildebeest's velocity as a function of time. Which statements must be true? <b>Select all that apply.</b>",figure:"vtRise",choices:["It is moving to the left between a and b and to the right between b and c.","It is moving to the right between a and c.","Its acceleration is increasing.","Its speed is decreasing from a to b and increasing from b to c."],answer:[0,3],why:"Below the time axis, <b>v &lt; 0</b>, so the animal moves left; above it, <b>v &gt; 0</b>, so it moves right. Speed is |v|, so it falls toward zero at b and then grows. The v–t line has one constant positive slope, so acceleration is <b>constant positive</b>, not increasing."},
+{id:"g5",topic:"graphs",type:"multi",origin:"Close transfer",prompt:"The velocity–time graph slopes downward through zero. Which statements must be true? <b>Select all that apply.</b>",figure:"vtFall",choices:["The object moves right from p to q and left from q to r.","Its acceleration is constant and negative.","Its speed increases during the entire interval.","Its speed decreases from p to q and increases from q to r.","The object is at the origin at q."],answer:[0,1,3],why:"Positive v means right; negative v means left. A straight downward v–t line has <b>constant negative acceleration</b>. Speed is |v|: it shrinks to zero at q, then grows. v = 0 tells you it stops momentarily—not where it is."},
+{id:"g6",topic:"graphs",type:"multi",origin:"Close transfer",prompt:"What does this velocity–time graph tell you? <b>Select all that apply.</b>",figure:"vtFlat",choices:["The object moves in the positive direction.","Its speed is constant.","Its acceleration is zero.","Its position is constant.","It must be at a positive position."],answer:[0,1,2],why:"The graph's positive height is velocity, so motion is in the positive direction at constant speed. Its slope is zero, so acceleration is zero. A v–t graph does not directly reveal the object's position."},
 /* --- kinematic equations --- */
 {id:"q1",topic:"kin2",type:"mc",prompt:"Which kinematic equation contains NO Δx?",choices:["v = v₀ + at","v² = v₀² + 2aΔx","Δx = v₀t + ½at²","Δx = ½(v₀ + v)t"],answer:0,why:"<b>v = v₀ + at</b>. Pick the equation by the variable you DON'T have/need — that's the entire selection method, not vibes."},
 {id:"q2",topic:"kin2",type:"num",prompt:"Dropped from rest, g ≈ 9.8 m/s². Speed after 2 s ≈ ? (m/s)",answer:19.6,tolerance:0.3,why:"v = 0 + 9.8 × 2 = <b>19.6 m/s</b>. Free fall = kinematics with a = g, nothing more."},
@@ -795,21 +1182,51 @@ const MONTH_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","
 function fmtDay(iso){ const [y,m,d]=iso.split("-").map(Number); return MONTH_NAMES[m-1]+" "+d; }
 
 /* ================= ROUTER ================= */
+/* v2.7 — five purpose-labelled destinations. Reference views live behind More so the
+   bar stays readable on a phone; nothing was removed, only reorganised. */
 const NAV = [
-  {id:"home",  ico:"🏠", label:"Today"},
-  {id:"map",   ico:"🧭", label:"Course Map"},
-  {id:"lab",   ico:"📝", label:"Problem Lab"},
-  {id:"drill", ico:"🎯", label:"Drill"},
-  {id:"track", ico:"🗓️", label:"Plan"},
-  {id:"cheat", ico:"📌", label:"Cheat Sheet"},
-  {id:"report",ico:"📤", label:"Report"},
+  {id:"home",  ico:"🏠", label:"Today",   purpose:"Start here"},
+  {id:"lab",   ico:"📝", label:"Problem", purpose:"Work it out"},
+  {id:"drill", ico:"🎯", label:"Drill",   purpose:"Quick checks"},
+  {id:"track", ico:"🗓️", label:"Plan",    purpose:"What's due"},
+  {id:"more",  ico:"⋯",  label:"More",    purpose:"Map · formulas"},
 ];
+const NAV_SECONDARY = ["map","cheat","report"];
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
-function renderNav(){ const n=$("#nav"); n.innerHTML=""; NAV.forEach(t=>{ const b=el("button",{class:S.view===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
+function renderNav(){
+  const n=$("#nav"); n.innerHTML="";
+  const active = NAV_SECONDARY.indexOf(S.view)>=0 ? "more" : S.view;
+  NAV.forEach(t=>{
+    const b=el("button",{class:active===t.id?"active":"",onclick:()=>go(t.id),"aria-label":t.label+" — "+t.purpose});
+    b.innerHTML='<span class="ico">'+t.ico+'</span><span class="nav-label">'+t.label+'</span><span class="nav-purpose">'+t.purpose+'</span>';
+    n.appendChild(b);
+  });
+}
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass(); $("#countdown").textContent = d>0 ? d+" days to class" : (d===0?"CLASS STARTS TODAY":"semester live"); }
 
 /* ================= VIEWS ================= */
 const VIEWS = {};
+
+/* ---- MORE (v2.7) — reference destinations, one tap from anywhere ---- */
+VIEWS.more = (v) => {
+  const head = el("div",{class:"card"});
+  head.appendChild(el("div",{class:"tag"},"Reference"));
+  head.appendChild(el("h2",{},"More"));
+  head.appendChild(el("p",{class:"muted"},"Everything that isn't a daily action lives here."));
+  v.appendChild(head);
+  const grid = el("div",{class:"more-grid"});
+  [
+    {id:"map",   ico:"🧭", t:"Course Map",  s:"How PHYS 210 is actually graded, and what the midterm covers"},
+    {id:"cheat", ico:"📌", t:"Cheat Sheet", s:"Formulas, constants, and the equations worth memorising"},
+    {id:"report",ico:"📤", t:"Report",      s:"Export your progress to paste into a Claude session"}
+  ].forEach(r=>{
+    const b = el("button",{class:"more-link",onclick:()=>go(r.id)});
+    b.innerHTML = '<span class="more-link-icon">'+r.ico+'</span>'
+                + '<span class="more-link-copy"><b>'+r.t+'</b><span class="more-link-sub">'+r.s+'</span></span>';
+    grid.appendChild(b);
+  });
+  v.appendChild(grid);
+};
 
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
@@ -932,8 +1349,8 @@ VIEWS.drill = (v) => {
       const done = qs.filter(q=>S.qstats[q.id]?.r).length;
       pr.appendChild(el("button",{class:"pill"+(done===qs.length&&qs.length?" done":""),onclick:()=>startDrill(k)},t.ico+" "+t.name+" <span class='mono'>"+done+"/"+qs.length+"</span>"));
     });
-    pr.appendChild(el("button",{class:"pill",style:"background:var(--gold)",onclick:()=>startDiagnostic()},"🧪 Mixed diagnostic"));
-    pr.appendChild(el("button",{class:"pill",style:"background:var(--coral);color:#fff",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
+    pr.appendChild(el("button",{class:"pill bright-gold",onclick:()=>startDiagnostic()},"🧪 Mixed diagnostic"));
+    pr.appendChild(el("button",{class:"pill bright-coral",onclick:()=>startDrill("__missed")},"🔥 Review missed ("+[...new Set(S.missed)].length+")"));
     v.appendChild(pr);
     return;
   }
@@ -952,7 +1369,9 @@ VIEWS.drill = (v) => {
   const q = D.queue[D.i];
   const c = el("div",{class:"card"});
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+'</span>'+
+    (q.origin?'<span class="tag gold" style="margin-left:6px">'+q.origin+'</span>':'')+
     '<div class="qprompt">'+q.prompt+'</div>';
+  if(q.figure) c.appendChild(el("div",{class:"question-figure"},FIGURES[q.figure]));
   const fb = el("div");
   const finish = (ok, revealHtml) => {
     D.answered=true;
@@ -963,7 +1382,27 @@ VIEWS.drill = (v) => {
     fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
     if(!ok)c.classList.add("shake");
   };
-  if (q.type==="mc"){
+  if (q.type==="multi"){
+    c.appendChild(el("div",{class:"multi-hint"},"Choose every true statement, then press Check."));
+    const ch=el("div",{class:"choices"});
+    const selected=new Set();
+    q.choices.forEach((txt,i)=>{
+      const b=el("button",{class:"choice",onclick:(e)=>{
+        if(D.answered)return;
+        if(selected.has(i)){selected.delete(i);e.currentTarget.classList.remove("selected");e.currentTarget.innerHTML="☐ &nbsp;"+txt;}
+        else{selected.add(i);e.currentTarget.classList.add("selected");e.currentTarget.innerHTML="☑ &nbsp;"+txt;}
+      }},"☐ &nbsp;"+txt);
+      ch.appendChild(b);
+    });
+    c.appendChild(ch);
+    c.appendChild(el("button",{class:"btn",style:"margin-top:12px",onclick:()=>{
+      if(D.answered||!selected.size)return;
+      const correct=new Set(q.answer);
+      const ok=selected.size===correct.size&&[...selected].every(i=>correct.has(i));
+      [...ch.children].forEach((b,i)=>{b.disabled=true;if(correct.has(i))b.classList.add("reveal-right");else if(selected.has(i))b.classList.add("picked-wrong");});
+      finish(ok,"");
+    }},"Check selections"));
+  } else if (q.type==="mc"){
     const ch=el("div",{class:"choices"});
     const order=shuffle(q.choices.map((txt,i)=>({txt,i})));
     order.forEach(o=>{
@@ -1102,7 +1541,7 @@ VIEWS.map = (v) => {
       '<div style="flex:20;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">LAB 20</div>'+
       '<div style="flex:20;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">JRNL 20</div>'+
       '<div style="flex:10;display:flex;align-items:center;justify-content:center;background:var(--paper2);border-right:1.5px solid var(--ink)">PPT 10</div>'+
-      '<div style="flex:30;display:flex;align-items:center;justify-content:center;background:var(--gold)">MIDTERM 30</div>'+
+      '<div style="flex:30;display:flex;align-items:center;justify-content:center;background:var(--gold);color:#07131B">MIDTERM 30</div>'+
     '</div>'+
     '<p class="muted">Plus +4% extra-credit paper. Absolute scale or curve, whichever helps you. <b>No final exam.</b> 70% is earned by doing the drip — impossible to cram, impossible to recover once missed.</p>';
   v.appendChild(gr);
