@@ -6,7 +6,33 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.66  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.69  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.69 (2026-09-12, Sat): PLAIN-LANGUAGE PROGRESSIVE HINTS. Every standard drill,
+        guided set, diagnostic, and mastery-bank question now offers one thinking step at a
+        time. Hints translate loaded vocabulary first, then apply the topic's reusable procedure;
+        the answer is never simply revealed. Different questions receive different hint counts.
+        Every completed attempt records exact hint count (including zero), opened step numbers,
+        and optional “helped / still unclear” feedback. Hint use remains teaching evidence but
+        cannot count as clean cold mastery or readiness. Attempt history and report export surface
+        the hint pattern so future wording/scaffold decisions can follow learner use. DEPLOY
+        PENDING; awaiting learner evidence on clarity.
+  v3.68 (2026-09-12, Sat): ONE-SCREEN START + FIVE-TAB NAV. The opening view now keeps
+        one mission above the fold. If a flight is paused, it becomes the entire primary card:
+        one progress line and one Resume button; duplicate paused cards no longer compete below.
+        Alternative drills, diagnostics, deadlines, Canvas, and metrics are collapsed into three
+        plainly named drawers. The bottom bar now follows the learner workflow—Today, Learn,
+        Practice, Exam, More—instead of exposing seven internal destinations. Plan, Cheat Sheet,
+        Report, account switching, cloud status, and version information moved into More. The
+        header now shows only course identity, exam timing, and More. DEPLOY PENDING; awaiting
+        learner evidence.
+  v3.67 (2026-09-12, Sat): LEARN → PRACTICE → PROVE. Rebuilt Today around one active
+        25-minute block chosen from the Exam 1 route. Every skill flight now starts with a
+        named, direct video and a compact vocabulary/rule decoder, moves into five supported
+        questions, and ends with the cold flight check. Mock flights explicitly stay cold and
+        skip video preparation. Paused work wins over every recommendation. Secondary metrics,
+        deadlines, Canvas updates, and optional tools remain available but folded below the path.
+        This implements the Learning Profile's decision-removal, small-block, rules-first, and
+        exposure-is-not-mastery constraints. DEPLOY PENDING; awaiting learner evidence.
   v3.66 (2026-09-12, Sat): AROMATIC ATTACHMENT REPAIR. Nine related layouts now attach
         side groups to actual ring carbon vertices. Para/ortho relationships and electron dots
         remain explicit. No question IDs, choices, answer keys, or learner storage changed.
@@ -1277,6 +1303,19 @@ nav button.active .ico{opacity:1}
 
 /* Question reading and answering are the app's main job. */
 .qprompt{font-size:1.06rem;line-height:1.62;margin:12px 0 16px}
+.hint-coach{border:1px solid #b9c8ce;border-radius:10px;background:#f8fafb;padding:.85rem;margin:.8rem 0 1rem}
+.hint-coach-head{display:flex;align-items:flex-start;gap:10px}
+.hint-coach-head>span{font-size:1.25rem;line-height:1.2}
+.hint-coach-head b{display:block;font-size:.92rem}
+.hint-coach-head small{display:block;color:var(--muted-tx);font-size:.76rem;line-height:1.4;margin-top:2px}
+.hint-list{display:grid;gap:7px;margin-top:.7rem}
+.hint-step{border-left:4px solid var(--gold);background:#fff;padding:.65rem .75rem;font-size:.88rem;line-height:1.5}
+.hint-step b{display:block;color:#684200;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.hint-feedback{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:.45rem}
+.hint-feedback>span{font-size:.74rem;color:var(--muted-tx)}
+.hint-feedback button{min-height:32px;padding:4px 8px;font-size:.72rem}
+.hint-next{width:100%;margin-top:.7rem}
+.hint-assisted{color:#81242c!important}
 .choices{gap:10px}
 .choice{
   min-height:48px;
@@ -1361,12 +1400,74 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* v3.67 — Gabe's path is a working surface, not another dashboard. */
+.learning-path{border:2px solid var(--teal);background:#fff;padding:1.1rem;margin-bottom:1rem}
+.path-kicker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.5rem}
+.path-kicker .tag{margin:0}
+.path-title{font-size:1.55rem;line-height:1.18;margin:.2rem 0 .45rem}
+.path-now{font-size:1rem;line-height:1.55;margin:0 0 1rem;color:var(--sec-tx)}
+.path-goals{margin:.75rem 0}
+.path-goal{border-left:4px solid var(--teal);background:#f0f3f4;padding:.7rem .8rem;min-width:0}
+.path-goal b{display:block;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:var(--teal-dk);margin-bottom:3px}
+.path-goal span{display:block;font-size:.86rem;line-height:1.42}
+.path-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:1rem 0}
+.path-step{border:1px solid #c7d1d5;border-radius:10px;padding:.8rem;background:#f6f8f8;min-width:0}
+.path-step.active{border:2px solid var(--teal);background:var(--accent-bg)}
+.path-step.done{border-color:#9bc4ab;background:var(--success-bg)}
+.path-step-num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#dbe3e6;color:var(--sec-tx);font-weight:800;margin-bottom:.45rem}
+.path-step.active .path-step-num{background:var(--teal);color:#fff}
+.path-step.done .path-step-num{background:var(--ok);color:#fff}
+.path-step b{display:block;font-size:.92rem;margin-bottom:.2rem}
+.path-step span{display:block;font-size:.8rem;line-height:1.42;color:var(--muted-tx)}
+.path-finish{font-size:.84rem;color:var(--sec-tx);margin:.55rem 0 0!important}
+.path-action{border-top:1px solid #d8e0e3;padding-top:1rem}
+.path-action h3{font-size:1.05rem;margin:0 0 .35rem}
+.path-action p{line-height:1.55;margin:0 0 .8rem}
+.path-resource{display:flex;align-items:flex-start;gap:10px;border:1px solid #b9c8ce;border-radius:10px;padding:.8rem;background:#f8fafb;margin:.65rem 0}
+.path-resource-icon{font-size:1.35rem;line-height:1.2}
+.path-resource-copy{min-width:0;flex:1}
+.path-resource-copy b{display:block;margin-bottom:2px}
+.path-resource-copy span{display:block;color:var(--muted-tx);font-size:.82rem;line-height:1.4}
+.path-link{color:var(--teal-dk);font-weight:800;text-decoration:underline;text-underline-offset:2px}
+.path-decoder{background:#f0f3f4;border-left:4px solid var(--gold);padding:.7rem .8rem;margin:.75rem 0;font-size:.88rem;line-height:1.5}
+.path-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:.75rem}
+.path-controls .btn:first-child{font-size:1rem;min-height:50px;padding-inline:1.1rem}
+.path-stop{font-size:.8rem;color:var(--muted-tx);margin-top:.7rem!important}
+.home-secondary{margin-top:.75rem}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.app-title{display:flex;align-items:center;gap:8px;min-width:0}
+.app-title-copy{display:flex;flex-direction:column;line-height:1.1}
+.app-title-copy small{font-size:.66rem;font-weight:650;color:var(--muted-tx);margin-top:4px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.header-more{display:grid;place-items:center;width:42px;height:42px;padding:0;border:1px solid #aeb9bf;border-radius:10px;background:#fff;color:var(--ink);font-size:1.2rem;font-weight:800;cursor:pointer}
+.home-fold-stack{display:grid;gap:.7rem;margin-top:.85rem}
+.home-fold-stack .home-section{margin:0}
+.more-grid{display:grid;gap:10px;margin-top:1rem}
+.more-link{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:68px;padding:10px 12px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;cursor:pointer}
+.more-link:hover{background:#f1f4f5}
+.more-link-icon{font-size:1.3rem;text-align:center}
+.more-link b{display:block;font-size:.95rem}
+.more-link span:not(.more-link-icon){display:block;color:var(--muted-tx);font-size:.78rem;line-height:1.35;margin-top:2px}
+.more-link::after{content:"›";font-size:1.4rem;color:var(--muted-tx)}
+@media(max-width:680px){
+  .path-title{font-size:1.35rem}
+  .learning-path{padding:.95rem}
+  .path-now{margin-bottom:.7rem}
+  .path-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:.75rem 0}
+  .path-step{padding:.55rem .35rem;text-align:center}
+  .path-step-num{margin:0 auto .25rem}
+  .path-step span{display:none}
+  .path-step b{font-size:.78rem;margin:0}
+  .path-resource{padding:.65rem;margin:.5rem 0}
+  .path-controls .btn{width:100%}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1><span class="flask">⚗️</span>CHEM 231 · Ochem Bootcamp <span style="font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:1.5px;background:var(--violet);color:#fff;border-radius:6px;padding:3px 8px;vertical-align:middle;margin-left:6px">CHAPTER 3</span></h1>
-  <span style="display:flex;gap:8px;align-items:center"><a class="menubtn" id="menubtn" href="./">⌂ Menu</a><span id="verbadge" style="font-family:var(--mono);font-size:.75rem;color:var(--muted-tx)" title="app version — if Claude says a newer number, refresh the page">v3.66</span><span id="syncdot" style="font-family:var(--mono);font-size:.75rem;color:#6b5a2b">◌ syncing…</span><span id="whoami" style="display:inline-flex;gap:6px;align-items:center"></span><span class="countdown" id="countdown"></span></span>
+  <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open more options">•••</button><span id="verbadge" class="sr-only">v3.69</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1419,6 +1520,17 @@ function mergeRemote(remote){
     const flightKey=x=>x.runId||[x.setId,x.date,x.right,x.total,x.activeSec].join("|");
     const fr=new Map([...(remote.flightRuns||[]),...(S.flightRuns||[])].map(x=>[flightKey(x),x]));
     S.flightRuns=[...fr.values()].slice(-80);
+  }
+  if(remote.flightPrep){
+    S.flightPrep=S.flightPrep||{};
+    Object.entries(remote.flightPrep).forEach(([id,x])=>{
+      const local=S.flightPrep[id]||{};
+      S.flightPrep[id]={
+        learnedAt:Math.max(local.learnedAt||0,x.learnedAt||0),
+        practicedAt:Math.max(local.practicedAt||0,x.practicedAt||0),
+        practicePct:(x.practicedAt||0)>(local.practicedAt||0)?x.practicePct:local.practicePct
+      };
+    });
   }
   if(remote.masteryDays){ const md=S.masteryDays||{}; Object.keys(remote.masteryDays).forEach(k=>{ md[k]=[...new Set([...(remote.masteryDays[k]||[]), ...(md[k]||[])])]; }); S.masteryDays=md; } // v3.16: union per topic
   if (remote.firstSeen) S.firstSeen = Math.min(S.firstSeen||remote.firstSeen, remote.firstSeen); // v3.51: earliest ever
@@ -1487,7 +1599,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, flightRuns:S.flightRuns, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null, firstSeen:S.firstSeen||Date.now(), lastSeen:Date.now()},
+      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, flightRuns:S.flightRuns, flightPrep:S.flightPrep, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, pausedDrill:S.pausedDrill, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null, firstSeen:S.firstSeen||Date.now(), lastSeen:Date.now()},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -1792,7 +1904,7 @@ function diagCriticalAudit(D){
   const logs=D.log||[],bondEvidence=D.bondBuildEvidence||{},resEvidence=D.resLabEvidence||{};
   return (D.diagCriticalIds||[]).map(id=>{
     const rec=logs.slice().reverse().find(x=>x.id===id),role=(D.diagRoles||{})[id]||id;
-    let ok=!!rec&&rec.ok&&!rec.g&&!rec.dk,detail="answer must be correct without a guess flag";
+    let ok=!!rec&&rec.ok&&!rec.g&&!rec.dk&&!(rec.h>0),detail="answer must be correct without guesses or hints";
     const bondKeys=(D.diagBondRequirements||{})[id]||[];
     if(bondKeys.length){
       const ev=bondEvidence[id]||[];
@@ -3964,6 +4076,7 @@ const S = {
   adaptiveRuns: safeStore.get("adaptiveRuns", []), // v3.25: planner pick/outcome audit trail, local only (cap 60)
   adaptiveReviews: safeStore.get("adaptiveReviews", []), // v3.25: slow-right spaced-retrieval queue, local only (cap 120)
   flightRuns: safeStore.get("flightRuns", []), // v3.64: completed Exam-1 runs; routing and strict 100% target are stored separately
+  flightPrep: safeStore.get("flightPrep", {}), // v3.67: exposure/practice steps; neither counts as mastery
   practiceOpen: safeStore.get("practiceOpen", null), // v3.27: which Practice chapters are expanded {chId:bool}; null = seed with course-current only
   firstSeen: safeStore.get("firstSeen", null), lastSeen: safeStore.get("lastSeen", null), // v3.51: usage stamps (epoch ms)
   pinHash: safeStore.get("pinHash", null),         // v3.47: this profile's PIN hash (mirrors the cloud row)
@@ -4016,18 +4129,18 @@ function dedupeWrLog(items){
 initLegacyQstats(); rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
 function save(){
   rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
-  safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("resDone",S.resDone); safeStore.set("resRuns",S.resRuns); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); safeStore.set("flightRuns",S.flightRuns); safeStore.set("pinHash",S.pinHash); if(!S.firstSeen) S.firstSeen=Date.now(); S.lastSeen=Date.now(); safeStore.set("firstSeen",S.firstSeen); safeStore.set("lastSeen",S.lastSeen); cloudPush(false);
+  safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("resDone",S.resDone); safeStore.set("resRuns",S.resRuns); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); safeStore.set("flightRuns",S.flightRuns); safeStore.set("flightPrep",S.flightPrep); safeStore.set("pinHash",S.pinHash); if(!S.firstSeen) S.firstSeen=Date.now(); S.lastSeen=Date.now(); safeStore.set("firstSeen",S.firstSeen); safeStore.set("lastSeen",S.lastSeen); cloudPush(false);
 }
 /* v3.4.1: rounds pause, never die. Snapshot after every answer; restore from Home. */
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
-  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, scopeName:D.scopeName||"", scopeTopics:D.scopeTopics||[], masteryTopic:D.masteryTopic||"", focusSetId:D.focusSetId||"", focusStartedAt:D.focusStartedAt||0, log:D.log||[], runId:D.runId||"", diagVersion:D.diagVersion||0, diagRoles:D.diagRoles||{}, diagCriticalIds:D.diagCriticalIds||[], diagBondRequirements:D.diagBondRequirements||{}, diagResonanceRequirements:D.diagResonanceRequirements||{}, bondBuildEvidence:D.bondBuildEvidence||{}, resLabEvidence:D.resLabEvidence||{}, adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, bondStructuresBuilt:D.bondStructuresBuilt||{}, ts:Date.now()};
+  else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, hinted:D.hinted||0, hintState:D._hintState||null, scopeName:D.scopeName||"", scopeTopics:D.scopeTopics||[], masteryTopic:D.masteryTopic||"", focusSetId:D.focusSetId||"", pathPracticeFor:D.pathPracticeFor||"", focusStartedAt:D.focusStartedAt||0, log:D.log||[], runId:D.runId||"", diagVersion:D.diagVersion||0, diagRoles:D.diagRoles||{}, diagCriticalIds:D.diagCriticalIds||[], diagBondRequirements:D.diagBondRequirements||{}, diagResonanceRequirements:D.diagResonanceRequirements||{}, bondBuildEvidence:D.bondBuildEvidence||{}, resLabEvidence:D.resLabEvidence||{}, adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, bondStructuresBuilt:D.bondStructuresBuilt||{}, ts:Date.now()};
   safeStore.set("pausedDrill", S.pausedDrill);
 }
 function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
   const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
-  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, scopeName:p.scopeName, scopeTopics:p.scopeTopics||[], masteryTopic:p.masteryTopic||"", focusSetId:p.focusSetId||"", focusStartedAt:p.focusStartedAt||0, log:p.log||[], runId:p.runId||"", diagVersion:p.diagVersion||0, diagRoles:p.diagRoles||{}, diagCriticalIds:p.diagCriticalIds||[], diagBondRequirements:p.diagBondRequirements||{}, diagResonanceRequirements:p.diagResonanceRequirements||{}, bondBuildEvidence:p.bondBuildEvidence||{}, resLabEvidence:p.resLabEvidence||{}, adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}, bondStructuresBuilt:p.bondStructuresBuilt||{}}; // v3.64: flight identity and first-audit construction evidence survive pause/resume
+  S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, hinted:p.hinted||0, _hintState:p.hintState||null, scopeName:p.scopeName, scopeTopics:p.scopeTopics||[], masteryTopic:p.masteryTopic||"", focusSetId:p.focusSetId||"", pathPracticeFor:p.pathPracticeFor||"", focusStartedAt:p.focusStartedAt||0, log:p.log||[], runId:p.runId||"", diagVersion:p.diagVersion||0, diagRoles:p.diagRoles||{}, diagCriticalIds:p.diagCriticalIds||[], diagBondRequirements:p.diagBondRequirements||{}, diagResonanceRequirements:p.diagResonanceRequirements||{}, bondBuildEvidence:p.bondBuildEvidence||{}, resLabEvidence:p.resLabEvidence||{}, adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}, bondStructuresBuilt:p.bondStructuresBuilt||{}}; // v3.69: path-practice + current hint step survive pause/resume
   go("drill");
 }
 /* v3.14: the FC mastery gate pauses too. It was the one multi-step run with no exit —
@@ -4105,7 +4218,8 @@ const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Ob
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function confetti(){ const c=$("#confetti"); const em=["🎉","⚗️","✨","🧪","💥","⭐️"]; for(let i=0;i<26;i++){ const s=document.createElement("span"); s.textContent=em[Math.floor(Math.random()*em.length)]; s.style.left=(Math.random()*100)+"%"; s.style.animationDelay=(Math.random()*.4)+"s"; c.appendChild(s); setTimeout(()=>s.remove(),1900);} }
 function daysUntilClass(){ const ms=new Date(CLASS_START+"T00:00:00")-new Date(); return Math.ceil(ms/86400000); }
-function accuracy(){ let r=0,w=0,g=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;g+=(s.gr||0);}); const t=r+w; const clean=r-g;
+function hintedRightNotGuessed(topic){return (S.attempts||[]).filter(a=>a.ok&&!a.g&&a.h>0&&(!topic||a.t===topic)).length;}
+function accuracy(){ let r=0,w=0,g=0; Object.values(S.qstats).forEach(s=>{r+=s.r;w+=s.w;g+=(s.gr||0);}); g+=hintedRightNotGuessed(); const t=r+w; const clean=r-g;
   return {r,w,g,t,pct:t?Math.round(100*r/t):0, cleanPct:t?Math.round(100*Math.max(0,clean)/t):0}; }
 /* v3.25: two different questions, two different signals.
    - itemDifficulty = the authored property of the item (0 trivial → 3 hard)
@@ -4140,6 +4254,9 @@ function logAttempt(q,ok,guessed,D,dk,ans){
   if(dk) ev.dk=1; // v3.5: "I don't know yet" — never learned ≠ guessed ≠ misconception
   if(D&&D.cold) ev.c=1; // diagnostics/mastery retain heavier evidence weight without adapting their questions
   if(D&&D.runId) ev.u=D.runId;
+  const hu=hintUse(D,q); ev.h=hu.count; // v3.69: explicit zero matters—unassisted work is evidence too
+  if(hu.steps.length)ev.hs=hu.steps;
+  if(hu.feedback)ev.hf=hu.feedback;
   if(D&&D.assignmentId) ev.as=D.assignmentId;
   // v3.11: record WHAT he actually answered, not just whether it was right. Without this the
   // history can say "✗ on l1g3" but never "you picked 109.5° like water" — and the wrong answer
@@ -4163,9 +4280,7 @@ const NAV = [
   {id:"learn", ico:"📖", label:"Learn"},
   {id:"practice", ico:"🎯", label:"Practice"},
   {id:"exam",  ico:"📊", label:"Exam"},
-  {id:"track", ico:"🗓️", label:"Plan"},
-  {id:"cheat", ico:"📌", label:"Cheat"},
-  {id:"report",ico:"📤", label:"Report"},
+  {id:"more", ico:"•••", label:"More"},
 ];
 // v2.12: full written exam PDFs (committed to the repo, so linkable from any device)
 const EXAM_READINESS = "./readiness.pdf";
@@ -4257,7 +4372,7 @@ const LESSONS = {
     links:[{l:"Khan Academy — states of matter & intermolecular forces",u:"https://www.khanacademy.org/science/chemistry/states-of-matter-and-intermolecular-forces"},{l:"The Organic Chemistry Tutor — intermolecular forces",u:"https://www.youtube.com/watch?v=QdwzMPwPA3I"}] },
 };
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
-const NAV_GROUP={lab:"practice",bondlab:"practice",reslab:"practice",drill:"practice",mastery:"practice",attempts:"report"}; // active-tab highlight for sub-views (v3.46: all three drawing labs live under Practice)
+const NAV_GROUP={lab:"practice",bondlab:"practice",reslab:"practice",drill:"practice",mastery:"practice",track:"more",cheat:"more",report:"more",attempts:"more"}; // v3.68: secondary utilities live under More; labs and drills remain Practice
 function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
   // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
@@ -4268,6 +4383,30 @@ function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view
 
 /* ================= VIEWS ================= */
 const VIEWS = {};
+
+VIEWS.more = (v) => {
+  const c=el("section",{class:"card"});
+  c.innerHTML='<span class="tag teal">MORE</span><h2 style="margin:4px 0">Tools and account</h2><p class="muted" style="margin:0">These are useful, but none of them is where you need to start studying. Today always holds your next step.</p>';
+  const grid=el("div",{class:"more-grid"});
+  [
+    ["🗓️","Plan","See the course schedule and longer runway","track"],
+    ["📌","Cheat sheet","Open your compact rules and exam-card builder","cheat"],
+    ["📤","Progress report","See attempts, evidence, and export options","report"]
+  ].forEach(x=>{
+    const b=el("button",{class:"more-link",onclick:()=>go(x[3])});
+    b.innerHTML='<span class="more-link-icon">'+x[0]+'</span><span><b>'+x[1]+'</b><span>'+x[2]+'</span></span>';
+    grid.appendChild(b);
+  });
+  c.appendChild(grid); v.appendChild(c);
+  const account=el("section",{class:"card cream"});
+  const status=cloudState==="synced"?"Cloud saved":cloudState==="qa"?"QA preview · not saved":cloudState==="offline"?"Local only":"Syncing";
+  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.69</p>';
+  const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
+  if(PROFILE==="gabe"&&!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:ownerView},"View Sam"));
+  if(!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:switchProfile},"Switch profile"));
+  const menu=el("a",{class:"btn ghost",href:"./"},"Course menu"); row.appendChild(menu);
+  account.appendChild(row); v.appendChild(account);
+};
 
 /* ---- v2.5: FORMAL-CHARGE MASTERY CHECK (the external audit's transfer gate) ----
    Six species, cold, inputs labeled: bonds → lone pairs → FC for the key atom.
@@ -4378,26 +4517,24 @@ function homeFold(title,sub,nodes){
   const body=el("div",{class:"home-section-body"}); nodes.forEach(n=>body.appendChild(n)); d.appendChild(body); return d;
 }
 function organizeHome(v){
-  /* v3.30: Today used to be an append-only stream: deadlines, three announcements, pacing,
-     eleven progress bars, two resume cards, planner, two recommendations, another duplicate
-     recommendation, then four stats. Every component was useful; the flat hierarchy was not.
-     Reorder the same live nodes into a decision-first page and fold secondary detail. Moving
-     nodes preserves every event listener and data source. */
+  /* v3.68: Today is a launchpad, not a dashboard. The flightpath owns the first viewport.
+     Everything that does not answer "what do I do now?" is folded below it. */
   const nodes=[...v.children], used=new Set();
   const take=sel=>nodes.filter(n=>n.matches&&n.matches(sel)).map(n=>(used.add(n),n));
-  const resume=take(".home-resume"), diagnostic=take(".home-diagnostic"), actions=take(".home-actions"), adaptive=take(".home-adaptive"), deadlines=take(".home-due");
+  const path=take(".home-path"), resumeDrill=take(".home-resume-drill"), resumeOther=take(".home-resume:not(.home-resume-drill)"), diagnostic=take(".home-diagnostic"), actions=take(".home-actions"), adaptive=take(".home-adaptive"), deadlines=take(".home-due");
   const course=take(".home-updates,.home-pacing"), progress=take(".home-progress-detail,.home-stats");
   const rest=nodes.filter(n=>!used.has(n));
   v.innerHTML="";
-  const label=s=>v.appendChild(el("div",{class:"home-section-label"},s));
-  if(resume.length){label("Continue");const g=el("div",{class:"home-resume-grid"});resume.forEach(n=>g.appendChild(n));v.appendChild(g);}
-  if(diagnostic.length){label("Due today");diagnostic.forEach(n=>v.appendChild(n));}
-  if(actions.length){label("Choose one next step");actions.forEach(n=>v.appendChild(n));}
-  if(adaptive.length){label("Optional");adaptive.forEach(n=>v.appendChild(n));}
-  if(deadlines.length){label("Up next");deadlines.forEach(n=>v.appendChild(n));}
-  if(course.length)v.appendChild(homeFold("Course information","Canvas updates and weekly pacing",course));
-  if(progress.length)v.appendChild(homeFold("Progress details","Accuracy, topic bars and history totals",progress));
-  rest.forEach(n=>v.appendChild(n));
+  path.forEach(n=>v.appendChild(n));
+  /* A paused drill is already represented by the primary flightpath card. Do not show it twice. */
+  resumeDrill.forEach(n=>n.remove());
+  const folds=el("div",{class:"home-fold-stack"});
+  if(resumeOther.length)folds.appendChild(homeFold("Saved for later · "+resumeOther.length,"Another unfinished activity; your main mission above still comes first",resumeOther));
+  const choices=[...diagnostic,...actions,...adaptive];
+  if(choices.length)folds.appendChild(homeFold("Other study choices","Diagnostic, review, and alternate drills",choices));
+  const details=[...deadlines,...course,...progress,...rest];
+  if(details.length)folds.appendChild(homeFold("Dates, course, and progress","Deadlines, Canvas updates, pacing, and your numbers",details));
+  if(folds.children.length)v.appendChild(folds);
 }
 VIEWS.home = (v) => {
   const t = todayStr();
@@ -4440,13 +4577,13 @@ VIEWS.home = (v) => {
       (an.length?an.map(a=>'<div style="margin:6px 0"><b class="mono" style="font-size:.72rem">'+(a.date||"")+'</b> <b>'+(a.title||"")+'</b>'+(a.summary?'<br><span class="muted" style="font-size:.82rem">'+a.summary+'</span>':'')+'</div>').join(""):'<p class="muted" style="margin:6px 0 0">No recent announcements.</p>');
     v.appendChild(ac);
   }
-  renderExam1Flightpath(v);
+  renderLearningPath(v);
   // v3.5: 📖 PACING — the APP's deadlines: cover each chapter within its course week
   // (Gabe's spec: "this week we start Ch 2 and end Ch 2, even though the Ch 1 quiz is this week"),
   // plus a hard READINESS GATE before every quiz/exam.
   (function(){
     const wk=Math.max(courseWeek(),1); const wkRow=SEMESTER.find(x=>x.wk===wk);
-    const cleanPct=k=>{let r=0,w=0,g=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=(s.r||0);w+=(s.w||0);g+=(s.gr||0);}}});const tt=r+w;return tt?Math.round(100*Math.max(0,r-g)/tt):null;};
+    const cleanPct=k=>{let r=0,w=0,g=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=(s.r||0);w+=(s.w||0);g+=(s.gr||0);}}});g+=hintedRightNotGuessed(k);const tt=r+w;return tt?Math.round(100*Math.max(0,r-g)/tt):null;};
     const pc=el("div",{class:"card home-pacing"});
     let inner='<span class="tag gold">📖 Pacing · week '+wk+'</span>';
     if(wkRow){
@@ -4462,7 +4599,7 @@ VIEWS.home = (v) => {
     const cp=nextCheckpoint();
     if(cp&&daysTo(cp.date)<=7&&daysTo(cp.date)>=0){
       const R=readinessFor(cp);
-      inner+='<div class="why" style="margin-top:8px"><b>'+(R.ready?'🟢':'🔴')+' '+cp.name+' readiness · '+daysTo(cp.date)+'d out:</b> clean '+(R.avg===null?'—':R.avg+'%')+' across scope · rigorous 🎯 diagnostic: '+(R.lastScoped?R.lastScoped.pct+'% · '+R.lastScoped.criticalPassed+'/'+R.lastScoped.criticalTotal+' critical ('+fmtDay(R.lastScoped.date)+')':'<b>none for this exact scope</b>')+'.<br>Gate: <b>≥80% clean</b>, no untouched topic, diagnostic <b>≥80%</b>, zero guessed-rights, every tested area passing, and <b>every critical task clean</b>. '+(R.ready?'✅ Cleared — maintain, don\'t cram.':'Not cleared yet — take or repair the homework-level scoped diagnostic.')+'</div>';
+      inner+='<div class="why" style="margin-top:8px"><b>'+(R.ready?'🟢':'🔴')+' '+cp.name+' readiness · '+daysTo(cp.date)+'d out:</b> clean '+(R.avg===null?'—':R.avg+'%')+' across scope · rigorous 🎯 diagnostic: '+(R.lastScoped?R.lastScoped.pct+'% · '+R.lastScoped.criticalPassed+'/'+R.lastScoped.criticalTotal+' critical ('+fmtDay(R.lastScoped.date)+')':'<b>none for this exact scope</b>')+'.<br>Gate: <b>≥80% clean</b>, no untouched topic, diagnostic <b>≥80%</b>, zero guessed or hint-assisted answers, every tested area passing, and <b>every critical task clean</b>. '+(R.ready?'✅ Cleared — maintain, don\'t cram.':'Not cleared yet — take or repair the homework-level scoped diagnostic.')+'</div>';
     }
     pc.innerHTML=inner; v.appendChild(pc);
   })();
@@ -4515,7 +4652,7 @@ VIEWS.home = (v) => {
     // v3.4.1: paused-round card — quitting/reloading never loses a round again
     if(S.pausedDrill && S.pausedDrill.ids && S.pausedDrill.i < S.pausedDrill.ids.length){
       const p=S.pausedDrill;
-      const rc=el("div",{class:"card cream home-resume"});
+      const rc=el("div",{class:"card cream home-resume home-resume-drill"});
       rc.innerHTML='<span class="tag coral">⏸ Continue</span><h3 style="margin:6px 0">'+(p.scopeName||"Round")+' · '+p.i+'/'+p.ids.length+' done</h3><p class="muted" style="margin:0 0 8px">'+p.right+' right · '+p.wrong+' wrong · saved.</p>';
       const rr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
       rr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeDrill()},"▶ Resume round"));
@@ -4526,7 +4663,7 @@ VIEWS.home = (v) => {
     // can be paused at the same time without either clobbering the other).
     if(S.pausedMastery && S.pausedMastery.names && S.pausedMastery.i < S.pausedMastery.names.length){
       const pm=S.pausedMastery;
-      const mc=el("div",{class:"card cream home-resume"});
+      const mc=el("div",{class:"card cream home-resume home-resume-mastery"});
       mc.innerHTML='<span class="tag coral">⏸ Continue</span><h3 style="margin:6px 0">⚖️ Formal-charge mastery · '+pm.i+'/'+pm.names.length+' done</h3><p class="muted" style="margin:0 0 8px">'+(pm.clean===false?'Already not-clean; finish for practice or discard.':'Still clean · saved at species '+(pm.i+1)+'.')+'</p>';
       const mr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
       mr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeMastery()},"▶ Resume mastery check"));
@@ -4539,7 +4676,7 @@ VIEWS.home = (v) => {
     // 📌 Cover = schedule-driven (this week's chapter; quiz-scope in final approach).
     // 🔧 Review = weakness-driven (misconceptions → dk/learn-first → weakest topic). ONE primary action each.
     (function(){
-      const tStats=k=>{let r=0,w=0,g=0,dk=0,cw=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=s.r||0;w+=s.w||0;g+=s.gr||0;dk+=s.dk||0;cw+=Math.max(0,(s.w||0)-(s.gw||0)-(s.dk||0));}}});const tt=r+w;return{clean:tt?Math.round(100*Math.max(0,r-g)/tt):null,att:tt,dk,cw};};
+      const tStats=k=>{let r=0,w=0,g=0,dk=0,cw=0;QUESTIONS.forEach(q=>{if(q.topic===k){const s=S.qstats[q.id];if(s){r+=s.r||0;w+=s.w||0;g+=s.gr||0;dk+=s.dk||0;cw+=Math.max(0,(s.w||0)-(s.gw||0)-(s.dk||0));}}});g+=hintedRightNotGuessed(k);const tt=r+w;return{clean:tt?Math.round(100*Math.max(0,r-g)/tt):null,att:tt,dk,cw};};
       const nm=k=>TOPICS[k]?(TOPICS[k].ico+" "+TOPICS[k].name):k;
       const cpT=nextCheckpoint(); const cpDays=cpT?daysTo(cpT.date):99;
       const wkRow=SEMESTER.find(x=>x.wk===Math.max(courseWeek(),1));
@@ -4789,12 +4926,12 @@ function topicEvidence(topic){
   const ev=(S.attempts||[]).filter(a=>a.t===topic&&a.ts>=cutoff&&QUESTIONS.some(q=>q.id===a.id));
   const ids=new Set(ev.map(a=>a.id)), tiers=new Set(ev.map(a=>{const q=QUESTIONS.find(x=>x.id===a.id);return q?Math.round(itemDifficulty(q)):null;})), exposures=new Set(ev.map(a=>{const q=QUESTIONS.find(x=>x.id===a.id);return q?exposureType(q):null;}));
   let earned=0,total=0;
-  ev.forEach(a=>{ const q=QUESTIONS.find(x=>x.id===a.id); if(!q)return; const e=exposureType(q), ew=e==="novel"?1.25:e==="similar"?1:.75, cold=a.c?1.3:1; total+=ew*cold; if(a.ok&&!a.g&&!a.dk)earned+=ew*cold; });
+  ev.forEach(a=>{ const q=QUESTIONS.find(x=>x.id===a.id); if(!q)return; const e=exposureType(q), ew=e==="novel"?1.25:e==="similar"?1:.75, cold=a.c?1.3:1; total+=ew*cold; if(a.ok&&!a.g&&!a.dk&&!(a.h>0))earned+=ew*cold; });
   const ds=ev.filter(a=>a.d>0).map(a=>a.d).sort((a,b)=>a-b), med=ds.length?ds[Math.floor(ds.length/2)]:null;
   const varied=ids.size>=3&&(tiers.size>=2||exposures.size>=2);
   const last=ev.length?Math.max(...ev.map(a=>a.ts)):0;
   return {topic,n:ev.length,unique:ids.size,varied,state:varied?"measured":"needs calibration",confidence:total?Math.round(100*earned/total):null,
-    clean:ev.filter(a=>a.ok&&!a.g&&!a.dk).length, guessed:ev.filter(a=>a.ok&&a.g&&!a.dk).length,
+    clean:ev.filter(a=>a.ok&&!a.g&&!a.dk&&!(a.h>0)).length, guessed:ev.filter(a=>a.ok&&a.g&&!a.dk).length, hinted:ev.filter(a=>a.h>0).length,
     wrong:ev.filter(a=>!a.ok).length, confidentWrong:ev.filter(a=>!a.ok&&!a.g&&!a.dk).length, dk:ev.filter(a=>a.dk).length,
     median:med,last,daysSince:last?Math.floor((Date.now()-last)/86400000):99,exposures};
 }
@@ -4894,18 +5031,19 @@ function startAdaptiveAssignment(plan){
 }
 function adaptiveBranch(D,q,attempt){
   if(!D.adaptive)return null;
-  const topicMed=medianSeconds((S.attempts||[]).filter(a=>a.t===q.topic&&a.d>0)), slow=!!(attempt.ok&&!attempt.g&&!attempt.dk&&attempt.d>Math.max(45,(topicMed||30)*1.5));
+  const topicMed=medianSeconds((S.attempts||[]).filter(a=>a.t===q.topic&&a.d>0)), slow=!!(attempt.ok&&!attempt.g&&!attempt.dk&&!(attempt.h>0)&&attempt.d>Math.max(45,(topicMed||30)*1.5));
   let signal,count,label;
   if(attempt.dk){signal="dont-know";count=2;label="learn first → scaffold";}
   else if(!attempt.ok&&!attempt.g){signal="confident-wrong";count=1;label="contrast the misconception";}
   else if(attempt.ok&&attempt.g){signal="guessed-right";count=1;label="same-level sibling";}
+  else if(attempt.ok&&attempt.h>0){signal="hinted-right";count=1;label="repeat with less help";}
   else if(slow){signal="slow-right";count=1;label="same level + spaced retrieval";}
   else {signal="clean-right";count=3;label="harder transfer";}
   const slots=Math.max(0,(D.assignmentTotal||ADAPTIVE_TOTAL)-(D.i+1)), take=Math.min(count,slots), answered=D.queue.slice(0,D.i+1).map(x=>x.id);
   let pool=QUESTIONS.filter(x=>x.type!=="written"&&x.id!==q.id&&x.topic===q.topic);
   const fam=CONCEPT_FAMILY[q.id];
   if(signal==="clean-right")pool=pool.filter(x=>exposureType(x)!=="exact"&&itemDifficulty(x)>=itemDifficulty(q));
-  else if(signal==="guessed-right"||signal==="slow-right")pool=pool.filter(x=>Math.abs(itemDifficulty(x)-itemDifficulty(q))<=1);
+  else if(signal==="guessed-right"||signal==="hinted-right"||signal==="slow-right")pool=pool.filter(x=>Math.abs(itemDifficulty(x)-itemDifficulty(q))<=1);
   else if(signal==="confident-wrong"&&fam){const same=pool.filter(x=>CONCEPT_FAMILY[x.id]===fam);if(same.length)pool=same;}
   else if(signal==="dont-know")pool=pool.filter(x=>itemDifficulty(x)<=itemDifficulty(q));
   if(pool.length<take)pool=QUESTIONS.filter(x=>x.type!=="written"&&x.id!==q.id&&(D.assignmentTopics||[]).includes(x.topic));
@@ -4997,6 +5135,142 @@ const EXAM1_FLIGHT_SETS=[
   {id:"exam1-flight-transfer",topic:"acidbase2",ico:"🛬",shortLabel:"5 · Written Part B",name:"Flight 5 — explain the chemistry on paper",blurb:"Four paper-style because-chains: atom versus orbital, positive-charge sign reversal, a complete proton transfer, and solvent leveling. Recognition cannot complete this flight.",includeWritten:true,match:q=>EXAM1_FLIGHT_IDS.paper.includes(q.id)},
   {id:"exam1-mock-b",topic:"acidbase2",ico:"🎯",shortLabel:"6 · Confirmation mock B",name:"Flight 6 — different 40-question / 80-minute confirmation",blurb:"A second fixed all-MC form with no repeated IDs from mock A. Use it after repair to test transfer rather than memory of Saturday's answers. Target: 100% unflagged inside 80 active minutes.",match:q=>EXAM1_MOCK_B_IDS.includes(q.id)},
 ];
+
+/* v3.67: the flightpath now includes instruction. Watching is exposure, five supported
+   questions are practice, and only the cold flight can provide readiness evidence. */
+const FLIGHT_GUIDES={
+  "exam1-flight-ops":{
+    goal:"I can add or remove H, update the charge, and draw electron arrows without hints.",
+    videoTitle:"Organic acid–base mechanisms",
+    videoBy:"Khan Academy · start here",
+    videoUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures/acid-base-review/v/organic-acid-base-mechanisms",
+    videoWhy:"Watch the arrows, not just the products: the tail starts on electrons, the base takes H, and the old H bond returns to its atom.",
+    extraTitle:"Curved-arrow notation — extra explanation",
+    extraUrl:"https://www.youtube.com/watch?v=UVpizSVIBX0",
+    decoder:"DEPROTONATE = remove H⁺; the bond electrons stay behind. PROTONATE = add H⁺ using a lone pair. Curved arrows show electrons, never the proton moving.",
+    rule:"Say ADD or REMOVE first. Predict the charge change. Then draw both arrows."
+  },
+  "exam1-mock-a":{
+    cold:true,
+    goal:"I get an honest baseline of what holds across Chapters 1–3; this mock diagnoses, it does not label me.",
+    decoder:"This is a measurement block, not a lesson. No videos, notes, or answer review first. Mark 🎲 if you guessed so the result stays honest.",
+    rule:"40 questions, 80 active minutes. Mark and move at two minutes."
+  },
+  "exam1-flight-stability":{
+    goal:"I can draw both conjugate bases and explain which one is more stable using the first deciding rule.",
+    videoTitle:"Resonance stabilization of a conjugate base",
+    videoBy:"The Organic Chemistry Tutor · primary video",
+    videoUrl:"https://www.youtube.com/watch?v=MAjy2WMkPHc",
+    videoWhy:"This connects electron delocalization to the exact question the exam asks: which conjugate base is more stable, and therefore which acid is stronger.",
+    extraTitle:"Khan: conjugate-base stability sequence",
+    extraUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures",
+    decoder:"CONJUGATE BASE = the structure after H⁺ is removed. STABLE BASE = weaker base. More stable conjugate base = stronger acid.",
+    rule:"Draw both conjugate bases first. Circle the negative charge. Compare: charge → atom → resonance → induction → orbital."
+  },
+  "exam1-flight-equilibrium":{
+    goal:"I can draw the products and predict the favored side from pKa or base stability, including solvent limits.",
+    videoTitle:"Using pKa values to predict equilibrium",
+    videoBy:"Khan Academy · 7:54",
+    videoUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures/acid-base-review/v/using-pka-values-to-predict-the-position-of-equilibrium-new",
+    videoWhy:"This gives the short exam rule: equilibrium favors the side with the weaker acid—the acid with the higher pKa.",
+    extraTitle:"Using a pKa table · 9:04",
+    extraUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures/modal/v/using-a-pka-table",
+    decoder:"LOW pKa = strong acid. HIGH pKa = weak acid. Equilibrium moves toward the higher-pKa acid and the more stable/weaker base.",
+    rule:"Label the acid on each side, compare their pKas, then point toward the higher pKa. Check solvent leveling last."
+  },
+  "exam1-flight-transfer":{
+    textOnly:true,
+    goal:"I can produce a complete structure-and-because-chain explanation from a blank page.",
+    videoTitle:"No new video for this flight",
+    videoBy:"Generation block · paper required",
+    videoWhy:"More watching now would create familiarity, not the written because-chain Part B requires. Read the recipe once, close it, then write from memory.",
+    decoder:"A complete because-chain names the changed species, locates its charge/lone pair, applies the first deciding rule, and links stability to acidity/basicity or equilibrium.",
+    rule:"Write the structure and explanation before looking at feedback. Recognition does not clear this flight."
+  },
+  "exam1-mock-b":{
+    cold:true,
+    goal:"I can transfer the full Exam 1 system to a different form: 100% unflagged within 80 active minutes.",
+    decoder:"Confirmation must stay separate from preparation. Do not watch a video or rehearse these items immediately before starting.",
+    rule:"40 questions, 80 active minutes, no notes. The mastery target is 100% unflagged—not merely finishing the route."
+  }
+};
+
+function startPathPractice(setId){
+  const st=EXAM1_FLIGHT_SETS.find(x=>x.id===setId); if(!st)return;
+  const checkIds=new Set(focusPool(st).map(q=>q.id));
+  let pool=QUESTIONS.filter(q=>q.topic===st.topic&&q.type!=="written"&&!checkIds.has(q.id));
+  pool=excludeRecentRounds(pool,5);
+  const seen=id=>((S.qstats[id]?.r)||0)+((S.qstats[id]?.w)||0);
+  pool=shuffle(pool).sort((a,b)=>(seen(a.id)?1:0)-(seen(b.id)?1:0)||qDiff(a)-qDiff(b));
+  const queue=pool.slice(0,5);
+  if(!queue.length){startFocusDrill(setId);return;}
+  S.drill={queue,i:0,right:0,wrong:0,topic:st.topic,answered:false,log:[],runId:makeRunId("path-practice"),scopeName:"Guided practice — "+st.shortLabel,pathPracticeFor:setId};
+  go("drill");
+}
+function finishFlightLearning(setId){
+  const p=S.flightPrep[setId]||(S.flightPrep[setId]={});
+  p.learnedAt=Date.now(); save(); startPathPractice(setId);
+}
+
+function renderLearningPath(v){
+  const states=EXAM1_FLIGHT_SETS.map(st=>({st,p:flightProgress(st)}));
+  const allRouted=states.every(x=>x.p.done), allTargets=states.every(x=>x.p.target);
+  let next=nextExam1Flight(states);
+  if(allRouted&&!allTargets){
+    const repair=states.filter(x=>!x.p.target&&!x.st.id.startsWith("exam1-mock-")).sort((a,b)=>((a.p.last?.pct)??-1)-((b.p.last?.pct)??-1));
+    next=repair[0]||states.find(x=>x.st.id==="exam1-mock-b")||next;
+  }
+  const st=next.st, prep=S.flightPrep[st.id]||{}, guide=FLIGHT_GUIDES[st.id]||{};
+  const paused=!!(S.pausedDrill&&S.pausedDrill.ids&&S.pausedDrill.i<S.pausedDrill.ids.length);
+  const stage=paused?(S.pausedDrill.pathPracticeFor?1:2):(guide.cold?2:(!prep.learnedAt?0:(!prep.practicedAt?1:2)));
+  const c=el("section",{class:"card learning-path home-path"});
+  if(paused){
+    const p=S.pausedDrill;
+    c.innerHTML='<div class="path-kicker"><span class="tag teal">TODAY\'S ONE JOB</span><span class="tag violet">saved</span></div><h2 class="path-title">Continue your flight</h2><p class="path-now">'+esc(p.scopeName||"Saved practice")+'</p><div class="path-goal"><b>Your place</b><span>'+(p.i||0)+' of '+p.ids.length+' complete · '+(p.right||0)+' right · '+(p.wrong||0)+' wrong</span></div>';
+    const a=el("div",{class:"path-action",style:"margin-top:1rem"});
+    a.innerHTML='<h3>Pick up exactly where you stopped</h3><p>Nothing else needs your attention until this loop is closed.</p>';
+    a.appendChild(el("button",{class:"btn coral",onclick:()=>resumeDrill()},"▶ Resume saved work"));
+    const d=el("details",{class:"mini-details"}); d.innerHTML='<summary>What comes after this?</summary><p class="muted">Review the misses, then Today will reveal the next Learn → Practice → Prove step automatically.</p>'; a.appendChild(d);
+    c.appendChild(a); v.appendChild(c); return;
+  }
+  c.innerHTML='<div class="path-kicker"><span class="tag teal">TODAY\'S MISSION</span><span class="tag '+(allTargets?'teal':allRouted?'gold':'violet')+'">'+(allTargets?'mastery target met':allRouted?'route complete · strengthening':'flight '+(states.indexOf(next)+1)+' of '+states.length)+'</span></div>'+
+    '<h2 class="path-title">'+(allTargets?'Protect the result':allRouted?'Turn the weakest flight clean':esc(st.shortLabel))+'</h2>'+
+    '<p class="path-now">'+(guide.cold?'This is a cold check: start without a video so the score is honest.':'One 25-minute block. Follow the three steps below; the app remembers your place.')+'</p>'+
+    '<div class="path-goals"><div class="path-goal"><b>Today\'s goal</b><span>'+esc(guide.goal||st.blurb)+'</span></div><p class="path-finish"><b>Done when:</b> '+(stage===0?'close the lesson and say the rule in your own words':stage===1?'finish five supported questions and review their explanations':'finish the flight and review every miss')+'</p></div>';
+  const steps=el("div",{class:"path-steps"});
+  [
+    ["1","Learn","Short input + vocabulary","Watching is exposure, not mastery"],
+    ["2","Practice","5 supported questions","Misses teach; they do not fail you"],
+    ["3","Prove","Cold flight check","This is the evidence that advances you"]
+  ].forEach((x,i)=>{
+    const skipped=guide.cold&&i<2, done=!skipped&&i<stage;
+    const d=el("div",{class:"path-step "+(i===stage?"active":done?"done":"")});
+    d.innerHTML='<span class="path-step-num">'+(done?'✓':skipped?'—':x[0])+'</span><div><b>'+x[1]+(skipped?' · skipped for a cold mock':'')+'</b><span>'+(skipped?'No prep immediately before measurement.':i===stage?x[2]:x[3])+'</span></div>';
+    steps.appendChild(d);
+  });
+  c.appendChild(steps);
+  const a=el("div",{class:"path-action"});
+  if(paused){
+    a.innerHTML='<h3>Finish: '+esc(S.pausedDrill.scopeName||"saved round")+'</h3><p>'+(S.pausedDrill.i||0)+' of '+S.pausedDrill.ids.length+' complete. Nothing else in the app is more urgent than closing this loop.</p>';
+    a.appendChild(el("button",{class:"btn coral",onclick:()=>resumeDrill()},"▶ Resume saved work"));
+  }else if(stage===0){
+    a.innerHTML='<h3>Step 1 · '+esc(guide.videoTitle||"Learn the rule")+'</h3><div class="path-resource"><span class="path-resource-icon">▶️</span><div class="path-resource-copy"><b>'+esc(guide.videoBy||"Short lesson")+'</b><span>'+esc(guide.videoWhy||"")+'</span></div></div>';
+    const row=el("div",{class:"path-controls"});
+    if(guide.videoUrl){const watch=el("a",{class:"btn coral",href:guide.videoUrl,target:"_blank",rel:"noopener"},guide.textOnly?"Open the reading ↗":"▶ Watch the exact video ↗");row.appendChild(watch);}
+    row.appendChild(el("button",{class:"btn ghost",onclick:()=>finishFlightLearning(st.id)},guide.textOnly?"Done reading — practice →":"Done watching — practice →")); a.appendChild(row);
+    const help=el("details",{class:"mini-details"}); help.innerHTML='<summary>Rule, vocabulary, and backup video</summary><div class="path-decoder"><b>Decode:</b> '+esc(guide.decoder||"")+'</div><p class="muted"><b>Rule:</b> '+esc(guide.rule||"")+'</p>'+(guide.extraUrl?'<p class="muted">Need another explanation? <a class="path-link" href="'+guide.extraUrl+'" target="_blank" rel="noopener">'+esc(guide.extraTitle)+' ↗</a></p>':'')+'<button class="btn ghost small" type="button" onclick="go(\'learn\')">Open the full lesson</button>'; a.appendChild(help);
+  }else if(stage===1){
+    a.innerHTML='<h3>Now use it with support</h3><p>Do five questions. Read each explanation after answering. This is where the video turns into a usable rule.</p><div class="path-decoder"><b>Keep beside you:</b> '+esc(guide.rule||guide.decoder||"")+'</div>';
+    a.appendChild(el("button",{class:"btn coral",onclick:()=>startPathPractice(st.id)},"▶ Start 5 guided questions"));
+  }else{
+    a.innerHTML='<h3>'+(guide.cold?'Start cold: ':'Prove it: ')+esc(st.name)+'</h3><p>'+esc(guide.decoder||st.blurb)+'</p><div class="path-decoder"><b>Success rule:</b> '+esc(guide.rule||"Answer without notes and review every miss.")+'</div>';
+    const row=el("div",{class:"path-controls"});
+    row.appendChild(el("button",{class:"btn coral",onclick:()=>startFocusDrill(st.id)},guide.cold?"▶ Start the cold mock":"▶ Start the flight check"));
+    if(!guide.cold)row.appendChild(el("button",{class:"btn ghost",onclick:()=>startPathPractice(st.id)},"Practice 5 more first"));
+    a.appendChild(row);
+  }
+  c.appendChild(a); v.appendChild(c);
+}
 const FOCUS_SETS=[
   ...EXAM1_FLIGHT_SETS,
   {id:"acidbase-source-batch8", topic:"acidbase2", ico:"📚", shortLabel:"All 54 source patterns",
@@ -5088,7 +5362,7 @@ const FOCUS_SETS=[
 ];
 function focusPool(st){ return QUESTIONS.filter(q=>st.match(q)&&(st.includeWritten||q.type!=="written")); }
 function focusSeen(st){ return focusPool(st).filter(q=>((S.qstats[q.id]?.r)||0)+((S.qstats[q.id]?.w)||0)>0).length; }
-function latestCleanAttempt(id){ const a=(S.attempts||[]).slice().reverse().find(x=>x.id===id); return !!(a&&a.ok&&!a.g&&!a.dk); }
+function latestCleanAttempt(id){ const a=(S.attempts||[]).slice().reverse().find(x=>x.id===id); return !!(a&&a.ok&&!a.g&&!a.dk&&!(a.h>0)); }
 function latestFlightRun(setId){ return (S.flightRuns||[]).slice().reverse().find(x=>x.setId===setId)||null; }
 function flightProgress(st){
   const pool=focusPool(st), clean=pool.filter(q=>latestCleanAttempt(q.id)).length;
@@ -5101,9 +5375,8 @@ function flightProgress(st){
   return {total:pool.length,clean,last,runs:runs.length,target,done};
 }
 function nextExam1Flight(states){
-  const mockA=states.find(x=>x.st.id==="exam1-mock-a"),mockB=states.find(x=>x.st.id==="exam1-mock-b");
-  if(todayStr()>="2026-09-13"&&mockB&&!mockB.p.done)return mockB; // Sunday: transfer confirmation, regardless of unfinished repair flights
-  if(todayStr()>="2026-09-12"&&mockA&&!mockA.p.done)return mockA; // Saturday: collect exam-format evidence early
+  /* v3.67: a path means order. Calendar overrides made later tests jump ahead of the
+     instruction and repair needed to make them useful. */
   return states.find(x=>!x.p.done)||states[states.length-1];
 }
 function renderExam1Flightpath(v,compact=false){
@@ -5451,6 +5724,7 @@ const LEVEL_STYLE={gap:{ico:"🔴",label:"gap"},shaky:{ico:"🟡",label:"shaky"}
 function topicCleanPct(k){
   let r=0,w=0,g=0;
   QUESTIONS.forEach(q=>{ if(q.topic===k){ const s=S.qstats[q.id]; if(s){ r+=(s.r||0); w+=(s.w||0); g+=(s.gr||0); } } });
+  g+=hintedRightNotGuessed(k);
   const tt=r+w; return tt?Math.round(100*Math.max(0,r-g)/tt):null;
 }
 function scopeForCheckpoint(cp){
@@ -5471,7 +5745,7 @@ function readinessFor(cp){
   const weakest=testable.filter(k=>topicCleanPct(k)!==null).sort((a,b)=>topicCleanPct(a)-topicCleanPct(b)).slice(0,3);
   const lastScopedAny=S.diags.slice().reverse().find(d=>d.type==="scope");
   const lastScoped=S.diags.slice().reverse().find(d=>d.type==="scope"&&d.diagVersion>=READINESS_DIAG_VERSION&&sameTopicScope(d.scopeTopics,testable));
-  const diagOK=!!lastScoped&&lastScoped.passed===true&&lastScoped.pct>=80&&!(lastScoped.guessedRight>0)&&lastScoped.criticalTotal>0&&lastScoped.criticalPassed===lastScoped.criticalTotal&&!(lastScoped.topicGaps||[]).length;
+  const diagOK=!!lastScoped&&lastScoped.passed===true&&lastScoped.pct>=80&&!(lastScoped.guessedRight>0)&&!(lastScoped.hinted>0)&&lastScoped.criticalTotal>0&&lastScoped.criticalPassed===lastScoped.criticalTotal&&!(lastScoped.topicGaps||[]).length;
   const cleanOK=avg!==null&&avg>=80;
   const ready=cleanOK&&diagOK&&!untouched.length;
   const d=daysTo(cp.date);
@@ -5501,7 +5775,7 @@ VIEWS.exam = (v) => {
     '<tr><td class="mono">3</td><td>Brønsted AND Lewis definitions · spot conjugate pairs · will the reaction occur (pKa) · most acidic proton via conjugate-base stability (ARIO) · most BASIC compound via lone-pair availability · curly arrows for proton transfer · pick acids/bases for a job using pKa · LEVELING EFFECT in water · equilibrium position from pKa AND from base stability</td><td>⚖️ ARIO set · lw- Lewis items · AB3-arw arrow items · NEW ex1- base-ranking items · leveling: today\'s lecture</td></tr>'+
     '</table>'));
   /* v3.23: readiness board — every quiz/exam/final, not just the next one */
-  v.appendChild(el("div",{class:"card"},'<span class="tag gold">🚦 Readiness</span><h2>Am I ready — for each one?</h2><p class="muted">Two layers. <b>The gate</b> is mechanical: ≥80% clean across the checkpoint scope, no topic untouched, and a matching v3.56+ scoped diagnostic with ≥80% raw, zero guessed-rights, every tested area passing, and every critical construction/transfer task first-audit clean. A high total can no longer hide a failed essential skill. <b>Claude\'s read</b> adds judgment from your reports, rationales, and handwritten work.</p>'));
+  v.appendChild(el("div",{class:"card"},'<span class="tag gold">🚦 Readiness</span><h2>Am I ready — for each one?</h2><p class="muted">Two layers. <b>The gate</b> is mechanical: ≥80% clean across the checkpoint scope, no topic untouched, and a matching v3.56+ scoped diagnostic with ≥80% raw, zero guessed or hint-assisted answers, every tested area passing, and every critical construction/transfer task first-audit clean. A high total can no longer hide a failed essential skill. <b>Claude\'s read</b> adds judgment from your reports, rationales, and handwritten work.</p>'));
   (function(){
     const f=assessmentFreshness();
     const c=el("div",{class:"card"+(assessmentAgeDays()<=4?" cream":"")});
@@ -5527,7 +5801,7 @@ VIEWS.exam = (v) => {
         (past?'Done — kept here for the record.':
          R.ready?'✅ Gate cleared. Maintain, don\'t cram.':
          '<b>Blocking:</b> '+[ (!R.cleanOK?(R.avg===null?'no reps on this scope yet':'clean % is '+R.avg+', needs 80'):null),
-                               (!R.diagOK?(R.lastScoped?'diagnostic needs ≥80%, zero guessed-rights, every tested area passing, and every critical task clean':'take the new homework-level diagnostic for this exact scope'):null),
+                               (!R.diagOK?(R.lastScoped?'diagnostic needs ≥80%, zero guesses or hints, every tested area passing, and every critical task clean':'take the new homework-level diagnostic for this exact scope'):null),
                                (R.untouched.length?R.untouched.length+' scope topic'+(R.untouched.length===1?'':'s')+' never attempted':null)
                              ].filter(Boolean).join(' · '))+'</p>'+
       (!past&&R.weakest.length?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">Weakest in scope: '+R.weakest.map(k=>(TOPICS[k]?.ico||"")+" "+(TOPICS[k]?.name||k)+" "+(topicCleanPct(k))+"%").join(" · ")+'</p>':'')+
@@ -5577,6 +5851,92 @@ VIEWS.exam = (v) => {
     '<p class="muted" style="margin-top:8px">Also in your CHEM 231 → Exams folder.</p>';
   v.appendChild(wr);
 };
+
+/* v3.69 — Khan-style progressive hints. The bank may provide q.hints for a truly
+   question-specific path; otherwise these plain-language procedures teach the next move
+   without exposing the keyed answer. Hint use is assistance, never cold mastery. */
+const HINT_TERMS={
+  "conjugate base":"what remains after an acid loses H⁺",
+  "deprotonate":"remove H⁺; leave the old bond electrons on the atom",
+  "protonate":"use a lone pair to attach H⁺",
+  "intramolecular":"happening within one molecule",
+  "thiolate":"a sulfur-containing group carrying a negative charge",
+  "carboxylate":"the negatively charged form of a carboxylic acid",
+  "contributor":"one valid drawing of the same resonance hybrid",
+  "localized":"kept mainly on one atom",
+  "delocalized":"spread through connected p orbitals by resonance",
+  "induction":"electron pull through sigma bonds; distance weakens it quickly",
+  "favored":"the side present in greater amount at equilibrium",
+  "equilibrium":"a reversible reaction; compare the two sides",
+  "nucleophile":"electron-pair donor; look for a lone pair, negative charge, or pi bond",
+  "electrophile":"electron-pair acceptor; look for positive or partly positive character",
+  "ipso":"the ring carbon directly attached to the named group",
+  "ortho":"next-door ring positions",
+  "para":"opposite ring positions"
+};
+const HINT_PATHS={
+  valence:["Write the group-number electron count for each atom before doing any arithmetic.","Adjust the total for charge: add one electron for each −; subtract one for each +.","Add the contributions once more and make sure every atom and the overall charge were counted."],
+  lewis:["Count the total valence electrons first. Do not start drawing until this number is fixed.","Connect the skeleton with single bonds, then fill the outside atoms before the center.","If the center lacks an octet, turn a neighbor's lone pair into a multiple bond; then recount electrons and charges."],
+  isomers:["Ignore how the drawing is rotated. Trace which atom is bonded to which.","Check the molecular formulas. Different formulas means they are not isomers.","Same formula but different connections means constitutional isomers; same connections means the same compound or a stereochemical question."],
+  formal:["On the named atom, count bonds and lone PAIRS separately.","Use the atom's normal valence number: H 1, C 4, N 5, O 6, halogen 7.","Compute: valence − lone-pair electrons − number of bonds. A lone pair contributes two electrons."],
+  polarity:["Mark each polar bond toward the more electronegative atom.","Find the actual molecular shape—not just the electron arrangement.","Ask whether equal bond dipoles cancel by symmetry. If they do not cancel, the molecule is polar."],
+  hybrid:["Choose the atom being asked about and count electron domains around it. A multiple bond counts as one domain.","Map the count: 2 domains → sp; 3 → sp²; 4 → sp³.","For shape, name only atom positions. For angle, return to the domain count: 180°, 120°, or about 109.5°."],
+  imf:["List what each molecule can do: dispersion always; dipole–dipole if polar; hydrogen bonding only with the needed N/O/F–H pattern.","Compare the strongest intermolecular force first.","If the force type ties, compare size and surface contact; greater contact usually raises boiling point."],
+  bondline:["Mark every corner and line end as a carbon before counting anything else.","Add enough hidden H to give each carbon four bonds; heteroatoms and their H must be shown.","Trace one continuous chain at a time and verify branches, bond orders, atom count, and charge."],
+  fgroups:["Circle every carbonyl, C=O, first. This separates the easiest decision tree from the rest.","For each carbonyl carbon, inspect what is directly attached: C, H, OH, O–C, N, or halogen.","Then scan the remaining structure for C=C, C≡C, alcohol, ether, amine, halide, and nitrile. Count each group only once."],
+  orbitals:["Name the bond or electron pair the question is asking about before choosing an orbital.","Sigma means head-on overlap; pi means sideways overlap of parallel p orbitals.","For hybrid orbitals, more s-character means electrons are held closer: sp > sp² > sp³ for shorter/stronger bonds."],
+  arrows:["Say the electron source aloud. The arrow tail must start on a lone pair or pi bond—never on H or an atom label.","Say where that electron pair will land: an atom or the space where a new bond forms.","After moving the pair, redraw bonds and charges. If a second-row atom would exceed an octet, another pair must leave."],
+  resonance:["First verify that atoms and sigma bonds stay fixed and the total charge stays the same.","Find the movable electrons: a lone pair or pi bond beside a pi bond, charge, or empty p orbital.","Draw the arrow from electrons to their destination, then update every affected bond, lone pair, and charge.","If ranking contributors: complete octets first, then fewer charges, then place negative charge on the more electronegative atom."],
+  acidbase1:["Identify the acid that can lose H⁺ and the base site that has an electron pair to take it.","Draw both products: remove H from the acid, add H to the base, and update both charges.","If pKa values are given, compare the acid on each side. Equilibrium favors the side with the higher-pKa, weaker acid."],
+  acidbase2:["Draw the conjugate base for every acid being compared: remove H and put the old H-bond electrons on that atom.","Circle where the negative charge sits in each conjugate base.","Compare in order: charge → atom → resonance → induction → orbital. Stop at the first real difference.","The more stable conjugate base came from the stronger acid; base strength runs in the opposite direction."],
+  lewisab:["Find the available electron pair: a lone pair, negative charge, or pi bond. That species is the Lewis base/nucleophile.","Find the electron-poor site that can accept the pair. That species is the Lewis acid/electrophile.","Draw the arrow from the donor pair to the accepting atom, then update bonds and formal charges."],
+  alkanes:["Find the longest continuous carbon chain; do not choose the chain that merely looks straightest.","Number from the end that gives the first substituent the lower number.","Name and alphabetize substituents, then assemble locants + substituents + parent."],
+  conform:["Choose the C–C bond you are looking down and place the front carbon before the back carbon.","Classify the relationship: eclipsed or staggered; if staggered, locate the two largest groups.","Anti places the largest groups 180° apart and is lower than gauche; eclipsed arrangements are higher."],
+  chair:["Mark every substituent as up or down before deciding axial or equatorial.","During a ring flip, up/down stays the same while axial/equatorial switches.","The more stable chair puts the larger substituent equatorial to reduce 1,3-diaxial crowding."],
+  default:["Rewrite the question in plain words: what exactly must you find or compare?","Write the one rule or relationship that controls that target.","Apply the rule one piece at a time, then check units, charge, atom count, and wording before choosing."]
+};
+function questionHints(q){
+  if(Array.isArray(q.hints)&&q.hints.length)return q.hints.slice();
+  const text=String(q.prompt||"").replace(/<[^>]+>/g," ").toLowerCase();
+  const terms=Object.entries(HINT_TERMS).filter(([k])=>text.includes(k)).slice(0,3);
+  const out=[];
+  if(terms.length)out.push("Translate the wording first: "+terms.map(([k,v])=>k.toUpperCase()+" = "+v).join("; ")+".");
+  out.push(...(HINT_PATHS[q.topic]||HINT_PATHS.default));
+  if(q.type==="mc"||q.type==="multiSelect")out.push("Now test each choice against those checks. Do not ask which one looks familiar; ask which one survives every check.");
+  else if(q.type==="written")out.push("Build your response as: structure or result → rule used → because statement → final conclusion.");
+  else if(q.type==="blanks"||q.type==="multi")out.push("Read the completed sentence back from left to right. Each entry must agree with the ones before it.");
+  const limit=q.hintCount||Math.min(5,terms.length?4:(q.type==="written"?5:3));
+  return out.slice(0,limit);
+}
+function hintStateKey(D,q){return (D.runId||"round")+"|"+D.i+"|"+q.id;}
+function hintUse(D,q){
+  const s=D&&D._hintState&&D._hintState.key===hintStateKey(D,q)?D._hintState:null;
+  if(!s)return{count:0,steps:[],feedback:""};
+  const vals=Object.values(s.ratings||{}),feedback=vals.includes("unclear")?"unclear":vals.includes("helped")?"helped":"";
+  return{count:(s.opened||[]).length,steps:(s.opened||[]).slice(),feedback};
+}
+function addHintCoach(c,q,D){
+  const hints=questionHints(q),key=hintStateKey(D,q);
+  if(!D._hintState||D._hintState.key!==key)D._hintState={key,opened:[],ratings:{}};
+  const state=D._hintState;
+  const coach=el("section",{class:"hint-coach","aria-label":"Step-by-step hints"});
+  coach.innerHTML='<div class="hint-coach-head"><span>💡</span><div><b>Need help getting started?</b><small class="'+(D.cold?'hint-assisted':'')+'">'+(D.cold?'Hints are allowed, but this answer becomes assisted—not clean mastery.':'Open one thinking step at a time. The answer will not be revealed.')+'</small></div></div>';
+  const list=el("div",{class:"hint-list"}),paint=()=>{
+    list.innerHTML="";
+    (state.opened||[]).forEach(i=>{
+      const box=el("div",{class:"hint-step"}); box.innerHTML='<b>Hint '+(i+1)+'</b>'+esc(hints[i]);
+      const rate=el("div",{class:"hint-feedback"}); rate.appendChild(el("span",{},"Did this step help?"));
+      [["helped","Yes"],["unclear","Still unclear"]].forEach(([value,label])=>rate.appendChild(el("button",{class:"btn ghost small",disabled:state.ratings[i]===value,onclick:()=>{state.ratings[i]=value;snapshotDrill(D.i);save();paint();}},state.ratings[i]===value?"✓ "+label:label)));
+      box.appendChild(rate); list.appendChild(box);
+    });
+    if(state.opened.length<hints.length){
+      const n=state.opened.length;
+      list.appendChild(el("button",{class:"btn gold hint-next",onclick:()=>{if(!state.opened.includes(n))state.opened.push(n);snapshotDrill(D.i);save();paint();}},n===0?"Show my first step":"Show hint "+(n+1)+" of "+hints.length));
+    }else list.appendChild(el("p",{class:"muted",style:"margin:2px 0 0;font-size:.78rem"},"All steps shown. Try the question now; your hint use will be recorded with the attempt."));
+  };
+  paint(); coach.appendChild(list); c.appendChild(coach);
+}
+
 VIEWS.drill = (v) => {
   if (!S.drill){ go("practice"); return; }
   const D = S.drill;
@@ -5602,7 +5962,7 @@ VIEWS.drill = (v) => {
       '<p class="muted" style="margin:6px 0 0;font-size:.8rem">Read-only — you can\'t change an answer from here.</p>'+
       '<div class="qprompt" style="margin-top:8px">'+(q?q.prompt:'<span class="muted">['+rec.id+'] not in the bank</span>')+'</div>'+
       '<p style="margin:10px 0 4px"><b style="color:'+(rec.ok?"#2a9d8f":"#e76f51")+'">'+(rec.ok?"✓ you got this right":"✗ you got this wrong")+'</b>'+
-        (rec.dk?' <span class="tag violet">🤷 unlearned</span>':(rec.g?' <span class="tag gold">🎲 guessed</span>':''))+'</p>'+
+        (rec.dk?' <span class="tag violet">🤷 unlearned</span>':(rec.g?' <span class="tag gold">🎲 guessed</span>':''))+(rec.h?' <span class="tag gold">💡 '+rec.h+' hint'+(rec.h===1?'':'s')+'</span>':'')+'</p>'+
       (rec.ans?'<p style="margin:2px 0">You answered: <b class="mono">'+esc(rec.ans)+'</b></p>':'')+
       (q&&q.type==="mc"&&!rec.ok?'<p style="margin:2px 0">Correct answer: <b class="mono">'+esc(String((q.choiceLabels||q.choices)[q.answer]))+'</b></p>':'')+
       (q&&q.type==="multi"&&!rec.ok?'<p style="margin:2px 0">Correct answers: <b class="mono">'+esc(q.fields.map(f=>f.label+": "+chargeLabel(f.answer)).join(" · "))+'</b></p>':'')+
@@ -5634,10 +5994,10 @@ VIEWS.drill = (v) => {
       const rep=gapReport(D.byTopic);
       const critical=diagCriticalAudit(D),criticalPassed=critical.filter(x=>x.ok).length,criticalOK=!critical.length||criticalPassed===critical.length;
       const rigorous=type!=="lec"&&D.diagVersion>=READINESS_DIAG_VERSION;
-      const solid = pct>=80 && !(D.guessedRight>0) && (!rigorous||(criticalOK&&!rep.gaps.length));
+      const solid = pct>=80 && !(D.guessedRight>0) && !(D.hinted>0) && (!rigorous||(criticalOK&&!rep.gaps.length));
       D.runId=D.runId||makeRunId("diag-"+type);
       if(!S.diags.some(x=>x.runId===D.runId)){
-        S.diags.push({runId:D.runId,date:todayStr(), type, scope:D.scopeName, scopeTopics:D.scopeTopics||[], score:scR, total:scT, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0, diagVersion:D.diagVersion||1, criticalTotal:critical.length, criticalPassed, criticalMisses:critical.filter(x=>!x.ok).map(x=>({id:x.id,role:x.role,detail:x.detail})),topicGaps:rep.gaps.slice(),passed:solid});
+        S.diags.push({runId:D.runId,date:todayStr(), type, scope:D.scopeName, scopeTopics:D.scopeTopics||[], score:scR, total:scT, pct, byTopic:D.byTopic, guessedRight:D.guessedRight||0, hinted:D.hinted||0, diagVersion:D.diagVersion||1, criticalTotal:critical.length, criticalPassed, criticalMisses:critical.filter(x=>!x.ok).map(x=>({id:x.id,role:x.role,detail:x.detail})),topicGaps:rep.gaps.slice(),passed:solid});
         if(S.diags.length>60) S.diags=S.diags.slice(-60);
         save();
       }
@@ -5646,7 +6006,7 @@ VIEWS.drill = (v) => {
       const nm=k=>TOPICS[k]?.name||k;
       const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
       c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
-        '<h2>'+scR+' / '+scT+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right (shaky, stays in rotation)</span>':'')+'</h2>'+ 
+        '<h2>'+scR+' / '+scT+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right</span>':'')+(D.hinted?' <span class="muted" style="font-size:.6em">· '+D.hinted+' answer'+(D.hinted===1?'':'s')+' used hints</span>':'')+'</h2>'+ 
         (rigorous?'<div class="why" style="margin:8px 0"><b>Readiness gate: '+criticalPassed+'/'+critical.length+' critical tasks clean · '+(rep.gaps.length?rep.gaps.length+' tested area'+(rep.gaps.length===1?'':'s')+' below its screen':'every tested area passed')+'.</b> '+(criticalOK?'Every essential task passed first-audit clean and unflagged.':'Still blocking: '+critical.filter(x=>!x.ok).map(x=>x.role+' ('+x.detail+')').join(' · '))+'.</div>':'')+
         '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+ 
         '<div class="why">'+(!solid?'<b>ONE repair:</b> '+(critical.find(x=>!x.ok)?.role||nm(rep.gaps[0]||Object.keys(D.byTopic)[0]))+' — repair that exact skill, then retake a new cold diagnostic.':(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Readiness diagnostic cleared. Maintain with spaced mixed practice; do not inflate volume just to chase a score.'))+'</div>'+ 
@@ -5700,19 +6060,19 @@ VIEWS.drill = (v) => {
        on the FIRST try, and nothing flagged guessed or unlearned. */
     if (D.masteryTopic){
       const L=D.log||[];
-      const clean = L.length===D.queue.length && L.every(r=>r.ok && !r.g && !r.dk);
+      const clean = L.length===D.queue.length && L.every(r=>r.ok && !r.g && !r.dk && !(r.h>0));
       const nm=(TOPICS[D.masteryTopic]||{}).name||D.masteryTopic;
       const c=el("div",{class:"card"+(clean?" teal":"")});
       if(clean){
         confetti();
         const days=bankMasteryDay(D.masteryTopic);
-        c.innerHTML='<span class="tag gold">CLEAN RUN — '+D.queue.length+'/'+D.queue.length+', no guesses</span>'+
+        c.innerHTML='<span class="tag gold">CLEAN RUN — '+D.queue.length+'/'+D.queue.length+', no guesses or hints</span>'+
           '<h2>'+(days>=2?"🏅 "+nm+" MASTERED. Two clean days on record ("+masteryDaysFor(D.masteryTopic).join(", ")+").":"Clean day 1 banked for "+nm+" ("+todayStr()+"). One more clean run on a DIFFERENT day and it's mastered.")+'</h2>'+
           '<p class="muted">Drill percentages never count as mastery — only this does.</p>';
       } else {
-        const missed=L.filter(r=>!r.ok).length, flagged=L.filter(r=>r.ok&&(r.g||r.dk)).length;
+        const missed=L.filter(r=>!r.ok).length, flagged=L.filter(r=>r.ok&&(r.g||r.dk||r.h>0)).length;
         c.innerHTML='<span class="tag coral">Not clean</span><h2>'+nm+' — '+D.right+'/'+D.queue.length+', run not clean</h2>'+
-          '<p style="margin:8px 0">'+(missed?missed+' missed. ':'')+(flagged?flagged+' right but flagged 🎲/🤷 — a guess isn\'t mastery, which is the point. ':'')+
+          '<p style="margin:8px 0">'+(missed?missed+' missed. ':'')+(flagged?flagged+' right but assisted or flagged — hints/guesses teach, but they are not mastery. ':'')+
           'No shame, real data. Read the explanations below, then come back on a later day — clean days have to be on <b>different</b> days, so cramming two in a row can\'t fake it.</p>'+
           '<p class="muted">'+masteryDaysFor(D.masteryTopic).length+'/2 clean days on '+nm+'.</p>';
       }
@@ -5726,7 +6086,7 @@ VIEWS.drill = (v) => {
        after review or after two full attempts; the final mock keeps the strict target. */
     if(D.focusSetId&&!S.flightRuns.some(x=>x.runId===D.runId)){
       const activeSec=(S.attempts||[]).filter(a=>a.u===D.runId).reduce((n,a)=>n+(a.d||0),0);
-      const allClean=(D.log||[]).length===D.queue.length&&(D.log||[]).every(r=>r.ok&&!r.g&&!r.dk);
+      const allClean=(D.log||[]).length===D.queue.length&&(D.log||[]).every(r=>r.ok&&!r.g&&!r.dk&&!(r.h>0));
       const timedOK=!D.focusSetId.startsWith("exam1-mock-")||activeSec<=4800;
       S.flightRuns.push({runId:D.runId,setId:D.focusSetId,date:todayStr(),right:D.right,total:D.queue.length,pct,activeSec,reviewed:!(D.log||[]).some(r=>!r.ok),clean:allClean&&timedOK});
       if(S.flightRuns.length>40)S.flightRuns=S.flightRuns.slice(-40);
@@ -5780,6 +6140,7 @@ VIEWS.drill = (v) => {
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+ 
     (D.diagVersion?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>'+((D.diagCriticalIds||[]).includes(q.id)?'🔒 Critical readiness task':'Readiness sample')+':</b> '+esc((D.diagRoles||{})[q.id]||"homework-level transfer")+'</p>':'')+
     '<div class="qprompt">'+q.prompt+'</div>';
+  addHintCoach(c,q,D);
   const structureDone=!!(D.structureBuilt&&D.structureBuilt[q.id]===q.drawMol);
   if(q.drawMol){
     const drawLabel=q.drawFirst?(structureDone?"✓ Structure checked — rebuild if needed":"✏️ Step 1 — build and check the structure →"):"✏️ Open checked drawing →";
@@ -5856,12 +6217,13 @@ VIEWS.drill = (v) => {
     const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
     const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
     const attempt=logAttempt(q,ok,guessed,D,isDK,submitted); // v3.25: immutable event drives every derived qstat
+    if(attempt.h)D.hinted=(D.hinted||0)+1;
     if(ok){D.right++; if(guessed){ D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
     else{D.wrong++;S.missed.push(q.id);}
     if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; } // v3.2: guessed-rights tallied per topic
     const rat=(rInp&&rInp.value.trim())||"";
     // v3.15: keep a per-round record so "go back and see what I answered" is possible
-    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(wrText||rat||"").slice(0,400)});
+    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, h:attempt.h||0, hs:attempt.hs||[], hf:attempt.hf||"", ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(wrText||rat||"").slice(0,400)});
     if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
     const branch=adaptiveBranch(D,q,attempt);
     if(D.adaptive)D.assignmentCompletion=Math.max(D.assignmentCompletion||0,Math.round(100*(D.i+1)/(D.assignmentTotal||ADAPTIVE_TOTAL)));
@@ -5869,10 +6231,10 @@ VIEWS.drill = (v) => {
     snapshotDrill(D.i+1);       // v3.25: snapshot AFTER counters, log and adaptive future-slot rewrite
     D._wrGuessed=false; D._wrDK=false;
     save();
-    const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(isDK?"✓ Right — but marked 🤷 don't-know, so it counts as UNLEARNED and stays in rotation. Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" next.":guessed?"✓ Right — but flagged as a guess, so it stays in rotation":"✓ Right"):(isDK?"🤷 Don't know yet — honest data, not a failure. Stays in rotation; hit the 📖 Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" after this round, then re-drill.":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:"")))+'</p>';
+    const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(isDK?"✓ Right — but marked 🤷 don't-know, so it counts as UNLEARNED and stays in rotation. Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" next.":guessed?"✓ Right — but flagged as a guess, so it stays in rotation":attempt.h?"✓ Right with "+attempt.h+" hint"+(attempt.h===1?"":"s")+" — guided practice, not clean proof.":"✓ Right without hints"):(isDK?"🤷 Don't know yet — honest data, not a failure. Stays in rotation; hit the 📖 Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" after this round, then re-drill.":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:"")))+'</p>';
     fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>')+(branch?'<p class="muted" style="font-size:.82em;margin:8px 0 0"><b>Planner branch:</b> '+branch.label+(branch.picks.length?' · '+branch.picks.length+' future slot'+(branch.picks.length===1?'':'s')+' adjusted':' · no unused sibling available')+'.</p>':'');
     if(isDK&&D.adaptive)fb.appendChild(el("button",{class:"btn teal",style:"margin-top:10px",onclick:()=>{snapshotDrill(D.i+1);S.drill=null;go("learn");}},"📖 Pause and open Learn primer"));
-    fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;render();}},"Next →"));
+    fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;D._hintState=null;render();}},"Next →"));
     if(!ok)c.classList.add("shake");
   };
   if (q.type==="written"){
@@ -6839,6 +7201,7 @@ function attFlags(a){
   let s="";
   if(a.dk) s+=' <span class="tag violet" title="marked: I don\'t know this yet">🤷 unlearned</span>';
   else if(a.g) s+=' <span class="tag gold" title="marked: I guessed">🎲 guessed</span>';
+  if(a.h>0) s+=' <span class="tag gold" title="guided answer; hint steps '+esc((a.hs||[]).map(i=>i+1).join(", "))+'">💡 '+a.h+' hint'+(a.h===1?'':'s')+(a.hf==="unclear"?' · unclear':'')+'</span>';
   if(a.as) s+=' <span class="tag teal" title="selected by the optional adaptive-assignment planner">🧭 adaptive</span>';
   else if(a.c) s+=' <span class="tag coral" title="cold diagnostic or mastery evidence">❄ cold</span>';
   if(a.d) s+=' <span class="muted" style="font-size:.78rem">'+a.d+'s</span>';
@@ -6879,7 +7242,7 @@ VIEWS.attempts = (v) => {
   /* ---- level 1: the feed ---- */
   v.appendChild(back("Report",()=>go("report")));
   if(!all.length){
-    v.appendChild(el("div",{class:"card"},'<span class="tag violet">📜 Attempts</span><h2>No attempts recorded yet</h2><p class="muted">Answer some questions and every one lands here — what you picked, whether you flagged it as a guess or as unlearned, how long it took, and any reasoning you typed.</p>'));
+    v.appendChild(el("div",{class:"card"},'<span class="tag violet">📜 Attempts</span><h2>No attempts recorded yet</h2><p class="muted">Answer some questions and every one lands here — what you picked, whether you used zero or several hints, whether each hint helped, your confidence flags, timing, and any reasoning you typed.</p>'));
     return;
   }
   let rows=all;
@@ -6887,13 +7250,14 @@ VIEWS.attempts = (v) => {
   if(F.outcome==="wrong") rows=rows.filter(a=>!a.ok);
   else if(F.outcome==="guessed") rows=rows.filter(a=>a.g&&!a.dk);
   else if(F.outcome==="dk") rows=rows.filter(a=>a.dk);
+  else if(F.outcome==="hints") rows=rows.filter(a=>a.h>0);
   else if(F.outcome==="noted") rows=rows.filter(a=>a.note);
 
   const head=el("div",{class:"card"});
   const rt=all.filter(a=>a.ok).length;
   head.innerHTML='<span class="tag violet">📜 Attempts</span><h2>Every answer you\'ve given</h2>'+
     '<p class="muted">'+all.length+' attempts on record · '+rt+' right ('+Math.round(100*rt/all.length)+'%) · '+
-    all.filter(a=>a.g&&!a.dk).length+' flagged 🎲 guessed · '+all.filter(a=>a.dk).length+' flagged 🤷 unlearned · '+
+    all.filter(a=>a.g&&!a.dk).length+' flagged 🎲 guessed · '+all.filter(a=>a.dk).length+' flagged 🤷 unlearned · '+all.filter(a=>a.h>0).length+' used 💡 hints · '+
     all.filter(a=>a.note).length+' with your reasoning saved. Tap any row to see that question\'s full history.</p>';
   v.appendChild(head);
 
@@ -6901,7 +7265,7 @@ VIEWS.attempts = (v) => {
   const fc=el("div",{class:"card cream"});
   fc.innerHTML='<p class="muted" style="margin:0 0 6px;font-size:.82rem"><b>Show:</b></p>';
   const oRow=el("div",{style:"display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"});
-  [["all","Everything"],["wrong","✗ Wrong only"],["guessed","🎲 Guessed"],["dk","🤷 Unlearned"],["noted","✍️ With my reasoning"]].forEach(([k,lab])=>{
+  [["all","Everything"],["wrong","✗ Wrong only"],["guessed","🎲 Guessed"],["dk","🤷 Unlearned"],["hints","💡 Used hints"],["noted","✍️ With my reasoning"]].forEach(([k,lab])=>{
     oRow.appendChild(el("button",{class:"btn small"+(F.outcome===k?"":" ghost"),onclick:()=>{F.outcome=k;F.limit=60;render();}},lab));
   });
   fc.appendChild(oRow);
@@ -6958,9 +7322,15 @@ VIEWS.report = (v) => {
   return "Guessed-flagged: "+g.map(([id,s])=>"["+id+"] "+(s.gr||0)+" right-but-guessed / "+(s.gw||0)+" wrong-guessed").join(" · ")+"\n"; })()+
 (function(){ const k=Object.entries(S.qstats).filter(([id,s])=>(s.dk||0)>0); if(!k.length) return "";
   return "Don't-know (unlearned) flagged: "+k.map(([id,s])=>"["+id+"] ×"+s.dk).join(" · ")+" — these need LEARN-first, not re-drilling\n"; })()+
+(function(){ const A=(S.attempts||[]).filter(a=>Object.prototype.hasOwnProperty.call(a,"h")); if(!A.length)return "";
+  const used=A.filter(a=>a.h>0),none=A.length-used.length,steps=used.reduce((n,a)=>n+(a.h||0),0),helped=used.filter(a=>a.hf==="helped").length,unclear=used.filter(a=>a.hf==="unclear").length;
+  const by={}; used.forEach(a=>{const k=a.t||"?";by[k]=(by[k]||0)+1;});
+  const topics=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,n])=>(TOPICS[k]?.name||k)+" "+n).join(" · ");
+  return "Hint pattern (v3.69): "+used.length+"/"+A.length+" attempts used hints; "+none+" used none; "+(used.length?(steps/used.length).toFixed(1):"0")+" steps per hinted attempt · feedback "+helped+" helped / "+unclear+" unclear"+(topics?" · most used: "+topics:"")+"\n";
+})()+
 (function(){ const A=S.attempts||[]; if(!A.length) return "";
   const secs=A.filter(a=>a.d>0).map(a=>a.d).sort((a,b)=>a-b); const med=secs.length?secs[Math.floor(secs.length/2)]:0;
-  const clean=A.filter(a=>a.ok&&!a.g).length;
+  const clean=A.filter(a=>a.ok&&!a.g&&!(a.h>0)).length;
   return "Event log (v3.2): "+A.length+" attempts · "+clean+" clean-right · median "+med+"s/answer · since "+new Date(A[0].ts).toLocaleDateString()+"\n"; })()+
 (function(){ const R=(S.adaptiveRuns||[]).slice(-1)[0]; if(!R)return "";
   return "Adaptive assignment ("+R.date+"): "+R.status+" · "+(R.right||0)+" right / "+(R.wrong||0)+" wrong · topics "+(R.topics||[]).map(k=>TOPICS[k]?.name||k).join(", ")+" · branches "+(R.branches||[]).map(b=>b.signal).join(", ")+"\n"; })()+
@@ -6977,7 +7347,7 @@ VIEWS.report = (v) => {
   const hist=el("div",{class:"card"});
   const nA=(S.attempts||[]).length, nN=(S.wrLog||[]).length;
   hist.innerHTML='<span class="tag violet">📜 History</span><h2>Attempt history</h2>'+
-    '<p class="muted" style="margin-bottom:10px">Every answer you\'ve given, newest first — what you picked, your 🎲 guessed / 🤷 unlearned flags, how long it took, and any reasoning you typed. Tap a question to see its whole trail and whether you\'re actually improving on it.'+
+    '<p class="muted" style="margin-bottom:10px">Every answer you\'ve given, newest first — what you picked, whether you used zero or several 💡 hints, which hint felt unclear, your confidence flags, timing, and any reasoning you typed. Tap a question to see its whole trail and whether you\'re actually improving on it.'+
     (nA?' <b>'+nA+'</b> attempts · <b>'+nN+'</b> with your reasoning saved.':'')+'</p>';
   hist.appendChild(el("button",{class:"btn violet",onclick:()=>{S.attView={topic:"all",outcome:"all",limit:60,qid:null};go("attempts");}},"Open attempt history →"));
   v.appendChild(hist);
