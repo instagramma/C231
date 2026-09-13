@@ -6,7 +6,20 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.69  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.71  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.71 (2026-09-12, Sat): VIDEO STAYS INSIDE THE FLIGHTPATH. The one recommended
+        Learn-step video now plays in a responsive, privacy-enhanced embedded player instead
+        of opening another site first. Exact Khan Academy videos use their official YouTube
+        channel copies; Organic Chemistry Tutor videos use their exact YouTube IDs. A source
+        link remains directly below each player when embedded playback is unavailable. Backup
+        videos remain collapsed so the Learn screen still presents one clear starting point.
+        DEPLOY PENDING; awaiting learner evidence.
+  v3.70 (2026-09-12, Sat): PURPOSE-FIRST BOTTOM NAV. Replaced section-name-only tabs
+        with a plain decision guide: Do next / Start here; Learn / Explanation; Practice /
+        Hints allowed; Prove / No hints; Tools / Plan + results. The first destination remains
+        the automatic flightpath, so a learner who is unsure never has to choose a study mode.
+        Added explicit accessible purpose labels without changing routing, study content, or
+        scoring. DEPLOY PENDING; awaiting learner evidence on whether the labels remove hesitation.
   v3.69 (2026-09-12, Sat): PLAIN-LANGUAGE PROGRESSIVE HINTS. Every standard drill,
         guided set, diagnostic, and mastery-bank question now offers one thinking step at a
         time. Hints translate loaded vocabulary first, then apply the topic's reusable procedure;
@@ -23,7 +36,7 @@
         plainly named drawers. The bottom bar now follows the learner workflow—Today, Learn,
         Practice, Exam, More—instead of exposing seven internal destinations. Plan, Cheat Sheet,
         Report, account switching, cloud status, and version information moved into More. The
-        header now shows only course identity, exam timing, and More. DEPLOY PENDING; awaiting
+        header now shows only course identity, exam timing, and More. Public v3.69 (deployed 2026-09-12 ~16:50 PDT, commit c1f04ff8); awaiting
         learner evidence.
   v3.67 (2026-09-12, Sat): LEARN → PRACTICE → PROVE. Rebuilt Today around one active
         25-minute block chosen from the Exam 1 route. Every skill flight now starts with a
@@ -32,7 +45,7 @@
         skip video preparation. Paused work wins over every recommendation. Secondary metrics,
         deadlines, Canvas updates, and optional tools remain available but folded below the path.
         This implements the Learning Profile's decision-removal, small-block, rules-first, and
-        exposure-is-not-mastery constraints. DEPLOY PENDING; awaiting learner evidence.
+        exposure-is-not-mastery constraints. Public v3.69 (deployed 2026-09-12 ~16:50 PDT, commit c1f04ff8); awaiting learner evidence.
   v3.66 (2026-09-12, Sat): AROMATIC ATTACHMENT REPAIR. Nine related layouts now attach
         side groups to actual ring carbon vertices. Para/ortho relationships and electron dots
         remain explicit. No question IDs, choices, answer keys, or learner storage changed.
@@ -1133,10 +1146,10 @@ header .countdown{
   align-items:center;
 }
 
-/* Seven destinations stay intact; clearer active state and usable tap targets. */
+/* v3.70: every destination says what it is for; the learner should not have to decode tabs. */
 nav{background:#fff;border-top:1px solid var(--line)}
 nav button{
-  min-height:64px;
+  min-height:74px;
   border-right:none;
   color:var(--muted-tx);
   font-size:.72rem;
@@ -1145,6 +1158,8 @@ nav button{
   padding:8px 2px 10px;
 }
 nav button .ico{font-size:1.2rem;opacity:.82}
+nav button .nav-label{font-size:.74rem;font-weight:800;line-height:1.05}
+nav button .nav-purpose{font-size:.58rem;font-weight:650;line-height:1.05;opacity:.78;white-space:nowrap}
 nav button.active{
   background:var(--accent-bg);
   color:var(--teal-dk);
@@ -1384,14 +1399,16 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 
 @media(max-width:600px){
   html{font-size:16px}
-  body{padding-bottom:84px}
+  body{padding-bottom:96px}
   main{padding:1rem .75rem 2rem}
   header{padding:.75rem .85rem;gap:8px}
   header h1{font-size:1.08rem}
   header>span{width:100%;justify-content:flex-start;flex-wrap:wrap}
   .card{padding:1rem;margin-bottom:.9rem}
   .statrow{gap:8px}
-  nav button{min-height:62px;font-size:.65rem}
+  nav button{min-height:74px;padding-left:0;padding-right:0}
+  nav button .nav-label{font-size:.64rem}
+  nav button .nav-purpose{font-size:.5rem}
   .deadline-row{grid-template-columns:48px minmax(0,1fr);gap:3px 8px;margin:12px 0!important}
   .deadline-when{grid-column:2;justify-self:start;margin:2px 0 0}
   .home-section>summary{padding:.8rem 1rem}
@@ -1429,6 +1446,9 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 .path-resource-copy{min-width:0;flex:1}
 .path-resource-copy b{display:block;margin-bottom:2px}
 .path-resource-copy span{display:block;color:var(--muted-tx);font-size:.82rem;line-height:1.4}
+.path-video{position:relative;width:100%;aspect-ratio:16/9;border:1px solid #aeb9bf;border-radius:10px;overflow:hidden;background:#111;margin:.75rem 0 .25rem}
+.path-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.path-video-source{display:inline-block;font-size:.75rem;margin:.15rem 0 .25rem;color:var(--teal-dk);font-weight:700}
 .path-link{color:var(--teal-dk);font-weight:800;text-decoration:underline;text-underline-offset:2px}
 .path-decoder{background:#f0f3f4;border-left:4px solid var(--gold);padding:.7rem .8rem;margin:.75rem 0;font-size:.88rem;line-height:1.5}
 .path-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:.75rem}
@@ -1467,7 +1487,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open more options">•••</button><span id="verbadge" class="sr-only">v3.69</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.71</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -4276,11 +4296,11 @@ document.addEventListener("visibilitychange",()=>{document.hidden?pauseQuestionC
 
 /* ================= ROUTER ================= */
 const NAV = [
-  {id:"home",  ico:"🏠", label:"Today"},
-  {id:"learn", ico:"📖", label:"Learn"},
-  {id:"practice", ico:"🎯", label:"Practice"},
-  {id:"exam",  ico:"📊", label:"Exam"},
-  {id:"more", ico:"•••", label:"More"},
+  {id:"home", ico:"🧭", label:"Do next", purpose:"Start here"},
+  {id:"learn", ico:"📖", label:"Learn", purpose:"Explanation"},
+  {id:"practice", ico:"💡", label:"Practice", purpose:"Hints allowed"},
+  {id:"exam", ico:"✅", label:"Prove", purpose:"No hints"},
+  {id:"more", ico:"•••", label:"Tools", purpose:"Plan + results"},
 ];
 // v2.12: full written exam PDFs (committed to the repo, so linkable from any device)
 const EXAM_READINESS = "./readiness.pdf";
@@ -4373,7 +4393,7 @@ const LESSONS = {
 };
 function go(view){ S.view=view; render(); window.scrollTo(0,0); }
 const NAV_GROUP={lab:"practice",bondlab:"practice",reslab:"practice",drill:"practice",mastery:"practice",track:"more",cheat:"more",report:"more",attempts:"more"}; // v3.68: secondary utilities live under More; labs and drills remain Practice
-function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id)}); b.innerHTML='<span class="ico">'+t.ico+'</span>'+t.label; n.appendChild(b); }); }
+function renderNav(){ const n=$("#nav"); n.innerHTML=""; const cur=NAV_GROUP[S.view]||S.view; NAV.forEach(t=>{ const b=el("button",{class:cur===t.id?"active":"",onclick:()=>go(t.id),"aria-label":t.label+": "+t.purpose}); b.innerHTML='<span class="ico" aria-hidden="true">'+t.ico+'</span><span class="nav-label">'+t.label+'</span><span class="nav-purpose">'+t.purpose+'</span>'; n.appendChild(b); }); }
 function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view](v); const d=daysUntilClass();
   // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
   let txt;
@@ -4400,7 +4420,7 @@ VIEWS.more = (v) => {
   c.appendChild(grid); v.appendChild(c);
   const account=el("section",{class:"card cream"});
   const status=cloudState==="synced"?"Cloud saved":cloudState==="qa"?"QA preview · not saved":cloudState==="offline"?"Local only":"Syncing";
-  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.69</p>';
+  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.71</p>';
   const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   if(PROFILE==="gabe"&&!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:ownerView},"View Sam"));
   if(!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:switchProfile},"Switch profile"));
@@ -5144,6 +5164,7 @@ const FLIGHT_GUIDES={
     videoTitle:"Organic acid–base mechanisms",
     videoBy:"Khan Academy · start here",
     videoUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures/acid-base-review/v/organic-acid-base-mechanisms",
+    embedUrl:"https://www.youtube-nocookie.com/embed/jIL333CKE9A?rel=0",
     videoWhy:"Watch the arrows, not just the products: the tail starts on electrons, the base takes H, and the old H bond returns to its atom.",
     extraTitle:"Curved-arrow notation — extra explanation",
     extraUrl:"https://www.youtube.com/watch?v=UVpizSVIBX0",
@@ -5161,6 +5182,7 @@ const FLIGHT_GUIDES={
     videoTitle:"Resonance stabilization of a conjugate base",
     videoBy:"The Organic Chemistry Tutor · primary video",
     videoUrl:"https://www.youtube.com/watch?v=MAjy2WMkPHc",
+    embedUrl:"https://www.youtube-nocookie.com/embed/MAjy2WMkPHc?rel=0",
     videoWhy:"This connects electron delocalization to the exact question the exam asks: which conjugate base is more stable, and therefore which acid is stronger.",
     extraTitle:"Khan: conjugate-base stability sequence",
     extraUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures",
@@ -5172,6 +5194,7 @@ const FLIGHT_GUIDES={
     videoTitle:"Using pKa values to predict equilibrium",
     videoBy:"Khan Academy · 7:54",
     videoUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures/acid-base-review/v/using-pka-values-to-predict-the-position-of-equilibrium-new",
+    embedUrl:"https://www.youtube-nocookie.com/embed/ve5hfX3ywk0?rel=0",
     videoWhy:"This gives the short exam rule: equilibrium favors the side with the weaker acid—the acid with the higher pKa.",
     extraTitle:"Using a pKa table · 9:04",
     extraUrl:"https://www.khanacademy.org/science/organic-chemistry/organic-structures/modal/v/using-a-pka-table",
@@ -5255,8 +5278,14 @@ function renderLearningPath(v){
     a.appendChild(el("button",{class:"btn coral",onclick:()=>resumeDrill()},"▶ Resume saved work"));
   }else if(stage===0){
     a.innerHTML='<h3>Step 1 · '+esc(guide.videoTitle||"Learn the rule")+'</h3><div class="path-resource"><span class="path-resource-icon">▶️</span><div class="path-resource-copy"><b>'+esc(guide.videoBy||"Short lesson")+'</b><span>'+esc(guide.videoWhy||"")+'</span></div></div>';
+    if(guide.embedUrl&&!guide.textOnly){
+      const player=el("div",{class:"path-video"});
+      player.innerHTML='<iframe src="'+esc(guide.embedUrl)+'" title="'+esc(guide.videoTitle||"Lesson video")+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+      a.appendChild(player);
+      if(guide.videoUrl)a.appendChild(el("a",{class:"path-video-source",href:guide.videoUrl,target:"_blank",rel:"noopener"},"Player not working? Open the official source ↗"));
+    }
     const row=el("div",{class:"path-controls"});
-    if(guide.videoUrl){const watch=el("a",{class:"btn coral",href:guide.videoUrl,target:"_blank",rel:"noopener"},guide.textOnly?"Open the reading ↗":"▶ Watch the exact video ↗");row.appendChild(watch);}
+    if(guide.videoUrl&&!guide.embedUrl){const watch=el("a",{class:"btn coral",href:guide.videoUrl,target:"_blank",rel:"noopener"},guide.textOnly?"Open the reading ↗":"▶ Watch the exact video ↗");row.appendChild(watch);}
     row.appendChild(el("button",{class:"btn ghost",onclick:()=>finishFlightLearning(st.id)},guide.textOnly?"Done reading — practice →":"Done watching — practice →")); a.appendChild(row);
     const help=el("details",{class:"mini-details"}); help.innerHTML='<summary>Rule, vocabulary, and backup video</summary><div class="path-decoder"><b>Decode:</b> '+esc(guide.decoder||"")+'</div><p class="muted"><b>Rule:</b> '+esc(guide.rule||"")+'</p>'+(guide.extraUrl?'<p class="muted">Need another explanation? <a class="path-link" href="'+guide.extraUrl+'" target="_blank" rel="noopener">'+esc(guide.extraTitle)+' ↗</a></p>':'')+'<button class="btn ghost small" type="button" onclick="go(\'learn\')">Open the full lesson</button>'; a.appendChild(help);
   }else if(stage===1){
