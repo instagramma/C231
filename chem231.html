@@ -6,7 +6,16 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.76  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.77  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.77 (2026-09-13, Sun): GENERATED PRACTICE STARTS FROM THE CHEMISTRY OBJECT.
+        Generated transfer items now identify themselves as a new example and state whether
+        the learner is reading a reaction, comparing separate structures, or working with one
+        molecule. The misleading ether/amine/amide item now shows one connected molecule,
+        labels each candidate atom beside the bond-line structure, includes H+, and asks one
+        concrete site-selection question. Transfer stays in the bank; unsupported mental
+        reconstruction does not. All 32 generated Chapter-3 transfer cards now pass a
+        visible-chemistry audit. Adaptive sets cool down exact repeats and generated siblings
+        derived from the same source; “Practice 5 more” rotates beyond the first guided five.
   v3.76 (2026-09-12, Sat): FLAG A QUESTION FOR REVIEW, NOT AS REASONING.
         Every question now has a dedicated 🚩 toggle. Its note field stays hidden until the
         flag is enabled; the flag, note, question, submitted answer, hint use, and attempt
@@ -1366,6 +1375,14 @@ nav button.active .ico{opacity:1}
 
 /* Question reading and answering are the app's main job. */
 .qprompt{font-size:1.06rem;line-height:1.62;margin:12px 0 16px}
+.question-orientation{border:1px solid #b9c8ce;border-left:5px solid var(--teal);border-radius:10px;background:#f5f9fb;padding:.72rem .8rem;margin:10px 0 12px}
+.question-orientation-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.question-orientation-head b{font-size:.9rem}
+.question-orientation p{font-size:.8rem;line-height:1.45;color:var(--muted-tx);margin:5px 0 0}
+.guided-question-visual{background:#fff;border:1px solid #c9d3d8;border-radius:12px;margin:12px 0;padding:10px}
+.guided-question-visual svg{display:block;width:100%;height:auto;max-height:330px}
+.guided-question-key{display:flex;justify-content:center;gap:8px 18px;flex-wrap:wrap;margin:6px 0 0;font-size:.8rem}
+.guided-question-key b{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;border-radius:50%;background:#e8f2f7;color:#0b5578;margin-right:4px}
 .hint-coach{border:1px solid #b9c8ce;border-radius:10px;background:#f8fafb;padding:.85rem;margin:.8rem 0 1rem}
 .hint-coach-head{display:flex;align-items:flex-start;gap:10px}
 .hint-coach-head>span{font-size:1.25rem;line-height:1.2}
@@ -1540,7 +1557,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.76</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.77</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1881,9 +1898,13 @@ function recencyPenalty(id){
 function excludeRecentRounds(pool, need){
   // adaptive window: exclude as much recent history as the pool can afford (up to ~6 rounds).
   // Big pools (38+) → a question sits out ~5-6 rounds; small pools self-limit via the guard.
+  // v3.77: sourceModelIds identify generated siblings built from the same course item.
+  // Those siblings now cool down together, so wording changes cannot masquerade as variety.
   const K=Math.min(30, Math.max(10, pool.length - need*2));
   const recent=new Set((S.attempts||[]).slice(-K).map(a=>a.id));
-  const filtered=pool.filter(q=>!recent.has(q.id));
+  const recentSources=new Set();
+  recent.forEach(id=>{const q=QUESTIONS.find(x=>x.id===id);(q?.sourceModelIds||[]).forEach(src=>recentSources.add(src));});
+  const filtered=pool.filter(q=>!recent.has(q.id)&&!(q.sourceModelIds||[]).some(src=>recentSources.has(src)));
   return filtered.length>=need ? filtered : pool;
 }
 /* v3.12.1 (audit r5 F5): exact-twin questions (same fact, different id) must not co-occur
@@ -4158,6 +4179,98 @@ QUESTIONS.forEach(q=>{
   if(original)q.prompt=q.prompt.replace(original[0],examBondLineCard(parts)+'<details style="margin:8px 0"><summary>Condensed formula reference</summary>'+original[0]+'</details>');
   else q.prompt+=examBondLineCard(parts);
 });
+/* v3.77: keep the transfer, remove the reconstruction tax. The former version said
+   “a molecule” while drawing three disconnected generic fragments. This is one concrete
+   molecule, its candidate sites stay attached to their names, and H+ makes the operation
+   visible without turning a site-choice question into a hidden mechanism exercise. */
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-04");
+  if(q){
+    q.questionMode="one-molecule";
+    q.prompt='The molecule below is exposed to H⁺. <b>Which labeled atom is protonated most readily?</b>'+
+      '<figure class="guided-question-visual" aria-label="One connected molecule containing an ether oxygen labeled A, an amide nitrogen labeled B, and a tertiary amine nitrogen labeled C, plus H positive">'+
+      '<svg viewBox="0 0 820 300" role="img" aria-labelledby="site-title site-desc">'+
+      '<title id="site-title">Choose the protonation site on one molecule</title><desc id="site-desc">A single connected bond-line molecule with ether oxygen A, amide nitrogen B, tertiary amine nitrogen C, and hydrogen ion as the reagent.</desc>'+
+      '<g fill="none" stroke="#202932" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">'+
+      '<path d="M70 154 L126 122 M150 122 L205 154 L265 120 L325 154"/><path d="M325 154 L325 84 M336 154 L336 84"/>'+ 
+      '<path d="M325 154 L390 118 M422 118 L480 154 L540 120 M570 120 L622 90 M570 120 L622 154"/>'+ 
+      '</g>'+ 
+      '<g fill="#202932" font-family="system-ui,-apple-system,sans-serif" font-size="30" font-weight="650">'+
+      '<text x="126" y="132">O</text><text x="315" y="70">O</text><text x="390" y="130">NH</text><text x="542" y="132">N</text><text x="628" y="96">CH₃</text><text x="628" y="163">CH₃</text>'+ 
+      '<text x="690" y="58" fill="#8b272f">+ H⁺</text>'+ 
+      '</g>'+ 
+      '<g font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="800" text-anchor="middle">'+
+      '<circle cx="139" cy="188" r="18" fill="#e8f2f7" stroke="#0b668f" stroke-width="2"/><text x="139" y="195" fill="#0b5578">A</text>'+ 
+      '<circle cx="406" cy="172" r="18" fill="#e8f2f7" stroke="#0b668f" stroke-width="2"/><text x="406" y="179" fill="#0b5578">B</text>'+ 
+      '<circle cx="556" cy="188" r="18" fill="#e8f2f7" stroke="#0b668f" stroke-width="2"/><text x="556" y="195" fill="#0b5578">C</text>'+ 
+      '</g>'+ 
+      '<text x="410" y="262" text-anchor="middle" fill="#52616b" font-family="system-ui,-apple-system,sans-serif" font-size="20">Choose the atom that uses its lone pair to bond to H⁺.</text>'+ 
+      '</svg>'+ 
+      '<figcaption class="guided-question-key"><span><b>A</b> ether oxygen</span><span><b>B</b> amide nitrogen</span><span><b>C</b> tertiary amine nitrogen</span></figcaption></figure>';
+    q.choices=["C — the tertiary amine nitrogen; its lone pair is localized and available","B — the amide nitrogen; resonance makes its lone pair more available","A — the ether oxygen; greater electronegativity makes it protonate first","The carbonyl carbon"];
+    q.hints=[
+      "This is one molecule plus H⁺. You are choosing where H⁺ attaches; you are not being asked to draw a full mechanism.",
+      "Read the labels before comparing: A is an ether oxygen, B is an amide nitrogen directly attached to C=O, and C is a tertiary amine nitrogen.",
+      "Ask which lone pair is most available. The amide pair is shared with C=O, while oxygen holds its pair more tightly than an aliphatic nitrogen."
+    ];
+  }
+}
+/* v3.77: the runtime audit found three generated transfer prompts with named organic
+   structures but no visible structure. Repair all three, not only the reported imine item. */
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-21");
+  if(q){
+    q.prompt='A claim says the <b>ketone A</b> is more basic than the <b>imine B</b> because “oxygen better stabilizes negative charge.” Use the structures to diagnose that claim.'+
+      courseStructureDiagram("cyclic-ketone-imine-pair","A: cyclohexanone (ketone, C=O) and B: N-methyl cyclohexanimine (imine, C=N–CH₃)","Compare the lone-pair sites that become O-positive or N-positive after protonation");
+    q.choices=["The claim uses an anion rule in the wrong situation: protonation creates O⁺ or N⁺, and N⁺ is more stable","The claim is correct because oxygen is always the more basic atom","Both molecules keep a negative charge after protonation","Basicity cannot be compared using conjugate acids"];
+    q.hints=["First find the functional groups in the drawings: A contains C=O (a ketone); B contains C=N (an imine).","Basicity asks which neutral lone pair accepts H⁺. After that, the conjugate acid carries a positive—not negative—charge.","Compare O⁺ with N⁺. For positive charge, the less-electronegative nitrogen is more comfortable than oxygen."];
+  }
+}
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-03");
+  if(q)q.prompt='The single molecule below contains a terminal thiolate and a carboxylic-acid proton. <b>What proton transfer occurs within the molecule?</b>'+
+    '<figure class="guided-question-visual" aria-label="Bond-line structure of a molecule with terminal sulfur negative and a carboxylic acid">'+
+    '<svg viewBox="0 0 720 220" role="img"><g fill="none" stroke="#202932" stroke-width="4" stroke-linecap="round"><path d="M110 112 L190 72 L270 112 L350 72 L425 112"/><path d="M425 112 L425 48 M436 112 L436 48"/><path d="M425 112 L505 72 L565 72"/></g>'+ 
+    '<g fill="#202932" font-family="system-ui,-apple-system,sans-serif" font-size="30" font-weight="700"><text x="42" y="123">S⁻</text><text x="416" y="39">O</text><text x="510" y="82">O–H</text></g>'+ 
+    '<g font-family="system-ui,-apple-system,sans-serif" font-size="18" fill="#52616b"><text x="68" y="172">thiolate base</text><text x="485" y="172">carboxylic acid</text></g></svg></figure>';
+}
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-26");
+  if(q)q.prompt='NH₂⁻ is being used to remove H from a terminal alkyne. <b>Which solvent will not destroy the base first?</b>'+
+    '<figure class="guided-question-visual" aria-label="Structures of THF, methanol, water, and ethanol">'+
+    '<svg viewBox="0 0 820 300" role="img">'+
+    '<g fill="none" stroke="#202932" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M95 126 L145 82 L205 112 L190 176 L120 176 Z"/><path d="M315 130 L375 96 L435 130"/><path d="M560 130 L620 96"/><path d="M690 130 L745 96 L795 130"/></g>'+ 
+    '<g fill="#202932" font-family="system-ui,-apple-system,sans-serif" font-size="27" font-weight="700" text-anchor="middle"><text x="145" y="91">O</text><text x="375" y="107">O</text><text x="435" y="141">H</text><text x="560" y="141">H</text><text x="620" y="107">O–H</text><text x="795" y="141">O–H</text></g>'+ 
+    '<g fill="#52616b" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" text-anchor="middle"><text x="150" y="225">THF</text><text x="375" y="225">methanol</text><text x="590" y="225">water</text><text x="745" y="225">ethanol</text></g></svg></figure>';
+}
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-05");
+  if(q){
+    q.prompt='Assign all four Brønsted roles in the <b>reaction shown</b>. Names and structures stay paired.'+
+      '<figure class="guided-question-visual" aria-label="Methanol plus amide ion forms methoxide plus ammonia"><svg viewBox="0 0 900 245" role="img"><g fill="#202932" font-family="system-ui,-apple-system,sans-serif" text-anchor="middle">'+
+      '<g font-size="21" font-weight="750"><text x="135" y="34">methanol</text><text x="345" y="34">amide ion</text><text x="625" y="34">methoxide</text><text x="800" y="34">ammonia</text></g><g font-size="34" font-weight="650"><text x="135" y="120">H₃C—O—H</text><text x="345" y="120">⁻NH₂</text><text x="625" y="120">H₃C—O⁻</text><text x="800" y="120">NH₃</text></g><g font-size="38" font-weight="700" fill="#0b668f"><text x="245" y="120">+</text><text x="470" y="120">⇌</text><text x="720" y="120">+</text></g><g font-size="18" fill="#52616b"><text x="450" y="190">Track the same H⁺ from reactants to products.</text></g></g></svg></figure>';
+    q.hints=["Follow only the H⁺ shown on methanol: which reactant loses it, and which reactant gains it?","The H⁺ donor is the acid; the H⁺ acceptor is the base.","Each product is the conjugate partner of the reactant directly connected to it by losing or gaining H⁺."];
+  }
+}
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-10");
+  if(q){
+    q.prompt='Compare the two <b>drawn rings</b>. If the labeled CH₂ proton is removed, does B gain the same aromatic stabilization as A?'+
+      '<figure class="guided-question-visual" aria-label="Cyclopentadiene and cycloheptatriene with their saturated CH2 positions labeled"><svg viewBox="0 0 820 330" role="img"><g fill="none" stroke="#202932" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">'+
+      '<path d="M180 72 L275 142 L238 255 L122 255 L85 142 Z"/><path d="M187 82 L263 140 M229 239 L131 239"/><path d="M590 58 L685 106 L710 205 L642 282 L538 282 L470 205 L495 106 Z"/><path d="M598 70 L673 109 M696 115 L714 195 M528 270 L480 210"/></g><g fill="#202932" font-family="system-ui,-apple-system,sans-serif" text-anchor="middle"><g font-size="22" font-weight="800"><text x="180" y="28">A · cyclopentadiene</text><text x="590" y="28">B · cycloheptatriene</text></g><g font-size="24" font-weight="750"><text x="180" y="67">CH₂</text><text x="590" y="54">CH₂</text></g><g font-size="19" fill="#52616b"><text x="410" y="315">Remove H⁺ from each labeled CH₂, then count π electrons.</text></g></g></svg></figure>';
+    q.hints=["Locate the labeled saturated CH₂ in each ring; that is the proton-removal site.","After deprotonation, its lone pair joins the ring π system. Count the ring π electrons in each anion.","A 6π cyclic conjugated system is aromatic; an 8π system does not receive that same stabilization."];
+  }
+}
+{
+  const q=QUESTIONS.find(x=>x.id==="SIM-AB8-20260911-31");
+  if(q){
+    q.prompt='Compare the <b>drawn N–H acids</b>. After one amino H⁺ is removed, which parent is more acidic?'+
+      '<figure class="guided-question-visual" aria-label="2-aminopyridine and 3-aminopyridine bond-line structures with the amino N-H sites shown"><svg viewBox="0 0 820 330" role="img"><g fill="none" stroke="#202932" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">'+
+      '<path d="M180 70 L272 123 L272 227 L180 280 L88 227 L88 123 Z"/><path d="M190 87 L255 125 M255 218 L190 262 M104 218 L104 132"/><path d="M272 123 L335 86"/><path d="M590 70 L682 123 L682 227 L590 280 L498 227 L498 123 Z"/><path d="M600 87 L665 125 M665 218 L600 262 M514 218 L514 132"/><path d="M682 227 L745 264"/></g><g fill="#202932" font-family="system-ui,-apple-system,sans-serif" text-anchor="middle"><g font-size="22" font-weight="800"><text x="180" y="28">A · 2-aminopyridine</text><text x="590" y="28">B · 3-aminopyridine</text></g><g font-size="29" font-weight="750"><text x="180" y="72">N</text><text x="365" y="82">NH₂</text><text x="590" y="72">N</text><text x="772" y="285">NH₂</text></g><g font-size="18" fill="#52616b"><text x="410" y="315">Remove one amino H⁺, then compare where −1 can be stabilized.</text></g></g></svg></figure>';
+    q.choices=["A; its conjugate base has an especially stabilizing contributor with −1 on the ring nitrogen","B; equal contributor count means equal acidity","B; carbon is more electronegative than nitrogen","A; because its conjugate base is less stable"];
+    q.hints=["First identify the acidic bond in each drawing: it is an N–H bond on the attached NH₂ group.","After H⁺ is removed, trace where the negative charge can move through the ring.","Do not count drawings only. A contributor with −1 on nitrogen is more stable than one with −1 on carbon."];
+  }
+}
 /* v3.75: an answer surface for proton-transfer arrows. The stable legacy keys remain
    available for old attempts; the new response is an unordered pair of graph edges. */
 ['lw-06','lw-08'].forEach(id=>{const q=QUESTIONS.find(x=>x.id===id);q.prompt+=courseStructureDiagram(id==='lw-06'?'ammonia-bf3-pair':'water-bf3-pair','Visible reactant atoms, bonds and lone pairs before the Lewis acid–base bond forms','The reactants before the new bond forms');});
@@ -5393,21 +5506,29 @@ function assignmentQuestionScore(q){
   const f=personalFriction(q), ev=(S.attempts||[]).filter(a=>a.id===q.id), unseen=!ev.length;
   const due=(S.adaptiveReviews||[]).some(x=>x.due<=Date.now()&&x.id===q.id);
   const recentReason=recentReasoningForQuestion(q.id), review=S.questionFlags[q.id]?.active;
-  return (due?8:0)+(review?12:0)+(recentReason.length?Math.min(9,3+recentReason.length*2):0)+(unseen?3:0)+f.score*2+(exposureType(q)==="novel"?1.3:exposureType(q)==="similar"?.6:0)-recencyPenalty(q.id)+Math.random()*.2;
+  const last=ev.length?Math.max(...ev.map(a=>a.ts||0)):0, hours=last?(Date.now()-last)/36e5:Infinity;
+  /* v3.77: a flag or fresh miss belongs in Review immediately, not as the same exact card
+     again five minutes later. Same-day exact repeats take a hard score hit; a different
+     question testing the same skill should lead. */
+  const exactCooldown=hours<6?30:hours<24?14:hours<48?4:0;
+  return (due?8:0)+(review?12:0)+(recentReason.length?Math.min(9,3+recentReason.length*2):0)+(unseen?3:0)+f.score*2+(exposureType(q)==="novel"?1.3:exposureType(q)==="similar"?.6:0)-recencyPenalty(q.id)-exactCooldown+Math.random()*.2;
 }
 function distinctAdaptivePicks(pool,n,avoidIds){
-  const used=new Set(avoidIds||[]), fams=new Set([...used].map(id=>CONCEPT_FAMILY[id]).filter(Boolean)), out=[];
-  pool.slice().sort((a,b)=>assignmentQuestionScore(b)-assignmentQuestionScore(a)).forEach(q=>{ if(out.length>=n||used.has(q.id))return; const f=CONCEPT_FAMILY[q.id]; if(f&&fams.has(f))return; out.push(q);used.add(q.id);if(f)fams.add(f); });
+  const used=new Set(avoidIds||[]), fams=new Set([...used].map(id=>CONCEPT_FAMILY[id]).filter(Boolean)), sources=new Set(), out=[];
+  [...used].forEach(id=>{const q=QUESTIONS.find(x=>x.id===id);(q?.sourceModelIds||[]).forEach(src=>sources.add(src));});
+  pool.slice().sort((a,b)=>assignmentQuestionScore(b)-assignmentQuestionScore(a)).forEach(q=>{ if(out.length>=n||used.has(q.id))return; const f=CONCEPT_FAMILY[q.id],src=q.sourceModelIds||[]; if((f&&fams.has(f))||src.some(x=>sources.has(x)))return; out.push(q);used.add(q.id);if(f)fams.add(f);src.forEach(x=>sources.add(x)); });
   if(out.length<n)pool.slice().sort((a,b)=>assignmentQuestionScore(b)-assignmentQuestionScore(a)).forEach(q=>{if(out.length<n&&!used.has(q.id)){out.push(q);used.add(q.id);}});
   return out;
 }
 function buildAdaptiveQueue(plan){
   const out=[], used=[], total=plan.total||ADAPTIVE_TOTAL, topics=plan.topics||[];
+  const scoped=QUESTIONS.filter(q=>topics.includes(q.topic)&&q.type!=="written");
+  const rotated=excludeRecentRounds(scoped,total);
   // With ten slots across three selected topics, seed three distinct items per topic.
   // The remaining slot follows the ordinary need score; future slots can still branch.
   const floor=topics.length?Math.max(1,Math.floor(total/topics.length)):0;
-  topics.forEach(k=>{const picks=distinctAdaptivePicks(QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"),floor,used);picks.forEach(p=>{out.push(p);used.push(p.id);});});
-  const rest=QUESTIONS.filter(q=>(plan.topics||[]).includes(q.topic)&&q.type!=="written");
+  topics.forEach(k=>{let candidates=rotated.filter(q=>q.topic===k);if(candidates.length<floor)candidates=scoped.filter(q=>q.topic===k);const picks=distinctAdaptivePicks(candidates,floor,used);picks.forEach(p=>{out.push(p);used.push(p.id);});});
+  const rest=rotated.length>=total?rotated:scoped;
   out.push(...distinctAdaptivePicks(rest,total-out.length,used));
   return spreadByDifficulty(out,total).slice(0,total);
 }
@@ -5605,8 +5726,20 @@ const GUIDED_PATH_IDS={
 function startPathPractice(setId){
   const st=EXAM1_FLIGHT_SETS.find(x=>x.id===setId); if(!st)return;
   const blueprint=GUIDED_PATH_IDS[setId]||[];
-  const queue=blueprint.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
+  let queue=blueprint.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(blueprint.length&&queue.length!==blueprint.length)throw new Error("Incomplete guided-practice blueprint for "+setId);
+  /* v3.77: the first supported run stays deliberately sequenced. “Practice 5 more” is
+     a transfer run, so it rotates through the rest of that flight instead of replaying
+     the same five-card lesson. The ops flight still guarantees a real arrow board. */
+  const alreadyPracticed=!!S.flightPrep[setId]?.practicedAt, pool=focusPool(st);
+  if(alreadyPracticed&&pool.length>=5){
+    const rotated=distinctAdaptivePicks(excludeRecentRounds(pool,5),5,[]);
+    if(rotated.length===5)queue=rotated;
+    if(setId==="exam1-flight-ops"&&!queue.some(q=>q.arrowBoard)){
+      const arrow=pool.filter(q=>q.arrowBoard).sort((a,b)=>assignmentQuestionScore(b)-assignmentQuestionScore(a))[0];
+      if(arrow&&!queue.some(q=>q.id===arrow.id))queue[queue.length-1]=arrow;
+    }
+  }
   if(!queue.length){startFocusDrill(setId);return;}
   S.drill={queue,i:0,right:0,wrong:0,topic:st.topic,answered:false,log:[],runId:makeRunId("path-practice"),scopeName:"Guided practice — "+st.shortLabel,pathPracticeFor:setId};
   go("drill");
@@ -6376,6 +6509,51 @@ function addReviewFlag(c,q,D){
   return {active:()=>active,note:()=>note.value.trim().slice(0,500),persist};
 }
 
+/* v3.77: generated transfer is useful only when its representation is explicit. This
+   Khan/tutorial-style orientation appears before every generated item and tells Gabe what
+   kind of chemistry object is on screen before he has to interpret the wording. */
+function questionOrientation(q){
+  if(!q||!q.sourceModelIds)return"";
+  const raw=String(q.prompt||"").replace(/<[^>]*>/g," ");
+  let kind="APPLY THE RULE", note="Use the visible structure and make the one requested decision.";
+  if(q.questionMode==="one-molecule"){
+    kind="ONE MOLECULE + H⁺";
+    note="All labels belong to the same connected molecule. Choose one protonation site; no full product or curved-arrow mechanism is required.";
+  }else if(q.arrowBoard){
+    kind="DRAW ON THE REACTION";
+    note="Use the visible reactants. Place the electron-moving arrows on those atoms and bonds.";
+  }else if(/⇌|→/.test(raw)){
+    kind="REACTION";
+    note="Read left to right as a reaction. Track the H, charge, and named species across the arrow.";
+  }else if(/which|compare|rank|stronger|more acidic|more basic/i.test(raw)){
+    kind="COMPARE STRUCTURES";
+    note="The displayed structures are examples to compare; they are not reacting with one another unless an arrow is shown.";
+  }
+  return '<aside class="question-orientation"><div class="question-orientation-head"><span class="tag teal">NEW PRACTICE</span><b>Same course skill · different example</b></div><p><b>'+kind+':</b> '+note+'</p></aside>';
+}
+function questionRepeatNotice(q){
+  const ev=(S.attempts||[]).filter(a=>a.id===q.id);if(!ev.length)return"";
+  const last=ev[ev.length-1], hours=(Date.now()-(last.ts||0))/36e5;
+  let why="spaced review after an earlier attempt";
+  if(S.questionFlags[q.id]?.active)why="you flagged this exact question for review";
+  else if(!last.ok)why="the last attempt was incorrect";
+  else if(last.dk)why="you marked the last attempt ‘I don’t know this yet’";
+  else if(last.g)why="the last correct answer was marked as a guess";
+  else if(last.h)why="the last correct answer used hints";
+  const when=hours<1?"earlier this hour":hours<24?Math.max(1,Math.round(hours))+" hours ago":Math.round(hours/24)+" days ago";
+  return '<aside class="question-orientation" style="border-left-color:#9a6500;background:#fffaf1"><div class="question-orientation-head"><span class="tag gold">REPEAT</span><b>Why this returned</b></div><p>'+esc(why)+' · last seen '+when+'. Exact cards and generated near-twins now cool down together; when the bank has an alternative, a different structure comes first.</p></aside>';
+}
+
+/* Local QA inventory: presentation metadata only, never answer keys or learner records. */
+if(new URLSearchParams(location.search).get("qa")==="1"){
+  const qaSummary=QUESTIONS.map(q=>({
+    id:q.id, topic:q.topic, generated:!!q.sourceModelIds,
+    text:String(q.prompt||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim(),
+    hasVisual:!!(q.arrowBoard||q.structureHtml||q.visual||q.drawMol||(q.bondLineFirst||[]).length||/(<svg|<figure|<img|exam-bondline|course-structure|course-molecule)/.test(String(q.prompt||"")))
+  }));
+  const qaNode=document.createElement("script");qaNode.type="application/json";qaNode.id="qa-question-summary";qaNode.textContent=JSON.stringify(qaSummary);document.head.appendChild(qaNode);
+}
+
 VIEWS.drill = (v) => {
   if (!S.drill){ go("practice"); return; }
   const D = S.drill;
@@ -6617,7 +6795,7 @@ VIEWS.drill = (v) => {
     v.appendChild(ac);
   }
   const c = el("div",{class:"card"});
-  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+ 
+  c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+questionOrientation(q)+questionRepeatNotice(q)+ 
     (D.diagVersion?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>'+((D.diagCriticalIds||[]).includes(q.id)?'🔒 Critical readiness task':'Readiness sample')+':</b> '+esc((D.diagRoles||{})[q.id]||"homework-level transfer")+'</p>':'')+
     '<div class="qprompt">'+(q.arrowBoard?'Draw both curved arrows for this proton transfer, then choose the product or charge.':q.prompt)+'</div>';
   if(q.arrowBoard)c.appendChild(el('div',{'data-proton-arrow-host':''}));
@@ -6704,6 +6882,9 @@ VIEWS.drill = (v) => {
     if(attempt.h)D.hinted=(D.hinted||0)+1;
     if(ok){D.right++; if(guessed){ D.guessedRight=(D.guessedRight||0)+1; S.missed.push(q.id); } } // correct-but-guessed = shaky → stays in rotation
     else{D.wrong++;S.missed.push(q.id);}
+    /* v3.77: a later clean answer closes the legacy missed-loop. Spaced-review dates remain
+       in adaptiveReviews, but the old S.missed list no longer keeps a solved card forever. */
+    if(ok&&!guessed&&!reviewFlag&&!(attempt.h>0))S.missed=S.missed.filter(id=>id!==q.id);
     if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; if(ok&&!guessed&&reviewFlag)bt.rf=(bt.rf||0)+1; } // assisted rights stay visible but never count as clean readiness
     const rat=(rInp&&rInp.value.trim())||"";
     const reasonSignal=reasoningSignalText(wrText||rat); if(reasonSignal)attempt.rs=reasonSignal;
