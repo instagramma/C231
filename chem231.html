@@ -10,7 +10,8 @@
   v3.80 (2026-09-13, Sun): DRAW THE CHEMISTRY, THEN EXPLAIN IT.
         The written thiophenolate/cyclohexanethiol and acetic-acid/hydroxide tasks are now real
         two-part responses. Part 1 requires curved arrows on visible reactants; only a correct
-        arrow set opens the question-specific written Part 2. The old AB3-arw07 graphic that
+        arrow set opens the question-specific written Part 2. The exact submitted arrow diagram
+        stays visible, zoomable, and read-only beside Part 2, including after pause/resume. The old AB3-arw07 graphic that
         printed the products and arrow instructions before the attempt is gone. Five core
         Chapter 2 production cards now require the checked Resonance Lab: acetate, allyl cation,
         amide donation, allyl anion, and nitrile anion. Each blocks its word controls until Gabe
@@ -20,8 +21,7 @@
         older instructor Exam 1 practice sheet (Q1-12 and Q17-19) are code-redrawn with stable IDs,
         visible structures, a dedicated practice route, and a modest adaptive priority boost;
         Q13-16 and Q20+ are excluded as instructed. Arrow, resonance, Learn, 1,166-question bank,
-        flightpath, and instructor-set QA passed with zero browser errors. DEPLOY PENDING;
-        awaiting learner evidence.
+        flightpath, and instructor-set QA passed with zero browser errors. Public v3.80 (deployed 2026-09-13 21:40 PDT, commit 4ed86a1); awaiting learner evidence.
   v3.79 (2026-09-13, Sun): EVERY QUESTION IDENTIFIES ITSELF.
         Every live question and read-only answer replay now shows its permanent question ID
         directly below the status tag with a one-tap Copy ID button. The control copies only
@@ -4459,17 +4459,19 @@ function protonProductCard(value){
   const name=value==='PhO⁻'?'Ring–O⁻ · phenoxide':value==='PhOH₂⁺'?'Ring–OH₂⁺ · extra H on O':'Ring–H · oxygen removed';
   return '<svg viewBox="0 0 210 125" role="img" aria-label="'+esc(name)+'"><path d="M 100 62 L 80 27 L 40 27 L 20 62 L 40 97 L 80 97 Z M 88 60 L 74 36 M 33 61 L 46 36 M 47 87 L 74 87 M 100 62 L 131 62" fill="none" stroke="#25313a" stroke-width="2.7"/><text x="137" y="70" font-family="Arial" font-size="22" fill="#25313a">'+group+'</text></svg><span>'+esc(name)+'</span>';
 }
-function renderProtonArrowQuestion(host,q,D,finish,onWrittenArrowPass){
+function renderProtonArrowQuestion(host,q,D,finish,onWrittenArrowPass,reviewOnly=false){
   const spec=protonArrowSpec(q.arrowBoard),all=D.arrowDrafts||(D.arrowDrafts={});
   const draft=all[q.id]||(all[q.id]={arrows:[],pending:null,answers:{}});
   const locked=()=>!!D.answered||!!draft.locked;
   const panel=el('section',{class:'proton-arrow-board','aria-label':'Draw your arrows'});
-  panel.innerHTML='<h3>Draw both arrows here</h3><p style="margin:4px 0">Drag from a pair of dots or a bond to its destination. Or tap the start, then tap the end. Both arrows show one reaction step.</p><p class="muted" style="font-size:.83rem;margin:6px 0">'+esc(spec.definition)+'</p><details class="why" style="margin:8px 0"><summary><b>Exam Part B checklist for this drawing</b></summary><ul class="audit"><li>Every tail starts on an electron pair: a lone pair or bond.</li><li>Every head ends where that pair goes: the proton, atom, or new bond.</li><li>The single proton-transfer step has both required arrows.</li><li>The products and their formal charges must match the arrows.</li></ul></details>';
+  panel.innerHTML=reviewOnly
+    ?'<span class="tag teal">✓ PART 1 DRAWING</span><h3 style="margin:7px 0 3px">Your saved curved arrows</h3><p style="margin:4px 0">Keep this diagram in view while you name the products, charges, roles, or equilibrium direction below.</p>'
+    :'<h3>Draw both arrows here</h3><p style="margin:4px 0">Drag from a pair of dots or a bond to its destination. Or tap the start, then tap the end. Both arrows show one reaction step.</p><p class="muted" style="font-size:.83rem;margin:6px 0">'+esc(spec.definition)+'</p><details class="why" style="margin:8px 0"><summary><b>Exam Part B checklist for this drawing</b></summary><ul class="audit"><li>Every tail starts on an electron pair: a lone pair or bond.</li><li>Every head ends where that pair goes: the proton, atom, or new bond.</li><li>The single proton-transfer step has both required arrows.</li><li>The products and their formal charges must match the arrows.</li></ul></details>';
   const diagram=el('div',{style:'overflow-x:auto;max-width:100%'}),status=el('p',{'aria-live':'polite',style:'margin:4px 0'}),list=el('div',{class:'proton-arrow-list'}),controls=el('div',{class:'proton-arrow-controls'});
   let enlarged=false;
   const zoom=el('button',{class:'btn ghost small',type:'button','aria-pressed':'false',onclick:()=>{enlarged=!enlarged;zoom.textContent=enlarged?'Fit drawing to screen':'Enlarge drawing';zoom.setAttribute('aria-pressed',String(enlarged));draw();}},'Enlarge drawing');
   const undo=el('button',{class:'btn ghost small',type:'button',onclick:()=>{if(locked())return;if(draft.pending)draft.pending=null;else draft.arrows.pop();remember();draw();}},'Undo last arrow');
-  controls.appendChild(undo);controls.appendChild(zoom);panel.appendChild(diagram);panel.appendChild(status);panel.appendChild(list);panel.appendChild(controls);
+  if(!reviewOnly)controls.appendChild(undo);controls.appendChild(zoom);panel.appendChild(diagram);panel.appendChild(status);panel.appendChild(list);panel.appendChild(controls);
   function remember(){snapshotDrill(D.i);}
   function add(from,to){
     if(locked()||draft.arrows.length>=2)return;
@@ -4481,7 +4483,7 @@ function renderProtonArrowQuestion(host,q,D,finish,onWrittenArrowPass){
     const focused=diagram.contains(document.activeElement)?document.activeElement.closest('[data-point]')?.dataset.point:null;
     diagram.innerHTML=protonArrowMarkup(spec,draft,'proton-'+q.id);
     const name=id=>spec.points.find(p=>p.id===id)?.label||id;
-    status.textContent=draft.arrows.length===2?'Both arrows drawn. Choose the answer below, then check.':draft.pending?'Start selected: '+name(draft.pending)+'. Tap where the arrow ends.':'Arrow '+(draft.arrows.length+1)+' of 2: choose where its tail starts.';
+    status.textContent=reviewOnly?'Part 1 is locked and saved with this question.':draft.arrows.length===2?'Both arrows drawn. Choose the answer below, then check.':draft.pending?'Start selected: '+name(draft.pending)+'. Tap where the arrow ends.':'Arrow '+(draft.arrows.length+1)+' of 2: choose where its tail starts.';
     list.innerHTML=draft.arrows.map((a,i)=>'<div><b>Arrow '+(i+1)+':</b> '+esc(name(a.from))+' → '+esc(name(a.to))+'</div>').join('');
     undo.disabled=locked()||(!draft.pending&&!draft.arrows.length);
     const svg=diagram.querySelector('svg');svg.style.minWidth=enlarged?'560px':'';let drag=null;
@@ -4525,7 +4527,7 @@ function renderProtonArrowQuestion(host,q,D,finish,onWrittenArrowPass){
     finish(correctArrows&&correctAnswer,'The base’s lone pair → the acid’s H; the old O–H bond → that acid O. '+(q.fields||[]).slice(4).map(f=>f.label+': '+f.answer).join(' · '),undefined,submitted);
     check.disabled=true;answers.querySelectorAll('button').forEach(x=>x.disabled=true);draw();status.textContent='Your submitted arrows are saved above.';
     if(!correctArrows){const worked=el('details',{open:true});worked.innerHTML='<summary><b>Compare with the correct arrows</b></summary>'+protonArrowMarkup(spec,{arrows:spec.expected,pending:null},'solution-'+q.id)+'<p>The dots on the separate O⁻ supply the pair that bonds to H. The old O–H bond supplies the pair that returns to the original O.</p>';worked.querySelectorAll('[data-point]').forEach(g=>{g.removeAttribute('role');g.removeAttribute('tabindex');});panel.appendChild(worked);}
-  }},q.type==="written"?'Check Part 1 arrows':'Check arrows + answer');panel.appendChild(check);host.appendChild(panel);draw();
+  }},q.type==="written"?'Check Part 1 arrows':'Check arrows + answer');if(!reviewOnly)panel.appendChild(check);host.appendChild(panel);draw();
 }
 /* ================= MOLECULES (Lewis Lab) =================
    Every target is a labelled molecular graph. The audit matches a student's graph up to
@@ -7158,7 +7160,12 @@ VIEWS.drill = (v) => {
       if((D.log||[]).length)ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=D.log.length-1;render();}},"👀 see my previous answers"));
       ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{snapshotDrill(S.drill.i);S.drill=null;go("home");}},"⏸ pause round — saved, resume from Home"));v.appendChild(ctl);return;
     }
-    if(q.arrowBoard&&arrowPassed)c.appendChild(el("div",{class:"why",style:"margin:8px 0 10px"},'<span class="tag teal">✓ PART 1 SAVED</span><h3 style="margin:7px 0 3px">'+esc(q.arrowPart2Title||"Part 2 of 2 · Explain the chemistry")+'</h3><p style="margin:0">'+esc(q.arrowPart2Help||"Explain what the arrows do, name the products, and place the formal charges.")+'</p>'));
+    if(q.arrowBoard&&arrowPassed){
+      const savedArrowHost=c.querySelector('[data-proton-arrow-host]');
+      c.appendChild(savedArrowHost); // keep the submitted structure immediately beside Part 2
+      renderProtonArrowQuestion(savedArrowHost,q,D,finish,null,true);
+      c.appendChild(el("div",{class:"why",style:"margin:8px 0 10px"},'<span class="tag teal">✓ PART 1 SAVED</span><h3 style="margin:7px 0 3px">'+esc(q.arrowPart2Title||"Part 2 of 2 · Explain the chemistry")+'</h3><p style="margin:0">'+esc(q.arrowPart2Help||"Explain what the arrows do, name the products, and place the formal charges.")+'</p>'));
+    }
     // v3.0: written item — answer on paper or type it; compare to model; self-grade HONESTLY (08-19 covenant).
     const ta=el("textarea",{class:"answerbox wide",style:"min-height:110px;width:100%;font-size:.95em",placeholder:q.arrowBoard?(q.arrowPart2Placeholder||"Part 2: explain the products and charges…"):"Work it on paper first if you prefer — then type your answer/derivation here (it gets saved for Claude's review)…"});
     const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;margin:8px 0 2px"});
