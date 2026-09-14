@@ -6,7 +6,14 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.82
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.84
+  v3.84 (2026-09-14, Mon): terminal-alkyne figure corrected again after a full render audit of
+        all ten condensedBondLineDiagram shapes: it was labelled 1-butyne but drew propyne (3 C),
+        and the bond into the first sp carbon was angled. Now CH3-CH2 angled, then CH2-C≡C-H
+        collinear. The other nine shapes were checked against their formulas and are correct.
+  v3.83 (2026-09-14, Mon): terminal-alkyne figure fixed — the triple bond ran straight into the H,
+        which read as H≡C (impossible; H makes exactly one bond). Now: triple bond ends at the
+        implicit terminal carbon, then a single-bond stub to H. Gabe caught it within minutes.
   v3.82 (2026-09-14, Mon): FLAGS ARE MESSAGES TO THE REVIEWERS. Gabe: "they are for your and gpt
         review, not mine." The flag toggle and note now say so, and in the exported Report the
         flagged questions move to the TOP under a loud NOTES FOR CLAUDE / GPT header with the full
@@ -2341,9 +2348,11 @@ function condensedBondLineDiagram(kind,title,formula,description){
   if(kind==="ethanol") body=
     '<polyline points="28,112 102,70 164,104"/><text x="188" y="113" text-anchor="middle" class="atom oxygen">O</text><line x1="204" y1="103" x2="233" y2="86"/><text x="251" y="89" text-anchor="middle" class="atom hydrogen">H</text>';
   if(kind==="terminalalkyne") body=
-    '<line x1="30" y1="120" x2="92" y2="78"/>'+
-    '<line x1="98" y1="66" x2="190" y2="66"/><line x1="98" y1="78" x2="190" y2="78"/><line x1="98" y1="90" x2="190" y2="90"/>'+
-    '<text x="213" y="88" text-anchor="middle" class="atom hydrogen">H</text>';
+    '<line x1="26" y1="124" x2="76" y2="92"/>'+
+    '<line x1="76" y1="92" x2="128" y2="92"/>'+
+    '<line x1="134" y1="80" x2="196" y2="80"/><line x1="134" y1="92" x2="196" y2="92"/><line x1="134" y1="104" x2="196" y2="104"/>'+
+    '<line x1="202" y1="92" x2="228" y2="92"/>'+
+    '<text x="246" y="101" text-anchor="middle" class="atom hydrogen">H</text>';
   if(kind==="isobutanol") body=
     '<line x1="104" y1="88" x2="29" y2="43"/><line x1="104" y1="88" x2="29" y2="137"/><line x1="104" y1="88" x2="169" y2="88"/><line x1="169" y1="88" x2="207" y2="65"/><text x="226" y="68" text-anchor="middle" class="atom oxygen">O</text><line x1="241" y1="60" x2="261" y2="48"/><text x="279" y="51" text-anchor="middle" class="atom hydrogen">H</text>';
   if(kind==="butanol") body=
