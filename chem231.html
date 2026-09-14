@@ -6,7 +6,12 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.84
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.85
+  v3.85 (2026-09-14, Mon): EXAM-1 SCOPE LABELS. 23 questions lean on molecules/ideas past Ch 1-3
+        (LDA + enolates, lactams, imines, sulfonic acids, cyclopentadiene aromaticity, ascorbic
+        acid, DBN, styrenes). Their reasoning is Ciesla's own ARIO/conjugate-base-stability
+        content, so they are LABELLED, not muted or rewritten — Gabe asked to modify rather than
+        hide, and they stay useful after Exam 1. Keys, rubrics, scoring and routing unchanged.
   v3.84 (2026-09-14, Mon): terminal-alkyne figure corrected again after a full render audit of
         all ten condensedBondLineDiagram shapes: it was labelled 1-butyne but drew propyne (3 C),
         and the bond into the first sp carbon was angled. Now CH3-CH2 angled, then CH2-C≡C-H
@@ -4390,6 +4395,22 @@ QUESTIONS.forEach(q=>{
 /* v3.75: an answer surface for proton-transfer arrows. The stable legacy keys remain
    available for old attempts; the new response is an unordered pair of graph edges. */
 ['lw-06','lw-08'].forEach(id=>{const q=QUESTIONS.find(x=>x.id===id);q.prompt+=courseStructureDiagram(id==='lw-06'?'ammonia-bf3-pair':'water-bf3-pair','Visible reactant atoms, bonds and lone pairs before the Lewis acid–base bond forms','The reactants before the new bond forms');});
+/* v3.85 — Exam-1 scope tagging. MUST run after every per-question prompt rewrite above:
+   several questions (e.g. SIM-AB8-20260911-21) reassign q.prompt wholesale, which silently
+   dropped this badge when the block sat earlier in the file. Caught by a render count of
+   22 badges against 23 tagged ids. Ciesla's official Exam 1 topic list covers Ch 1-3 only.
+   These questions use molecules or ideas she has not taught yet (LDA/enolates, lactams,
+   imines, sulfonic acids, cyclopentadiene aromaticity, ascorbic acid, DBN, styrenes).
+   The REASONING in them is her ARIO/conjugate-base content and stays valuable later, so they
+   are NOT removed or muted — they are labelled, so a learner revising for Exam 1 can tell at a
+   glance what is in scope. Scoring, keys, rubrics and routing are untouched. */
+const BEYOND_EXAM1=["SIM-RC-20260830R-08", "EXACT-RB2-20260901-07", "SIM-RB2-20260901-07", "SIM-RB6-20260902-05", "EXACT-AB8-20260911-02", "EXACT-AB8-20260911-05", "EXACT-AB8-20260911-06", "EXACT-AB8-20260911-08", "EXACT-AB8-20260911-13", "EXACT-AB8-20260911-15", "EXACT-AB8-20260911-16", "EXACT-AB8-20260911-17", "EXACT-AB8-20260911-18", "EXACT-AB8-20260911-19", "EXACT-AB8-20260911-22", "EXACT-AB8-20260911-46", "EXACT-AB8-20260911-47", "SIM-AB8-20260911-02", "SIM-AB8-20260911-11", "SIM-AB8-20260911-14", "SIM-AB8-20260911-21", "WR-AB8-20260911-02", "WR-AB8-20260911-04"];
+QUESTIONS.forEach(q=>{
+  if(BEYOND_EXAM1.indexOf(q.id)<0) return;
+  q.beyondExam1=true;
+  q.prompt='<div style="display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:#f1ece2;color:#6b5a38;border:1px solid #cbbb95;border-radius:99px;padding:3px 9px;margin:0 0 8px">Beyond Exam 1 scope · Ch 1-3 only</div><br>'+q.prompt;
+});
+
 const PROTON_ARROW_QUESTIONS={"EXACT-AB8-20260911-01":"phenol-hydroxide","SIM-AB8-20260911-01":"acetic-methoxide","AB3-arw07":"acetic-hydroxide","WR-AB8-20260911-03":"thiophenolate-cyclohexanethiol"};
 Object.entries(PROTON_ARROW_QUESTIONS).forEach(([id,key])=>{
   const q=QUESTIONS.find(x=>x.id===id);q.arrowBoard=key;
