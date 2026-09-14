@@ -6,7 +6,19 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.80  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.82
+  v3.82 (2026-09-14, Mon): FLAGS ARE MESSAGES TO THE REVIEWERS. Gabe: "they are for your and gpt
+        review, not mine." The flag toggle and note now say so, and in the exported Report the
+        flagged questions move to the TOP under a loud NOTES FOR CLAUDE / GPT header with the full
+        note text, topic, timestamp and a longer question excerpt — previously they were buried
+        mid-report with a 90-character snippet, which is why notes went unread. Storage unchanged.
+  v3.81 (2026-09-14, Mon): SOLVENT-LEVELING QUESTION NOW SHOWS ITS STRUCTURES.
+        WR-AB8-20260911-04 asked the learner to compare ethanol's O-H against a terminal
+        alkyne's triple-bond C-H while showing neither molecule; Gabe flagged it twice, the
+        second time saying he would just guess to clear it. Both molecules are now drawn as
+        code-native bond-line figures under the prompt via the existing condensedBondLineDiagram
+        helper (new "terminalalkyne" shape). Answer key, rubric, scoring and question ID unchanged.
+  v3.80  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
   v3.80 (2026-09-13, Sun): DRAW THE CHEMISTRY, THEN EXPLAIN IT.
         The written thiophenolate/cyclohexanethiol and acetic-acid/hydroxide tasks are now real
         two-part responses. Part 1 requires curved arrows on visible reactants; only a correct
@@ -21,7 +33,7 @@
         older instructor Exam 1 practice sheet (Q1-12 and Q17-19) are code-redrawn with stable IDs,
         visible structures, a dedicated practice route, and a modest adaptive priority boost;
         Q13-16 and Q20+ are excluded as instructed. Arrow, resonance, Learn, 1,166-question bank,
-        flightpath, and instructor-set QA passed with zero browser errors. Public v3.80 (deployed 2026-09-13 21:40 PDT, commit 4ed86a1); awaiting learner evidence.
+        flightpath, and instructor-set QA passed with zero browser errors. Public v3.80 (deployed 2026-09-13 21:40 PDT, commit 4ed86a1; arrow-diagram-stays-visible follow-up deployed 2026-09-14 09:01 PDT, commit 93c78ff); awaiting learner evidence.
   v3.79 (2026-09-13, Sun): EVERY QUESTION IDENTIFIES ITSELF.
         Every live question and read-only answer replay now shows its permanent question ID
         directly below the status tag with a one-tap Copy ID button. The control copies only
@@ -2328,6 +2340,10 @@ function condensedBondLineDiagram(kind,title,formula,description){
     '<polyline points="22,112 72,68 122,112 172,68 242,112"/>';
   if(kind==="ethanol") body=
     '<polyline points="28,112 102,70 164,104"/><text x="188" y="113" text-anchor="middle" class="atom oxygen">O</text><line x1="204" y1="103" x2="233" y2="86"/><text x="251" y="89" text-anchor="middle" class="atom hydrogen">H</text>';
+  if(kind==="terminalalkyne") body=
+    '<line x1="30" y1="120" x2="92" y2="78"/>'+
+    '<line x1="98" y1="66" x2="190" y2="66"/><line x1="98" y1="78" x2="190" y2="78"/><line x1="98" y1="90" x2="190" y2="90"/>'+
+    '<text x="213" y="88" text-anchor="middle" class="atom hydrogen">H</text>';
   if(kind==="isobutanol") body=
     '<line x1="104" y1="88" x2="29" y2="43"/><line x1="104" y1="88" x2="29" y2="137"/><line x1="104" y1="88" x2="169" y2="88"/><line x1="169" y1="88" x2="207" y2="65"/><text x="226" y="68" text-anchor="middle" class="atom oxygen">O</text><line x1="241" y1="60" x2="261" y2="48"/><text x="279" y="51" text-anchor="middle" class="atom hydrogen">H</text>';
   if(kind==="butanol") body=
@@ -4179,7 +4195,7 @@ QUESTIONS.push(
 {id:"WR-AB8-20260911-01",flightLeg:"paper",topic:"acidbase2",type:"written",diff:3,prompt:"<b>Part B — atom versus orbital:</b> Draw the two conjugate bases of HOCH₂C≡CH, then justify which parent proton is more acidic. Your explanation must compare both charge-bearing atoms and the carbon orbital.",model:"Removing O–H gives <b>⁻OCH₂C≡CH</b>; removing terminal C–H gives <b>HOCH₂C≡C⁻</b>. The alcohol proton is more acidic because its conjugate base places −1 on <b>oxygen</b>, which is more electronegative than carbon. The acetylide does gain stability from an <b>sp orbital (50% s character)</b>, but that orbital advantage does not outweigh the atom advantage of O over C.",rubric:["Draws both conjugate bases with one fewer H and net −1","Places each charge on the atom that lost H","Uses oxygen electronegativity as the controlling atom comparison","Acknowledges sp stabilization without letting it override the O-versus-C comparison"]},
 {id:"WR-AB8-20260911-02",flightLeg:"paper",topic:"acidbase2",type:"written",diff:3,prompt:"<b>Part B — positive-charge sign reversal:</b> Compare protonated acetone, (CH₃)₂C=OH⁺, with protonated acetone imine, (CH₃)₂C=NH₂⁺. Identify the stronger acid and justify it without a pKₐ table.",model:"The <b>O-protonated carbonyl is the stronger acid</b>. Its conjugate base is neutral acetone. For the acids themselves, the less electronegative <b>nitrogen</b> tolerates positive charge better than oxygen, so the N-protonated imine is the more stable, weaker acid. This is the sign reversal: electronegative atoms stabilize − charge, while less electronegative atoms stabilize + charge.",rubric:["Selects O-protonated acetone as stronger acid","States that nitrogen handles positive charge better than oxygen","Connects the more stable charged acid to weaker acidity","Does not use the negative-charge electronegativity rule backward"]},
 {id:"WR-AB8-20260911-03",flightLeg:"paper",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Two-part proton-transfer argument:</b> For PhS⁻ + cyclohexyl–SH ⇌ PhSH + cyclohexyl–S⁻, first draw both curved arrows on the visible reactants. Then name all four acid/base roles and predict which side predominates at equilibrium from conjugate-base stability.",model:"Arrow 1 goes from a <b>lone pair on PhS⁻ to the thiol H</b>; arrow 2 goes from the <b>cyclohexyl S–H bond to that sulfur</b>. PhS⁻ is the base and PhSH its conjugate acid; cyclohexyl–SH is the acid and cyclohexyl–S⁻ its conjugate base. <b>Reactants are favored</b>: PhS⁻ is resonance-stabilized by the phenyl ring and is therefore the weaker base; equilibrium favors the weaker acid/base pair.",rubric:["Both arrows begin on electron sources and end at the correct destinations","All four roles are paired correctly","Recognizes phenyl thiolate as resonance-stabilized and weaker base","Chooses reactants and explicitly invokes the weaker-pair rule"]},
-{id:"WR-AB8-20260911-04",flightLeg:"paper",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Part B — solvent leveling:</b> Explain why ethanol cannot be used as the solvent when NH₂⁻ is supposed to generate an acetylide from a terminal alkyne. Include the actual competing reaction and the consequence for the desired anion.",model:"Ethanol is a <b>protic acid</b> (pKₐ about 16), much more acidic than a terminal alkyne (about 25). NH₂⁻ therefore reacts first with the enormous solvent excess: <b>NH₂⁻ + EtOH → NH₃ + EtO⁻</b>. The solvent levels the strongest available base to ethoxide, which is not strong enough to produce an appreciable concentration of acetylide. Use an aprotic solvent such as THF instead.",rubric:["Writes or states NH₂⁻ + EtOH → NH₃ + EtO⁻","Compares ethanol and terminal-alkyne acidity in the correct direction","Explains that solvent excess quenches/levels NH₂⁻","Concludes that the desired acetylide will not form appreciably"]}
+{id:"WR-AB8-20260911-04",flightLeg:"paper",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Part B — solvent leveling:</b> Explain why ethanol cannot be used as the solvent when NH₂⁻ is supposed to generate an acetylide from a terminal alkyne. Include the actual competing reaction and the consequence for the desired anion."+condensedBondLineDiagram("ethanol","Solvent — ethanol","CH₃CH₂OH","Ethanol bond-line structure: a two-carbon chain ending in an O-H group")+condensedBondLineDiagram("terminalalkyne","Substrate — terminal alkyne","CH₃CH₂C≡CH","Terminal alkyne bond-line structure: a two-carbon chain ending in a carbon-carbon triple bond bearing one hydrogen on the end carbon"),model:"Ethanol is a <b>protic acid</b> (pKₐ about 16), much more acidic than a terminal alkyne (about 25). NH₂⁻ therefore reacts first with the enormous solvent excess: <b>NH₂⁻ + EtOH → NH₃ + EtO⁻</b>. The solvent levels the strongest available base to ethoxide, which is not strong enough to produce an appreciable concentration of acetylide. Use an aprotic solvent such as THF instead.",rubric:["Writes or states NH₂⁻ + EtOH → NH₃ + EtO⁻","Compares ethanol and terminal-alkyne acidity in the correct direction","Explains that solvent excess quenches/levels NH₂⁻","Concludes that the desired acetylide will not form appreciably"]}
 );
 
 /* v3.73: answer controls may collect a decision, but must never hide the situation
@@ -6731,12 +6747,12 @@ function addReviewFlag(c,q,D){
   const saved=(S.questionFlags||{})[q.id]||{}, wrap=el("div",{class:"review-flag"});
   let active=!!saved.active;
   const toggle=el("button",{type:"button",class:"review-flag-toggle"+(active?" on":""),"aria-pressed":active?"true":"false"});
-  const note=el("textarea",{class:"answerbox review-flag-note"+(active?" open":""),placeholder:"What should I review or fix about this question?"});
+  const note=el("textarea",{class:"answerbox review-flag-note"+(active?" open":""),placeholder:"Note for Claude / GPT — what is wrong, missing, or confusing here? This goes out in your Report."});
   note.value=saved.note||"";
   const paint=()=>{
     toggle.className="review-flag-toggle"+(active?" on":"");
     toggle.setAttribute("aria-pressed",active?"true":"false");
-    toggle.textContent=active?"🚩 Flagged for review — add a note below":"⚐ Flag this question for review";
+    toggle.textContent=active?"🚩 Flagged for Claude / GPT — add your note below":"⚐ Flag this question for Claude / GPT";
     note.classList.toggle("open",active);
   };
   const persist=()=>{
@@ -8440,10 +8456,11 @@ VIEWS.report = (v) => {
   const missedIds=[...new Set(S.missed)];
   const missedTxt=missedIds.slice(-12).map(id=>{const q=QUESTIONS.find(x=>x.id===id);return "  ["+id+"] "+q.prompt.replace(/<[^>]+>/g,"").slice(0,70);}).join("\n");
   const reviewFlags=activeReviewFlags();
-  const reviewTxt=reviewFlags.map(([id,f])=>{const q=QUESTIONS.find(x=>x.id===id);return "  ["+id+"] "+(f.note||"No note")+" — "+(q?String(q.prompt).replace(/<[^>]+>/g,"").replace(/\s+/g," ").slice(0,90):"question no longer in bank");}).join("\n");
+  const reviewTxt=reviewFlags.map(([id,f])=>{const q=QUESTIONS.find(x=>x.id===id);const when=f.ts?new Date(f.ts).toLocaleString():"";return "  • ["+id+"] "+(q?(TOPICS[q.topic]?.name||q.topic):"?")+(when?" · "+when:"")+"\n    NOTE: "+(f.note||"(no note)")+"\n    Q: "+(q?String(q.prompt).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,160):"question no longer in bank");}).join("\n");
   const txt =
 "CHEM 231 BOOTCAMP REPORT — "+todayStr()+"\n"+
 "(paste this to Claude in the CHEM 231 session)\n\n"+
+(reviewFlags.length?("🚩 NOTES FOR CLAUDE / GPT — "+reviewFlags.length+" flagged question"+(reviewFlags.length===1?"":"s")+" (v3.82: read these FIRST, they are messages from Gabe about the app or the question):\n"+reviewTxt+"\n\n"):"")+
 "Track: "+S.doneDays.length+"/"+TRACK.length+" days marked done ("+S.doneDays.join(", ")+")\n"+
 "Visits: "+S.visits.join(", ")+"\n"+
 "Questions: "+a.r+" right / "+a.w+" wrong ("+a.pct+"% overall)\n"+
@@ -8453,7 +8470,6 @@ VIEWS.report = (v) => {
 "FC mastery: "+new Set(S.fcMastery).size+"/2 clean days"+(S.fcMastery.length?" ("+[...new Set(S.fcMastery)].join(", ")+")":"")+(new Set(S.fcMastery).size>=2?" — MASTERED":"")+"\n"+
 (S.lastEval?("Evaluator ("+S.lastEval.date+", "+S.lastEval.kind+"): "+S.lastEval.pct+"% · gaps to study first: "+(S.lastEval.gaps.length?S.lastEval.gaps.map(k=>TOPICS[k]?.name||k).join(" > "):"none")+"\n"):"")+
 (missedIds.length?("Recent misses:\n"+missedTxt+"\n"):"")+
-(reviewFlags.length?("Flagged for review:\n"+reviewTxt+"\n"):"")+
 // v3.0.1: include the v3.0 measurement layer in the export (guessed flags, diagnostics, written answers + rationales)
 (function(){ const g=Object.entries(S.qstats).filter(([id,s])=>(s.gr||0)+(s.gw||0)>0); if(!g.length) return "";
   return "Guessed-flagged: "+g.map(([id,s])=>"["+id+"] "+(s.gr||0)+" right-but-guessed / "+(s.gw||0)+" wrong-guessed").join(" · ")+"\n"; })()+
@@ -8482,7 +8498,7 @@ VIEWS.report = (v) => {
   }
   if(reviewFlags.length){
     const rq=el("div",{class:"card",style:"border-color:#c79a45;background:#fffaf1"});
-    rq.innerHTML='<span class="tag coral">🚩 Review queue</span><h2>'+reviewFlags.length+' question'+(reviewFlags.length===1?'':'s')+' you chose to revisit</h2><p class="muted">These are separate from guesses and reasoning notes. Clearing one marks it reviewed; it does not erase the attempt.</p>';
+    rq.innerHTML='<span class="tag coral">🚩 Review queue</span><h2>'+reviewFlags.length+' note'+(reviewFlags.length===1?'':'s')+' for Claude / GPT</h2><p class="muted">These are separate from guesses and reasoning notes. Clearing one marks it reviewed; it does not erase the attempt.</p>';
     reviewFlags.slice(0,6).forEach(([id,f])=>{
       const q=QUESTIONS.find(x=>x.id===id), row=el("div",{class:"why",style:"margin-top:8px;border-left-color:var(--gold)"});
       row.innerHTML='<b>'+(q?(TOPICS[q.topic]?.name||q.topic):id)+'</b><br>'+(f.note?esc(f.note):'<span class="muted">No note added.</span>');
