@@ -6,7 +6,22 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.79  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.80  ·  built 2026-08-09 · audited r1 08-11, r2 08-15, r3 (full-scope) 08-19, r4+r5 (bank) 08-25, r6+r7+r8 09-01, r9+r10+r11+r12+r13+r14+r15+r16+r17+r18+r19+r20 09-02, r21+r22+r23 09-03, r24 09-07, r25 09-09, r26 09-11
+  v3.80 (2026-09-13, Sun): DRAW THE CHEMISTRY, THEN EXPLAIN IT.
+        The written thiophenolate/cyclohexanethiol and acetic-acid/hydroxide tasks are now real
+        two-part responses. Part 1 requires curved arrows on visible reactants; only a correct
+        arrow set opens the question-specific written Part 2. The old AB3-arw07 graphic that
+        printed the products and arrow instructions before the attempt is gone. Five core
+        Chapter 2 production cards now require the checked Resonance Lab: acetate, allyl cation,
+        amide donation, allyl anion, and nitrile anion. Each blocks its word controls until Gabe
+        draws the arrow graph and builds the next contributor; both are saved with the attempt.
+        The instructor's Exam 1 Part B rubric now appears beside proton/resonance drawing and as
+        a 17-section Learn checklist covering Chapters 1-3. Fifteen eligible questions from the
+        older instructor Exam 1 practice sheet (Q1-12 and Q17-19) are code-redrawn with stable IDs,
+        visible structures, a dedicated practice route, and a modest adaptive priority boost;
+        Q13-16 and Q20+ are excluded as instructed. Arrow, resonance, Learn, 1,166-question bank,
+        flightpath, and instructor-set QA passed with zero browser errors. DEPLOY PENDING;
+        awaiting learner evidence.
   v3.79 (2026-09-13, Sun): EVERY QUESTION IDENTIFIES ITSELF.
         Every live question and read-only answer replay now shows its permanent question ID
         directly below the status tag with a one-tap Copy ID button. The control copies only
@@ -15,8 +30,7 @@
         Queue, so a currently active flag and its note remain visible even if an older round-log
         snapshot omitted the flag bit. The reported thiol/ammonia item now distinguishes a
         stronger acid being eager to react from the weaker-acid side predominating at equilibrium.
-        Phone-width flag, copy, replay, bank, flightpath, and arrow QA passed. DEPLOY PENDING;
-        awaiting learner evidence.
+        Phone-width flag, copy, replay, bank, flightpath, and arrow QA passed. Public v3.79 (deployed 2026-09-13 15:25 PDT, commit 2c16bdd); awaiting learner evidence.
   v3.78 (2026-09-13, Sun): BUILD RANKINGS; DO NOT RECOGNIZE A COMPLETE ANSWER.
         Every full-order ranking blank now presents shuffled individual tiles and numbered
         weakest/strongest endpoints instead of a dropdown containing complete candidate
@@ -1604,7 +1618,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.79</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.80</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -4131,10 +4145,40 @@ const CH23_BONDLINE_PROMPT_UPGRADES={
 };
 EXAM1_AB_SOURCE_QUESTIONS.forEach(q=>{const upgrade=CH23_BONDLINE_PROMPT_UPGRADES[q.id];if(upgrade)q.prompt=upgrade();});
 QUESTIONS.push(...EXAM1_AB_SOURCE_QUESTIONS);
+
+/* v3.80 — Instructor Exam 1 practice sheet (eligible scope only).
+   Gabe supplied the older instructor worksheet on 9/13 and explicitly scoped Exam 1 to
+   Q1–12 and Q17–19. Q13–16 and Q20+ are intentionally absent. These are code-redrawn,
+   source-labeled tasks rather than PDF screenshots, so every structure stays readable on
+   phone and every attempt keeps a stable UID. Priority is a tie-breaker; misses, flags,
+   current-assessment scope, and the anti-repeat cooldown still lead the adaptive engine. */
+function instructorPracticeCard(title,body,note){
+  return '<figure class="exam-chem exam-bondline" style="margin-top:14px"><figcaption><b>'+title+'</b></figcaption><div style="font-size:1.12rem;line-height:1.7;text-align:center;padding:12px 8px">'+body+'</div>'+(note?'<small class="muted">'+note+'</small>':'')+'</figure>';
+}
+const INSTRUCTOR_EXAM1_PRACTICE_IDS=[];
+const INSTRUCTOR_EXAM1_PRACTICE_QUESTIONS=[
+{id:"EXACT-E1P-2014-01",topic:"bondline",type:"mc",diff:2,prompt:"Write the condensed formula for the shown bond-line molecule."+instructorPracticeCard("Instructor practice Q1 · bond-line structure",'<svg viewBox="0 0 430 150" role="img" aria-label="Branched bond-line structure with chlorine on the middle carbon" style="width:min(430px,100%);height:auto"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M55 100L115 65L175 100L235 65L295 100M115 65L115 15M175 100L175 145M235 65L205 15M235 65L265 15M235 65L295 100"/></g><text x="158" y="146" font-size="25" font-weight="800">Cl</text></svg>',"Unlabeled ends and corners are carbon; carbon-bound H is implied."),choices:["(CH₃)₂CHCHClC(CH₃)₃","CH₃CH₂CHClCH₂CH₃","(CH₃)₃CCH₂CH₂Cl","(CH₃)₂CClCH₂C(CH₃)₂"],answer:0,why:"Walk the main path and preserve both branches: the left junction is <b>(CH₃)₂CH–</b>, the next carbon is <b>–CHCl–</b>, and the right junction is <b>–C(CH₃)₃</b>. Together: (CH₃)₂CHCHClC(CH₃)₃."},
+{id:"EXACT-E1P-2014-02",topic:"isomers",type:"mc",diff:2,prompt:"How many constitutional isomers are possible for C₃H₈O?"+instructorPracticeCard("Instructor practice Q2 · fixed molecular formula","C₃H₈O","Count different atom-to-atom connections; do not count rotations or conformations."),choices:["3 — two alcohols and one ether","2 — both are alcohols","4 — three alcohols and one ether","1"],answer:0,why:"The three connectivities are 1-propanol, 2-propanol, and methoxyethane. Same formula, different atom-to-atom connections."},
+{id:"EXACT-E1P-2014-03",topic:"formal",type:"blanks",diff:2,prompt:"Calculate the formal charges on the labeled nitrogen and oxygen."+instructorPracticeCard("Instructor practice Q3 · full Lewis structure","H₃C–C≡N–O &nbsp;&nbsp; <span class=\"muted\">(O has 3 lone pairs; N has 4 bonds)</span>","Use FC = valence − nonbonding electrons − bond order sum."),template:"Nitrogen = {{0}}; oxygen = {{1}}.",fields:[{label:"N charge",kind:"select",choices:["+1","0","−1"],answer:"+1"},{label:"O charge",kind:"select",choices:["−1","0","+1"],answer:"−1"}],why:"N has four bonds and no lone pair, so it is <b>+1</b>. O has one bond and three lone pairs, so it is <b>−1</b>. Net charge remains zero."},
+{id:"EXACT-E1P-2014-04",topic:"polarity",type:"mc",diff:1,prompt:"In which molecule does hydrogen carry a partial negative charge from bond electronegativity?"+instructorPracticeCard("Compare the bonds","B–H &nbsp;&nbsp; C–H &nbsp;&nbsp; N–H &nbsp;&nbsp; O–H","The δ− end lies on the more electronegative atom."),choices:["BH₃","CH₄","NH₃","H₂O"],answer:0,why:"B is less electronegative than H, so electron density shifts toward H in B–H and H is δ−. C, N, and O are all more electronegative than H."},
+{id:"EXACT-E1P-2014-05",topic:"resonance",type:"mc",diff:2,prompt:"Follow the two shown electron moves. What formal charge appears on nitrogen in the next resonance contributor?"+instructorPracticeCard("Instructor practice Q5 · electron movement","⁻:S–C≡N: &nbsp; ⟶ &nbsp; S=C=N?","Move one sulfur lone pair into S–C; move one C≡N π pair onto N. Atoms do not move."),choices:["−1","0","+1","−2"],answer:0,why:"The C≡N π pair becomes a lone pair on nitrogen. In S=C=N⁻, nitrogen has two lone pairs and one double bond, giving <b>−1</b>."},
+{id:"EXACT-E1P-2014-06",topic:"resonance",type:"mc",diff:2,prompt:"Diazomethane loses N₂. Which carbon species is formed?"+instructorPracticeCard("Instructor practice Q6 · bond breaking","H₂C:⁻–N⁺≡N: &nbsp; ⟶ &nbsp; ? + N₂","Track the C–N bonding pair when the leaving group departs."),choices:["Neutral singlet carbene, H₂C:","Methyl cation, H₂C⁺","Dication, H₂C²⁺","Dianion, H₂C²⁻"],answer:0,why:"The carbon retains a nonbonding pair after N₂ leaves, giving neutral singlet carbene <b>H₂C:</b>."},
+{id:"EXACT-E1P-2014-07",topic:"acidbase1",type:"mc",diff:2,prompt:"In the shown equilibrium, identify the strongest base."+instructorPracticeCard("Instructor practice Q7 · acid–base equilibrium","H₂O + NH₂⁻ ⇌ OH⁻ + NH₃<br><small>pKₐ(H₂O)=15.7 · pKₐ(NH₃)=36</small>","A higher-pKₐ conjugate acid has the stronger conjugate base."),choices:["NH₂⁻","OH⁻","H₂O","NH₃"],answer:0,why:"NH₃ is far weaker as an acid than water (higher pKₐ), so its conjugate base <b>NH₂⁻</b> is stronger than OH⁻."},
+{id:"EXACT-E1P-2014-08",topic:"resonance",type:"mc",diff:2,prompt:"Which contributor results from the shown electron-pair moves?"+instructorPracticeCard("Instructor practice Q8 · cyanate resonance",":N=C=O:⁻ &nbsp; ⟶ &nbsp; ?","An O lone pair forms C=O while the C=N π pair moves onto N."),choices:["⁻:N=C=O","N≡C–O⁻","N=C–O (neutral)","N⁻≡C=O"],answer:0,why:"The atoms stay N–C–O. Moving the C=N π pair onto N produces <b>⁻N=C=O</b>; the new O=C bond makes oxygen neutral."},
+{id:"EXACT-E1P-2014-09",topic:"acidbase1",type:"mc",diff:3,prompt:"Hydroxide removes an alpha H from acetone while the C–H pair forms C=C and the C=O π pair moves to O. Which products result?"+instructorPracticeCard("Instructor practice Q9 · three-arrow bookkeeping","HO⁻ + H–CH₂–C(=O)–CH₃ ⟶ ?","Follow every shown pair: base→H, C–H→C=C, C=O→O."),choices:["H₂O + CH₂=C(O⁻)–CH₃","H₂O + CH₃–C(=O)–CH₂⁺","HOCH₂–C(=O)–CH₃","H₂O + CH₃–C(O⁻)=CH₂⁺"],answer:0,why:"Hydroxide becomes water. The substrate loses the alpha H, forms C=C, and places −1 on oxygen: the oxygen-centered enolate contributor."},
+{id:"EXACT-E1P-2014-10",topic:"resonance",type:"mc",diff:3,prompt:"Which is the most stable contributor of the shown conjugated zwitterion?"+instructorPracticeCard("Instructor practice Q10 · contributor ranking","⁺CH₂–CH=CH–O⁻ &nbsp; ↔ &nbsp; ?","Keep the same C–C–C–O sigma framework; compare octets, charge separation, and number of covalent bonds."),choices:["CH₂=CH–CH=O (neutral)","⁺CH₂–CH⁻–CH=O","⁺CH₂–CH=C=O⁻","CH₂=C=CH–O⁻"],answer:0,why:"The neutral <b>CH₂=CH–CH=O</b> contributor has complete octets, no charge separation, and more covalent bonds, so it is the largest contributor."},
+{id:"EXACT-E1P-2014-11",topic:"acidbase2",type:"blanks",diff:3,prompt:"Rank the four shown acids from most acidic to least acidic."+instructorPracticeCard("Instructor practice Q11 · structures named and shown","I · protonated cyclic ether, ring–O(H)⁺ &nbsp; | &nbsp; II · cyclic secondary amine, ring–NH<br>III · 1-methylcyclopentanol, ring–C(OH)(CH₃) &nbsp; | &nbsp; IV · N-methyl cyclic iminium, ring–N(H)(CH₃)⁺","The name and the visible bonding/charge pattern stay together."),template:"Most acidic → least acidic: {{0}}.",fields:[{label:"ranking",kind:"order",answer:"I > IV > III > II"}],why:"The positively charged acids lead. O⁺ is less stable and more acidic than N⁺, so I > IV. Among the neutral compounds, O–H alcohol is more acidic than N–H amine, so III > II."},
+{id:"EXACT-E1P-2014-12",topic:"resonance",type:"mc",diff:3,prompt:"Follow all three electron-movement arrows in the oxygen-containing six-membered ring. Which result keeps the atoms fixed and moves only π/lone-pair electrons?"+instructorPracticeCard("Instructor practice Q12 · cyclic resonance move",'<svg viewBox="0 0 390 150" role="img" aria-label="Six member oxygen heterocycle with two pi bonds and three curved-arrow shifts" style="width:min(390px,100%);height:auto"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M110 35L180 15L245 50L245 105L180 135L110 100Z"/><path d="M123 42L177 27M232 57L232 98"/></g><text x="92" y="112" font-size="25" font-weight="800">O</text><g fill="none" stroke="#8a5b00" stroke-width="3"><path d="M135 30Q170 65 205 38"/><path d="M220 47Q270 70 230 112"/><path d="M130 105Q155 75 190 112"/></g></svg>',"Three arrows shift an O lone pair and the two π pairs around the same ring."),choices:["The same six-member O ring with both π bonds shifted one position (structure C)","The ring breaks into an open-chain alcohol","A separated carbocation and oxide ion","The same bond pattern with a new net charge"],answer:0,why:"Resonance moves electrons, not atoms or sigma bonds. All three pairs shift around the existing ring, producing the alternate neutral contributor shown as structure C on the instructor sheet."},
+{id:"EXACT-E1P-2014-17",topic:"orbitals",type:"mc",diff:1,prompt:"The C–C sigma bond in acetylene is formed by overlap of which orbitals?"+instructorPracticeCard("Instructor practice Q17","H–C≡C–H","Each triple-bond carbon is sp hybridized."),choices:["sp–sp","sp²–sp²","p–p","sp³–sp³"],answer:0,why:"The head-on C–C sigma overlap uses one <b>sp orbital from each carbon</b>. The two remaining p orbitals on each carbon make the two π bonds."},
+{id:"EXACT-E1P-2014-18",topic:"isomers",type:"multiSelect",selectN:3,diff:3,prompt:"Which THREE visible ring structures are constitutional isomers?"+instructorPracticeCard("Instructor practice Q18 · four bond-line structures",'<svg viewBox="0 0 720 180" role="img" aria-label="Four labeled methyl-substituted cyclic alkene bond-line structures" style="width:min(720px,100%);height:auto"><g fill="none" stroke="currentColor" stroke-width="3"><path d="M55 65L95 40L138 62L138 110L95 135L55 110Z M95 40L95 10 M102 48L130 65"/><path d="M225 68L265 43L306 65L294 112L248 122Z M225 68L200 45 M265 43L265 10 M233 68L260 52"/><path d="M385 65L425 40L468 62L468 110L425 135L385 110Z M425 40L425 10 M455 67L455 105"/><path d="M555 65L595 40L638 62L638 110L595 135L555 110Z M595 40L595 10 M603 48L630 65 M603 127L630 110"/></g><g font-size="20" font-weight="800"><text x="90" y="170">I</text><text x="255" y="170">II</text><text x="420" y="170">III</text><text x="590" y="170">IV</text></g><g font-size="16"><text x="82" y="9">CH₃</text><text x="178" y="42">CH₃</text><text x="252" y="9">CH₃</text><text x="412" y="9">CH₃</text><text x="582" y="9">CH₃</text></g></svg>',"Count atoms and unsaturation before comparing connectivity."),choices:["I","II","III","IV"],answer:[0,1,2],why:"I, II, and III share the same molecular formula but differ in ring size or double-bond/substituent connectivity. IV has an additional double bond, so it has two fewer H and is not an isomer of the first three."},
+{id:"EXACT-E1P-2014-19",topic:"isomers",type:"mc",diff:2,prompt:"Which C₆H₁₄ isomer contains only primary and tertiary carbons?"+instructorPracticeCard("Carbon-degree target","primary C = bonded to 1 carbon · tertiary C = bonded to 3 carbons","Sketch each candidate and label every carbon before choosing."),choices:["2,3-dimethylbutane","n-hexane","2-methylpentane","3-methylpentane"],answer:0,why:"In 2,3-dimethylbutane, the four CH₃ carbons are primary and the two central CH carbons are tertiary. There are no secondary or quaternary carbons."}
+].map(q=>Object.assign(q,{sourceBatch:"instructor-exam1-practice-older-sheet",exam1InstructorPractice:true,exam1Priority:2,sourceQuestion:Number(q.id.slice(-2))}));
+INSTRUCTOR_EXAM1_PRACTICE_QUESTIONS.forEach(q=>INSTRUCTOR_EXAM1_PRACTICE_IDS.push(q.id));
+QUESTIONS.push(...INSTRUCTOR_EXAM1_PRACTICE_QUESTIONS);
 QUESTIONS.push(
 {id:"WR-AB8-20260911-01",flightLeg:"paper",topic:"acidbase2",type:"written",diff:3,prompt:"<b>Part B — atom versus orbital:</b> Draw the two conjugate bases of HOCH₂C≡CH, then justify which parent proton is more acidic. Your explanation must compare both charge-bearing atoms and the carbon orbital.",model:"Removing O–H gives <b>⁻OCH₂C≡CH</b>; removing terminal C–H gives <b>HOCH₂C≡C⁻</b>. The alcohol proton is more acidic because its conjugate base places −1 on <b>oxygen</b>, which is more electronegative than carbon. The acetylide does gain stability from an <b>sp orbital (50% s character)</b>, but that orbital advantage does not outweigh the atom advantage of O over C.",rubric:["Draws both conjugate bases with one fewer H and net −1","Places each charge on the atom that lost H","Uses oxygen electronegativity as the controlling atom comparison","Acknowledges sp stabilization without letting it override the O-versus-C comparison"]},
 {id:"WR-AB8-20260911-02",flightLeg:"paper",topic:"acidbase2",type:"written",diff:3,prompt:"<b>Part B — positive-charge sign reversal:</b> Compare protonated acetone, (CH₃)₂C=OH⁺, with protonated acetone imine, (CH₃)₂C=NH₂⁺. Identify the stronger acid and justify it without a pKₐ table.",model:"The <b>O-protonated carbonyl is the stronger acid</b>. Its conjugate base is neutral acetone. For the acids themselves, the less electronegative <b>nitrogen</b> tolerates positive charge better than oxygen, so the N-protonated imine is the more stable, weaker acid. This is the sign reversal: electronegative atoms stabilize − charge, while less electronegative atoms stabilize + charge.",rubric:["Selects O-protonated acetone as stronger acid","States that nitrogen handles positive charge better than oxygen","Connects the more stable charged acid to weaker acidity","Does not use the negative-charge electronegativity rule backward"]},
-{id:"WR-AB8-20260911-03",flightLeg:"paper",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Part B — complete proton-transfer argument:</b> For PhS⁻ + cyclohexyl–SH ⇌ PhSH + cyclohexyl–S⁻, draw both curved arrows, name all four acid/base roles, and predict the favored side from conjugate-base stability.",model:"Arrow 1 goes from a <b>lone pair on PhS⁻ to the thiol H</b>; arrow 2 goes from the <b>cyclohexyl S–H bond to that sulfur</b>. PhS⁻ is the base and PhSH its conjugate acid; cyclohexyl–SH is the acid and cyclohexyl–S⁻ its conjugate base. <b>Reactants are favored</b>: PhS⁻ is resonance-stabilized by the phenyl ring and is therefore the weaker base; equilibrium favors the weaker acid/base pair.",rubric:["Both arrows begin on electron sources and end at the correct destinations","All four roles are paired correctly","Recognizes phenyl thiolate as resonance-stabilized and weaker base","Chooses reactants and explicitly invokes the weaker-pair rule"]},
+{id:"WR-AB8-20260911-03",flightLeg:"paper",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Two-part proton-transfer argument:</b> For PhS⁻ + cyclohexyl–SH ⇌ PhSH + cyclohexyl–S⁻, first draw both curved arrows on the visible reactants. Then name all four acid/base roles and predict which side predominates at equilibrium from conjugate-base stability.",model:"Arrow 1 goes from a <b>lone pair on PhS⁻ to the thiol H</b>; arrow 2 goes from the <b>cyclohexyl S–H bond to that sulfur</b>. PhS⁻ is the base and PhSH its conjugate acid; cyclohexyl–SH is the acid and cyclohexyl–S⁻ its conjugate base. <b>Reactants are favored</b>: PhS⁻ is resonance-stabilized by the phenyl ring and is therefore the weaker base; equilibrium favors the weaker acid/base pair.",rubric:["Both arrows begin on electron sources and end at the correct destinations","All four roles are paired correctly","Recognizes phenyl thiolate as resonance-stabilized and weaker base","Chooses reactants and explicitly invokes the weaker-pair rule"]},
 {id:"WR-AB8-20260911-04",flightLeg:"paper",topic:"acidbase1",type:"written",diff:3,prompt:"<b>Part B — solvent leveling:</b> Explain why ethanol cannot be used as the solvent when NH₂⁻ is supposed to generate an acetylide from a terminal alkyne. Include the actual competing reaction and the consequence for the desired anion.",model:"Ethanol is a <b>protic acid</b> (pKₐ about 16), much more acidic than a terminal alkyne (about 25). NH₂⁻ therefore reacts first with the enormous solvent excess: <b>NH₂⁻ + EtOH → NH₃ + EtO⁻</b>. The solvent levels the strongest available base to ethoxide, which is not strong enough to produce an appreciable concentration of acetylide. Use an aprotic solvent such as THF instead.",rubric:["Writes or states NH₂⁻ + EtOH → NH₃ + EtO⁻","Compares ethanol and terminal-alkyne acidity in the correct direction","Explains that solvent excess quenches/levels NH₂⁻","Concludes that the desired acetylide will not form appreciably"]}
 );
 
@@ -4178,7 +4222,7 @@ const CH23_CLEAR_QUESTION_UPGRADES={
     prompt:"Rank the four labeled protons on the actual capstone molecule in increasing acidity. The letter, functional group, and bond-line position are shown together."+ab8Shot("54-four-site-acidity-ranking.png",1007,646,80,235,400,190,"Bond-line capstone with A amine N–H, B carboxylic-acid O–H, C carbamate N–H, and D terminal-alkyne C–H")+examChem("Site key","A = amine N–H · B = CO₂H · C = –NH–C(=O)–O– · D = terminal C≡C–H","Increasing acidity means weakest acid first.")
   },
   "AB3-arw07":{
-    prompt:"<b>Draw it on paper, then describe it:</b> hydroxide deprotonates acetic acid. Add both curved arrows directly to the shown reactants, then draw the products with formal charges."+courseStructureDiagram("acetic-hydroxide-transfer","Bond-line acetic acid and Lewis hydroxide react to form bond-line acetate and water; no curved arrows are printed because the learner must add them","Your paper must show arrow 1: hydroxide lone pair → acidic H; arrow 2: acid O–H bond → that oxygen")
+    prompt:"<b>Two-part proton transfer:</b> Hydroxide deprotonates acetic acid. First draw both curved arrows on the visible reactants. Then identify the products and their formal charges in words."
   },
   "AB3-bas03":{
     prompt:"Which base is stronger? Compare each base with the named conjugate acid directly beneath it; the conjugate-acid pKₐ belongs to that pair."+courseStructureDiagram("acetylide-amide-pka-pair","Acetylide is paired with its terminal-alkyne conjugate acid at pKa 25; amide ion is paired with its ammonia conjugate acid at pKa 38","Each pKₐ stays beside the conjugate acid it belongs to")
@@ -4321,29 +4365,63 @@ QUESTIONS.forEach(q=>{
 /* v3.75: an answer surface for proton-transfer arrows. The stable legacy keys remain
    available for old attempts; the new response is an unordered pair of graph edges. */
 ['lw-06','lw-08'].forEach(id=>{const q=QUESTIONS.find(x=>x.id===id);q.prompt+=courseStructureDiagram(id==='lw-06'?'ammonia-bf3-pair':'water-bf3-pair','Visible reactant atoms, bonds and lone pairs before the Lewis acid–base bond forms','The reactants before the new bond forms');});
-const PROTON_ARROW_QUESTIONS={"EXACT-AB8-20260911-01":"phenol-hydroxide","SIM-AB8-20260911-01":"acetic-methoxide"};
+const PROTON_ARROW_QUESTIONS={"EXACT-AB8-20260911-01":"phenol-hydroxide","SIM-AB8-20260911-01":"acetic-methoxide","AB3-arw07":"acetic-hydroxide","WR-AB8-20260911-03":"thiophenolate-cyclohexanethiol"};
 Object.entries(PROTON_ARROW_QUESTIONS).forEach(([id,key])=>{
   const q=QUESTIONS.find(x=>x.id===id);q.arrowBoard=key;
   q.hints=[
     "An arrow carries two electrons. Two dots are a lone pair; a bond line is also a pair. Start by finding those electron sources in the drawing.",
-    key==="phenol-hydroxide"?"The ring has an O–H group. That H is the one transferred. The separate O⁻ uses a lone pair to make a new bond to it.":"The O–H group on acetic acid provides the H. The separate O⁻ on methoxide uses a lone pair to make a new bond to that H.",
-    "As the new bond to H forms, the old O–H bond must break. Start your second arrow on that old bond line and end it on the O that was attached to H. Both arrows belong to the same step."
+    key==="phenol-hydroxide"?"The ring has an O–H group. That H is the one transferred. The separate O⁻ uses a lone pair to make a new bond to it.":key==="acetic-methoxide"?"The O–H group on acetic acid provides the H. The separate O⁻ on methoxide uses a lone pair to make a new bond to that H.":key==="acetic-hydroxide"?"The O–H group on acetic acid provides the H. A lone pair on the separate hydroxide O⁻ makes a new bond to that H.":"Thiophenolate is the sulfur with the negative charge. A lone pair on that S⁻ reaches for the H attached to cyclohexyl sulfur.",
+    "As the new bond to H forms, the old X–H bond must break. Start the second arrow on that bond line and end it on the atom that was attached to H. Both arrows belong to the same step."
   ];
   if(key==="acetic-methoxide")q.why="A lone pair on methoxide O makes a new bond to the acid’s H. The acid’s old O–H bond gives its electron pair back to that oxygen. The products are acetate and methanol. The carbon skeleton stays intact; one O–H bond breaks and another forms. Total charge remains −1.";
+  if(id==="AB3-arw07"){
+    q.arrowPart2Title="Part 2 of 2 · Draw or name the products";
+    q.arrowPart2Help="State the two products, place every formal charge, and briefly explain how each charge follows from the arrows you drew.";
+    q.arrowPart2Placeholder="Part 2: products + formal charges + how the arrows create them…";
+  }
+  if(id==="WR-AB8-20260911-03"){
+    q.arrowPart2Title="Part 2 of 2 · Complete the equilibrium argument";
+    q.arrowPart2Help="Name all four acid/base roles, state which side predominates at equilibrium, and justify it using conjugate-base stability.";
+    q.arrowPart2Placeholder="Part 2: four roles + equilibrium side + conjugate-base stability…";
+  }
 });
+/* v3.80: Chapter 2 production cards must require the same action named by their
+   prompt. These five span the core one- and two-arrow resonance patterns. The
+   checked lab records both the arrow graph and the contributor built from it. */
+const RESONANCE_QUESTION_BOARDS={
+  "rz-16":"carboxylate",
+  "rz-22":"allylic-cation",
+  "rz-27":"amide-donation",
+  "rz-36":"allylic-anion",
+  "EXACT-RB6-20260902-06":"nitrile-anion"
+};
+Object.entries(RESONANCE_QUESTION_BOARDS).forEach(([id,key])=>{const q=QUESTIONS.find(x=>x.id===id);if(q)q.resonanceBoard=key;});
 function protonArrowSpec(key){
-  const phenol=key==="phenol-hydroxide";
-  return {key,phenol,acid:phenol?"Phenol · ring–O–H":"Acetic acid · CH₃CO₂H",base:phenol?"Hydroxide · OH⁻":"Methoxide · CH₃O⁻",
+  if(key==="thiophenolate-cyclohexanethiol")return{
+    key,sulfur:true,acid:"Cyclohexanethiol · cyclohexyl–S–H",base:"Thiophenolate · PhS⁻",
+    definition:"Part 1 of 2: draw the proton transfer on the reactant side. Thiophenolate S⁻ supplies a lone pair; the S–H bond on cyclohexanethiol supplies the second electron pair.",
+    points:[
+      {id:"baseAtom",x:230,y:115,label:"Thiophenolate S⁻",symbol:"S"},
+      {id:"baseLP",x:230,y:68,label:"Lone pair on thiophenolate S⁻",pair:true},
+      {id:"acidAtom",x:555,y:115,label:"Cyclohexanethiol sulfur",symbol:"S"},
+      {id:"acidH",x:645,y:115,label:"H on cyclohexyl S–H",symbol:"H"},
+      {id:"acidBond",x:600,y:115,label:"Cyclohexyl S–H bond",bond:true},
+      {id:"acidLP",x:555,y:68,label:"Lone pair on cyclohexanethiol sulfur",pair:true},
+      {id:"baseCarbon",x:175,y:115,label:"Phenyl carbon attached to sulfur",symbol:""},
+      {id:"acidCarbon",x:505,y:115,label:"Cyclohexyl carbon attached to sulfur",symbol:""}
+    ],expected:[{from:"baseLP",to:"acidH"},{from:"acidBond",to:"acidAtom"}]};
+  const phenol=key==="phenol-hydroxide",hydroxide=phenol||key==="acetic-hydroxide";
+  return {key,phenol,hydroxide,acid:phenol?"Phenol · ring–O–H":"Acetic acid · CH₃CO₂H",base:hydroxide?"Hydroxide · OH⁻":"Methoxide · CH₃O⁻",
     definition:phenol?"Phenol is a benzene ring with O–H attached. “Phenolic H” means this O–H hydrogen; “phenolic O” means the O attached to the ring.":"The acid has two oxygens. The O–H oxygen has an H attached; the carbonyl oxygen is the one joined by two bond lines.",
     points:[
       {id:"acidAtom",x:210,y:130,label:phenol?"O attached to ring":"Acid O with H attached",symbol:"O"},
       {id:"acidH",x:310,y:130,label:phenol?"H on ring–O–H":"H on acid O–H",symbol:"H"},
       {id:"acidBond",x:260,y:130,label:"Old O–H bond",bond:true},
       {id:"acidLP",x:210,y:84,label:phenol?"Lone pair on ring O":"Lone pair on acid O",pair:true},
-      {id:"baseAtom",x:425,y:285,label:phenol?"Hydroxide O":"Methoxide O",symbol:"O"},
-      {id:"baseLP",x:425,y:235,label:phenol?"Lone pair on hydroxide O":"Lone pair on methoxide O",pair:true},
-      {id:"baseEnd",x:515,y:285,label:phenol?"H already on hydroxide":"Methoxide carbon",symbol:phenol?"H":""},
-      {id:"baseBond",x:470,y:285,label:phenol?"Hydroxide O–H bond":"Methoxide O–C bond",bond:true},
+      {id:"baseAtom",x:425,y:285,label:hydroxide?"Hydroxide O":"Methoxide O",symbol:"O"},
+      {id:"baseLP",x:425,y:235,label:hydroxide?"Lone pair on hydroxide O":"Lone pair on methoxide O",pair:true},
+      {id:"baseEnd",x:515,y:285,label:hydroxide?"H already on hydroxide":"Methoxide carbon",symbol:hydroxide?"H":""},
+      {id:"baseBond",x:470,y:285,label:hydroxide?"Hydroxide O–H bond":"Methoxide O–C bond",bond:true},
       {id:"acidCarbon",x:145,y:130,label:phenol?"Ring carbon":"Carbonyl carbon",symbol:""}
     ],expected:[{from:"baseLP",to:"acidH"},{from:"acidBond",to:"acidAtom"}]};
 }
@@ -4351,7 +4429,19 @@ function protonArrowPath(a,b){
   const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,bend=Math.min(80,Math.max(45,len*.34));
   return 'M '+a.x+' '+a.y+' Q '+((a.x+b.x)/2-dy/len*bend)+' '+((a.y+b.y)/2+dx/len*bend)+' '+b.x+' '+b.y;
 }
+function sulfurProtonArrowMarkup(spec,draft,prefix){
+  const line=(x,y,u,v)=>'<path d="M '+x+' '+y+' L '+u+' '+v+'" fill="none" stroke="#25313a" stroke-width="3"/>';
+  const dots=(x,y)=>'<circle cx="'+(x-5)+'" cy="'+y+'" r="3" fill="#25313a"/><circle cx="'+(x+5)+'" cy="'+y+'" r="3" fill="#25313a"/>';
+  const label=(x,y,t,size=19)=>'<text x="'+x+'" y="'+y+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+size+'" fill="#25313a">'+esc(t)+'</text>';
+  const baseRing='<path d="M 175 115 L 145 63 L 85 63 L 55 115 L 85 167 L 145 167 Z M 160 112 L 137 73 M 72 115 L 94 75 M 95 156 L 137 156" fill="none" stroke="#25313a" stroke-width="3"/>';
+  const acidRing='<path d="M 505 115 L 475 63 L 415 63 L 385 115 L 415 167 L 475 167 Z" fill="none" stroke="#25313a" stroke-width="3"/>';
+  const molecule=baseRing+acidRing+line(175,115,211,115)+line(249,115,275,115)+label(288,106,'−',25)+dots(230,153)+line(505,115,536,115)+line(574,115,626,115)+dots(555,153);
+  const points=spec.points.map(p=>'<g data-point="'+p.id+'" role="button" tabindex="0" aria-label="'+esc(p.label)+'"'+(draft.pending===p.id?' class="arrow-selected"':'')+'><title>'+esc(p.label)+'</title><rect class="arrow-hit" x="'+(p.x-(p.bond?19:23))+'" y="'+(p.y-(p.bond?16:20))+'" width="'+(p.bond?38:46)+'" height="'+(p.bond?32:40)+'" rx="8"/>'+(p.pair?dots(p.x,p.y):p.symbol?label(p.x,p.y+10,p.symbol,30):'')+'</g>').join('');
+  const arrows=draft.arrows.map((a,i)=>{const from=spec.points.find(p=>p.id===a.from),to=spec.points.find(p=>p.id===a.to);if(!from||!to)return '';return '<path data-drawn-arrow="'+i+'" d="'+protonArrowPath(from,to)+'" fill="none" stroke="'+(i?'#8053a0':'#12638c')+'" stroke-width="3.5" marker-end="url(#'+prefix+'-head-'+i+')" pointer-events="none"/>';}).join('');
+  return '<svg viewBox="0 0 700 245" role="group" aria-label="Draw two curved electron arrows on thiophenolate and cyclohexanethiol"><defs>'+[0,1].map(i=>'<marker id="'+prefix+'-head-'+i+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="'+(i?'#8053a0':'#12638c')+'"/></marker>').join('')+'</defs>'+label(165,215,spec.base)+label(520,215,spec.acid)+label(338,122,'+',30)+molecule+points+arrows+'</svg>';
+}
 function protonArrowMarkup(spec,draft,prefix){
+  if(spec.sulfur)return sulfurProtonArrowMarkup(spec,draft,prefix);
   const line=(x,y,u,v)=>'<path d="M '+x+' '+y+' L '+u+' '+v+'" fill="none" stroke="#25313a" stroke-width="3"/>';
   const dots=(x,y)=>'<circle cx="'+(x-5)+'" cy="'+y+'" r="3" fill="#25313a"/><circle cx="'+(x+5)+'" cy="'+y+'" r="3" fill="#25313a"/>';
   const label=(x,y,t,size=19)=>'<text x="'+x+'" y="'+y+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="'+size+'" fill="#25313a">'+esc(t)+'</text>';
@@ -4369,35 +4459,36 @@ function protonProductCard(value){
   const name=value==='PhO⁻'?'Ring–O⁻ · phenoxide':value==='PhOH₂⁺'?'Ring–OH₂⁺ · extra H on O':'Ring–H · oxygen removed';
   return '<svg viewBox="0 0 210 125" role="img" aria-label="'+esc(name)+'"><path d="M 100 62 L 80 27 L 40 27 L 20 62 L 40 97 L 80 97 Z M 88 60 L 74 36 M 33 61 L 46 36 M 47 87 L 74 87 M 100 62 L 131 62" fill="none" stroke="#25313a" stroke-width="2.7"/><text x="137" y="70" font-family="Arial" font-size="22" fill="#25313a">'+group+'</text></svg><span>'+esc(name)+'</span>';
 }
-function renderProtonArrowQuestion(host,q,D,finish){
+function renderProtonArrowQuestion(host,q,D,finish,onWrittenArrowPass){
   const spec=protonArrowSpec(q.arrowBoard),all=D.arrowDrafts||(D.arrowDrafts={});
   const draft=all[q.id]||(all[q.id]={arrows:[],pending:null,answers:{}});
+  const locked=()=>!!D.answered||!!draft.locked;
   const panel=el('section',{class:'proton-arrow-board','aria-label':'Draw your arrows'});
-  panel.innerHTML='<h3>Draw both arrows here</h3><p style="margin:4px 0">Drag from a pair of dots or a bond to its destination. Or tap the start, then tap the end. Both arrows show one reaction step.</p><p class="muted" style="font-size:.83rem;margin:6px 0">'+esc(spec.definition)+'</p>';
+  panel.innerHTML='<h3>Draw both arrows here</h3><p style="margin:4px 0">Drag from a pair of dots or a bond to its destination. Or tap the start, then tap the end. Both arrows show one reaction step.</p><p class="muted" style="font-size:.83rem;margin:6px 0">'+esc(spec.definition)+'</p><details class="why" style="margin:8px 0"><summary><b>Exam Part B checklist for this drawing</b></summary><ul class="audit"><li>Every tail starts on an electron pair: a lone pair or bond.</li><li>Every head ends where that pair goes: the proton, atom, or new bond.</li><li>The single proton-transfer step has both required arrows.</li><li>The products and their formal charges must match the arrows.</li></ul></details>';
   const diagram=el('div',{style:'overflow-x:auto;max-width:100%'}),status=el('p',{'aria-live':'polite',style:'margin:4px 0'}),list=el('div',{class:'proton-arrow-list'}),controls=el('div',{class:'proton-arrow-controls'});
   let enlarged=false;
   const zoom=el('button',{class:'btn ghost small',type:'button','aria-pressed':'false',onclick:()=>{enlarged=!enlarged;zoom.textContent=enlarged?'Fit drawing to screen':'Enlarge drawing';zoom.setAttribute('aria-pressed',String(enlarged));draw();}},'Enlarge drawing');
-  const undo=el('button',{class:'btn ghost small',type:'button',onclick:()=>{if(D.answered)return;if(draft.pending)draft.pending=null;else draft.arrows.pop();remember();draw();}},'Undo last arrow');
+  const undo=el('button',{class:'btn ghost small',type:'button',onclick:()=>{if(locked())return;if(draft.pending)draft.pending=null;else draft.arrows.pop();remember();draw();}},'Undo last arrow');
   controls.appendChild(undo);controls.appendChild(zoom);panel.appendChild(diagram);panel.appendChild(status);panel.appendChild(list);panel.appendChild(controls);
   function remember(){snapshotDrill(D.i);}
   function add(from,to){
-    if(D.answered||draft.arrows.length>=2)return;
+    if(locked()||draft.arrows.length>=2)return;
     if(from===to){draft.pending=null;remember();draw();return;}
     draft.arrows.push({from,to});draft.pending=null;remember();draw();
   }
-  function tap(id){if(D.answered||draft.arrows.length>=2)return;if(draft.pending)add(draft.pending,id);else{draft.pending=id;remember();draw();}}
+  function tap(id){if(locked()||draft.arrows.length>=2)return;if(draft.pending)add(draft.pending,id);else{draft.pending=id;remember();draw();}}
   function draw(){
     const focused=diagram.contains(document.activeElement)?document.activeElement.closest('[data-point]')?.dataset.point:null;
     diagram.innerHTML=protonArrowMarkup(spec,draft,'proton-'+q.id);
     const name=id=>spec.points.find(p=>p.id===id)?.label||id;
     status.textContent=draft.arrows.length===2?'Both arrows drawn. Choose the answer below, then check.':draft.pending?'Start selected: '+name(draft.pending)+'. Tap where the arrow ends.':'Arrow '+(draft.arrows.length+1)+' of 2: choose where its tail starts.';
     list.innerHTML=draft.arrows.map((a,i)=>'<div><b>Arrow '+(i+1)+':</b> '+esc(name(a.from))+' → '+esc(name(a.to))+'</div>').join('');
-    undo.disabled=!!D.answered||(!draft.pending&&!draft.arrows.length);
+    undo.disabled=locked()||(!draft.pending&&!draft.arrows.length);
     const svg=diagram.querySelector('svg');svg.style.minWidth=enlarged?'560px':'';let drag=null;
     svg.querySelectorAll('[data-point]').forEach(g=>{
-      g.setAttribute('aria-disabled',D.answered?'true':'false');if(D.answered)g.setAttribute('tabindex','-1');
+      g.setAttribute('aria-disabled',locked()?'true':'false');if(locked())g.setAttribute('tabindex','-1');
       g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tap(g.dataset.point);}});
-      g.addEventListener('pointerdown',e=>{if(D.answered||draft.arrows.length>=2||e.button>0)return;e.preventDefault();drag={from:g.dataset.point,x:e.clientX,y:e.clientY,id:e.pointerId};svg.setPointerCapture(e.pointerId);});
+      g.addEventListener('pointerdown',e=>{if(locked()||draft.arrows.length>=2||e.button>0)return;e.preventDefault();drag={from:g.dataset.point,x:e.clientX,y:e.clientY,id:e.pointerId};svg.setPointerCapture(e.pointerId);});
     });
     svg.addEventListener('pointermove',e=>{
       if(!drag||Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;
@@ -4414,21 +4505,27 @@ function renderProtonArrowQuestion(host,q,D,finish){
     if(focused&&!D.answered)svg.querySelector('[data-point="'+focused+'"]').focus({preventScroll:true});
   }
   const answers=el('div');
-  q.fields.slice(4).forEach((field,j)=>{
+  (q.fields||[]).slice(4).forEach((field,j)=>{
     const idx=j+4;answers.appendChild(el('b',{},spec.phenol?'Choose the ring-containing product (water is the other product):':'Choose the total charge after this reaction:'));
     const choices=el('div',{class:'proton-answer-choices'});
     field.choices.forEach(value=>{const b=el('button',{type:'button',class:'proton-answer-choice','data-value':value,'aria-pressed':String(draft.answers[idx]===value),onclick:()=>{if(D.answered)return;draft.answers[idx]=value;choices.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.value===value)));remember();}},spec.phenol?protonProductCard(value):esc(value));choices.appendChild(b);});answers.appendChild(choices);
   });panel.appendChild(answers);
   const check=el('button',{type:'button',class:'btn',onclick:()=>{
-    if(D.answered)return;
-    if(draft.arrows.length!==2||q.fields.slice(4).some((f,i)=>!draft.answers[i+4])){status.textContent='Draw two arrows and choose the answer below before checking.';return;}
+    if(locked())return;
+    if(draft.arrows.length!==2||(q.fields||[]).slice(4).some((f,i)=>!draft.answers[i+4])){status.textContent=q.type==="written"?'Draw both arrows before checking Part 1.':'Draw two arrows and choose the answer below before checking.';return;}
     const correctArrows=spec.expected.every(w=>draft.arrows.some(a=>a.from===w.from&&a.to===w.to));
-    const correctAnswer=q.fields.slice(4).every((f,i)=>draft.answers[i+4]===f.answer);
-    const submitted=draft.arrows.map(a=>a.from+'→'+a.to).join('; ')+'; '+q.fields.slice(4).map((f,i)=>f.label+'='+draft.answers[i+4]).join('; ');
-    finish(correctArrows&&correctAnswer,'The base’s lone pair → the acid’s H; the old O–H bond → that acid O. '+q.fields.slice(4).map(f=>f.label+': '+f.answer).join(' · '),undefined,submitted);
+    if(q.type==="written"){
+      if(!correctArrows){status.textContent='Not yet. One or both arrows has the wrong electron source or destination. Use Undo and try Part 1 again.';return;}
+      draft.locked=true;(D.writtenArrowPassed||(D.writtenArrowPassed={}))[q.id]=true;remember();save();
+      check.disabled=true;draw();status.textContent='Part 1 complete: both arrows are saved. Part 2 is opening below.';
+      if(onWrittenArrowPass)onWrittenArrowPass();return;
+    }
+    const correctAnswer=(q.fields||[]).slice(4).every((f,i)=>draft.answers[i+4]===f.answer);
+    const submitted=draft.arrows.map(a=>a.from+'→'+a.to).join('; ')+'; '+(q.fields||[]).slice(4).map((f,i)=>f.label+'='+draft.answers[i+4]).join('; ');
+    finish(correctArrows&&correctAnswer,'The base’s lone pair → the acid’s H; the old O–H bond → that acid O. '+(q.fields||[]).slice(4).map(f=>f.label+': '+f.answer).join(' · '),undefined,submitted);
     check.disabled=true;answers.querySelectorAll('button').forEach(x=>x.disabled=true);draw();status.textContent='Your submitted arrows are saved above.';
     if(!correctArrows){const worked=el('details',{open:true});worked.innerHTML='<summary><b>Compare with the correct arrows</b></summary>'+protonArrowMarkup(spec,{arrows:spec.expected,pending:null},'solution-'+q.id)+'<p>The dots on the separate O⁻ supply the pair that bonds to H. The old O–H bond supplies the pair that returns to the original O.</p>';worked.querySelectorAll('[data-point]').forEach(g=>{g.removeAttribute('role');g.removeAttribute('tabindex');});panel.appendChild(worked);}
-  }},'Check arrows + answer');panel.appendChild(check);host.appendChild(panel);draw();
+  }},q.type==="written"?'Check Part 1 arrows':'Check arrows + answer');panel.appendChild(check);host.appendChild(panel);draw();
 }
 /* ================= MOLECULES (Lewis Lab) =================
    Every target is a labelled molecular graph. The audit matches a student's graph up to
@@ -4653,14 +4750,14 @@ function save(){
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
   else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, hinted:D.hinted||0, reviewFlaggedRight:D.reviewFlaggedRight||0, hintState:D._hintState||null, scopeName:D.scopeName||"", scopeTopics:D.scopeTopics||[], masteryTopic:D.masteryTopic||"", focusSetId:D.focusSetId||"", pathPracticeFor:D.pathPracticeFor||"", focusStartedAt:D.focusStartedAt||0, log:D.log||[], runId:D.runId||"", diagVersion:D.diagVersion||0, diagRoles:D.diagRoles||{}, diagCriticalIds:D.diagCriticalIds||[], diagBondRequirements:D.diagBondRequirements||{}, diagResonanceRequirements:D.diagResonanceRequirements||{}, bondBuildEvidence:D.bondBuildEvidence||{}, resLabEvidence:D.resLabEvidence||{}, adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, bondStructuresBuilt:D.bondStructuresBuilt||{}, ts:Date.now()};
-  if(S.pausedDrill){S.pausedDrill.arrowDrafts=D.arrowDrafts||{};S.pausedDrill.learnReturn=D.learnReturn||null;}
+  if(S.pausedDrill){S.pausedDrill.arrowDrafts=D.arrowDrafts||{};S.pausedDrill.writtenArrowPassed=D.writtenArrowPassed||{};S.pausedDrill.learnReturn=D.learnReturn||null;}
   safeStore.set("pausedDrill", S.pausedDrill);
 }
 function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
   const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
   S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, hinted:p.hinted||0, reviewFlaggedRight:p.reviewFlaggedRight||0, _hintState:p.hintState||null, scopeName:p.scopeName, scopeTopics:p.scopeTopics||[], masteryTopic:p.masteryTopic||"", focusSetId:p.focusSetId||"", pathPracticeFor:p.pathPracticeFor||"", focusStartedAt:p.focusStartedAt||0, log:p.log||[], runId:p.runId||"", diagVersion:p.diagVersion||0, diagRoles:p.diagRoles||{}, diagCriticalIds:p.diagCriticalIds||[], diagBondRequirements:p.diagBondRequirements||{}, diagResonanceRequirements:p.diagResonanceRequirements||{}, bondBuildEvidence:p.bondBuildEvidence||{}, resLabEvidence:p.resLabEvidence||{}, adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}, bondStructuresBuilt:p.bondStructuresBuilt||{}}; // v3.76: all assistance signals, including review flags, survive pause/resume
-  S.drill.arrowDrafts=p.arrowDrafts||{};S.drill.learnReturn=p.learnReturn||null;
+  S.drill.arrowDrafts=p.arrowDrafts||{};S.drill.writtenArrowPassed=p.writtenArrowPassed||{};S.drill.learnReturn=p.learnReturn||null;
   go("drill");
 }
 /* v3.14: the FC mastery gate pauses too. It was the one multi-step run with no exit —
@@ -4868,6 +4965,7 @@ function logAttempt(q,ok,guessed,D,dk,ans){
   if(hu.steps.length)ev.hs=hu.steps;
   if(hu.feedback)ev.hf=hu.feedback;
   if(q.arrowBoard&&D.arrowDrafts?.[q.id]){const a=D.arrowDrafts[q.id];ev.drawing={kind:'proton-transfer',version:1,model:q.arrowBoard,arrows:a.arrows.map(x=>({...x})),answers:{...a.answers}};}
+  else if((q.resonanceBoard||D.diagResonanceRequirements?.[q.id])&&D.resLabEvidence?.[q.id]){const a=D.resLabEvidence[q.id];ev.drawing={kind:'resonance',version:1,model:a.key,arrows:(a.arrows||[]).map(x=>({...x})),product:a.product?resCloneGraph(a.product):null,clean:!!a.clean};}
   if(D&&D.assignmentId) ev.as=D.assignmentId;
   // v3.11: record WHAT he actually answered, not just whether it was right. Without this the
   // history can say "✗ on l1g3" but never "you picked 109.5° like water" — and the wrong answer
@@ -5023,7 +5121,7 @@ VIEWS.more = (v) => {
   c.appendChild(grid); v.appendChild(c);
   const account=el("section",{class:"card cream"});
   const status=cloudState==="synced"?"Cloud saved":cloudState==="qa"?"QA preview · not saved":cloudState==="offline"?"Local only":"Syncing";
-  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.79</p>';
+  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.80</p>';
   const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   if(PROFILE==="gabe"&&!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:ownerView},"View Sam"));
   if(!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:switchProfile},"Switch profile"));
@@ -5647,7 +5745,8 @@ function assignmentQuestionScore(q){
      again five minutes later. Same-day exact repeats take a hard score hit; a different
      question testing the same skill should lead. */
   const exactCooldown=hours<6?30:hours<24?14:hours<48?4:0;
-  return (due?8:0)+(review?12:0)+(recentReason.length?Math.min(9,3+recentReason.length*2):0)+(unseen?3:0)+f.score*2+(exposureType(q)==="novel"?1.3:exposureType(q)==="similar"?.6:0)-recencyPenalty(q.id)-exactCooldown+Math.random()*.2;
+  const instructorPriority=q.exam1InstructorPractice?2:0;
+  return (due?8:0)+(review?12:0)+(recentReason.length?Math.min(9,3+recentReason.length*2):0)+(unseen?3:0)+f.score*2+instructorPriority+(exposureType(q)==="novel"?1.3:exposureType(q)==="similar"?.6:0)-recencyPenalty(q.id)-exactCooldown+Math.random()*.2;
 }
 function distinctAdaptivePicks(pool,n,avoidIds){
   const used=new Set(avoidIds||[]), fams=new Set([...used].map(id=>CONCEPT_FAMILY[id]).filter(Boolean)), sources=new Set(), out=[];
@@ -5952,6 +6051,10 @@ function renderLearningPath(v){
 }
 const FOCUS_SETS=[
   ...EXAM1_FLIGHT_SETS,
+  {id:"instructor-exam1-practice", topic:"exam1", ico:"📝", shortLabel:"Instructor practice 1–12, 17–19",
+   name:"Instructor Exam 1 practice — eligible questions only",
+   blurb:"Fifteen code-redrawn questions from the older instructor practice sheet. Q13–16 and Q20 onward are intentionally excluded because they belong to Chapter 4 or later. Structures stay visible, names stay paired with structures, and rotation cooldowns still prevent immediate repeats.",
+   match:q=>q.exam1InstructorPractice===true},
   {id:"acidbase-source-batch8", topic:"acidbase2", ico:"📚", shortLabel:"All 54 source patterns",
    name:"Chapter 3 intake — all 54 exact-source reconstructions",
    blurb:"Every numbered problem Gabe supplied from Sep 7–11, independently keyed and redrawn without answer-state leakage. Use this after the required route only if a source pattern still feels unfamiliar.",
@@ -6101,7 +6204,7 @@ function startDrill(topic){
      last few hours drops behind equally-needy ones and the rotation actually advances.
      Then the top slice is re-picked to span difficulty tiers rather than clustering. */
   pool = excludeRecentRounds(pool, SESSION_MAX); // v3.12.1 (audit r5 F2): last 2 rounds' questions sit out when the pool can afford it
-  pool = shuffle(pool).sort((a,b)=>(need(b)-recencyPenalty(b.id))-(need(a)-recencyPenalty(a.id)));
+  pool = shuffle(pool).sort((a,b)=>(need(b)+(b.exam1InstructorPractice?.35:0)-recencyPenalty(b.id))-(need(a)+(a.exam1InstructorPractice?.35:0)-recencyPenalty(a.id)));
   pool = spreadByDifficulty(pool, SESSION_MAX);
   // v2.4: first pass through formal charge runs the scaffold sequence IN ORDER
   // (derive LP count → then compute FC). After first exposure, adaptive shuffle resumes.
@@ -6936,7 +7039,7 @@ VIEWS.drill = (v) => {
   const c = el("div",{class:"card"});
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+questionOrientation(q)+questionRepeatNotice(q)+ 
     (D.diagVersion?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>'+((D.diagCriticalIds||[]).includes(q.id)?'🔒 Critical readiness task':'Readiness sample')+':</b> '+esc((D.diagRoles||{})[q.id]||"homework-level transfer")+'</p>':'')+
-    '<div class="qprompt">'+(q.arrowBoard?'Draw both curved arrows for this proton transfer, then choose the product or charge.':q.prompt)+'</div>';
+    '<div class="qprompt">'+(q.arrowBoard&&q.type!=="written"?'Draw both curved arrows for this proton transfer, then choose the product or charge.':q.prompt)+'</div>';
   c.insertBefore(questionIdRow(q),c.querySelector(".question-orientation, .qprompt"));
   if(q.arrowBoard)c.appendChild(el('div',{'data-proton-arrow-host':''}));
   addHintCoach(c,q,D);
@@ -6981,15 +7084,15 @@ VIEWS.drill = (v) => {
       return;
     }
   }
-  const resRequired=(D.diagResonanceRequirements||{})[q.id];
+  const resRequired=q.resonanceBoard||(D.diagResonanceRequirements||{})[q.id];
   const resEvidence=resRequired&&(D.resLabEvidence||{})[q.id];
   if(resRequired){
     const target=resTarget(resRequired),passed=!!resEvidence&&resEvidence.key===resRequired&&resEvidence.passed;
     const gate=el("div",{class:"why",style:"margin:6px 0 10px"});
-    gate.innerHTML='<b>Curved-arrow construction first: '+(passed?'exact transformation passed':'not yet checked')+'.</b> Draw every arrow with a visible tail and head, then build the complete next contributor on the same bond-line skeleton. The audit checks arrow source/destination, bond orders, lone pairs, formal charges, net charge, and electron-pair conservation.'+(passed&&!resEvidence.clean?'<br><b style="color:var(--coral)">You corrected this after an audit miss, so this critical task is learned practice—not clean readiness evidence for this run.</b>':passed?'<br><b style="color:var(--ok)">First-audit clean ✓</b>':'');
+    gate.innerHTML='<b>Draw the resonance move first: '+(passed?'checked transformation saved':'not yet completed')+'.</b> Place every curved-arrow tail and head, then build the complete next contributor on the same bond-line skeleton. The checker audits the arrow source/destination, bond orders, lone pairs, formal charges, total charge, and electron-pair conservation.'+(passed&&!resEvidence.clean?'<br><b style="color:var(--coral)">You corrected this after an audit miss, so this is supported practice—not clean readiness evidence for this run.</b>':passed?'<br><b style="color:var(--ok)">First-audit clean ✓</b>':'');
     c.appendChild(gate);
     if(!passed){
-      c.appendChild(el("button",{class:"btn coral small",style:"margin:0 0 8px",onclick:()=>{snapshotDrill(D.i);startResLab(resRequired,false,"drill");}},"↪️ Draw arrows + build "+(target?.name||resRequired)+" →"));
+      c.appendChild(el("button",{class:"btn coral small",style:"margin:0 0 8px",onclick:()=>{snapshotDrill(D.i);startResLab(resRequired,false,"drill");}},"✍️ Draw arrows + next contributor →"));
       const _rt=resTile(q.topic);if(_rt)c.appendChild(_rt);v.appendChild(c);
       const ctl=el("div",{class:"center",style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center"});
       if((D.log||[]).length)ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=D.log.length-1;render();}},"👀 see my previous answers"));
@@ -7044,8 +7147,20 @@ VIEWS.drill = (v) => {
     if(!ok)c.classList.add("shake");
   };
   if (q.type==="written"){
+    const arrowPassed=!!(D.writtenArrowPassed&&D.writtenArrowPassed[q.id])||!!(D.arrowDrafts&&D.arrowDrafts[q.id]&&D.arrowDrafts[q.id].locked);
+    if(q.arrowBoard&&!arrowPassed){
+      const gate=el("div",{class:"why",style:"margin:4px 0 10px"});
+      gate.innerHTML='<span class="tag teal">PART 1 OF 2</span><h3 style="margin:7px 0 3px">Draw both curved arrows</h3><p style="margin:0">The written explanation opens after both electron-moving arrows pass. Your drawing stays attached to this question ID.</p>';
+      c.insertBefore(gate,c.querySelector('[data-proton-arrow-host]'));
+      renderProtonArrowQuestion(c.querySelector('[data-proton-arrow-host]'),q,D,finish,()=>render());
+      reviewCtl=addReviewFlag(c,q,D);v.appendChild(c);
+      const ctl=el("div",{class:"center",style:"display:flex;gap:8px;flex-wrap:wrap;justify-content:center"});
+      if((D.log||[]).length)ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{D.reviewIdx=D.log.length-1;render();}},"👀 see my previous answers"));
+      ctl.appendChild(el("button",{class:"btn ghost small",onclick:()=>{snapshotDrill(S.drill.i);S.drill=null;go("home");}},"⏸ pause round — saved, resume from Home"));v.appendChild(ctl);return;
+    }
+    if(q.arrowBoard&&arrowPassed)c.appendChild(el("div",{class:"why",style:"margin:8px 0 10px"},'<span class="tag teal">✓ PART 1 SAVED</span><h3 style="margin:7px 0 3px">'+esc(q.arrowPart2Title||"Part 2 of 2 · Explain the chemistry")+'</h3><p style="margin:0">'+esc(q.arrowPart2Help||"Explain what the arrows do, name the products, and place the formal charges.")+'</p>'));
     // v3.0: written item — answer on paper or type it; compare to model; self-grade HONESTLY (08-19 covenant).
-    const ta=el("textarea",{class:"answerbox wide",style:"min-height:110px;width:100%;font-size:.95em",placeholder:"Work it on paper first if you prefer — then type your answer/derivation here (it gets saved for Claude's review)…"});
+    const ta=el("textarea",{class:"answerbox wide",style:"min-height:110px;width:100%;font-size:.95em",placeholder:q.arrowBoard?(q.arrowPart2Placeholder||"Part 2: explain the products and charges…"):"Work it on paper first if you prefer — then type your answer/derivation here (it gets saved for Claude's review)…"});
     const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;margin:8px 0 2px"});
     const wgk=el("input",{type:"checkbox",id:"wgk"});
     gRow.appendChild(wgk); gRow.appendChild(el("label",{for:"wgk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I'm not confident in this"));
@@ -7739,7 +7854,11 @@ function runResAudit(){
     if(R.returnTo==="drill"&&S.drill&&R.returnQuestionId){const ev=S.drill.resLabEvidence=S.drill.resLabEvidence||{};if(!ev[R.returnQuestionId])ev[R.returnQuestionId]={key:R.target.key,clean:false,passed:false};snapshotDrill(S.drill.i);}
     R.fails++;if(S.resRun&&!S.resRun.complete)S.resRun.clean=false;render();return;
   }
-  if(R.returnTo==="drill"&&S.drill&&R.returnQuestionId){const ev=S.drill.resLabEvidence=S.drill.resLabEvidence||{},old=ev[R.returnQuestionId];if(old)old.passed=true;else ev[R.returnQuestionId]={key:R.target.key,clean:R.fails===0,passed:true};snapshotDrill(S.drill.i);}
+  if(R.returnTo==="drill"&&S.drill&&R.returnQuestionId){
+    const ev=S.drill.resLabEvidence=S.drill.resLabEvidence||{},old=ev[R.returnQuestionId]||{};
+    ev[R.returnQuestionId]={...old,key:R.target.key,clean:old.clean===false?false:R.fails===0,passed:true,arrows:R.arrows.map(x=>({...x})),product:resCloneGraph(R.product)};
+    snapshotDrill(S.drill.i);
+  }
   if(!S.resDone.includes(R.target.key))S.resDone.push(R.target.key);save();render();
 }
 function resResetProduct(){const R=S.resLab;if(!R)return;R.product=resCloneGraph(R.target.graph);R.editSel=null;R.audit=null;render();}
@@ -7794,7 +7913,7 @@ VIEWS.reslab=(v)=>{
   const R=S.resLab;
   if(!R){
     const complete=S.resDone.filter(k=>resTarget(k)).length,clean=(S.resRuns||[]).filter(r=>r.cold&&r.clean).length;
-    v.appendChild(el("div",{class:"card teal"},'<span class="tag coral">Resonance Lab · '+RESONANCE_TARGETS.length+' checked transformations</span><h2>Draw the arrows. Build what they produce.</h2><p>Tap where an electron pair starts, then where it ends. In the second panel, edit bond orders, lone pairs, and charges on the same locked atom framework. The audit checks both panels independently.</p><div class="why"><b>Fast test routine:</b> ① find a movable pair or nearby C⁺ · ② draw one legal pattern · ③ rebuild bonds/LP/charges · ④ confirm same atoms, same net charge, same electron-pair count · ⑤ rank: octets → fewer charges → favorable charge placement.</div><p class="muted" style="margin-top:8px">Completion: <b>'+complete+'/'+RESONANCE_TARGETS.length+'</b> · clean cold sequences: <b>'+clean+'</b>. Completion is practice evidence; only an entire first-audit-clean cold sequence is labeled cold readiness evidence.</p>'));
+    v.appendChild(el("div",{class:"card teal"},'<span class="tag coral">Resonance Lab · '+RESONANCE_TARGETS.length+' checked transformations</span><h2>Draw the arrows. Build what they produce.</h2><p>Tap where an electron pair starts, then where it ends. In the second panel, edit bond orders, lone pairs, and charges on the same locked atom framework. The audit checks both panels independently.</p><div class="why"><b>Fast test routine:</b> ① find a movable pair or nearby C⁺ · ② draw one legal pattern · ③ rebuild bonds/LP/charges · ④ confirm same atoms, same net charge, same electron-pair count · ⑤ rank: octets → fewer charges → favorable charge placement.</div><details class="why" style="margin-top:8px"><summary><b>Instructor’s Exam 1 Part B resonance checklist</b></summary><ul class="audit"><li>Arrow tails begin on a lone pair or π bond; heads reach the correct atom or new bond.</li><li>Only electrons move. The atom positions and σ skeleton stay fixed.</li><li>Every contributor shows correct formal charges and respects the octet rule.</li><li>Draw the complete reasonable contributor set—not just one convenient form.</li><li>Name the major contributor and explain both why it is major and why the others are minor.</li><li>For a hybrid, use partial bonds plus δ+/δ−; do not copy full charges from one contributor.</li></ul></details><p class="muted" style="margin-top:8px">Completion: <b>'+complete+'/'+RESONANCE_TARGETS.length+'</b> · clean cold sequences: <b>'+clean+'</b>. Completion is practice evidence; only an entire first-audit-clean cold sequence is labeled cold readiness evidence.</p>'));
     if(S.resRun&&S.resRun.complete){const x=S.resRun.result;v.appendChild(el("div",{class:"card "+(x.cold&&x.clean?"teal":"cream")},'<h3>'+(x.cold?(x.clean?'✓ Clean cold sequence':'Cold sequence completed with corrections'):'✓ Guided sequence completed')+'</h3><p class="muted">'+x.total+' transformations finished. '+(x.cold&&x.clean?'Every target passed on its first audit. This is readiness evidence, not a permanent mastery claim.':x.cold?'Run it cold again after fixing the missed pattern(s).':'Now repeat the set cold—with pattern names and hints hidden.')+'</p>'));}
     const actions=el("div",{class:"card"});actions.innerHTML='<h3>One next action</h3><p class="muted">'+(complete<RESONANCE_TARGETS.length?'Run the guided sequence once, in order. It teaches all five handout patterns through ten checked transformations.':'Run the full set cold. The pattern label and starter hint stay hidden until after the audit.')+'</p>';
     if(S.resRun&&!S.resRun.complete)actions.appendChild(el("button",{class:"btn coral",style:"margin-right:8px",onclick:resumeResRun},"Resume sequence · "+(S.resRun.i+1)+"/"+S.resRun.queue.length+" →"));
@@ -7807,7 +7926,8 @@ VIEWS.reslab=(v)=>{
     return;
   }
   const t=R.target,run=S.resRun&&!S.resRun.complete?S.resRun:null;
-  const head=el("div",{class:"card"});head.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><div style="flex:1"><span class="tag '+(R.returnTo==="drill"||run&&run.cold?'coral':'violet')+'">'+(R.returnTo==="drill"?'Cold diagnostic build':run?(run.cold?'Cold sequence':'Guided sequence')+' · '+(run.i+1)+'/'+run.queue.length:'Guided target')+'</span><h2>'+t.name+'</h2><p class="mono" style="font-size:1.05rem">'+t.formula+'</p></div>'+(R.guided?'<span class="tag gold">'+t.pattern+' · '+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span>':'')+'</div><p>'+t.prompt+'</p><p class="muted"><b>Rule:</b> atom connectivity is locked. Only electrons move. Build the complete next contributor—not the resonance hybrid.</p>';v.appendChild(head);
+  const fromColdQuestion=R.returnTo==="drill"&&!!S.drill?.cold;
+  const head=el("div",{class:"card"});head.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap"><div style="flex:1"><span class="tag '+(R.returnTo==="drill"||run&&run.cold?'coral':'violet')+'">'+(R.returnTo==="drill"?(fromColdQuestion?'Cold diagnostic build':'Question-required drawing'):run?(run.cold?'Cold sequence':'Guided sequence')+' · '+(run.i+1)+'/'+run.queue.length:'Guided target')+'</span><h2>'+t.name+'</h2><p class="mono" style="font-size:1.05rem">'+t.formula+'</p></div>'+(R.guided?'<span class="tag gold">'+t.pattern+' · '+t.arrowCount+' arrow'+(t.arrowCount===1?'':'s')+'</span>':'')+'</div><p>'+t.prompt+'</p><p class="muted"><b>Rule:</b> atom connectivity is locked. Only electrons move. Build the complete next contributor—not the resonance hybrid.</p><details class="why"><summary><b>What the Part B rubric will inspect here</b></summary><ul class="audit"><li>Arrow sources and destinations</li><li>Unchanged atoms and σ skeleton</li><li>Correct bonds, lone pairs, and every nonzero formal charge</li><li>Octets, conserved total charge, and conserved electron pairs</li></ul></details>';v.appendChild(head);
   const grid=el("div",{class:"res-grid"});
   const source=el("div",{class:"res-stage"});source.innerHTML='<h3>1 · Draw curved arrow'+(t.arrowCount===1?'':'s')+'</h3><p class="muted" style="margin:0">Tap source → destination for each electron pair. <b style="color:#8f2028">○ tail ring = source · open arrowhead = destination</b></p>';
   const ssvg=document.createElementNS("http://www.w3.org/2000/svg","svg");ssvg.setAttribute("class","res-svg");ssvg.setAttribute("aria-label","Starting resonance contributor and curved arrows");source.appendChild(ssvg);
@@ -7819,7 +7939,7 @@ VIEWS.reslab=(v)=>{
   const sel=R.editSel,bar=el("div",{class:"res-toolbar"});bar.appendChild(el("span",{class:"muted",style:"width:100%"},sel?(sel.kind==="bond"?"Selected bond "+sel.id.toUpperCase().replace("-","–"):"Selected atom "+sel.id.toUpperCase()):"Select an atom or bond above."));
   [["Bond −","bond",-1],["Bond +","bond",1],["Charge −","charge",-1],["Charge +","charge",1],["LP −","lp",-1],["LP +","lp",1]].forEach(([label,kind,d])=>bar.appendChild(el("button",{class:"tool",disabled:!sel||(kind==="bond")!==(sel.kind==="bond"),onclick:()=>resAdjust(kind,d)},label)));
   bar.appendChild(el("button",{class:"tool",onclick:resResetProduct},"Reset contributor"));product.appendChild(bar);grid.appendChild(product);v.appendChild(grid);
-  const row=el("div",{class:"card",style:"margin-top:12px"});row.innerHTML='<h3>3 · Audit before ranking</h3><p class="muted">The checker will verify arrow source/head, exact next contributor, conserved net charge, and conserved electron pairs.</p>';row.appendChild(el("button",{class:"btn coral",onclick:runResAudit},"Check arrows + contributor"));row.appendChild(el("button",{class:"btn ghost small",style:"margin-left:8px",onclick:leaveResLab},R.returnTo==="drill"?"← diagnostic question":"← targets"));v.appendChild(row);
+  const row=el("div",{class:"card",style:"margin-top:12px"});row.innerHTML='<h3>3 · Audit before ranking</h3><p class="muted">The checker will verify arrow source/head, exact next contributor, conserved net charge, and conserved electron pairs.</p>';row.appendChild(el("button",{class:"btn coral",onclick:runResAudit},"Check arrows + contributor"));row.appendChild(el("button",{class:"btn ghost small",style:"margin-left:8px",onclick:leaveResLab},R.returnTo==="drill"?"← return to question":"← targets"));v.appendChild(row);
   const fb=resAuditFeedback();if(fb)v.appendChild(fb);drawResGraph(ssvg,t.graph,"source");drawResGraph(psvg,R.product,"edit");
 };
 
@@ -7975,6 +8095,7 @@ const CHAPTER_LEARNING_UNITS={
     }
   ]
 };
+const PART_B_RUBRIC_GUIDE_HTML='<details class="card cream"><summary><b>Exam 1 Part B rubric map · what your written work must show</b></summary><p><b>Instructor’s top tip:</b> draw the structure, figure, or reaction scheme first, then refer to that drawing in your explanation.</p><h3>Chapter 1 · Structure and bonding</h3><ol class="audit"><li><b>Hybridization:</b> calculate steric number, then connect it to sp/sp²/sp³.</li><li><b>Geometry:</b> distinguish electron geometry from molecular geometry and justify bond angles, including lone-pair effects.</li><li><b>Dipoles:</b> draw the geometry, label bond dipoles or δ+/δ−, then use shape and symmetry for the net dipole.</li><li><b>σ/π bonds:</b> draw and label head-on versus side-by-side overlap and count them in single/double/triple bonds.</li><li><b>Bond length/strength:</b> use bond order, s-character, and orbital overlap—not vague language.</li><li><b>IMFs/properties:</b> name the forces for every option and explain why the alternatives rank lower.</li></ol><h3>Chapter 2 · Representing structures</h3><ol class="audit" start="7"><li><b>Conversions:</b> preserve every atom and bond; hide carbon labels/C–H only in skeletal form.</li><li><b>Functional groups:</b> identify and draw the complete bonding pattern with correct valence.</li><li><b>Formal charge:</b> show every nonzero charge on the correct atom, consistent with the drawn bonds and lone pairs.</li><li><b>Resonance:</b> draw electron-source arrows, keep atoms fixed, show charges/octets, complete the contributor set, identify the major contributor, explain why it is major, and explain why the others are minor.</li><li><b>Hybrid:</b> use partial/dashed bonds and δ+/δ− as an average—not full charges copied from one contributor.</li></ol><h3>Chapter 3 · Acids and bases</h3><ol class="audit" start="12"><li><b>Four roles:</b> match acid/base to their conjugates and identify the exact atom gaining or losing H.</li><li><b>Will it occur?</b> compare the acid and conjugate-acid pKₐ values explicitly; formation of the weaker acid is favored.</li><li><b>Most acidic/basic site:</b> apply ARIO and explain why the other reasonable sites lose.</li><li><b>Curved arrows:</b> correct sources, destinations, number of arrows, products, and charges.</li><li><b>Equilibrium:</b> identify the side with the weaker/more-stable pair and explain why the other side is less favored.</li><li><b>Leveling:</b> use the solvent’s usable pKₐ range and name the leveled acid/base species.</li></ol><p class="muted">The app’s checked structure labs cover drawing evidence. Written comparison prompts cover the required “why this choice and why not the alternatives” explanation.</p></details>';
 function openLearningUnit(chapter,unit){S.learnCh=chapter;S.learnTopic=null;S.learnUnit=unit;go('learn');}
 function startLessonPractice(chapter,unitId){
   const unit=(CHAPTER_LEARNING_UNITS[chapter]||[]).find(x=>x.id===unitId);if(!unit)return;
@@ -8046,6 +8167,7 @@ VIEWS.learn = (v) => {
   }
   // ---- level 1: chapters menu ----
   v.appendChild(el("div",{class:"card"},'<span class="tag violet">📖 Learn</span><h2>Understand it, then try it</h2><p class="muted">Open Chapter 3 for the current material. Chapters 1 and 2 stay here for foundations and review. Chapters 2 and 3 now pair each lesson with worked structures and selected practice.</p>'));
+  v.appendChild(el("div",{},PART_B_RUBRIC_GUIDE_HTML));
   CH.forEach(c0=>{
     const done=c0.topics.filter(k=>{const s=tStat(k); return s&&parseInt(s)>=75;}).length;
     const c=el("div",{class:"card cream"});
