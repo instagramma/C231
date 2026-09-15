@@ -6,7 +6,7 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.85
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.86
   v3.85 (2026-09-14, Mon): EXAM-1 SCOPE LABELS. 23 questions lean on molecules/ideas past Ch 1-3
         (LDA + enolates, lactams, imines, sulfonic acids, cyclopentadiene aromaticity, ascorbic
         acid, DBN, styrenes). Their reasoning is Ciesla's own ARIO/conjugate-base-stability
@@ -1642,7 +1642,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.80</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.86</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2141,6 +2141,72 @@ function buildReadinessDiagnostic(scopeTopics,type,needScore){
   }
   const auto=shuffle(picked.filter(q=>q.type!=="written")),written=shuffle(picked.filter(q=>q.type==="written"));
   return {queue:auto.concat(written),roles,critical,bondRequirements,resonanceRequirements};
+}
+/* ============ v3.86 — EXAM 1 PULSE CHECK (cumulative snapshot) ============
+   THE BUG THIS FIXES: buildReadinessDiagnostic() branches into a Chapter-2-only production
+   blueprint whenever the scope contains all four Ch 2 core topics — and EVERY Exam 1 scope
+   does. So a "cumulative" scoped diagnostic silently tested Chapter 2 and never sampled
+   Chapter 1 or Chapter 3 at all. Gabe asked for "a full snapshot," which the old instrument
+   could not give. This builder samples every chapter in scope, weighted to her observed exam
+   mix (mock A 12/12/16, mock B 10/10/20 → ~30/30/40), guarantees each in-scope topic appears
+   at least once, and reports a per-chapter rollup alongside the per-topic one.
+   Deliberately NOT a readiness gate: no critical-task gating, diagVersion 0, recorded under
+   its own type so it never collides with the every-2-day scoped-diagnostic contract. */
+const PULSE_TOTAL=30;
+const PULSE_WEIGHT={ch1:0.30,ch2:0.30,ch3:0.40};
+function pulseChaptersFor(scopeTopics){
+  return CHAPTERS.map(c=>({id:c.id,ico:c.ico,name:(c.name||"").split(" \u2014 ")[0],
+    topics:(c.topics||[]).filter(k=>scopeTopics.includes(k)&&QUESTIONS.some(q=>q.topic===k&&q.type!=="written"))}))
+    .filter(c=>c.topics.length);
+}
+function chapterRollup(byTopic){
+  const out=[];
+  CHAPTERS.forEach(c=>{ let r=0,w=0;
+    (c.topics||[]).forEach(k=>{const bt=byTopic[k]; if(bt){r+=(bt.r||0);w+=(bt.w||0);}});
+    if(r+w>0) out.push({ico:c.ico,name:(c.name||"").split(" \u2014 ")[0],r:r,tot:r+w,pct:Math.round(100*r/(r+w))});
+  });
+  return out;
+}
+function buildPulseCheck(scopeTopics,needScore){
+  const chs=pulseChaptersFor(scopeTopics);
+  if(!chs.length) return {queue:[],roles:{},critical:[],bondRequirements:{},resonanceRequirements:{}};
+  const used=new Set(),picked=[],roles={};
+  const eligible=k=>QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"&&itemDifficulty(q)>=1&&!used.has(q.id));
+  const take=(qs,role)=>{const q=shuffle(qs).sort((a,b)=>needScore(b)-needScore(a))[0]; if(!q)return null; picked.push(q); used.add(q.id); roles[q.id]=role; return q;};
+  chs.forEach(c=>c.topics.forEach(k=>take(eligible(k),(TOPICS[k]&&TOPICS[k].name)||k)));
+  const countIn=c=>picked.filter(q=>c.topics.indexOf(q.topic)>=0).length;
+  chs.forEach(c=>{
+    const target=Math.max(countIn(c),Math.round(PULSE_TOTAL*(PULSE_WEIGHT[c.id]||(1/chs.length))));
+    let guard=0;
+    while(countIn(c)<target&&guard++<300){
+      const pool=c.topics.reduce((acc,k)=>acc.concat(eligible(k)),[]);
+      if(!pool.length) break;
+      const q=take(pool,"transfer"); if(!q) break;
+      roles[q.id]=(TOPICS[q.topic]&&TOPICS[q.topic].name)||q.topic;
+    }
+  });
+  return {queue:shuffle(picked),roles:roles,critical:[],bondRequirements:{},resonanceRequirements:{}};
+}
+function startPulseCheck(){
+  const cov=coveredTopics(), cp=nextCheckpoint();
+  const wanted=(cp&&cp.topics)?cp.topics:cov;
+  const scopeTopics=wanted.filter(k=>QUESTIONS.some(q=>q.topic===k&&q.type!=="written"));
+  const missing=wanted.filter(k=>scopeTopics.indexOf(k)<0);
+  if(!scopeTopics.length){alert("No in-scope topics in the bank yet.");return;}
+  if(missing.length) alert("\u26a0 HONESTY NOTE \u2014 this Pulse Check does NOT cover: "+missing.join(", ")+".\nThe score below excludes those.");
+  const seen=id=>((S.qstats[id]&&S.qstats[id].r)||0)+((S.qstats[id]&&S.qstats[id].w)||0);
+  const needScore=q=>{const st=S.qstats[q.id];let n=0;
+    if(st&&(st.w-(st.gw||0)-(st.dk||0))>0)n+=4; else if(st&&st.w>0)n+=2;
+    if(st&&(st.gr||0)>0&&st.r<=(st.gr||0))n+=2;
+    if(seen(q.id)===0)n+=2;
+    return n-recencyPenalty(q.id);};
+  const plan=buildPulseCheck(scopeTopics,needScore);
+  if(plan.queue.length<12){alert("Not enough homework-level items in scope for a Pulse Check (has "+plan.queue.length+", needs 12+).");return;}
+  S.drill={queue:plan.queue,i:0,right:0,wrong:0,topic:"__pulse",answered:false,byTopic:{},cold:true,guessedRight:0,
+    scopeName:(cp?cp.name:"semester")+" \u2014 full snapshot",scopeTopics:scopeTopics.slice(),log:[],
+    runId:makeRunId("diag-pulse"),diagVersion:0,diagRoles:plan.roles,diagCriticalIds:[],
+    diagBondRequirements:{},diagResonanceRequirements:{},bondBuildEvidence:{},resLabEvidence:{}};
+  go("drill");
 }
 function startDiag2(type){
   const cov=coveredTopics();
@@ -6596,6 +6662,14 @@ VIEWS.exam = (v) => {
     '<p style="margin:6px 0"><b>Provided:</b> periodic table, electronegativity values, any needed pKa values — so do NOT memorize pKa numbers; memorize how to USE them.</p>'+
     '<p style="margin:6px 0"><b>Allowed: ONE handwritten, double-sided 5×8″ index card — name at the TOP-RIGHT (her request).</b> It is collected after Part A and handed back for Part B. Content is unregulated — write whatever helps. Blank cards are available in class today and Monday: grab a couple, since making the card is a study technique and you may want to reorganize. The 📌 Cheat tab has the blueprint — draft Saturday, rewrite clean Monday.</p>'+
     '<p class="muted" style="margin:6px 0 0;font-size:.85rem">Pacing drill: 2 minutes per question. If one passes the 2-minute mark, mark it and move — 40 × 2 leaves zero slack.</p>'));
+  (function(){
+    const c=el("div",{class:"card teal"});
+    c.innerHTML='<span class="tag gold">🩺 Pulse Check</span><h2>Exam 1 \u2014 full snapshot</h2>'+
+      '<p style="margin:6px 0">One cold run across <b>every chapter on the exam</b>, weighted the way her mocks are (~30% Ch 1 \u00b7 30% Ch 2 \u00b7 40% Ch 3), with every in-scope topic guaranteed at least one question. Roughly 30 items. You get a <b>per-chapter and per-topic breakdown</b>, not just a score.</p>'+
+      '<p class="muted" style="margin:6px 0 0;font-size:.85rem">Take it cold \u2014 no notes, no hints. This is a measurement, not a gate: it does not replace the every-2-day scoped diagnostic, and nothing about it passes or fails you.</p>';
+    c.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>startPulseCheck()},"\ud83e\ude7a Start the Pulse Check"));
+    v.appendChild(c);
+  })();
   v.appendChild(el("div",{class:"card"},
     '<span class="tag violet">📜 Her official topic list ("not exhaustive — the main topics")</span><h2>Every bullet → where it lives in the app</h2>'+
     '<p class="muted" style="margin:4px 0 8px;font-size:.85rem">Condensed from the posted PDF. Nothing on it is outside the bank except leveling-effect DEPTH (today\'s lecture — items land after the transcript).</p>'+
@@ -6897,8 +6971,8 @@ VIEWS.drill = (v) => {
     if(D.byTopic){ let r=0,w=0; Object.values(D.byTopic).forEach(v=>{r+=(v.r||0);w+=(v.w||0);});
       if(r+w>0){ scR=r; scT=r+w; pct=Math.round(100*r/(r+w)); } }
     // v3.0: every-2-day diagnostics (cumulative / scoped) → record the run + honest gap map
-    if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec") && D.byTopic){
-      const type=D.topic==="__cum"?"cum":(D.topic==="__lec"?"lec":"scope");
+    if ((D.topic==="__cum"||D.topic==="__scope"||D.topic==="__lec"||D.topic==="__pulse") && D.byTopic){
+      const type=D.topic==="__cum"?"cum":(D.topic==="__lec"?"lec":(D.topic==="__pulse"?"pulse":"scope"));
       const rep=gapReport(D.byTopic);
       const critical=diagCriticalAudit(D),criticalPassed=critical.filter(x=>x.ok).length,criticalOK=!critical.length||criticalPassed===critical.length;
       const rigorous=type!=="lec"&&D.diagVersion>=READINESS_DIAG_VERSION;
@@ -6913,9 +6987,10 @@ VIEWS.drill = (v) => {
       const c=el("div",{class:"card"+(solid?" teal":"")});
       const nm=k=>TOPICS[k]?.name||k;
       const allTopics=[...new Set([...GAP_PRIORITY.filter(k=>D.byTopic[k]), ...Object.keys(D.byTopic).filter(k=>!GAP_PRIORITY.includes(k))])];
-      c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
+      c.innerHTML='<span class="tag gold">'+(type==="cum"?"📚 Cumulative diagnostic":type==="lec"?"📝 Lecture check":type==="pulse"?"🩺 Pulse Check \u00b7 full snapshot":"🎯 Scoped diagnostic")+' · '+D.scopeName+'</span>'+
         '<h2>'+scR+' / '+scT+' ('+pct+'%)'+(D.guessedRight?' <span class="muted" style="font-size:.6em">incl. '+D.guessedRight+' guessed-right</span>':'')+(D.hinted?' <span class="muted" style="font-size:.6em">· '+D.hinted+' answer'+(D.hinted===1?'':'s')+' used hints</span>':'')+'</h2>'+ 
         (rigorous?'<div class="why" style="margin:8px 0"><b>Readiness gate: '+criticalPassed+'/'+critical.length+' critical tasks clean · '+(rep.gaps.length?rep.gaps.length+' tested area'+(rep.gaps.length===1?'':'s')+' below its screen':'every tested area passed')+'.</b> '+(criticalOK?'Every essential task passed first-audit clean and unflagged.':'Still blocking: '+critical.filter(x=>!x.ok).map(x=>x.role+' ('+x.detail+')').join(' · '))+'.</div>':'')+
+        (type==="pulse"?'<div style="margin:10px 0 2px"><b>By chapter</b></div>'+chapterRollup(D.byTopic).map(c=>'<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+c.ico+'</span><b>'+esc(c.name)+'</b> <span class="muted">'+c.r+'/'+c.tot+' = '+c.pct+'%</span></div>').join("")+'<div style="margin:10px 0 2px"><b>By topic</b></div>':'')+
         '<div style="margin:10px 0">'+allTopics.map(k=>{ const hit=rep.solid.includes(k); return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:16px">'+(hit?"🟢":"🔴")+'</span><b style="'+(hit?'':'color:var(--coral)')+'">'+nm(k)+'</b> <span class="muted">'+(D.byTopic[k].r+'/'+(D.byTopic[k].r+D.byTopic[k].w))+'</span></div>'; }).join("")+'</div>'+ 
         '<div class="why">'+(!solid?'<b>ONE repair:</b> '+(critical.find(x=>!x.ok)?.role||nm(rep.gaps[0]||Object.keys(D.byTopic)[0]))+' — repair that exact skill, then retake a new cold diagnostic.':(rep.gaps.length?'<b>ONE repair:</b> '+nm(rep.gaps[0])+' — read its 📖 Learn primer, then drill it. Everything else waits (one repair at a time).':'Readiness diagnostic cleared. Maintain with spaced mixed practice; do not inflate volume just to chase a score.'))+'</div>'+ 
         (S.diags.length>=2?'<p class="muted" style="margin:6px 0 0;font-size:.85em">History: '+S.diags.slice(-5).map(d=>(d.type==="cum"?"📚":"🎯")+d.pct+"%").join(" · ")+'</p>':'');
