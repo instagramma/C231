@@ -6,7 +6,7 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.88
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.89
   v3.85 (2026-09-14, Mon): EXAM-1 SCOPE LABELS. 23 questions lean on molecules/ideas past Ch 1-3
         (LDA + enolates, lactams, imines, sulfonic acids, cyclopentadiene aromaticity, ascorbic
         acid, DBN, styrenes). Their reasoning is Ciesla's own ARIO/conjugate-base-stability
@@ -1642,7 +1642,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Exam 1 flightpath</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.88</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.89</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2172,7 +2172,10 @@ function buildReadinessDiagnostic(scopeTopics,type,needScore){
      (a) a physical description tied to something visible  ("the alkene carbon bearing the
          two methyls", "the CH next to the C=O"), or
      (b) a number counted from a stated origin ("C1 is the carbonyl carbon"), which is
-         Ciesla's own convention on Quiz 1 ("the C2-C3 bond").
+         Ciesla's own convention on Quiz 1 ("the C2-C3 bond"), or
+     (c) v3.89: a letter that is DRAWN ON THE STRUCTURE via q.structureLabels — Ciesla's
+         other convention (histidine item: nitrogens A/B/C). Pair it with the description:
+         "C — the alkene carbon bearing the two methyls".
    Audited 2026-09-14: 30 items mention alpha/beta; 17 are prose-only and fine; 13 put it on
    the answer surface; 5 required a bare Greek-letter selection and were rewritten. */
 const PULSE_TOTAL=30;
@@ -3994,9 +3997,9 @@ const QUESTIONS = [
 {id:"SIM-RB4-20260902-01",topic:"hybrid",type:"blanks",diff:3,prompt:"For 2-oxazolidinone, O=C1OCCN1, classify the local geometry at each atom role.",template:"Carbonyl O: {{0}} · carbonyl C: {{1}} · ring O: {{2}} · ring N: {{3}} · each CH2 carbon: {{4}}",fields:[{label:"carbonyl O",kind:"select",choices:["not relevant","bent","linear"],answer:"not relevant"},{label:"carbonyl C",kind:"select",choices:["trigonal planar","tetrahedral","linear"],answer:"trigonal planar"},{label:"ring O",kind:"select",choices:["bent","linear","trigonal planar"],answer:"bent"},{label:"ring N",kind:"select",choices:["trigonal planar","trigonal pyramidal","linear"],answer:"trigonal planar"},{label:"CH2 carbons",kind:"select",choices:["tetrahedral","trigonal planar","linear"],answer:"tetrahedral"}],why:"The carbonyl oxygen has only one attached atom, so the requested local molecular geometry is not relevant. The carbonyl carbon and resonance-flattened carbamate nitrogen are trigonal planar; the two-bond oxygen is bent; saturated CH₂ carbons are tetrahedral."},
 {id:"SIM-RB4-20260902-02",topic:"hybrid",type:"blanks",diff:3,prompt:"Classify the highlighted atom roles in acetanilide, C₆H₅–NH–C(=O)–CH₃.",template:"Amide N: {{0}}, {{1}} · carbonyl C: {{2}} · phenyl ipso C: {{3}} · methyl C: {{4}}",fields:[{label:"amide N hybridization",kind:"select",choices:["sp2","sp3","sp"],answer:"sp2"},{label:"amide N geometry",kind:"select",choices:["trigonal planar","trigonal pyramidal","linear"],answer:"trigonal planar"},{label:"carbonyl C geometry",kind:"select",choices:["trigonal planar","tetrahedral","linear"],answer:"trigonal planar"},{label:"phenyl carbon geometry",kind:"select",choices:["trigonal planar","tetrahedral","linear"],answer:"trigonal planar"},{label:"methyl carbon geometry",kind:"select",choices:["tetrahedral","trigonal planar","linear"],answer:"tetrahedral"}],why:"The amide lone pair must occupy a p orbital aligned with C=O, so nitrogen is sp²/planar. Carbonyl and aromatic carbons are also sp²/planar, while the methyl carbon has four σ domains and is tetrahedral."},
 {id:"SIM-RB4-20260902-03",topic:"hybrid",type:"blanks",diff:2,prompt:"Morpholine is a saturated six-membered ring containing one –NH– and one –O– separated by CH₂ groups. Classify its heteroatoms.",template:"Ring N: {{0}}, {{1}} · ring O: {{2}} · both lone-pair systems are {{3}}",fields:[{label:"nitrogen hybridization",kind:"select",choices:["sp3","sp2","sp"],answer:"sp3"},{label:"nitrogen geometry",kind:"select",choices:["trigonal pyramidal","trigonal planar","linear"],answer:"trigonal pyramidal"},{label:"oxygen geometry",kind:"select",choices:["bent","linear","trigonal planar"],answer:"bent"},{label:"lone-pair localization",kind:"select",choices:["localized","delocalized","absent"],answer:"localized"}],why:"Morpholine has no adjacent π acceptor. Its amine nitrogen keeps a localized pair in an sp³ hybrid and is pyramidal; its two-bond oxygen is bent, and its pairs are localized."},
-{id:"SIM-RB4-20260902-04",topic:"resonance",type:"blanks",diff:2,bondLineFirst:["rb4-methyl-vinyl-ketone"],prompt:"Build methyl vinyl ketone, CH₂=CH–C(=O)–CH₃, then use its checked conjugated skeleton to identify the electrophilic sites.",template:"O is {{0}}. The carbonyl carbon is {{1}} and the terminal CH₂ is {{2}}. A conjugate nucleophile attacks {{3}}.",fields:[{label:"oxygen",kind:"select",choices:["δ−","δ+","none"],answer:"δ−"},{label:"carbonyl carbon",kind:"select",choices:["δ+","δ−","none"],answer:"δ+"},{label:"terminal CH₂",kind:"select",choices:["δ+","δ−","none"],answer:"δ+"},{label:"attack site",kind:"select",choices:["the terminal CH₂","the CH next to the C=O","the CH₃ on the far side of the C=O"],answer:"the terminal CH₂"}],why:"The checked graph confirms one continuous O=C–C=C p system. C=O polarization makes oxygen electron-rich and the carbonyl carbon electron-poor; conjugation shifts that electron deficiency to the terminal beta carbon, explaining 1,4- or conjugate attack there."},
+{id:"SIM-RB4-20260902-04",topic:"resonance",type:"blanks",diff:2,bondLineFirst:["rb4-methyl-vinyl-ketone"],structureLabels:{A:0,B:3,C:4},prompt:"Build methyl vinyl ketone, CH₂=CH–C(=O)–CH₃, then use the labelled structure to identify the electrophilic sites.",template:"O is {{0}}. Atom A (the carbonyl carbon) is {{1}} and atom C (the terminal CH₂) is {{2}}. A conjugate nucleophile attacks {{3}}.",fields:[{label:"oxygen",kind:"select",choices:["δ−","δ+","none"],answer:"δ−"},{label:"atom A",kind:"select",choices:["δ+","δ−","none"],answer:"δ+"},{label:"atom C",kind:"select",choices:["δ+","δ−","none"],answer:"δ+"},{label:"attack site",kind:"select",choices:["C — the terminal CH₂","B — the CH next to the C=O","the CH₃ on the far side of the C=O"],answer:"C — the terminal CH₂"}],why:"The checked graph confirms one continuous O=C–C=C p system. C=O polarization makes oxygen electron-rich and the carbonyl carbon electron-poor; conjugation shifts that electron deficiency to the terminal beta carbon, explaining 1,4- or conjugate attack there."},
 {id:"SIM-RB4-20260902-05",topic:"resonance",type:"blanks",diff:3,bondLineFirst:["rb4-2-cyclohexenone"],prompt:"Build 2-cyclohexenone, then identify the sites revealed by its charge-separated resonance contributor. <i>(α = the carbon attached to the C=O · β = the next one out.)</i>",template:"The acceptor is an {{0}}. Oxygen carries {{1}}, while the carbonyl carbon and C3 (the beta carbon) carry {{2}} character. C3 is electron-{{3}}.",fields:[{label:"system",kind:"select",choices:["alpha,beta-unsaturated ketone","isolated alkene","saturated alcohol"],answer:"alpha,beta-unsaturated ketone"},{label:"oxygen polarity",kind:"select",choices:["δ−","δ+","none"],answer:"δ−"},{label:"carbon polarity",kind:"select",choices:["δ+","δ−","none"],answer:"δ+"},{label:"electron character",kind:"select",choices:["deficient","rich","neutral"],answer:"deficient"}],why:"The checked ring graph confirms that O=C–C=C is a continuous p system. Its hybrid places δ− on O and δ+ at both the carbonyl carbon and beta carbon C3."},
-{id:"SIM-RB4-20260902-06",topic:"resonance",type:"blanks",diff:3,bondLineFirst:["rb4-mesityl-oxide"],prompt:"Build mesityl oxide, CH₃–C(=O)–CH=C(CH₃)₂, then locate the resonance-derived partial charges.",template:"The carbonyl oxygen is {{0}}. Partial positive character appears at the {{1}} and at {{2}}. The CH sitting next to the C=O is {{3}} one that carries the remote δ+ site.",fields:[{label:"oxygen polarity",kind:"select",choices:["δ−","δ+","none"],answer:"δ−"},{label:"first positive site",kind:"select",choices:["carbonyl carbon","carbonyl oxygen","a methyl carbon"],answer:"carbonyl carbon"},{label:"second positive site",kind:"select",choices:["the alkene carbon bearing the two methyls","the CH next to the C=O","a methyl carbon"],answer:"the alkene carbon bearing the two methyls"},{label:"CH-next-to-C=O statement",kind:"select",choices:["not the","the only","always the"],answer:"not the"}],why:"The checked graph prevents the two methyl branches from hiding the conjugated O=C–C=C path. Electron deficiency appears at the carbonyl carbon and then at beta, not at alpha; substitution changes stability and sterics but not the polarity pattern."},
+{id:"SIM-RB4-20260902-06",topic:"resonance",type:"blanks",diff:3,bondLineFirst:["rb4-mesityl-oxide"],structureLabels:{A:0,B:3,C:4},prompt:"Build mesityl oxide, CH₃–C(=O)–CH=C(CH₃)₂, then use the labelled structure to locate the resonance-derived partial charges.",template:"The carbonyl oxygen is {{0}}. Partial positive character appears at {{1}} and at {{2}}. Atom B, the CH next to the C=O, is {{3}} one that carries the remote δ+ site.",fields:[{label:"oxygen polarity",kind:"select",choices:["δ−","δ+","none"],answer:"δ−"},{label:"first positive site",kind:"select",choices:["A — the carbonyl carbon","the carbonyl oxygen","a methyl carbon"],answer:"A — the carbonyl carbon"},{label:"second positive site",kind:"select",choices:["C — the alkene carbon bearing the two methyls","B — the CH next to the C=O","a methyl carbon"],answer:"C — the alkene carbon bearing the two methyls"},{label:"atom-B statement",kind:"select",choices:["not the","the only","always the"],answer:"not the"}],why:"The checked graph prevents the two methyl branches from hiding the conjugated O=C–C=C path. Electron deficiency appears at the carbonyl carbon and then at beta, not at alpha; substitution changes stability and sterics but not the polarity pattern."},
 {id:"SIM-RB4-20260902-07",topic:"resonance",type:"blanks",diff:3,prompt:"Using the course's resonance/hybridization model, classify the dimethylamino nitrogen and N–N bond in dimethylnitramine, (CH₃)₂N–NO₂.",template:"Its lone pair is {{0}} in a {{1}} orbital; the donor N is approximately {{2}} and {{3}}. The N–N bond has partial {{4}}-bond character.",fields:[{label:"lone-pair behavior",kind:"select",choices:["delocalized","localized","absent"],answer:"delocalized"},{label:"lone-pair orbital",kind:"select",choices:["p","sp3 hybrid","s"],answer:"p"},{label:"hybridization",kind:"select",choices:["sp2","sp3","sp"],answer:"sp2"},{label:"geometry",kind:"select",choices:["trigonal planar","trigonal pyramidal","linear"],answer:"trigonal planar"},{label:"bond character",kind:"select",choices:["pi","ionic","hydrogen"],answer:"pi"}],why:"The amine lone pair overlaps the adjacent nitro π acceptor. The introductory model therefore assigns a p-type lone pair, sp² hybridization, and near-planar geometry. Experimental structures show strong but not perfectly idealized planarity, consistent with substantial N–N partial π character."},
 {id:"SIM-RB4-20260902-08",topic:"resonance",type:"blanks",diff:3,prompt:"Using the course's resonance/hybridization model, compare piperidine with N-nitropiperidine.",template:"Piperidine N has a {{0}} pair and is {{1}}/{{2}}. N-nitropiperidine has a {{3}} pair and is approximately {{4}}/{{5}}.",fields:[{label:"piperidine pair",kind:"select",choices:["localized","delocalized","absent"],answer:"localized"},{label:"piperidine hybridization",kind:"select",choices:["sp3","sp2","sp"],answer:"sp3"},{label:"piperidine geometry",kind:"select",choices:["trigonal pyramidal","trigonal planar","linear"],answer:"trigonal pyramidal"},{label:"nitramine pair",kind:"select",choices:["delocalized","localized","absent"],answer:"delocalized"},{label:"nitramine hybridization",kind:"select",choices:["sp2","sp3","sp"],answer:"sp2"},{label:"nitramine geometry",kind:"select",choices:["trigonal planar","trigonal pyramidal","linear"],answer:"trigonal planar"}],why:"Installing NO₂ directly on the ring nitrogen creates an adjacent π acceptor. The ordinary amine pair is localized and pyramidal; the course model classifies the conjugated nitramine pair as p-type and the donor nitrogen as approximately sp²/planar. Real nitramines can retain slight pyramidalization."},
 {id:"SIM-RB4-20260902-09",topic:"resonance",type:"blanks",diff:2,prompt:"Contrast the lone pairs on hydrazine, H₂N–NH₂, and dimethylnitramine, (CH₃)₂N–NO₂.",template:"Hydrazine has no adjacent pi acceptor, so each N pair is {{0}}. The dimethylnitramine donor pair is {{1}} because it overlaps the {{2}} group.",fields:[{label:"hydrazine pairs",kind:"select",choices:["localized","delocalized","absent"],answer:"localized"},{label:"nitramine pair",kind:"select",choices:["delocalized","localized","absent"],answer:"delocalized"},{label:"acceptor",kind:"select",choices:["nitro","methyl","C–H"],answer:"nitro"}],why:"An N–N single bond alone does not create the alternating p system needed for resonance. The nitro substituent does, so the nitramine lone pair delocalizes while hydrazine's pairs remain localized."},
@@ -7229,6 +7232,7 @@ VIEWS.drill = (v) => {
       v.appendChild(ctl);
       return;
     }
+    const built=builtStructureCard(q); if(built) c.appendChild(built); // v3.89
   }
   const resRequired=q.resonanceBoard||(D.diagResonanceRequirements||{})[q.id];
   const resEvidence=resRequired&&(D.resLabEvidence||{})[q.id];
@@ -7799,6 +7803,115 @@ function bondPointer(ev,svg){
   }else if(B.tool==="erase"&&hit){B.bonds=B.bonds.filter(x=>x.a!==hit.id&&x.b!==hit.id);B.atoms.splice(B.atoms.indexOf(hit),1);render();}
 }
 function bondOrderFor(B,a){return B.bonds.filter(x=>x.a===a.id||x.b===a.id).reduce((s,x)=>s+x.order,0);}
+/* ============ v3.89 — SHOW THE CHECKED STRUCTURE, LABELLED (Gabe, 9/14: "where is the
+   diagram im supposed to be looking at LOL") ============
+   The bond-line gate audited his drawing, stored only the molecule KEY, then asked the
+   question against an invisible molecule. This block lays out any BONDLINE_MOLECULES target
+   (pure connectivity, no coordinates) into a canonical skeleton and draws it above the
+   blanks once the gate has passed — with the atoms the question refers to labelled A/B/C,
+   the way Ciesla labels her own exam structures. Layout: longest-path zigzag backbone
+   (acyclic) or regular polygon (single ring), then every other atom placed into the widest
+   free angular gap around its neighbour. Anything it cannot lay out (disconnected, >1 ring)
+   returns null and the card is simply omitted — never worse than before. */
+function skeletonLayout(target){
+  try{
+    const n=target.nodes.length; if(!n) return null;
+    const adj=Array.from({length:n},()=>[]);
+    target.bonds.forEach(([a,b])=>{adj[a].push(b);adj[b].push(a);});
+    const STEP=30;
+    const seen=Array(n).fill(false),par=Array(n).fill(-1),st=[0];seen[0]=true;let back=null;
+    while(st.length){const u=st.pop();for(const v of adj[u]){if(!seen[v]){seen[v]=true;par[v]=u;st.push(v);}else if(par[u]!==v&&!back)back=[u,v];}}
+    if(seen.some(x=>!x)) return null;
+    if(target.bonds.length-n+1>1) return null; // fused / multi-ring: not tonight
+    const pos=Array(n).fill(null);
+    if(back){
+      // single ring: walk parents from both ends of the back-edge to find the cycle
+      const chain=u=>{const c=[];for(let v=u;v!==-1;v=par[v])c.push(v);return c;};
+      const A=chain(back[0]),B=chain(back[1]);const setB=new Set(B);let meet=A.find(x=>setB.has(x));
+      const ring=A.slice(0,A.indexOf(meet)+1).concat(B.slice(0,B.indexOf(meet)).reverse());
+      const k=ring.length,R=STEP/(2*Math.sin(Math.PI/k));
+      ring.forEach((v,i)=>{const t=-Math.PI/2+i*2*Math.PI/k;pos[v]={x:R*Math.cos(t),y:R*Math.sin(t)};});
+    }else{
+      const bfs=s0=>{const d=Array(n).fill(-1),pp=Array(n).fill(-1),q=[s0];d[s0]=0;while(q.length){const u=q.shift();for(const v of adj[u])if(d[v]<0){d[v]=d[u]+1;pp[v]=u;q.push(v);}}return{d,pp};};
+      // farthest node, preferring a carbon endpoint on ties so C=O / –OH hang off the backbone
+      const isC=i=>target.nodes[i].el==="C", pick=(d)=>{let f=0;d.forEach((x,i)=>{if(x>d[f]||(x===d[f]&&isC(i)&&!isC(f)))f=i;});return f;};
+      const a=bfs(0);const far=pick(a.d);
+      const b=bfs(far);const far2=pick(b.d);
+      const path=[];for(let v=far2;v!==-1;v=b.pp[v])path.push(v);
+      path.forEach((v,i)=>{pos[v]={x:i*STEP*Math.cos(Math.PI/6),y:(i%2?-1:0)*STEP*Math.sin(Math.PI/6)};});
+    }
+    // place everything else into the widest free angular gap around a placed neighbour
+    let guard=0;
+    while(pos.some(x=>!x)&&guard++<200){
+      for(let u=0;u<n;u++){ if(!pos[u]) continue;
+        for(const v of adj[u]){ if(pos[v]) continue;
+          const used=adj[u].filter(w=>pos[w]).map(w=>Math.atan2(pos[w].y-pos[u].y,pos[w].x-pos[u].x));
+          let best=null,bestGap=-1;
+          for(let deg=0;deg<360;deg+=15){const t=deg*Math.PI/180;
+            const gap=used.length?Math.min(...used.map(a0=>{let d=Math.abs(t-a0)%(2*Math.PI);return Math.min(d,2*Math.PI-d);})):Math.PI;
+            // prefer bond angles near 120° from existing bonds, and upward/downward tidy directions
+            if(gap>bestGap+1e-9){bestGap=gap;best=t;}
+          }
+          pos[v]={x:pos[u].x+STEP*Math.cos(best),y:pos[u].y+STEP*Math.sin(best)};
+        }
+      }
+    }
+    if(pos.some(x=>!x)) return null;
+    return pos;
+  }catch(e){ return null; }
+}
+function skeletonSVG(molKey,labels){
+  const m=(typeof BONDLINE_MOLECULES!=="undefined")&&BONDLINE_MOLECULES.find(x=>x.key===molKey); if(!m||!m.target) return "";
+  const pos=skeletonLayout(m.target); if(!pos) return "";
+  const nodes=m.target.nodes, bonds=m.target.bonds;
+  const xs=pos.map(p=>p.x),ys=pos.map(p=>p.y),pad=34;
+  const minX=Math.min(...xs)-pad,maxX=Math.max(...xs)+pad,minY=Math.min(...ys)-pad,maxY=Math.max(...ys)+pad;
+  const W=maxX-minX,H=maxY-minY;
+  const esc_=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  const lbl=el0=>{const e=String(el0);return e==="C"?"":e.replace("NH2","NH₂").replace("O-","O⁻");};
+  const isHetero=i=>nodes[i].el!=="C";
+  const bondOrder=i=>bonds.filter(b=>b[0]===i||b[1]===i).reduce((s,b)=>s+b[2],0);
+  let out='<svg viewBox="'+minX.toFixed(1)+' '+minY.toFixed(1)+' '+W.toFixed(1)+' '+H.toFixed(1)+'" style="max-width:'+Math.min(360,Math.round(W*1.1))+'px;width:100%;height:auto;display:block;margin:0 auto" role="img" aria-label="Checked bond-line structure of '+esc_(m.formula)+'">';
+  bonds.forEach(([a,b,o])=>{
+    let A=pos[a],B=pos[b];const dx=B.x-A.x,dy=B.y-A.y,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len;
+    const ta=isHetero(a)?10:0,tb=isHetero(b)?10:0;
+    const x1=A.x+ux*ta,y1=A.y+uy*ta,x2=B.x-ux*tb,y2=B.y-uy*tb;
+    const ox=-uy*3.6,oy=ux*3.6,offs=o===1?[0]:o===2?[-1,1]:[-1.5,0,1.5];
+    offs.forEach(k=>{out+='<line x1="'+(x1+ox*k).toFixed(1)+'" y1="'+(y1+oy*k).toFixed(1)+'" x2="'+(x2+ox*k).toFixed(1)+'" y2="'+(y2+oy*k).toFixed(1)+'" stroke="#20241F" stroke-width="2.2" stroke-linecap="round"/>';});
+  });
+  nodes.forEach((nd,i)=>{const t=lbl(nd.el);if(!t)return;const P=pos[i];
+    out+='<circle cx="'+P.x.toFixed(1)+'" cy="'+P.y.toFixed(1)+'" r="11" fill="#FBF6EA"/>';
+    out+='<text x="'+P.x.toFixed(1)+'" y="'+(P.y+5).toFixed(1)+'" text-anchor="middle" font-size="14" font-weight="700" font-family="-apple-system,Segoe UI,Helvetica Neue,sans-serif" fill="#20241F">'+esc_(t)+'</text>';
+  });
+  // labels A/B/C… on referenced atoms, placed into the widest free gap, with a leader
+  if(labels){ Object.entries(labels).forEach(([L,i])=>{ if(pos[i]===undefined||pos[i]===null) return; const P=pos[i];
+    const used=bonds.filter(b=>b[0]===i||b[1]===i).map(b=>{const j=b[0]===i?b[1]:b[0];return Math.atan2(pos[j].y-P.y,pos[j].x-P.x);});
+    let best=-Math.PI/2,bestGap=-1;for(let deg=0;deg<360;deg+=15){const t=deg*Math.PI/180;const gap=used.length?Math.min(...used.map(a0=>{let d=Math.abs(t-a0)%(2*Math.PI);return Math.min(d,2*Math.PI-d);})):Math.PI;if(gap>bestGap+1e-9){bestGap=gap;best=t;}}
+    const D=24,cx=P.x+D*Math.cos(best),cy=P.y+D*Math.sin(best);
+    const s0=isHetero(i)?12:4,lx=P.x+s0*Math.cos(best),ly=P.y+s0*Math.sin(best);
+    out+='<line x1="'+lx.toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(cx-9*Math.cos(best)).toFixed(1)+'" y2="'+(cy-9*Math.sin(best)).toFixed(1)+'" stroke="#8a6a00" stroke-width="1.6"/>';
+    out+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="9.5" fill="#F2B705" stroke="#20241F" stroke-width="1.5"/>';
+    out+='<text x="'+cx.toFixed(1)+'" y="'+(cy+4.5).toFixed(1)+'" text-anchor="middle" font-size="12" font-weight="800" font-family="-apple-system,Segoe UI,Helvetica Neue,sans-serif" fill="#20241F">'+esc_(L)+'</text>';
+  }); }
+  out+='</svg>';
+  return out;
+}
+/* q.structureLabels: either {A:nodeIdx,...} (applies to the item's first bondLineFirst key)
+   or {"<molKey>":{A:nodeIdx,...},...}. Returns an element or null. */
+function builtStructureCard(q){
+  const keys=q.bondLineFirst||[]; if(!keys.length) return null;
+  const SL=q.structureLabels||null;
+  const perKey=k=>{ if(!SL) return null; const vals=Object.values(SL); if(vals.length&&typeof vals[0]==="number") return keys[0]===k?SL:null; return SL[k]||null; };
+  let html="",any=false;
+  keys.forEach(k=>{ const m=BONDLINE_MOLECULES.find(x=>x.key===k); const svg=skeletonSVG(k,perKey(k)); if(!svg) return; any=true;
+    html+='<div style="margin:6px 0">'+svg+'<p class="mono center muted" style="margin:4px 0 0;font-size:.82rem">'+esc(m?m.formula:k)+'</p></div>';
+  });
+  if(!any) return null;
+  const hasLabels=!!SL;
+  const c=el("div",{class:"card cream",style:"padding:10px 12px"});
+  c.innerHTML='<span class="tag gold">✓ Your checked structure'+(hasLabels?' · labelled':'')+'</span>'+html+(hasLabels?'<p class="muted" style="margin:6px 0 0;font-size:.82rem">The lettered atoms are the ones this question refers to. Carbon-bound H stays implicit, as in bond-line.</p>':'');
+  return c;
+}
 function drawBondLab(svg){
   const B=S.bondLab;if(!B)return;svg.innerHTML="";const NS="http://www.w3.org/2000/svg";
   const mk=(t,at)=>{const e=document.createElementNS(NS,t);Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v));svg.appendChild(e);return e;};
