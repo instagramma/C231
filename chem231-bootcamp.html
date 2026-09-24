@@ -6,7 +6,7 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.93
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.94
   v3.90 (2026-09-19, Sat): CURRENT COURSE + PRODUCTION. Eight Chapter 4 lessons,
         34 source-aligned questions, checked Newman/chair construction, retained freehand
         drawings, distinct supported/independent pairs, completion saved at final submission,
@@ -1647,7 +1647,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Chapter 4 · learn, build, check</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.93</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.94</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -8864,11 +8864,14 @@ function ch4Newman(front,back,mode='staggered',title='Given Newman projection'){
   return ch4Figure(title,body,480,284);
 }
 function ch4BondView(kind='butane'){
-  const left=kind==='ethane'?'H':'CH₃',right=kind==='ethane'?'H':'CH₃',branch=kind==='branched'?'CH₃':'H';
-  return ch4Figure('Given connectivity (flat drawing: it fixes WHICH groups are on each carbon, not their 3-D placement — that is set by the conformation you are asked for) — look from the left carbon toward the right carbon',
-    ch4Line(220,130,340,130)+ch4Line(180,130,105,130)+ch4Line(380,130,455,130)+ch4Line(200,105,200,55)+ch4Line(200,150,200,200)+ch4Line(360,105,360,55)+ch4Line(360,150,360,200)+
-    ch4Label(200,137,'C',22)+ch4Label(360,137,'C',22)+ch4Label(80,137,left,22)+ch4Label(480,137,right,22)+ch4Label(200,40,branch,22)+ch4Label(200,228,'H',22)+ch4Label(360,40,'H',22)+ch4Label(360,228,'H',22)+
-    ch4Label(280,95,'view →',17)+ch4Label(200,265,kind==='ethane'?'C1 · front':'C2 · front',16)+ch4Label(360,265,kind==='ethane'?'C2 · back':'C3 · back',16),560,285);
+  /* v3.93 — this used to be drawn as a flat "structure", which looked like it was withholding wedge/dash
+     information. It never had any: it is an inventory of groups per carbon. The 3-D placement in these items
+     comes from the conformation you are asked to build, not from a drawing. Wedge/dash items (v3.92) are separate. */
+  const end=kind==='ethane'?'H':'CH₃',branch=kind==='branched'?'CH₃':'H';
+  const frontName=kind==='ethane'?'C1':'C2',backName=kind==='ethane'?'C2':'C3';
+  const front=[end,branch,'H'],back=[end,'H','H'];
+  const box=(name,groups,role)=>'<div style="border:1px solid #cbd5df;border-radius:10px;padding:10px 12px;background:#fff;text-align:center"><div style="font-weight:700">'+name+' · '+role+'</div><div style="font-size:1.25rem;margin:4px 0 2px">'+groups.map(g=>ch4Escape(g)).join(' &nbsp;·&nbsp; ')+'</div><div class="muted" style="font-size:.8rem">three groups, no 3-D order given</div></div>';
+  return '<figure style="margin:16px 0;padding:12px;border:1px solid #cbd5df;border-radius:12px;background:#fff"><figcaption style="font-weight:700;margin-bottom:8px">Groups on each carbon — look from '+frontName+' toward '+backName+'</figcaption><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+box(frontName,front,'front (the dot)')+box(backName,back,'back (the circle)')+'</div><p class="muted" style="margin:8px 0 0;font-size:.85rem">This is an inventory, not a drawing. There are no wedges or dashes to read: the spatial arrangement is whatever conformation the question asks you to build. When a carbon carries two or three identical groups, their order does not matter.</p></figure>';
 }
 function ch4ButaneWedge(){return ch4Figure('Butane — view from C2 toward C3 along the horizontal bond',
   ch4Line(195,135,335,135)+ch4Line(195,135,145,55)+ch4Line(335,135,385,215)+
@@ -9037,6 +9040,7 @@ function ch4Clone(value){return JSON.parse(JSON.stringify(value));}
 function ch4SameInventory(a,b){return [...a].sort().join('|')===[...b].sort().join('|');}
 /* v3.92 — the Newman builder is two wheels. Front bonds sit at 270/30/150 + fRot; back bonds at 330/90/210 + bRot.
    Groups ride with their bonds. Staggered/eclipsed is DERIVED from the wheel offset, not chosen from a menu. */
+function ch4WheelStateText(draft){return '<b>Drag any bond or label to spin that carbon</b> — it snaps every 60°. Or use the buttons. The groups ride with their bonds, like a real C–C bond. Right now the offset makes this <b>'+draft.mode+'</b> (front '+draft.fRot+'°, back '+draft.bRot+'°).';}
 function ch4NewmanSync(draft){
   if(typeof draft.fRot!=='number'||typeof draft.bRot!=='number'){draft.fRot=0;draft.bRot=draft.mode==='eclipsed'?60:0;}
   draft.fRot=((draft.fRot%360)+360)%360;draft.bRot=((draft.bRot%360)+360)%360;
@@ -9120,7 +9124,6 @@ function ch4NewmanFromWedge(spec,extra){
 }
 function ch4ChairUp(board,carbon,site){const axialUp=(carbon%2===1)!==(board==='B');return site==='a'?axialUp:!axialUp;}
 function gradeCh4Production(q,draft){
-  if(q.production?.kind==='chair')return gradeCh4ChairEditor(q,draft);
   const p=q.production||{},checks=[];
   if(p.kind==='newman'){
     const placed=draft.placements||{},front=[0,1,2].map(i=>placed['f'+i]),back=[0,1,2].map(i=>placed['b'+i]);
@@ -9217,10 +9220,10 @@ function ch4NewmanSvg(q,draft){
   ['back','front'].forEach(side=>angles[side].forEach((angle,i)=>{
     const rear=side==='back',from=rear?38:0,to=draft.mode==='eclipsed'?(rear?157:91):132,labelRadius=draft.mode==='eclipsed'?(rear?185:113):164;
     const [x1,y1]=xy(angle,from),[x2,y2]=xy(angle,to),[tx,ty]=xy(angle,labelRadius),key=(rear?'b':'f')+i;
-    bonds+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+(rear?'#687986':'#145f83')+'" stroke-width="4"/>';
-    slots+=ch4SvgSlot(key,tx,ty,placed[key],(rear?'Back':'Front')+' carbon, bond '+(i+1),draft.locked);
+    bonds+='<line data-ch4-side="'+(rear?'back':'front')+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+(rear?'#687986':'#145f83')+'" stroke-width="'+(draft.locked?4:9)+'" stroke-linecap="round" style="'+(draft.locked?'':'cursor:grab;touch-action:none')+'"/>';
+    slots+=ch4SvgSlot(key,tx,ty,placed[key],(rear?'Back':'Front')+' carbon, bond '+(i+1),draft.locked).replace('<g class="ch4-slot','<g data-ch4-side="'+(rear?'back':'front')+'" class="ch4-slot');
   }));
-  return '<svg viewBox="0 0 460 435" role="group" aria-label="Build a Newman projection. Blue bonds start at the front carbon dot; gray bonds start at the rear carbon circle."><circle cx="230" cy="216" r="38" fill="white" stroke="#687986" stroke-width="3"/>'+bonds+'<circle cx="230" cy="216" r="7" fill="#145f83"/>'+slots+'<text x="230" y="422" text-anchor="middle" fill="#425563" font-size="16">Blue = FRONT dot · gray = BACK circle</text></svg>';
+  return '<svg class="ch4-newman-svg" style="'+(draft.locked?'':'touch-action:none;')+'" viewBox="0 0 460 435" role="group" aria-label="Build a Newman projection. Blue bonds start at the front carbon dot; gray bonds start at the rear carbon circle. Drag a bond to spin that carbon; it snaps every 60 degrees."><circle cx="230" cy="216" r="38" fill="white" stroke="#687986" stroke-width="3"/>'+bonds+'<circle cx="230" cy="216" r="7" fill="#145f83"/>'+slots+'<text x="230" y="422" text-anchor="middle" fill="#425563" font-size="16">Blue = FRONT dot · gray = BACK circle</text></svg>';
 }
 function ch4ChairSvg(q,draft,board){
   // Opposite ring edges stay parallel. B inverts the chair while preserving C numbers.
@@ -9242,7 +9245,6 @@ function ch4ChairSvg(q,draft,board){
   return '<svg viewBox="-30 -20 535 335" role="group" aria-label="Chair '+board+' with numbered carbons. Select a group and place it on a substituent bond."><path d="'+points.map(([x,y],i)=>(i?'L':'M')+x+' '+y).join(' ')+' Z" fill="none" stroke="#273541" stroke-width="4" stroke-linejoin="round"/>'+bonds+numbers+controls+'<text x="235" y="300" text-anchor="middle" fill="#425563" font-size="15">Vertical = axial · slanted outward = equatorial</text></svg>';
 }
 function renderCh4Production(host,q,D,finish,reviewOnly=false){
-  if(q.production?.kind==='chair')return renderCh4ChairEditor(host,q,D,finish,reviewOnly);
   ch4ProductionStyle();
   D.ch4Drafts=D.ch4Drafts||{};D.ch4Evidence=D.ch4Evidence||{};
   const p=q.production,draft=D.ch4Drafts[q.id]||(D.ch4Drafts[q.id]={placements:p.kind==='chair'?{A:{},B:{}}:{},mode:'',preferred:'',selected:null,checks:0,locked:false});
@@ -9251,7 +9253,7 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
   const button=(text,pressed,fn)=>el('button',{class:'btn ghost small',type:'button','aria-pressed':!!pressed,onclick:fn},text);
   const bindSlots=(container,board)=>container.querySelectorAll('[data-ch4-slot]').forEach(slot=>{
     const activate=()=>{
-      if(draft.locked)return;const key=slot.dataset.ch4Slot;
+      if(draft.locked)return;if(dragState.moved)return;const key=slot.dataset.ch4Slot;
       if(p.kind==='newman'){
         if(draft.selected){draft.placements[key]=draft.selected;draft.selected=null;}else delete draft.placements[key];
       }else{
@@ -9262,9 +9264,20 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
       persist();draw();
     };slot.addEventListener('click',activate);slot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}});
   });
+  const dragState={moved:false};
   function drawDiagram(container,state){
     if(p.kind==='newman'){
-      const visual=el('div',{class:'ch4-construction-scroll'});visual.innerHTML=ch4NewmanSvg(q,state);container.appendChild(visual);return;
+      const visual=el('div',{class:'ch4-construction-scroll'});visual.innerHTML=ch4NewmanSvg(q,state);container.appendChild(visual);
+      if(state!==draft||draft.locked)return;
+      /* v3.94 — drag-to-spin. Grab any bond or label on a wheel and rotate; the wheel snaps in 60° detents. */
+      let drag=null;
+      const angleAt=e=>{const svg=visual.querySelector('svg'),r=svg.getBoundingClientRect();const x=(e.clientX-r.left)*(460/r.width)-230,y=(e.clientY-r.top)*(435/r.height)-216;return Math.atan2(y,x)*180/Math.PI;};
+      const redraw=()=>{ch4NewmanSync(draft);visual.innerHTML=ch4NewmanSvg(q,draft);bindSlots(visual);const st=host.querySelector('[data-ch4-wheelstate]');if(st)st.innerHTML=ch4WheelStateText(draft);};
+      visual.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('[data-ch4-side]');if(!t||draft.locked)return;dragState.moved=false;const key=t.dataset.ch4Side==='front'?'fRot':'bRot';drag={key,start:angleAt(e),base:draft[key]||0,id:e.pointerId};});
+      visual.addEventListener('pointermove',e=>{if(!drag)return;let d=angleAt(e)-drag.start;d=((d+180)%360+720)%360-180;if(Math.abs(d)>10&&!dragState.moved){dragState.moved=true;try{visual.setPointerCapture(drag.id);}catch(_){}}const next=(((drag.base+Math.round(d/60)*60)%360)+360)%360;if(next!==draft[drag.key]){draft[drag.key]=next;persist();redraw();}});
+      const end=()=>{if(!drag)return;drag=null;if(dragState.moved)setTimeout(()=>{dragState.moved=false;},0);};
+      visual.addEventListener('pointerup',end);visual.addEventListener('pointercancel',end);
+      return;
     }
     (p.requireFlip===false?['A']:['A','B']).forEach(board=>{
       container.appendChild(el('h4',{class:'ch4-board-title'},'Chair '+board+(board==='B'?' · after the ring flip':'')));
@@ -9287,7 +9300,7 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
         const wheels=el('div',{class:'ch4-controls','aria-label':'Rotate the front or back carbon'});
         [['fRot',-60,'↺ front'],['fRot',60,'front ↻'],['bRot',-60,'↺ back'],['bRot',60,'back ↻']].forEach(([key,delta,text])=>wheels.appendChild(button(text+' 60°',false,()=>{draft[key]=(draft[key]||0)+delta;ch4NewmanSync(draft);persist();draw();})));
         host.appendChild(wheels);
-        const state=el('p',{class:'muted','aria-live':'polite'});state.innerHTML='Each wheel turns 60° at a time and the groups ride with their bonds — like a real C–C bond. Right now the offset makes this <b>'+draft.mode+'</b> (front '+draft.fRot+'°, back '+draft.bRot+'°).';host.appendChild(state);
+        const state=el('p',{class:'muted','aria-live':'polite','data-ch4-wheelstate':'1'});state.innerHTML=ch4WheelStateText(draft);host.appendChild(state);
         const tiles=el('div',{class:'ch4-controls','aria-label':'Available Newman groups'}),all=[...(p.front||[]),...(p.back||[])];
         [...new Set(all)].sort().forEach(label=>{const remaining=all.filter(x=>x===label).length-Object.values(draft.placements).filter(x=>x===label).length;
           const b=button(ch4DisplayGroup(label)+' · '+remaining+' left',draft.selected===label,()=>{draft.selected=draft.selected===label?null:label;draw();});b.disabled=remaining<=0;tiles.appendChild(b);
@@ -9574,244 +9587,6 @@ applyCh23FlagRepairs();
 
 CHAPTER_LEARNING_UNITS.ch4=CH4_LESSONS;
 QUESTIONS.push(...CH4_QUESTIONS);
-/* BEGIN CHAIR SUBSTITUENT EDITOR */
-/* Chair substituent editor · 2026-09-24.
- * Carbon identity and face are chemical state; screen positions are only a view.
- * Accepts legacy substituent IDs and @label values, preserving old saved attempts.
- * No cloud calls: the host owns persistence and first-attempt evidence.
- */
-const CHAIR_GROUP_BANK = [
-  ['CH3','Me','methyl'],['CH2CH3','Et','ethyl'],['CH2CH2CH3','n-Pr','n-propyl'],
-  ['CH(CH3)2','i-Pr','isopropyl'],['C(CH3)3','t-Bu','tert-butyl'],['Ph','Ph','phenyl'],
-  ['R','R','unspecified group'],['CO2R','CO₂R','ester'],['CO2H','CO₂H','carboxyl'],
-  ['CH2OH','CH₂OH','hydroxymethyl'],['OH','OH','hydroxyl'],['Cl','Cl','chlorine'],
-  ['Br','Br','bromine'],['H','H','hydrogen / remove group']
-];
-function chairCanonical(label){
-  const s=String(label||'').replace(/[₀-₉]/g,d=>String('₀₁₂₃₄₅₆₇₈₉'.indexOf(d)));
-  return ({Me:'CH3',Et:'CH2CH3','n-Pr':'CH2CH2CH3','i-Pr':'CH(CH3)2','t-Bu':'C(CH3)3'})[s]||s;
-}
-function chairValue(q,value){
-  if(!value)return 'H';
-  const sub=(q.production.substituents||[]).find(s=>s.id===value);
-  return chairCanonical(sub?sub.label:String(value).replace(/^@/,''));
-}
-function chairLabel(label){
-  const canonical=chairCanonical(label),entry=CHAIR_GROUP_BANK.find(g=>g[0]===canonical);
-  return entry?entry[1]:ch4DisplayGroup(canonical);
-}
-function chairUp(board,carbon,site){
-  const axialUp=(carbon%2===1)!==(board==='B');
-  return site==='a'?axialUp:!axialUp;
-}
-function chairGeometry(board){
-  // Ordered ring vertices C1..C6. Reflection in y flips the chair without
-  // renumbering, reordering the cycle, or attaching a group to the other neighbor.
-  const base=[[80,200],[135,80],[270,115],[395,80],[340,200],[205,165]];
-  const eq=[[-67.5,-17.5],[-62.5,17.5],[27.5,-60],[67.5,17.5],[62.5,-17.5],[-27.5,60]];
-  return base.map(([x,y],i)=>{
-    y=board==='A'?270-y:y;
-    const carbon=i+1;
-    return {carbon,x,y,sites:['a','e'].map(site=>{
-      const up=chairUp(board,carbon,site),dx=site==='a'?0:eq[i][0];
-      const dy=site==='a'?(up?-68:68):eq[i][1]*(board==='A'?-1:1);
-      return {key:carbon+site,site,up,x:x+dx,y:y+dy};
-    })};
-  });
-}
-function chairFlipPlacements(placements){
-  const flipped={};
-  Object.entries(placements||{}).forEach(([key,value])=>{
-    if(/^[1-6][ae]$/.test(key))flipped[key[0]+(key[1]==='a'?'e':'a')]=value;
-  });
-  return flipped;
-}
-function gradeCh4ChairEditor(q,draft){
-  const p=q.production,subs=p.substituents||[],checks=[];
-  (p.requireFlip===false?['A']:['A','B']).forEach(board=>{
-    const slots=(draft.placements||{})[board]||{};
-    const occupied=Object.entries(slots).filter(([,v])=>chairValue(q,v)!=='H');
-    const expected=subs.map(s=>chairCanonical(s.label)).filter(v=>v!=='H').sort();
-    checks.push({key:board+'-complete',ok:occupied.every(([key])=>/^[1-6][ae]$/.test(key))&&
-      JSON.stringify(occupied.map(([,v])=>chairValue(q,v)).sort())===JSON.stringify(expected),
-      text:'Chair '+board+': use exactly the groups in the given molecule; restore any extra substituents to H.'});
-    subs.forEach(sub=>{
-      const site=chairUp(board,sub.carbon,'a')===sub.up?'a':'e';
-      checks.push({key:board+'-'+sub.id,ok:chairValue(q,slots[sub.carbon+site])===chairCanonical(sub.label),
-        text:'Chair '+board+': '+chairLabel(sub.label)+' belongs on C'+sub.carbon+' and must stay '+(sub.up?'up':'down')+'. Track the carbon number before checking axial/equatorial.'});
-    });
-  });
-  if(p.preferredChair)checks.push({key:'stability',ok:draft.preferred===p.preferredChair,text:'Compare the axial substituents to choose the lower-energy chair.'});
-  return {ok:checks.every(c=>c.ok),checks};
-}
-function chairEditorStyle(){
-  if(document.getElementById('chair-editor-style'))return;
-  const style=document.createElement('style');style.id='chair-editor-style';style.textContent=`
-    .chair-editor{--ce-ink:#233e48;--ce-teal:#126a70;--ce-line:#ccdcdf;color:var(--ce-ink);background:#f8fbfb;border:1px solid var(--ce-line);border-radius:18px;padding:18px;margin:16px 0;font:16px/1.5 system-ui,sans-serif}
-    .chair-editor *{box-sizing:border-box}.chair-editor h3{font-size:22px;margin:0 0 8px}.chair-editor h4{font-size:18px;margin:0}.chair-editor p{margin:8px 0}.chair-editor .ce-muted{color:#526b73;font-size:14px}
-    .ce-toolbar,.ce-bank{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chair-editor button{font:inherit;cursor:pointer;min-height:44px;padding:9px 14px;background:white;color:var(--ce-ink);border:1px solid #a9bfc4;border-radius:10px;line-height:1.2}
-    .chair-editor button:hover{border-color:var(--ce-teal)}.chair-editor button:focus-visible{outline:3px solid #c58a2c;outline-offset:3px}.chair-editor button[aria-pressed="true"],.chair-editor button.ce-primary{background:var(--ce-teal);color:white;border-color:var(--ce-teal)}
-    .chair-editor button:disabled{opacity:.45;cursor:default}.ce-bank button{min-width:48px;touch-action:none;user-select:none;-webkit-user-select:none;font-weight:650}.ce-board{border-top:1px solid var(--ce-line);padding-top:16px;margin-top:16px}
-    .ce-canvas{background:white;border:1px solid #d6e1e3;border-radius:14px;overflow-x:auto;max-width:100%}.ce-canvas svg{display:block;width:100%;min-width:530px;max-width:760px;height:auto;margin:auto}.ce-enlarged .ce-canvas svg{min-width:700px}
-    .ce-carbon,.ce-bond-slot{cursor:pointer;outline:none;touch-action:manipulation}.ce-carbon .ce-carbon-hit{fill:transparent}.ce-carbon .ce-number{fill:white;stroke:#a9bfc4;stroke-width:1.5}.ce-carbon[aria-expanded="true"] .ce-number{fill:#e0f2f0;stroke:#126a70;stroke-width:2}
-    .ce-carbon:focus-visible .ce-carbon-hit{stroke:#c58a2c;stroke-width:3}.ce-bond-slot .ce-slot-hit{fill:#f0f4f5;stroke:#bdcdd0;stroke-width:1.4}.ce-bond-slot.ce-occupied .ce-slot-hit{fill:#e0f2f0;stroke:#126a70;stroke-width:2}
-    .ce-bond-slot.ce-target .ce-slot-hit,.ce-bond-slot.ce-drop .ce-slot-hit,.ce-bond-slot:focus-visible .ce-slot-hit{fill:#fff3d7;stroke:#af7619;stroke-width:3}.ce-bond-slot[aria-disabled="true"]{cursor:default}.ce-bond-slot text,.ce-carbon text{pointer-events:none;user-select:none}
-    .ce-readonly .ce-carbon{cursor:default}.ce-note{background:#e9f4f3;border-left:3px solid var(--ce-teal);padding:10px 14px;border-radius:4px}.ce-feedback{background:#fff3db;padding:12px 16px;border-radius:10px}.ce-feedback ul{padding-left:20px}.ce-feedback li{margin:8px 0}
-    .ce-status{min-height:24px;font-size:14px;color:#3e6069}.ce-caption{margin:8px 4px;font-size:13px;color:#526b73}.chair-editor summary{cursor:pointer;padding:12px 0}.ce-drag{opacity:.65}
-    @media(max-width:500px){.chair-editor{padding:12px}.ce-bank{gap:6px}.ce-bank button{padding:8px 10px}.chair-editor h3{font-size:20px}}
-  `;document.head.appendChild(style);
-}
-function chairEditorSvg(q,draft,board){
-  const carbons=chairGeometry(board),slots=(draft.placements||{})[board]||{},expanded=(draft.expanded||{})[board]||[];
-  const escText=s=>esc(String(s));let bonds='',controls='',numbers='';
-  carbons.forEach(c=>{
-    const open=expanded.includes(c.carbon);
-    c.sites.forEach(s=>{
-      const value=chairValue(q,slots[s.key]),occupied=value!=='H';
-      // Placed groups remain visible even when unused H bonds are collapsed.
-      if(!occupied&&!open)return;
-      const key=board+':'+s.key,label=chairLabel(value),target=draft.target===key;
-      bonds+='<line x1="'+c.x+'" y1="'+c.y+'" x2="'+s.x+'" y2="'+s.y+'" stroke="'+(occupied?'#233e48':'#83969c')+'" stroke-width="3"/>';
-      controls+='<g class="ce-bond-slot '+(occupied?'ce-occupied ':'')+(target?'ce-target':'')+'" data-chair-slot="'+key+'" data-ch4-slot="'+key+'" role="button" tabindex="'+(draft.locked?-1:0)+'" aria-disabled="'+!!draft.locked+'" aria-label="Chair '+board+', C'+c.carbon+', '+(s.site==='a'?'axial':'equatorial')+' '+(s.up?'up':'down')+': '+escText(label)+'"><rect class="ce-slot-hit" x="'+(s.x-29)+'" y="'+(s.y-22)+'" width="58" height="44" rx="9"/><text x="'+s.x+'" y="'+(s.y+6)+'" text-anchor="middle" font-size="'+(label.length>5?13:17)+'" font-family="system-ui,sans-serif" font-weight="600" fill="#233e48">'+escText(label)+'</text></g>';
-    });
-    numbers+='<g class="ce-carbon" data-chair-carbon="'+board+':'+c.carbon+'" role="button" tabindex="'+(draft.locked?-1:0)+'" aria-disabled="'+!!draft.locked+'" aria-expanded="'+open+'" aria-label="Chair '+board+', carbon '+c.carbon+', '+(open?'hide':'show')+' attached hydrogen bonds"><circle class="ce-carbon-hit" cx="'+c.x+'" cy="'+c.y+'" r="23"/><circle class="ce-number" cx="'+c.x+'" cy="'+c.y+'" r="12"/><text x="'+c.x+'" y="'+(c.y+5)+'" text-anchor="middle" font-size="14" font-family="system-ui,sans-serif" font-weight="700" fill="#233e48">'+c.carbon+'</text></g>';
-  });
-  return '<svg viewBox="-24 -26 530 336" role="group" aria-label="Chair '+board+', six numbered carbons. Tap a carbon to reveal its two substituent bonds."><path d="'+carbons.map((c,i)=>(i?'L':'M')+c.x+' '+c.y).join(' ')+' Z" fill="none" stroke="#233e48" stroke-width="4" stroke-linejoin="round"/>'+bonds+controls+numbers+'</svg>';
-}
-function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
-  chairEditorStyle();D.ch4Drafts=D.ch4Drafts||{};D.ch4Evidence=D.ch4Evidence||{};
-  const p=q.production,boards=p.requireFlip===false?['A']:['A','B'];
-  const draft=D.ch4Drafts[q.id]||(D.ch4Drafts[q.id]={placements:{A:{},B:{}},preferred:'',checks:0,locked:false});
-  draft.placements=draft.placements||{A:{},B:{}};boards.forEach(b=>draft.placements[b]=draft.placements[b]||{});
-  draft.expanded=draft.expanded||{A:[],B:[]};draft.history=draft.history||[];draft.future=draft.future||[];
-  if(draft.chairEditorVersion!==1){draft.selected=null;draft.target=null;draft.chairEditorVersion=1;}
-  if(reviewOnly)draft.locked=true;
-  let message='',suppressClick=false;
-  const persist=()=>{
-    if(typeof snapshotDrill==='function'&&typeof S!=='undefined'&&S.drill===D){snapshotDrill(D.i);if(typeof save==='function')save();}
-    if(typeof D.onChairDraft==='function')D.onChairDraft(ch4Clone(draft));
-  };
-  const snapshot=()=>({placements:ch4Clone(draft.placements),preferred:draft.preferred||''});
-  const edit=fn=>{
-    if(draft.locked||D.answered)return false;
-    const before=snapshot();fn();
-    if(JSON.stringify(before)!==JSON.stringify(snapshot())){draft.history.push(before);draft.history=draft.history.slice(-40);draft.future=[];}
-    return true;
-  };
-  const button=(text,fn,attrs={})=>el('button',Object.assign({type:'button',onclick:fn},attrs),esc(text));
-  const redraw=focus=>{persist();draw();if(focus){const node=host.querySelector(focus);if(node)node.focus({preventScroll:true});}};
-  function place(key,label){
-    const [board,where]=key.split(':');if(!boards.includes(board)||!/^[1-6][ae]$/.test(where))return;
-    if(!edit(()=>{if(chairCanonical(label)==='H')delete draft.placements[board][where];else draft.placements[board][where]='@'+chairCanonical(label);}))return;
-    draft.target=null;message=chairLabel(label)+' placed on chair '+board+', C'+where[0]+' '+(where[1]==='a'?'axial':'equatorial')+'.';
-    redraw('[data-chair-slot="'+key+'"]');
-  }
-  function choose(board,label){
-    if(draft.locked)return;
-    if(draft.target&&draft.target.startsWith(board+':')){place(draft.target,label);return;}
-    draft.selected=draft.selected?.board===board&&draft.selected.label===label?null:{board,label};
-    message=draft.selected?'Tap a bond on chair '+board+' to place '+chairLabel(label)+'.':'Group selection cleared.';
-    redraw('[data-chair-bank="'+board+':'+label+'"]');
-  }
-  function bindDrawing(container){
-    const activate=(node,fn)=>{node.addEventListener('click',fn);node.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();fn();}});};
-    container.querySelectorAll('[data-chair-carbon]').forEach(node=>activate(node,()=>{
-      if(draft.locked)return;const [board,n]=node.dataset.chairCarbon.split(':'),carbon=Number(n),list=draft.expanded[board]||[];
-      draft.expanded[board]=list.includes(carbon)?list.filter(x=>x!==carbon):list.concat(carbon);
-      if(draft.target?.startsWith(board+':'+carbon))draft.target=null;
-      redraw('[data-chair-carbon="'+board+':'+carbon+'"]');
-    }));
-    container.querySelectorAll('[data-chair-slot]').forEach(node=>activate(node,()=>{
-      if(draft.locked)return;const key=node.dataset.chairSlot,board=key.split(':')[0];
-      if(draft.selected?.board===board){place(key,draft.selected.label);return;}
-      draft.target=draft.target===key?null:key;
-      message=draft.target?'Choose a group from chair '+board+'’s bank. H restores hydrogen.':'Bond selection cleared.';
-      redraw('[data-chair-slot="'+key+'"]');
-    }));
-  }
-  function bindDrag(tile,board,label){
-    tile.addEventListener('pointerdown',event=>{
-      if(draft.locked||event.button!==0)return;
-      const start={x:event.clientX,y:event.clientY,id:event.pointerId};let moved=false,over=null;
-      tile.setPointerCapture(event.pointerId);
-      const clear=()=>{host.querySelectorAll('.ce-drop').forEach(n=>n.classList.remove('ce-drop'));tile.classList.remove('ce-drag');};
-      const move=e=>{
-        if(e.pointerId!==start.id)return;
-        moved=moved||Math.hypot(e.clientX-start.x,e.clientY-start.y)>7;if(!moved)return;
-        clear();tile.classList.add('ce-drag');const hit=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-chair-slot]');
-        over=hit&&host.contains(hit)&&hit.dataset.chairSlot.startsWith(board+':')?hit:null;
-        if(over)over.classList.add('ce-drop');
-      };
-      const end=e=>{
-        if(e.pointerId!==start.id)return;
-        tile.removeEventListener('pointermove',move);tile.removeEventListener('pointerup',end);tile.removeEventListener('pointercancel',end);
-        const key=over?.dataset.chairSlot;clear();
-        if(tile.hasPointerCapture(start.id))tile.releasePointerCapture(start.id);
-        if(moved){suppressClick=true;setTimeout(()=>{suppressClick=false;},0);if(e.type==='pointerup'&&key)place(key,label);}
-      };
-      tile.addEventListener('pointermove',move);tile.addEventListener('pointerup',end);tile.addEventListener('pointercancel',end);
-    });
-  }
-  function addBoard(container,state,board,interactive){
-    const section=el('section',{class:'ce-board','aria-label':'Chair '+board+' editor'});
-    section.appendChild(el('h4',{},'Chair '+board+(board==='B'?' · after the flip':'')));
-    if(interactive){
-      const bank=el('div',{class:'ce-bank','aria-label':'Chair '+board+' substituents'});
-      const groups=CHAIR_GROUP_BANK.concat((p.substituents||[]).map(s=>chairCanonical(s.label)).filter((v,i,a)=>a.indexOf(v)===i&&!CHAIR_GROUP_BANK.some(g=>g[0]===v)).map(v=>[v,ch4DisplayGroup(v),v]));
-      groups.forEach(([label,display,name])=>{
-        const tile=button(display,()=>{if(!suppressClick)choose(board,label);},{'data-chair-bank':board+':'+label,'aria-label':display+' — '+name,'aria-pressed':draft.selected?.board===board&&draft.selected.label===label,title:display+' = '+name});
-        bindDrag(tile,board,label);bank.appendChild(tile);
-      });section.appendChild(bank);
-    }
-    const visual=el('div',{class:'ce-canvas'+(state.locked?' ce-readonly':'')});visual.innerHTML=chairEditorSvg(q,state,board);section.appendChild(visual);
-    section.appendChild(el('p',{class:'ce-caption'},interactive?'Tap a numbered carbon to show/hide H bonds. Choose a group, then tap a bond—or drag onto it. On a narrow screen, swipe inside the drawing to reach all six carbons.':'Carbon numbers identify the same atoms in both chairs. On a narrow screen, swipe inside the drawing to see the entire chair.'));
-    container.appendChild(section);if(interactive)bindDrawing(visual);
-  }
-  function draw(){
-    host.innerHTML='';host.classList.add('chair-editor');host.classList.toggle('ce-enlarged',!!draft.zoom);host.dataset.ch4Production='chair';
-    host.appendChild(el('h3',{},draft.locked?'Your submitted chairs':boards.length===1?'Build the chair':'Build both chair conformations'));
-    host.appendChild(el('p',{class:'ce-muted'},'Keep each group on the same numbered carbon. A ring flip exchanges axial and equatorial; up/down stays the same.'));
-    const toolbar=el('div',{class:'ce-toolbar'});
-    toolbar.appendChild(button(draft.zoom?'Standard size':'Enlarge drawing',()=>{draft.zoom=!draft.zoom;redraw();}));
-    if(!draft.locked){
-      const travel=(from,to)=>{if(!draft[from].length)return;draft[to].push(snapshot());Object.assign(draft,draft[from].pop());draft.selected=null;draft.target=null;message='Construction '+(from==='history'?'restored.':'redone.');redraw();};
-      toolbar.appendChild(button('Undo',()=>travel('history','future'),{disabled:!draft.history.length}));
-      toolbar.appendChild(button('Redo',()=>travel('future','history'),{disabled:!draft.future.length}));
-      toolbar.appendChild(button('Clear selection',()=>{draft.selected=null;draft.target=null;message='Selection cleared.';redraw();}));
-    }
-    host.appendChild(toolbar);
-    if(!draft.locked)host.appendChild(el('p',{class:'ce-status','aria-live':'polite'},esc(message||'Start by tapping a carbon. Every carbon has one axial and one equatorial bond.')));
-    boards.forEach(board=>addBoard(host,draft,board,!draft.locked));
-    if(p.preferredChair){
-      host.appendChild(el('p',{},'Which chair is lower in energy?'));
-      const choices=el('div',{class:'ce-toolbar','aria-label':'Lower-energy chair'});
-      [['A','Chair A'],['B','Chair B'],['equal','Equal energy']].forEach(([value,label])=>choices.appendChild(button(label,()=>{edit(()=>draft.preferred=value);redraw();},{disabled:!!draft.locked,'aria-pressed':draft.preferred===value})));host.appendChild(choices);
-    }
-    if(draft.locked){
-      host.appendChild(el('p',{class:'ce-note'},'Your construction is saved with this question. It is read-only after submission.'));
-      if(draft.result&&(!D.cold||reviewOnly)){
-        const misses=draft.result.checks.filter(c=>!c.ok),feedback=el('div',{class:'ce-feedback'});
-        feedback.innerHTML=draft.result.ok?'<b>Construction checked.</b> Each group has the correct carbon and face in both chairs.':'<b>Review your construction</b><ul>'+misses.map(c=>'<li>'+esc(c.text)+'</li>').join('')+'</ul>';host.appendChild(feedback);
-        if(!draft.result.ok){const comparison=el('details',{});comparison.appendChild(el('summary',{},'Compare with one correct construction'));const model=ch4ProductionModel(q);boards.forEach(board=>addBoard(comparison,model,board,false));host.appendChild(comparison);}
-      }return;
-    }
-    const actions=el('div',{class:'ce-toolbar'});
-    actions.appendChild(button('Check my construction',()=>{
-      if(draft.locked||D.answered)return;
-      if(p.preferredChair&&!draft.preferred){message='Choose the lower-energy chair before checking.';redraw();return;}
-      if(boards.some(b=>!Object.keys(draft.placements[b]).length)&&(p.substituents||[]).some(s=>chairCanonical(s.label)!=='H')){message='Add the substituents to each chair before checking.';redraw();return;}
-      draft.result=gradeCh4ChairEditor(q,draft);draft.checks=(draft.checks||0)+1;draft.locked=true;draft.selected=null;draft.target=null;
-      const evidence={kind:'chair',editorVersion:1,placements:ch4Clone(draft.placements),mode:null,preferred:draft.preferred||null,ok:draft.result.ok,checks:draft.checks,firstTry:draft.checks===1,checkedAt:Date.now(),grading:'checked-spatial-construction',criteria:ch4Clone(draft.result.checks)};
-      D.ch4Evidence[q.id]=evidence;redraw();
-      finish(evidence.ok,'See the construction check below.','',JSON.stringify({kind:'chair',placements:evidence.placements,preferred:evidence.preferred}));
-    },{class:'ce-primary'}));
-    actions.appendChild(button('Clear construction',()=>{edit(()=>{draft.placements={A:{},B:{}};draft.preferred='';});draft.selected=null;draft.target=null;message='Construction cleared. Undo will restore it.';redraw();}));host.appendChild(actions);
-  }
-  draw();return draft;
-}
-
-/* END CHAIR SUBSTITUENT EDITOR */
-
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
    unless ?qa is present, so learner sessions and their evidence can never use it. */
