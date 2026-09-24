@@ -6,7 +6,7 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.91
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.92
   v3.90 (2026-09-19, Sat): CURRENT COURSE + PRODUCTION. Eight Chapter 4 lessons,
         34 source-aligned questions, checked Newman/chair construction, retained freehand
         drawings, distinct supported/independent pairs, completion saved at final submission,
@@ -1647,7 +1647,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Chapter 4 · learn, build, check</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.91</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.92</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -8483,7 +8483,7 @@ VIEWS.cheat = (v) => {
     '<h3>⛰️ Ch 4 — what she actually grades (Lectures 9a/9b/10A)</h3>'+
     '<p style="margin:4px 0"><b>Naming, four steps, written out:</b> ① parent (highlight it; ring vs chain = more carbons; a carbon belongs to ONE of them) · ② substituents (-yl; halogens -o; di/tri for repeats) · ③ number — first substituent lowest, then <b>first point of difference</b> one substituent at a time (never the sum); alphabet only as a tiebreaker · ④ assemble alphabetically (ignore di/tri; <b>iso and cyclo count</b>, sec-/tert- with the hyphen are ignored). Commas between numbers, dashes between number and letter.</p>'+
     '<p style="margin:4px 0"><b>Complex substituents (know through C4):</b> attachment carbon = C1. isopropyl (1-methylethyl) · sec-butyl (1-methylpropyl) · isobutyl (2-methylpropyl) · tert-butyl (1,1-dimethylethyl). Both systems accepted; pick one per name. Say <i>primary/secondary/tertiary</i>, never "one degree."</p>'+
-    '<p style="margin:4px 0"><b>Newman, her 4 checks:</b> back bonds stop at the circle · correct conformation · correct atom per bond · <b>every H labeled</b>. "Cx–Cy" → Cx is the front; number the chain by IUPAC first. Rotate ONE carbon, 60° steps, eclipsed = peak, staggered = valley.</p>'+
+    '<p style="margin:4px 0"><b>Wedge/dash → Newman:</b> in-plane (zigzag) bonds go straight up/down; wedge and dash split left/right — the same side-rule on both carbons; moving the eye to the other end mirrors left/right. <b>Newman, her 4 checks:</b> back bonds stop at the circle · correct conformation · correct atom per bond · <b>every H labeled</b>. "Cx–Cy" → Cx is the front; number the chain by IUPAC first. Rotate ONE carbon, 60° steps, eclipsed = peak, staggered = valley.</p>'+
     '<p style="margin:4px 0"><b>Strain:</b> torsional = eclipsing bonds; steric = non-H groups close. Gauche = staggered but steric. Largest groups anti = lowest; largest groups eclipsed = highest. Ethane eclipse ≈ 4 kJ/mol per H/H (12 total); propane 14.</p>'+
     '<p class="muted" style="margin:6px 0 0;font-size:.82rem">Models are allowed in exams — bring your own. "Newmans are worth a lot of points in Exam 2."</p>'));
   /* v3.62 — the 5×8 index-card blueprint (one handwritten double-sided card is ALLOWED on Exam 1). */
@@ -8865,7 +8865,7 @@ function ch4Newman(front,back,mode='staggered',title='Given Newman projection'){
 }
 function ch4BondView(kind='butane'){
   const left=kind==='ethane'?'H':'CH₃',right=kind==='ethane'?'H':'CH₃',branch=kind==='branched'?'CH₃':'H';
-  return ch4Figure('Given connectivity — look from the left carbon toward the right carbon',
+  return ch4Figure('Given connectivity (flat drawing: it fixes WHICH groups are on each carbon, not their 3-D placement — that is set by the conformation you are asked for) — look from the left carbon toward the right carbon',
     ch4Line(220,130,340,130)+ch4Line(180,130,105,130)+ch4Line(380,130,455,130)+ch4Line(200,105,200,55)+ch4Line(200,150,200,200)+ch4Line(360,105,360,55)+ch4Line(360,150,360,200)+
     ch4Label(200,137,'C',22)+ch4Label(360,137,'C',22)+ch4Label(80,137,left,22)+ch4Label(480,137,right,22)+ch4Label(200,40,branch,22)+ch4Label(200,228,'H',22)+ch4Label(360,40,'H',22)+ch4Label(360,228,'H',22)+
     ch4Label(280,95,'view →',17)+ch4Label(200,265,kind==='ethane'?'C1 · front':'C2 · front',16)+ch4Label(360,265,kind==='ethane'?'C2 · back':'C3 · back',16),560,285);
@@ -9001,6 +9001,20 @@ CH4_QUESTIONS.push(
   ch4Q2(31,'conform','mc','On a Newman projection you draw a bond leaving the back circle and write nothing at its end. How will she read it?',{choices:['As a CH₃ (methyl) — an unlabeled bond means a carbon; hydrogens MUST be written in','As a hydrogen — unlabeled bonds are always H','As an error she ignores','As a lone pair'],answer:0,hints:['Bond-line convention: an unlabeled line-end is carbon.','"If it\'s a hydrogen and you draw that, you will lose points."'],why:'An unlabeled line-end is a <b>carbon</b> by bond-line convention, so she reads it as CH₃. <b>Label every H.</b> This is check #4 on her grading list.',source:ch4Source('40–44')}),
   ch4Q2(32,'conform','written','<b>Define torsional strain and steric strain in one sentence each, then give one conformation that has ONLY steric strain and one that has BOTH.</b> Draw the two Newman projections you name.',{why:'<b>Torsional strain</b>: strain from eclipsing bonds (bond electron density overlapping). <b>Steric strain</b>: strain from non-hydrogen groups being close together in space. <b>Only steric</b>: gauche butane (staggered, methyls 60° apart). <b>Both</b>: fully eclipsed butane (CH₃ eclipsing CH₃, 0°). Check your drawings against her list: back bonds stop at the circle · correct conformation · correct atom on each bond · every H labeled.',source:ch4Source('46–55')}),
   ch4Q2(33,'conform','mc','Model kits. What did she say about them for exams?',{choices:['Allowed in exams; she recommends buying your own since she does not have one per person — build with one ball per group, no hydrogens on substituents','Not allowed in exams','Allowed only for the final','Required — she provides one per student'],answer:0,hints:['"The people who can do three-dimensional analysis mentally are in the minority."','Her build tip: one colored ball per group, or the model gets bulky and you cannot see the geometry.'],why:'<b>Allowed, bring your own.</b> Her tip: don\'t build out every CH₃ — one ball per group, three on the front carbon, three on the back, color-coded.',source:ch4Source('40')}),
+
+  /* ===== v3.92 · 2026-09-24 · Wedge/dash → Newman (the Wiley SkillBuilder 4.7 format Gabe asked for) =====
+     "there is no way of telling what is facing what if there are no wedges or dashes" — correct for the flat figure;
+     these give the wedge/dash drawing + an eye, and the grader accepts any rotation of the page but NOT the mirror image. */
+  ch4Q2(40,'conform','ch4production','<b>Draw the Newman projection of this compound as viewed from the eye.</b> Butane with Cl and Br. Keep the conformation shown (flat zigzag = staggered, chain anti).'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:ch4NewmanFromWedge({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),hints:['The eye is nearest C2, so C2 is the front carbon (the dot). C3 is the circle.','On C2: the in-plane chain bond (to CH₃) lands straight up or straight down. The dash and the implied wedge H land 60° either side of the opposite direction.','Which side? Wedge = toward the reader of the page, dash = away. From the eye, one of those is your left and one is your right — decide it once and apply it to both carbons.'],why:'Front (C2): CH₃ in-plane, Cl on the dash, H on the wedge. Back (C3): CH₃ in-plane and opposite (anti — a flat zigzag), Br on the wedge, H on the dash. The in-plane groups go up/down; wedge and dash split left/right, and the same side rule applies to both carbons. Rotating the whole picture is fine; a mirror image is a different drawing.',source:ch4Source('40–48','SkillBuilder 4.7')}),
+  ch4Q2(41,'conform','ch4production','<b>Same molecule, eye on the other side.</b> Draw the Newman projection as viewed from this eye.'+ch4WedgeView({n:4,front:3,back:2,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:ch4NewmanFromWedge({n:4,front:3,back:2,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),hints:['Now C3 is nearest the eye → C3 is the front carbon. Br goes on the front.','Reversing the viewing direction mirrors left/right for the wedge and dash.'],why:'Front (C3): CH₃ in-plane, Br wedge, H dash. Back (C2): CH₃ in-plane opposite, Cl dash, H wedge. Compare with the previous item: same molecule, the left/right of wedge vs dash has flipped because you are looking from the other end.',source:ch4Source('40–48','SkillBuilder 4.7')}),
+  ch4Q2(42,'conform','ch4production','<b>Draw the Newman projection as viewed from the eye.</b>'+ch4WedgeView({n:5,front:3,back:2,subs:{3:{wedge:'OH'}},flipY:true}),{production:ch4NewmanFromWedge({n:5,front:3,back:2,subs:{3:{wedge:'OH'}},flipY:true}),hints:['Front carbon = C3 (nearest the eye). Its groups: the chain toward C4/C5 (an ethyl, in-plane), OH (wedge), H (implied, dash).','Back carbon = C2: chain toward C1 (a methyl, in-plane), and two H.','The two in-plane chain groups are anti (opposite) in a flat zigzag.'],why:'Front (C3): CH₂CH₃ in-plane, OH wedge, H dash. Back (C2): CH₃ in-plane and opposite, H, H. When a carbon carries two H, which H is which does not matter — only the OH side does.',source:ch4Source('40–48','SkillBuilder 4.7')}),
+  ch4Q2(43,'conform','ch4production','<b>Draw the Newman projection as viewed from the eye.</b> Two non-hydrogen groups on the front carbon.'+ch4WedgeView({n:5,front:3,back:4,subs:{3:{wedge:'Cl',dash:'CH₃'},4:{dash:'Br'}}}),{production:ch4NewmanFromWedge({n:5,front:3,back:4,subs:{3:{wedge:'Cl',dash:'CH₃'},4:{dash:'Br'}}}),hints:['Front C3 has NO hydrogen: chain (ethyl, in-plane), Cl (wedge), CH₃ (dash).','Back C4: chain (methyl, in-plane), Br (dash), H (wedge, implied).','Wedge and dash sit on opposite sides; the same side-rule applies on both carbons because the eye has not moved.'],why:'Front (C3): CH₂CH₃ in-plane, Cl wedge, CH₃ dash. Back (C4): CH₃ in-plane opposite, Br dash, H wedge. Cl (wedge) and H-on-back (wedge) are on the same side; CH₃ (dash) and Br (dash) are on the other side.',source:ch4Source('40–48','SkillBuilder 4.7')}),
+  ch4Q2(44,'conform','ch4production','<b>Number the chain first, then draw the Newman projection looking down the C2–C3 bond.</b> No eye is given: "C2–C3" means C2 is the front carbon, and the numbers come from the IUPAC rules, not from the page.'+ch4WedgeView({n:5,front:4,back:3,subs:{4:{dash:'Cl'}},eye:false,title:'Given structure — number it yourself (lowest locant to the substituent)'}),{production:ch4NewmanFromWedge({n:5,front:4,back:3,subs:{4:{dash:'Cl'}},eye:false},{viewingLabel:'Look down the C2–C3 bond: C2 in front.'}),hints:['Pentane with one Cl. Number from the end that gives Cl the lowest locant: from the right, Cl is on C2. So the RIGHT-hand carbon bearing Cl is C2 — that is your front carbon.','Now the view direction is C2 → C3, i.e., from the right end looking left.','Front C2: CH₃ in-plane, Cl dash, H wedge. Back C3: CH₂CH₃ in-plane (the rest of the chain), H, H.'],why:'Correct numbering puts Cl on C2 counting from the right, so C2 is the right-hand substituted carbon and it is the front. Front: CH₃, Cl (dash), H. Back (C3): CH₂CH₃ in-plane opposite, two H. Her top tip for this: highlight the C2–C3 bond and write out all three groups on each carbon before you draw.',source:ch4Source('40–44','SkillBuilder 4.7')}),
+  ch4Q2(45,'conform','ch4production','<b>Number the chain, then draw the Newman looking down the C3–C4 bond.</b>'+ch4WedgeView({n:6,front:3,back:4,subs:{3:{wedge:'Br'}},eye:false,flipY:true,title:'Given structure — number it yourself'}),{production:ch4NewmanFromWedge({n:6,front:3,back:4,subs:{3:{wedge:'Br'}},eye:false,flipY:true},{viewingLabel:'Look down the C3–C4 bond: C3 in front.'}),hints:['Hexane with Br on the third carbon from the left (that is 3 from the left, 4 from the right → number from the left).','C3 is front: chain toward C1 (an ethyl, in-plane), Br wedge, H dash. C4 is back: chain toward C6 (a propyl, in-plane), H, H.'],why:'Number from the left (Br gets 3, not 4). Front C3: CH₂CH₃ in-plane, Br wedge, H dash. Back C4: CH₂CH₂CH₃ in-plane and opposite, H, H.',source:ch4Source('40–44','SkillBuilder 4.7')}),
+  ch4Q2(46,'conform','ch4production','<b>Rotate to the requested conformer.</b> Start from the drawing, then turn the <i>back</i> wheel until Cl (front) and Br (back) are <b>eclipsed</b> (0° apart). Keep every group on its own carbon.'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:{kind:'newman',front:['CH₃','Cl','H'],back:['CH₃','Br','H'],targetMode:'eclipsed',targetPair:{a:'Cl',b:'Br',gap:0},viewingLabel:'Eye nearest C2: C2 is the front carbon.'},hints:['Build the staggered drawing first (as in the item before this).','Turning the back wheel 60° makes it eclipsed; 120° more keeps rotating. Stop when Br sits directly behind Cl.','Rotating only ONE carbon — her rule. "You start moving both, you\'re gonna mess yourself up."'],why:'Front: CH₃, Cl, H stay put. Turn the back wheel until Br lines up with Cl. That is the highest-energy conformer for this bond: torsional strain (eclipsed bonds) plus steric strain (two big halogens eclipsing).',source:ch4Source('44–55')}),
+  ch4Q2(47,'conform','ch4production','<b>Rotate to the most stable conformer.</b> From the drawing, turn the back wheel until Cl (front) and Br (back) are <b>anti</b> (180° apart), staggered.'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:{kind:'newman',front:['CH₃','Cl','H'],back:['CH₃','Br','H'],targetMode:'staggered',targetPair:{a:'Cl',b:'Br',gap:180},viewingLabel:'Eye nearest C2: C2 is the front carbon.'},hints:['In the flat drawing the two CH₃ are anti — but the question asks for Cl and Br anti.','Turn the back wheel in 60° steps; after each step ask: is Br directly opposite Cl? Are front and back still alternating?'],why:'Her generalization: lowest energy = staggered with the two largest groups anti. Here that is Cl/Br at 180°. Note the methyls are then gauche to each other — you cannot have every pair anti at once.',source:ch4Source('51–55')}),
+  ch4Q2(48,'conform','mc','From the eye shown, which statement about the front carbon\'s groups is correct?'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{choices:['CH₃ points straight up or straight down; Cl and H sit 60° either side of the opposite direction, on opposite left/right sides','Cl points straight up because it is drawn vertically on the page','All three groups can go anywhere as long as they are 120° apart','Cl and Br are on the front carbon'],answer:0,hints:['Bonds drawn flat on the page (the zigzag) project to straight up or straight down in the Newman.','Wedge and dash project to opposite left/right sides.'],why:'The in-plane chain bond projects to the vertical; the wedge and the dash project to the two remaining slots, one each side. Which side is which depends on where the eye is — so decide it once and keep it for both carbons.',source:ch4Source('40–44')}),
+  ch4Q2(49,'conform','mc','You reverse the viewing direction (move the eye to the other end of the same bond). What happens to your Newman drawing?',{choices:['Front and back carbons swap, and the left/right placement of wedge vs dash mirrors','Nothing — it is the same molecule so the drawing is identical','Only the front and back swap; left/right stays the same','The staggered conformation becomes eclipsed'],answer:0,hints:['Looking from the other end is like looking at the page from behind.','Compare items 40 and 41 side by side.'],why:'Reversing the view swaps which carbon is the dot and which is the circle, and mirrors left/right (a wedge that was on your right is now on your left). Up/down of the in-plane groups is unchanged.',source:ch4Source('40–44')}),
   ch4Q(34,'chair','written','<b>Draw cyclohexane as a double Newman projection.</b> Use the numbered chair below. Look along the two parallel bonds <b>C1 → C2</b> and <b>C5 → C4</b>. Join the two projections through C3 and C6 so the ring remains closed. Show the H on the four viewed carbons; label C3 and C6 as CH₂. Then explain how your drawing shows staggered adjacent bonds.'+ch4CyclohexaneChair(),{requiresDrawing:true,answer:'Two staggered Newman views; front C1/C5, rear C2/C4; bridges C3/C6; closed C6H12 ring.',model:ch4CyclohexaneDoubleNewman()+'<p>The left dot is C5 and its circle is C4. The right dot is C1 and its circle is C2. The rear carbons join through CH₂ at C3; the front carbons join through CH₂ at C6. All six ring carbons are retained, and neighboring front/back bonds alternate. Rotating the complete picture is allowed. Compare your full connectivity and H count with the model; this freehand task requires self-review or instructor review.</p>',rubric:['Two Newman circles/dots with the stated front/rear carbons','C2–C3–C4 bridge retained','C1–C6–C5 bridge retained','Staggered front/back bonds','All six carbons and twelve H accounted for'],hints:['Draw two Newman circles. Label the left front/back C5/C4 and right front/back C1/C2.','The two front dots connect through C6; the two back circles connect through C3.','Each viewed carbon has two H. The two connecting carbons are CH₂. Count the six-carbon ring before comparing.'],why:'Cyclohexane cannot be replaced by two disconnected ethane drawings. The double Newman keeps both ring connections and exposes the staggered bonds of a chair. This is a self-reviewed drawing task, not an automatic mastery certification.',source:ch4Source('65–76')})
 );
 const CH4_LESSONS=[
@@ -9021,7 +9035,89 @@ const CH4_LESSONS=[
  */
 function ch4Clone(value){return JSON.parse(JSON.stringify(value));}
 function ch4SameInventory(a,b){return [...a].sort().join('|')===[...b].sort().join('|');}
-function ch4NewmanAngles(mode){return {front:[270,30,150],back:mode==='eclipsed'?[270,30,150]:[330,90,210]};}
+/* v3.92 — the Newman builder is two wheels. Front bonds sit at 270/30/150 + fRot; back bonds at 330/90/210 + bRot.
+   Groups ride with their bonds. Staggered/eclipsed is DERIVED from the wheel offset, not chosen from a menu. */
+function ch4NewmanSync(draft){
+  if(typeof draft.fRot!=='number'||typeof draft.bRot!=='number'){draft.fRot=0;draft.bRot=draft.mode==='eclipsed'?60:0;}
+  draft.fRot=((draft.fRot%360)+360)%360;draft.bRot=((draft.bRot%360)+360)%360;
+  draft.mode=(((draft.bRot-draft.fRot)%120)+120)%120===0?'staggered':'eclipsed';
+  return draft;
+}
+function ch4NewmanAngles(draftOrMode){
+  if(typeof draftOrMode==='string')return {front:[270,30,150],back:draftOrMode==='eclipsed'?[270,30,150]:[330,90,210]};
+  const d=ch4NewmanSync(draftOrMode||{});
+  return {front:[0,1,2].map(i=>(270+120*i+d.fRot)%360),back:[0,1,2].map(i=>(330+120*i+d.bRot)%360)};
+}
+/* Wedge/dash → Newman target. Page coords y-up; viewer looks along d (front→back), up = in-page perpendicular
+   with positive y, right = forward × up. In-plane groups land exactly up/down; wedge/dash land ±30° off the
+   horizontal. Verified against Wiley SkillBuilder 4.7 answer text (Cl up-right / CH3 down // CH3 up / Br down-left). */
+function ch4ZigzagXY(spec){
+  const n=spec.n,L=64,c30=Math.cos(Math.PI/6),pts=[];
+  for(let k=1;k<=n;k++){const sgn=(k%2===1?1:-1)*(spec.flipY?-1:1);pts.push([70+(k-1)*L*c30,150+sgn*32]);}
+  return pts;
+}
+function ch4ChainLabel(count){return ['','CH₃','CH₂CH₃','CH₂CH₂CH₃','CH₂CH₂CH₂CH₃'][count]||'R';}
+function ch4WedgeNewmanTarget(spec){
+  const P=ch4ZigzagXY(spec).map(([x,y])=>[x,-y]),f=spec.front,b=spec.back;
+  const unit=v=>{const n=Math.hypot(v[0],v[1]);return [v[0]/n,v[1]/n];};
+  const d=unit([P[b-1][0]-P[f-1][0],P[b-1][1]-P[f-1][1]]);
+  let u=[-d[1],d[0]];if(u[1]<0)u=[-u[0],-u[1]];
+  const rz=d[0]*u[1]-d[1]*u[0];
+  const out={};
+  [['front',f,b],['back',b,f]].forEach(([side,c,partner])=>{
+    const other=c===partner+1?c+1:c-1; /* the chain neighbour that is not the viewing bond */
+    const dc=unit([P[partner-1][0]-P[c-1][0],P[partner-1][1]-P[c-1][1]]);
+    const e=unit([P[other-1][0]-P[c-1][0],P[other-1][1]-P[c-1][1]]);
+    const w=unit([-(dc[0]+e[0]),-(dc[1]+e[1])]);
+    const sub=(spec.subs||{})[c]||{},remaining=other<c?other:spec.n-other+1;
+    const groups=[['inplane',[e[0],e[1],0],ch4ChainLabel(remaining)],['wedge',[0.58*w[0],0.58*w[1],0.82],sub.wedge||'H'],['dash',[0.58*w[0],0.58*w[1],-0.82],sub.dash||'H']];
+    out[side]=groups.map(([kind,v,label])=>{
+      const up=v[0]*u[0]+v[1]*u[1],right=v[2]*rz,th=(Math.atan2(up,right)*180/Math.PI+360)%360,svg=(360-th)%360;
+      return {label,kind,a:((Math.round((svg-30)/60)*60+30)%360+360)%360};
+    });
+  });
+  return out;
+}
+function ch4NewmanTargets(p){
+  if(p.wedge)return ch4WedgeNewmanTarget(p.wedge);
+  if(p.targetFront&&p.targetBack){const a=ch4NewmanAngles(p.targetMode||'staggered');return {front:p.targetFront.map((label,i)=>({label,a:a.front[i]})),back:p.targetBack.map((label,i)=>({label,a:a.back[i]}))};}
+  return null;
+}
+function ch4AngleMapEqual(builtFront,builtBack,target,rotations){
+  const key=list=>list.map(x=>x.a+':'+x.label).sort().join('|');
+  const bf=key(builtFront),bb=key(builtBack);
+  return rotations.some(k=>bf===key(target.front.map(x=>({a:(x.a+k)%360,label:x.label})))&&bb===key(target.back.map(x=>({a:(x.a+k)%360,label:x.label}))));
+}
+function ch4WedgeView(spec){
+  const P=ch4ZigzagXY(spec),f=spec.front,b=spec.back;
+  let body='';
+  for(let k=0;k<P.length-1;k++)body+=ch4Line(P[k][0],P[k][1],P[k+1][0],P[k+1][1]);
+  const wedge=(x1,y1,x2,y2)=>{const dx=x2-x1,dy=y2-y1,n=Math.hypot(dx,dy),px=-dy/n*6,py=dx/n*6;return '<polygon points="'+x1+','+y1+' '+(x2+px)+','+(y2+py)+' '+(x2-px)+','+(y2-py)+'" fill="currentColor" stroke="none"/>';};
+  const dash=(x1,y1,x2,y2)=>{let o='';const dx=x2-x1,dy=y2-y1,n=Math.hypot(dx,dy),px=-dy/n,py=dx/n;for(let t=0.22;t<=1.001;t+=0.13){const hw=1.5+5*t,x=x1+dx*t,y=y1+dy*t;o+='<line x1="'+(x+px*hw)+'" y1="'+(y+py*hw)+'" x2="'+(x-px*hw)+'" y2="'+(y-py*hw)+'" stroke-width="2.4"/>';}return o;};
+  Object.entries(spec.subs||{}).forEach(([c,sub])=>{
+    const k=Number(c),[x,y]=P[k-1],sgn=(k%2===1?1:-1)*(spec.flipY?-1:1),dirY=sgn; /* bisector points away from the two chain neighbours */
+    const items=[];if(sub.wedge&&sub.wedge!=='H')items.push(['wedge',sub.wedge]);if(sub.dash&&sub.dash!=='H')items.push(['dash',sub.dash]);
+    items.forEach(([kind,label],i)=>{
+      const splay=items.length===2?(i===0?-22:22):0,ang=(dirY>0?90:270)+splay,rad=ang*Math.PI/180,len=46,ex=x+Math.cos(rad)*len,ey=y+Math.sin(rad)*len;
+      body+=kind==='wedge'?wedge(x,y,ex,ey):dash(x,y,ex,ey);
+      body+=ch4Label(x+Math.cos(rad)*(len+18),y+Math.sin(rad)*(len+18)+5,label,19);
+    });
+  });
+  if(spec.numbers)P.forEach(([x,y],i)=>{const k=i+1,sgn=(k%2===1?1:-1)*(spec.flipY?-1:1);body+=ch4Label(x,y-sgn*16+5,'C'+k,13);});
+  if(spec.eye!==false){
+    const [fx,fy]=P[f-1],[bx,by]=P[b-1],dx=fx-bx,dy=fy-by,n=Math.hypot(dx,dy),ux=dx/n,uy=dy/n,ex=fx+ux*96,ey=fy+uy*96;
+    body+='<line x1="'+(ex-ux*18)+'" y1="'+(ey-uy*18)+'" x2="'+(fx+ux*14)+'" y2="'+(fy+uy*14)+'" stroke-dasharray="5 5" stroke-width="2.5"/>';
+    body+='<polygon points="'+(fx+ux*12)+','+(fy+uy*12)+' '+(fx+ux*26-uy*6)+','+(fy+uy*26+ux*6)+' '+(fx+ux*26+uy*6)+','+(fy+uy*26-ux*6)+'" fill="currentColor" stroke="none"/>';
+    body+='<ellipse cx="'+ex+'" cy="'+ey+'" rx="15" ry="9" fill="#fff" stroke-width="2.5"/><circle cx="'+ex+'" cy="'+ey+'" r="4.5" fill="currentColor"/>';
+    body+=ch4Label(ex,ey+26,'eye',13);
+  }
+  const w=70+(spec.n-1)*64*Math.cos(Math.PI/6)+130;
+  return ch4Figure(spec.title||'Given structure — solid wedge = toward you · hashed = away · H on carbon implied',body,Math.max(w,420),300);
+}
+function ch4NewmanFromWedge(spec,extra){
+  const t=ch4WedgeNewmanTarget(spec);
+  return Object.assign({kind:'newman',wedge:spec,front:t.front.map(x=>x.label),back:t.back.map(x=>x.label),targetMode:'staggered',viewingLabel:spec.viewingLabel||'Look from the eye toward the far carbon. The front carbon is the one nearer the eye.'},extra||{});
+}
 function ch4ChairUp(board,carbon,site){const axialUp=(carbon%2===1)!==(board==='B');return site==='a'?axialUp:!axialUp;}
 function gradeCh4Production(q,draft){
   const p=q.production||{},checks=[];
@@ -9030,17 +9126,25 @@ function gradeCh4Production(q,draft){
     checks.push({key:'complete',ok:front.concat(back).every(Boolean),text:'Place a group on all six bonds.'});
     checks.push({key:'front',ok:ch4SameInventory(front,p.front||[]),text:'Check the three groups attached to the FRONT carbon in the original structure.'});
     checks.push({key:'back',ok:ch4SameInventory(back,p.back||[]),text:'Check the three groups attached to the BACK carbon in the original structure.'});
-    checks.push({key:'mode',ok:draft.mode===p.targetMode,text:'Check whether the front and back bonds should line up or alternate for the requested conformation.'});
+    ch4NewmanSync(draft);const angles=ch4NewmanAngles(draft);
+    if(p.targetMode)checks.push({key:'mode',ok:draft.mode===p.targetMode,text:'Turn a wheel: the front and back bonds should '+(p.targetMode==='eclipsed'?'line up':'alternate')+' for the requested conformation.'});
+    const gapBetween=(A,B)=>{const g=[];front.forEach((f,i)=>back.forEach((b,j)=>{if(f===A&&b===B){const gap=Math.abs(angles.front[i]-angles.back[j]);g.push(Math.min(gap,360-gap));}}));return g;};
     if(p.targetRelation){
-      const angles=ch4NewmanAngles(draft.mode),large=p.largeGroup||'CH3',gaps=[];
-      front.forEach((f,i)=>back.forEach((b,j)=>{if(f===large&&b===large){const gap=Math.abs(angles.front[i]-angles.back[j]);gaps.push(Math.min(gap,360-gap));}}));
+      const large=p.largeGroup||'CH3',gaps=gapBetween(large,large);
       const ok=p.targetRelation==='anti'?gaps.includes(180):p.targetRelation==='gauche'?gaps.includes(60)&&!gaps.includes(180):false;
       checks.push({key:'relation',ok,text:'Compare the angle between the '+large+' groups on the front and back carbons.'});
     }
-    if(p.targetFront&&p.targetBack){
-      const shifts=p.rotationEquivalent===false?[0]:[0,1,2];
-      const match=shifts.some(shift=>front.every((x,i)=>x===p.targetFront[(i+shift)%3])&&back.every((x,i)=>x===p.targetBack[(i+shift)%3]));
-      checks.push({key:'orientation',ok:match,text:'Check the order of the groups around each carbon from the stated viewing direction.'});
+    if(p.targetPair){
+      const gaps=gapBetween(p.targetPair.a,p.targetPair.b);
+      checks.push({key:'pair',ok:gaps.includes(p.targetPair.gap),text:'Turn the back wheel until '+p.targetPair.a+' (front) and '+p.targetPair.b+' (back) are '+p.targetPair.gap+'° apart.'});
+    }
+    const target=ch4NewmanTargets(p);
+    if(target){
+      const rotations=p.rotationEquivalent===false?[0]:[0,60,120,180,240,300];
+      const builtF=front.map((label,i)=>({label,a:angles.front[i]})),builtB=back.map((label,i)=>({label,a:angles.back[i]}));
+      const match=ch4AngleMapEqual(builtF,builtB,target,rotations);
+      const mirror=!match&&ch4AngleMapEqual(builtF.map(x=>({label:x.label,a:(360-x.a)%360})),builtB.map(x=>({label:x.label,a:(360-x.a)%360})),target,rotations);
+      checks.push({key:'orientation',ok:match,text:mirror?'Your drawing is the MIRROR IMAGE of the correct one — wedge and dash are swapped left/right. Re-check which side faces the eye.':'Check the order of the groups around each carbon from the stated viewing direction (rotating the whole drawing is fine; swapping two groups is not).'});
     }
   }else if(p.kind==='chair'){
     const boards=p.requireFlip===false?['A']:['A','B'];
@@ -9066,11 +9170,19 @@ function ch4ProductionModel(q){
     return {placements,preferred:p.preferredChair||'',locked:true};
   }
   const permutations=items=>{if(items.length===0)return [[]];return items.flatMap((x,i)=>permutations(items.filter((_,j)=>j!==i)).map(rest=>[x,...rest]));};
-  for(const front of permutations(p.front||[]))for(const back of permutations(p.back||[])){
-    const placements={};front.forEach((x,i)=>placements['f'+i]=x);back.forEach((x,i)=>placements['b'+i]=x);
-    const draft={placements,mode:p.targetMode,locked:true};if(gradeCh4Production(q,draft).ok)return draft;
+  const target=ch4NewmanTargets(p);
+  if(target){ /* direct construction: pick wheel angles so slot angles hit the target angles */
+    const fRot=((target.front[0].a-270)%120+120)%120,bRot=((target.back[0].a-330)%120+120)%120,draft={placements:{},fRot,bRot,locked:true};
+    ch4NewmanSync(draft);const angles=ch4NewmanAngles(draft);
+    angles.front.forEach((a,i)=>{const t=target.front.find(x=>x.a===a);if(t)draft.placements['f'+i]=t.label;});
+    angles.back.forEach((a,i)=>{const t=target.back.find(x=>x.a===a);if(t)draft.placements['b'+i]=t.label;});
+    if(gradeCh4Production(q,draft).ok)return draft;
   }
-  return {placements:{},mode:p.targetMode,locked:true};
+  for(const bRot of [0,60,120,180,240,300])for(const front of permutations(p.front||[]))for(const back of permutations(p.back||[])){
+    const placements={};front.forEach((x,i)=>placements['f'+i]=x);back.forEach((x,i)=>placements['b'+i]=x);
+    const draft={placements,fRot:0,bRot,locked:true};ch4NewmanSync(draft);if(gradeCh4Production(q,draft).ok)return draft;
+  }
+  const fallback={placements:{},fRot:0,bRot:p.targetMode==='eclipsed'?60:0,locked:true};return ch4NewmanSync(fallback);
 }
 function ch4ProductionStyle(){
   if(document.getElementById('ch4-production-style'))return;
@@ -9097,7 +9209,8 @@ function ch4SvgSlot(key,x,y,value,label,locked){
   return '<g class="ch4-slot '+(value?'ch4-slot-filled':'')+'" data-ch4-slot="'+esc(key)+'" role="button" tabindex="'+(locked?'-1':'0')+'" aria-disabled="'+!!locked+'" aria-label="'+esc(label+(value?': '+value:': empty'))+'"><rect class="ch4-slot-hit" x="'+(x-33)+'" y="'+(y-22)+'" width="66" height="44" rx="11"/><text x="'+x+'" y="'+(y+6)+'" text-anchor="middle" font-size="'+font+'" font-weight="700" fill="#183648">'+esc(value?ch4DisplayGroup(value):'?')+'</text></g>';
 }
 function ch4NewmanSvg(q,draft){
-  const angles=ch4NewmanAngles(draft.mode||'staggered'),placed=draft.placements||{},cx=230,cy=216;
+  ch4NewmanSync(draft);
+  const angles=ch4NewmanAngles(draft),placed=draft.placements||{},cx=230,cy=216;
   const xy=(a,r)=>[cx+Math.cos(a*Math.PI/180)*r,cy+Math.sin(a*Math.PI/180)*r];
   let bonds='',slots='';
   ['back','front'].forEach(side=>angles[side].forEach((angle,i)=>{
@@ -9168,9 +9281,11 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
     if(!draft.locked){
       host.appendChild(el('p',{class:'muted'},'Choose a group tile, then tap the bond where it belongs. Tap a placed group with no tile selected to remove it. Your work saves as you go.'));
       if(p.kind==='newman'){
-        const mode=el('div',{class:'ch4-controls','aria-label':'Choose conformation'});
-        ['staggered','eclipsed'].forEach(value=>mode.appendChild(button(value[0].toUpperCase()+value.slice(1),draft.mode===value,()=>{draft.mode=value;persist();draw();})));
-        host.appendChild(mode);if(!draft.mode)host.appendChild(el('p',{class:'muted'},'Choose staggered or eclipsed, then place the groups. The preview starts staggered.'));
+        ch4NewmanSync(draft);
+        const wheels=el('div',{class:'ch4-controls','aria-label':'Rotate the front or back carbon'});
+        [['fRot',-60,'↺ front'],['fRot',60,'front ↻'],['bRot',-60,'↺ back'],['bRot',60,'back ↻']].forEach(([key,delta,text])=>wheels.appendChild(button(text+' 60°',false,()=>{draft[key]=(draft[key]||0)+delta;ch4NewmanSync(draft);persist();draw();})));
+        host.appendChild(wheels);
+        const state=el('p',{class:'muted','aria-live':'polite'});state.innerHTML='Each wheel turns 60° at a time and the groups ride with their bonds — like a real C–C bond. Right now the offset makes this <b>'+draft.mode+'</b> (front '+draft.fRot+'°, back '+draft.bRot+'°).';host.appendChild(state);
         const tiles=el('div',{class:'ch4-controls','aria-label':'Available Newman groups'}),all=[...(p.front||[]),...(p.back||[])];
         [...new Set(all)].sort().forEach(label=>{const remaining=all.filter(x=>x===label).length-Object.values(draft.placements).filter(x=>x===label).length;
           const b=button(ch4DisplayGroup(label)+' · '+remaining+' left',draft.selected===label,()=>{draft.selected=draft.selected===label?null:label;draw();});b.disabled=remaining<=0;tiles.appendChild(b);
@@ -9206,14 +9321,14 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
     const actions=el('div',{class:'ch4-controls'});
     actions.appendChild(el('button',{class:'btn',type:'button',onclick:()=>{
       if(draft.locked||D.answered)return;
-      const complete=p.kind==='newman'?Object.keys(draft.placements).length===6&&!!draft.mode:(p.requireFlip===false?['A']:['A','B']).every(b=>Object.values(draft.placements[b]||{}).length===(p.substituents||[]).length)&&(!p.preferredChair||!!draft.preferred);
+      const complete=p.kind==='newman'?Object.keys(draft.placements).length===6&&!!ch4NewmanSync(draft).mode:(p.requireFlip===false?['A']:['A','B']).every(b=>Object.values(draft.placements[b]||{}).length===(p.substituents||[]).length)&&(!p.preferredChair||!!draft.preferred);
       if(!complete){status.textContent='Finish placing every group'+(p.kind==='newman'?' and choose a conformation.':p.preferredChair?' in both chairs, then choose the lower-energy chair.':'.');return;}
       draft.result=gradeCh4Production(q,draft);draft.checks++;draft.locked=true;draft.selected=null;
       const evidence={kind:p.kind,placements:ch4Clone(draft.placements),mode:draft.mode||null,preferred:draft.preferred||null,ok:draft.result.ok,checks:draft.checks,firstTry:draft.checks===1,checkedAt:Date.now(),grading:'checked-spatial-construction',criteria:ch4Clone(draft.result.checks)};
       D.ch4Evidence[q.id]=evidence;persist();draw();
       finish(draft.result.ok,'See the construction check below.','',JSON.stringify({kind:p.kind,placements:evidence.placements,mode:evidence.mode,preferred:evidence.preferred}));
     }},'Check my construction'));
-    actions.appendChild(button('Clear construction',false,()=>{draft.placements=p.kind==='chair'?{A:{},B:{}}:{};draft.preferred='';draft.selected=null;persist();draw();}));host.appendChild(actions);
+    actions.appendChild(button('Clear construction',false,()=>{draft.placements=p.kind==='chair'?{A:{},B:{}}:{};draft.preferred='';draft.selected=null;if(p.kind==='newman'){draft.fRot=0;draft.bRot=0;ch4NewmanSync(draft);}persist();draw();}));host.appendChild(actions);
     const status=el('p',{'aria-live':'polite',class:'muted'});host.appendChild(status);
   }
   draw();return draft;
