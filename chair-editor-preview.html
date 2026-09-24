@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chair builder · CHEM 231</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#eef4f3;color:#213d46;font:16px/1.6 system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:38px 24px 70px}.eyebrow{color:#17686d;font-size:12px;font-weight:750;letter-spacing:.13em;text-transform:uppercase}h1{font-size:clamp(29px,5vw,44px);line-height:1.15;margin:12px 0}header>p{max-width:680px;margin:12px 0 24px;color:#52676e}.prompt{display:flex;gap:24px;align-items:center;background:white;border:1px solid #cddcde;border-radius:18px;padding:18px 24px}.prompt svg{width:230px;flex-shrink:0;max-width:100%}.prompt h2{font-size:19px;margin:0 0 8px}.prompt p{margin:0}.foot{display:flex;align-items:center;flex-wrap:wrap;gap:18px;margin:20px 0;color:#52676e;font-size:14px}.foot button{font:inherit;min-height:44px;padding:10px 16px;border-radius:10px;background:white;border:1px solid #a9bfc4;color:#233e48;cursor:pointer}#storage-note{font-size:13px;color:#52676e}@media(max-width:600px){main{padding:22px 12px 40px}.prompt{display:block;padding:18px}.prompt svg{display:block;margin:auto}}
+</style>
+</head>
+<body><main>
+<header><div class="eyebrow">CHEM 231 · interactive practice</div><h1>Build it, one carbon at a time.</h1><p>Tap a carbon to reveal its two bonds. Pick a group from the bank and tap a hydrogen to replace it. You can also drag a group onto a visible bond.</p></header>
+<section class="prompt" aria-label="Practice molecule">
+<svg viewBox="0 0 260 220" role="img" aria-label="Cyclohexane with methyl on carbon 1 and ethyl on adjacent carbon 2, both solid wedge up. Ring carbons are numbered 1 through 6.">
+<g fill="none" stroke="#233e48" stroke-width="3" stroke-linejoin="round"><path d="M140 60 L172 116 L140 172 L76 172 L44 116 L76 60 Z"/></g>
+<g fill="#233e48"><path d="M140 60 L151 25 L162 31 Z"/><path d="M172 116 L211 109 L211 123 Z"/></g><path d="M211 116 L231 146" fill="none" stroke="#233e48" stroke-width="3"/>
+<g fill="#17686d" font-size="13" font-family="system-ui" font-weight="700"><text x="127" y="82">1</text><text x="151" y="121">2</text><text x="127" y="160">3</text><text x="79" y="158">4</text><text x="56" y="121">5</text><text x="79" y="82">6</text></g>
+<g fill="#233e48" font-size="15" font-family="system-ui"><text x="166" y="30">Me</text><text x="210" y="172">Et</text></g></svg>
+<div><h2>Keep both groups on the same face.</h2><p>Place <b>Me on C1, up</b>, and <b>Et on C2, up</b>, in both chairs. The first Me is already placed. The carbon numbers stay attached to the same atoms through the flip.</p><p style="font-size:14px;color:#52676e;margin-top:10px">Me = methyl (CH₃) · Et = ethyl (CH₂CH₃). This is a numbered practice drawing, not an IUPAC numbering exercise.</p></div>
+</section>
+<div id="editor"></div>
+<div class="foot"><button id="restart" type="button">Restart practice example</button><span>Preview practice only. Checks here do not enter your course score or mastery record.</span></div>
+<p id="storage-note" role="status"></p>
+</main>
+<script>
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const el=(tag,attrs={},html='')=>{const e=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v);});e.innerHTML=html;return e;};
+const ch4Clone=value=>JSON.parse(JSON.stringify(value));
+const ch4DisplayGroup=label=>String(label).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
+function ch4ProductionModel(q){const placements={A:{},B:{}};for(const board of ['A','B'])for(const s of q.production.substituents){const site=chairUp(board,s.carbon,'a')===s.up?'a':'e';placements[board][s.carbon+site]='@'+s.label;}return {placements,locked:true};}
+</script>
+<script src="chair-substituent-editor.js"></script>
+<script>
+const question={id:'preview-cis-me-et',production:{kind:'chair',requireFlip:true,substituents:[{id:'methyl',label:'CH3',carbon:1,up:true},{id:'ethyl',label:'CH2CH3',carbon:2,up:true}]}};
+const storageKey='chem231-chair-editor-preview-v1';let session;
+function start(reset=false){
+  let saved=null;if(!reset){try{saved=JSON.parse(localStorage.getItem(storageKey)||'null');}catch{}}
+  session={i:0,answered:!!saved?.locked,ch4Drafts:{},onChairDraft:draft=>{try{localStorage.setItem(storageKey,JSON.stringify(draft));document.getElementById('storage-note').textContent='Your preview draft is saved in this browser.';}catch{document.getElementById('storage-note').textContent='Browser storage is unavailable. Keep this page open to retain your draft.';}}};
+  session.ch4Drafts[question.id]=saved||{placements:{A:{'1a':'@CH3'},B:{}},checks:0,locked:false};
+  renderCh4ChairEditor(document.getElementById('editor'),question,session,()=>{session.answered=true;});
+  session.onChairDraft(session.ch4Drafts[question.id]);
+}
+document.getElementById('restart').addEventListener('click',()=>start(true));start();
+</script>
+</body></html>
