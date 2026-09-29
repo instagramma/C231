@@ -6,7 +6,9 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.99
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.99.1
+  v3.99.1 (2026-09-29): LOCAL PENCIL GESTURE FIX. Canvas-only native
+  selection/callout guards preserve rapid handwriting and surrounding page UI.
   v3.99 (2026-09-29): LOCAL CHAPTER 5 PREP. Outline-aligned stereochemistry
   lessons, visual practice and separate no-hint checks. Chapter 4 remains Home.
   Instructor assessment scope unconfirmed; drawings self-reviewed. Not published.
@@ -9634,7 +9636,7 @@ function renderCourseSketch(host,q,D,readOnly=false,provided=null){
   D.sketchDrafts=D.sketchDrafts||{};
   const draft=provided||(D.sketchDrafts[q.id]||(D.sketchDrafts[q.id]={strokes:[],text:''}));
   const box=el('section',{class:'course-sketch'});box.innerHTML='<h3>Your drawing</h3><p class="muted">Draw here, or use paper and tick the box below. Written notes are optional; include any labels or explanation requested in the question on your drawing or paper.</p>';
-  const canvas=el('canvas',{width:800,height:420,'aria-label':'Draw your structure here',style:'width:100%;height:auto;display:block;border:1px solid #a9bac1;border-radius:10px;background:white;touch-action:none'}),ctx=canvas.getContext('2d');
+  const canvas=el('canvas',{width:800,height:420,draggable:'false','aria-label':'Draw your structure here',style:'width:100%;height:auto;display:block;border:1px solid #a9bac1;border-radius:10px;background:white;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;-webkit-tap-highlight-color:transparent'}),ctx=canvas.getContext('2d');
   // Legacy stroke arrays remain unchanged. New styles live alongside them so
   // previous drafts/attempts replay without migration or rewritten evidence.
   const colors=[['Black','#173a4b'],['Blue','#1766b3'],['Red','#be3548'],['Green','#237348'],['Purple','#7644a9'],['Yellow','#f4cf32']];
@@ -9698,6 +9700,16 @@ function renderCourseSketch(host,q,D,readOnly=false,provided=null){
     status.textContent=cancel?'Gesture canceled; previous drawing restored.':actionMessage?(actionMessage+' '+updateMessage):updateMessage;paint();store();
   };
   if(!readOnly){
+    // Rapid Pencil strokes can become native multi-tap selection/callout gestures
+    // in Safari. Pointerdown cancellation alone does not suppress every native
+    // click/context-menu action. Keep these guards on the canvas, not its parent:
+    // question text, notes, tool buttons and scrolling outside remain ordinary UI.
+    const preventInkDefault=e=>{if(e.cancelable)e.preventDefault();};
+    ['selectstart','dragstart','contextmenu','mousedown','click','dblclick'].forEach(type=>canvas.addEventListener(type,preventInkDefault));
+    // Safari also recognizes touch gestures independently of Pointer Events.
+    // Cancel their defaults without drawing twice or stopping event propagation
+    // (the expanded workspace still needs to observe pointer completion).
+    ['touchstart','touchmove','touchend'].forEach(type=>canvas.addEventListener(type,preventInkDefault,{passive:false}));
     const tools=el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px',role:'group','aria-label':'Drawing tools'});
     const palette=el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:8px',role:'group','aria-label':'Drawing colors'}),toolButtons=[],modeButtons=[],colorButtons=[];
     const updateTools=()=>{
@@ -9739,7 +9751,7 @@ function renderCourseSketch(host,q,D,readOnly=false,provided=null){
       if(snapped){active.splice(1,active.length-1,next);}else if(next[0]!==active[active.length-1][0]||next[1]!==active[active.length-1][1]){active.push(next);}
       armHold(e);paint();
     });
-    canvas.addEventListener('pointerup',e=>end(e));canvas.addEventListener('pointercancel',e=>end(e,true));canvas.addEventListener('lostpointercapture',e=>end(e,true));
+    canvas.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)preventInkDefault(e);end(e);});canvas.addEventListener('pointercancel',e=>end(e,true));canvas.addEventListener('lostpointercapture',e=>end(e,true));
   }
   box.appendChild(canvas);if(!readOnly)box.appendChild(el('button',{type:'button',class:'btn ghost small','data-sketch-undo':'true','aria-label':'Undo last stroke or erasure',onclick:()=>{
     if(D.answered)return;if(pointerId!==null){end(null,true);return;}alignStyles();const action=draft.inkHistory.pop();
