@@ -6,7 +6,15 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.97
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.99
+  v3.99 (2026-09-29): LOCAL CHAPTER 5 PREP. Outline-aligned stereochemistry
+  lessons, visual practice and separate no-hint checks. Chapter 4 remains Home.
+  Instructor assessment scope unconfirmed; drawings self-reviewed. Not published.
+  v3.98 (2026-09-29): LOCAL QUIZ A ROTATION. Scoped adaptive naming/drawing
+  rounds with protected format coverage and bounded selection history, separate
+  fixed rehearsal, compact question layout and expandable ink workspace with
+  colored pen/highlighter, whole-stroke eraser and undoable drawing edits.
+  Existing answers and paused rounds preserved. Not published by this update.
   v3.97 (2026-09-28): LOCAL ADAPTIVE PRACTICE. Shared evidence-aware routing,
   twelve tiered naming/drawing tasks, specific construction feedback, pointer
   placement repairs and hold-to-straighten ink. Existing history preserved.
@@ -1736,6 +1744,7 @@ function mergeRemote(remote){
   }
   S.parkedResolved=[...new Set([...(S.parkedResolved||[]),...(remote.parkedResolved||[])])];
   S.parkedDrills=[...new Map([...(remote.parkedDrills||[]),...(S.parkedDrills||[])].map(x=>[x.runId,x])).values()].filter(x=>!S.parkedResolved.includes(x.runId));
+  S.practiceSelections=[...new Map([...(remote.practiceSelections||[]),...(S.practiceSelections||[])].filter(x=>x&&x.runId&&Array.isArray(x.plannedIds)).sort((a,b)=>(a.ts||0)-(b.ts||0)).map(x=>[x.runId,x])).values()].sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-30);
   if(remote.masteryDays){ const md=S.masteryDays||{}; Object.keys(remote.masteryDays).forEach(k=>{ md[k]=[...new Set([...(remote.masteryDays[k]||[]), ...(md[k]||[])])]; }); S.masteryDays=md; } // v3.16: union per topic
   if (remote.firstSeen) S.firstSeen = Math.min(S.firstSeen||remote.firstSeen, remote.firstSeen); // v3.51: earliest ever
   if (remote.lastSeen) S.lastSeen = Math.max(S.lastSeen||0, remote.lastSeen);                       // v3.51: latest anywhere
@@ -1809,7 +1818,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, flightRuns:S.flightRuns, flightPrep:S.flightPrep, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, questionFlags:S.questionFlags, pausedDrill:S.pausedDrill, parkedDrills:S.parkedDrills, parkedResolved:S.parkedResolved, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null, firstSeen:S.firstSeen||Date.now(), lastSeen:Date.now()},
+      data: {practiceSelections:S.practiceSelections||[], doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, flightRuns:S.flightRuns, flightPrep:S.flightPrep, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, questionFlags:S.questionFlags, pausedDrill:S.pausedDrill, parkedDrills:S.parkedDrills, parkedResolved:S.parkedResolved, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null, firstSeen:S.firstSeen||Date.now(), lastSeen:Date.now()},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -4849,6 +4858,7 @@ const S = {
   attempts: safeStore.get("attempts", []),    // v3.2: immutable event log [{id,ts,ok,g,d,m,t}] — the game tape (cap 5000)
   questionFlags: safeStore.get("questionFlags", {}), // v3.76: id -> {active,note,ts,runId}; dedicated learner review queue
   parkedDrills: safeStore.get("parkedDrills", []),
+  practiceSelections: safeStore.get("practiceSelections", []), // Planned round IDs only; never scored as attempts or exposure.
   parkedResolved: safeStore.get("parkedResolved", []),
   pausedDrill: safeStore.get("pausedDrill", null), // v3.4.1: mid-round snapshot {ids,i,right,wrong,topic,byTopic,cold,guessedRight,scopeName,ts} — quitting never loses a round
   pausedMastery: safeStore.get("pausedMastery", null), // v3.14: same guarantee for the FC mastery gate {names,i,clean,ts} — Gabe hit 2/6 with no way out
@@ -4908,6 +4918,7 @@ function dedupeWrLog(items){
 }
 initLegacyQstats(); rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
 function save(){
+  safeStore.set("practiceSelections",S.practiceSelections||[]);
   safeStore.set("parkedDrills",S.parkedDrills);safeStore.set("parkedResolved",S.parkedResolved);
   rebuildQstatsFromAttempts(); S.wrLog=dedupeWrLog(S.wrLog).slice(-120);
   safeStore.set("masteryDays",S.masteryDays); safeStore.set("doneDays",S.doneDays); safeStore.set("qstats",S.qstats); safeStore.set("legacyQstats",S.legacyQstats); safeStore.set("missed",S.missed); safeStore.set("molDone",S.molDone); safeStore.set("bondDone",S.bondDone); safeStore.set("resDone",S.resDone); safeStore.set("resRuns",S.resRuns); safeStore.set("visits",S.visits); safeStore.set("fcMastery",S.fcMastery); safeStore.set("lastEval",S.lastEval); safeStore.set("diags",S.diags); safeStore.set("nextQuiz",S.nextQuiz); safeStore.set("wrLog",S.wrLog); safeStore.set("attempts",S.attempts); safeStore.set("questionFlags",S.questionFlags); safeStore.set("pausedDrill",S.pausedDrill); safeStore.set("pausedMastery",S.pausedMastery); safeStore.set("adaptivePlan",S.adaptivePlan); safeStore.set("adaptiveRuns",S.adaptiveRuns); safeStore.set("adaptiveReviews",S.adaptiveReviews); safeStore.set("flightRuns",S.flightRuns); safeStore.set("flightPrep",S.flightPrep); safeStore.set("pinHash",S.pinHash); if(!S.firstSeen) S.firstSeen=Date.now(); S.lastSeen=Date.now(); safeStore.set("firstSeen",S.firstSeen); safeStore.set("lastSeen",S.lastSeen); cloudPush(false);
@@ -5133,7 +5144,10 @@ function logAttempt(q,ok,guessed,D,dk,ans){
   if(q.arrowBoard&&D.arrowDrafts?.[q.id]){const a=D.arrowDrafts[q.id];ev.drawing={kind:'proton-transfer',version:1,model:q.arrowBoard,arrows:a.arrows.map(x=>({...x})),answers:{...a.answers}};}
   else if((q.resonanceBoard||D.diagResonanceRequirements?.[q.id])&&D.resLabEvidence?.[q.id]){const a=D.resLabEvidence[q.id];ev.drawing={kind:'resonance',version:1,model:a.key,arrows:(a.arrows||[]).map(x=>({...x})),product:a.product?resCloneGraph(a.product):null,clean:!!a.clean};}
   if(D.ch4Evidence?.[q.id])ev.drawing=JSON.parse(JSON.stringify(D.ch4Evidence[q.id]));
-  if(q.requiresDrawing&&D.sketchDrafts?.[q.id])ev.drawing={kind:"freehand-self-review",...JSON.parse(JSON.stringify(D.sketchDrafts[q.id]))};
+  if(q.requiresDrawing&&D.sketchDrafts?.[q.id]){
+    ev.drawing={kind:"freehand-self-review",...JSON.parse(JSON.stringify(D.sketchDrafts[q.id]))};
+    delete ev.drawing.inkHistory; // Undo belongs to the editable draft, not immutable submitted ink.
+  }
   if(q.type==="written")ev.sr=1;
   if(D.courseUnit){ev.courseUnit=D.courseUnit;ev.coursePhase=D.coursePhase;}
   if(D&&D.assignmentId) ev.as=D.assignmentId;
@@ -6880,7 +6894,7 @@ function hintUse(D,q){
   return{count:(s.opened||[]).length,steps:(s.opened||[]).slice(),feedback};
 }
 function addHintCoach(c,q,D){
-  if(D.courseUnit&&D.cold){c.appendChild(el("p",{class:"muted"},"Independent check · hints are off. Your explanation and drawing will be saved."));return;}
+  if((D.courseUnit||D.learnReturn?.chapter==='ch5')&&D.cold){c.appendChild(el("p",{class:"muted"},"Independent check · hints are off. Your explanation and drawing will be saved in normal mode."));return;}
   const hints=questionHints(q),key=hintStateKey(D,q);
   if(!D._hintState||D._hintState.key!==key)D._hintState={key,opened:[],ratings:{}};
   const state=D._hintState;
@@ -7241,9 +7255,9 @@ VIEWS.drill = (v) => {
   c.innerHTML='<span class="tag violet">'+(TOPICS[q.topic]?.name||"Review")+' · '+(D.i+1)+'/'+D.queue.length+' · item '+diffDots(itemDifficulty(q))+frictionBadge(q)+(D.cold?' · <b>COLD</b>':'')+(q.type==="written"?' · '+q.id:'')+'</span>'+questionOrientation(q)+questionRepeatNotice(q)+ 
     (D.diagVersion?'<p class="muted" style="margin:8px 0 0;font-size:.82rem"><b>'+((D.diagCriticalIds||[]).includes(q.id)?'🔒 Critical readiness task':'Readiness sample')+':</b> '+esc((D.diagRoles||{})[q.id]||"homework-level transfer")+'</p>':'')+
     '<div class="qprompt">'+(q.arrowBoard&&q.type!=="written"?'Draw both curved arrows for this proton transfer, then choose the product or charge.':q.prompt)+'</div>';
-  if(q.courseRoute==='ch4'){const tag=c.querySelector('.tag');if(tag)tag.textContent=(TOPICS[q.topic]?.name||'Chapter 4')+' · '+(D.i+1)+'/'+D.queue.length+(D.cold?' · independent':' · with support');}
+  if(['ch4','ch5'].includes(q.courseRoute)){const tag=c.querySelector('.tag');if(tag)tag.textContent=(TOPICS[q.topic]?.name||'Course practice')+' · '+(D.i+1)+'/'+D.queue.length+(D.cold?' · independent':' · with support');}
   c.insertBefore(questionIdRow(q),c.querySelector(".question-orientation, .qprompt"));
-  if(q.courseRoute==='ch4'&&q.source){const source=el('details',{class:'mini-details'});source.innerHTML='<summary>Course source</summary><p>'+esc(q.source)+'</p>';c.appendChild(source);}
+  if(['ch4','ch5'].includes(q.courseRoute)&&q.source){const source=el('details',{class:'mini-details'});source.innerHTML='<summary>Course source</summary><p>'+esc(q.source)+'</p>';c.appendChild(source);}
   if(q.arrowBoard)c.appendChild(el('div',{'data-proton-arrow-host':''}));
   addHintCoach(c,q,D);
   const structureDone=!!(D.structureBuilt&&D.structureBuilt[q.id]===q.drawMol);
@@ -7310,7 +7324,7 @@ VIEWS.drill = (v) => {
     const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 2px"});
     gk=el("input",{type:"checkbox",id:"gk"});
     const gl=el("label",{for:"gk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I guessed on this");
-    if(q.courseRoute==='ch4'||q.chapter===4){
+    if(['ch4','ch5'].includes(q.courseRoute)||[4,5].includes(q.chapter)){
       D.reasoningDrafts=D.reasoningDrafts||{};
       rInp=el('textarea',{class:'answerbox wide',rows:2,'data-ch4-reasoning-input':'true','aria-label':'My reasoning (optional)',placeholder:'What led you to your answer?'});
       rInp.value=D.reasoningDrafts[q.id]||'';
@@ -7343,12 +7357,12 @@ VIEWS.drill = (v) => {
     const rat=(rInp&&rInp.value.trim())||"";
     // Keep the exact explanation on its own immutable attempt. Blank is valid;
     // the spatial/answer grader never uses this text to award correctness.
-    if(q.courseRoute==='ch4'||q.chapter===4){attempt.reasoning=wrText||rat;attempt.reasoningKind=wrText?'written':'rationale';if(rInp)rInp.readOnly=true;}
+    if(['ch4','ch5'].includes(q.courseRoute)||[4,5].includes(q.chapter)){attempt.reasoning=wrText||rat;attempt.reasoningKind=wrText?'written':'rationale';if(rInp)rInp.readOnly=true;}
     const reasonSignal=reasoningSignalText(wrText||rat); if(reasonSignal)attempt.rs=reasonSignal;
     // v3.15: keep a per-round record so "go back and see what I answered" is possible
-    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, rf:reviewFlag, rn:reviewNote, h:attempt.h||0, hs:attempt.hs||[], hf:attempt.hf||"", ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(q.courseRoute==='ch4'||q.chapter===4)?(wrText||rat||""):(wrText||rat||"").slice(0,400),sr:attempt.sr||0,drawing:attempt.drawing||null});
+    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, rf:reviewFlag, rn:reviewNote, h:attempt.h||0, hs:attempt.hs||[], hf:attempt.hf||"", ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(['ch4','ch5'].includes(q.courseRoute)||[4,5].includes(q.chapter))?(wrText||rat||""):(wrText||rat||"").slice(0,400),sr:attempt.sr||0,drawing:attempt.drawing||null});
     if(D.courseUnit&&D.i+1>=D.queue.length)recordCourseRound(D);
-    if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText||q.courseRoute==='ch4'||q.chapter===4}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
+    if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText||['ch4','ch5'].includes(q.courseRoute)||[4,5].includes(q.chapter)}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
     const branch=adaptiveBranch(D,q,attempt);
     if(D.adaptive)D.assignmentCompletion=Math.max(D.assignmentCompletion||0,Math.round(100*(D.i+1)/(D.assignmentTotal||ADAPTIVE_TOTAL)));
     if(D.adaptive&&D.i+1>=D.queue.length)finishAdaptiveRun(D); // final answer banks completion even if the tab closes before the results card
@@ -9456,7 +9470,10 @@ function courseUnitState(u){
 }
 function nextCourseUnit(){return CH4_LESSONS.find(u=>!courseUnitState(u).proof)||null;}
 function parkCurrentDrill(){
-  if(S.drill&&S.drill.i<S.drill.queue.length)snapshotDrill(S.drill.i);
+  if(S.drill&&S.drill.i<S.drill.queue.length){
+    if(typeof courseNavigationCaptureAnswer==='function')courseNavigationCaptureAnswer();
+    snapshotDrill(S.drill.answered?S.drill.i+1:S.drill.i);
+  }
   if(S.pausedDrill){
     const p=S.pausedDrill;
     S.parkedDrills=(S.parkedDrills||[]).filter(x=>x.runId!==p.runId);
@@ -9601,20 +9618,58 @@ function courseSketchNearStraight(points){
   }
   return path/chord<=1.06&&maxDeviation<=Math.min(8,Math.max(2.5,chord*.035));
 }
+function courseSketchPointSegmentDistance(p,a,b){
+  const dx=b[0]-a[0],dy=b[1]-a[1],length=dx*dx+dy*dy;
+  const t=length?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/length)):0;
+  return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy);
+}
+function courseSketchSegmentsNear(a,b,c,d,radius){
+  const cross=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+  const abC=cross(a,b,c),abD=cross(a,b,d),cdA=cross(c,d,a),cdB=cross(c,d,b);
+  // Strict crossings have zero distance; endpoint/collinear cases use distances.
+  if(abC*abD<0&&cdA*cdB<0)return true;
+  return Math.min(courseSketchPointSegmentDistance(a,c,d),courseSketchPointSegmentDistance(b,c,d),courseSketchPointSegmentDistance(c,a,b),courseSketchPointSegmentDistance(d,a,b))<=radius;
+}
 function renderCourseSketch(host,q,D,readOnly=false,provided=null){
   D.sketchDrafts=D.sketchDrafts||{};
   const draft=provided||(D.sketchDrafts[q.id]||(D.sketchDrafts[q.id]={strokes:[],text:''}));
   const box=el('section',{class:'course-sketch'});box.innerHTML='<h3>Your drawing</h3><p class="muted">Draw here, or use paper and tick the box below. Written notes are optional; include any labels or explanation requested in the question on your drawing or paper.</p>';
   const canvas=el('canvas',{width:800,height:420,'aria-label':'Draw your structure here',style:'width:100%;height:auto;display:block;border:1px solid #a9bac1;border-radius:10px;background:white;touch-action:none'}),ctx=canvas.getContext('2d');
-  const paint=()=>{ctx.clearRect(0,0,800,420);ctx.strokeStyle='#173a4b';ctx.lineWidth=3;ctx.lineCap='round';for(const stroke of draft.strokes){ctx.beginPath();stroke.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();}};
-  let active=null,pointerId=null,holdTimer=null,lineMode=false,snapped=false,holdAnchor=null;
+  // Legacy stroke arrays remain unchanged. New styles live alongside them so
+  // previous drafts/attempts replay without migration or rewritten evidence.
+  const colors=[['Black','#173a4b'],['Blue','#1766b3'],['Red','#be3548'],['Green','#237348'],['Purple','#7644a9'],['Yellow','#f4cf32']];
+  const settings=Object.assign({tool:'pen',penColor:'#173a4b',highlightColor:'#f4cf32',mode:'freehand'},draft.inkSettings||{});
+  if(!['pen','highlighter','eraser'].includes(settings.tool))settings.tool='pen';
+  if(!readOnly){draft.inkSettings=settings;draft.strokeStyles=draft.strokeStyles||[];draft.inkHistory=draft.inkHistory||[];}
+  const styleAt=i=>Object.assign({tool:'pen',color:'#173a4b',width:3,opacity:1},draft.strokeStyles?.[i]||{});
+  const paint=()=>{
+    ctx.clearRect(0,0,800,420);
+    (draft.strokes||[]).forEach((stroke,index)=>{
+      if(!stroke.length)return;const style=styleAt(index);ctx.save();ctx.strokeStyle=style.color;ctx.fillStyle=style.color;ctx.lineWidth=style.width;ctx.globalAlpha=style.opacity;ctx.lineCap='round';ctx.lineJoin='round';
+      if(stroke.length===1){ctx.beginPath();ctx.arc(stroke[0][0],stroke[0][1],style.width/2,0,Math.PI*2);ctx.fill();}
+      else {ctx.beginPath();stroke.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();}ctx.restore();
+    });
+  };
+  let active=null,pointerId=null,holdTimer=null,lineMode=settings.mode==='line',snapped=false,holdAnchor=null,eraseAction=null,eraserLast=null,statusRow=null;
   const point=e=>{const r=canvas.getBoundingClientRect();return [Math.round(Math.max(0,Math.min(800,(e.clientX-r.left)*800/r.width))),Math.round(Math.max(0,Math.min(420,(e.clientY-r.top)*420/r.height)))];};
   const store=()=>{snapshotDrill(D.i);save();};
   const savedMessage=()=>typeof safeStore!=='undefined'&&safeStore.persistent===false?'Preview only — drawings in this preview are not saved.':'Drawing recorded. Use Export to keep a backup.';
   const status=el('span',{class:'muted','aria-live':'polite','data-sketch-status':'true'});
+  const remember=action=>{draft.inkHistory.push(action);draft.inkHistory=draft.inkHistory.slice(-50);};
+  const restoreErased=items=>items.slice().sort((a,b)=>a.index-b.index).forEach(item=>{draft.strokes.splice(item.index,0,item.points);draft.strokeStyles.splice(item.index,0,item.style);});
+  const alignStyles=()=>{while(draft.strokeStyles.length<draft.strokes.length)draft.strokeStyles.push(null);};
+  const eraseTo=next=>{
+    const from=eraserLast||next;
+    for(let i=draft.strokes.length-1;i>=0;i--){
+      const stroke=draft.strokes[i],radius=10+styleAt(i).width/2;
+      const hit=stroke.length===1?courseSketchPointSegmentDistance(stroke[0],from,next)<=radius:stroke.some((p,j)=>j&&courseSketchSegmentsNear(from,next,stroke[j-1],p,radius));
+      if(hit){eraseAction.items.push({index:eraseAction.original.indexOf(stroke),points:stroke,style:draft.strokeStyles[i]||null});draft.strokes.splice(i,1);draft.strokeStyles.splice(i,1);}
+    }
+    eraserLast=next;paint();
+  };
   const stopHold=()=>{clearTimeout(holdTimer);holdTimer=null;};
   const armHold=e=>{
-    if(lineMode||snapped)return;
+    if(lineMode||snapped||settings.tool!=='pen')return;
     // Ignore tiny device jitter while holding, but restart after intentional movement.
     if(holdAnchor&&Math.hypot(e.clientX-holdAnchor[0],e.clientY-holdAnchor[1])<3)return;
     holdAnchor=[e.clientX,e.clientY];stopHold();
@@ -9625,37 +9680,76 @@ function renderCourseSketch(host,q,D,readOnly=false,provided=null){
     },500);
   };
   const end=(e,cancel=false)=>{
-    if(!active||(e&&e.pointerId!==pointerId))return;
+    if(pointerId===null||(e&&e.pointerId!==pointerId))return;
     stopHold();
-    if(cancel){const index=draft.strokes.indexOf(active);if(index>=0)draft.strokes.splice(index,1);}
-    const finishedPointer=pointerId;active=null;pointerId=null;holdAnchor=null;snapped=false;
+    let actionMessage='';
+    if(eraseAction){
+      if(cancel)restoreErased(eraseAction.items);
+      else if(eraseAction.items.length){remember({kind:'erase',items:eraseAction.items});actionMessage=eraseAction.items.length+' whole stroke'+(eraseAction.items.length===1?'':'s')+' erased. Undo restores '+(eraseAction.items.length===1?'it.':'them.');}
+      else actionMessage='No stroke touched.';
+    }else if(active){
+      if(cancel){const index=draft.strokes.indexOf(active);if(index>=0){draft.strokes.splice(index,1);draft.strokeStyles.splice(index,1);}}
+      else remember({kind:'add'});
+    }
+    const finishedPointer=pointerId;active=null;eraseAction=null;eraserLast=null;pointerId=null;holdAnchor=null;snapped=false;
     if(canvas.hasPointerCapture(finishedPointer))canvas.releasePointerCapture(finishedPointer);
-    status.textContent=cancel?'Stroke canceled.':savedMessage();paint();store();
+    if(statusRow){statusRow.style.height='';statusRow.style.overflow='';}
+    const updateMessage=typeof safeStore!=='undefined'&&safeStore.persistent===false?'Preview drawing updated.':savedMessage();
+    status.textContent=cancel?'Gesture canceled; previous drawing restored.':actionMessage?(actionMessage+' '+updateMessage):updateMessage;paint();store();
   };
   if(!readOnly){
-    const tools=el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px','aria-label':'Drawing tools'});
-    const free=el('button',{type:'button',class:'btn ghost small','aria-pressed':'true','data-sketch-tool':'freehand'},'Freehand');
-    const line=el('button',{type:'button',class:'btn ghost small','aria-pressed':'false','data-sketch-tool':'line'},'Straight line');
-    const selectTool=value=>{if(D.answered||active)return;lineMode=value;[free,line].forEach((button,i)=>{const chosen=Boolean(i)===value;button.setAttribute('aria-pressed',String(chosen));button.style.background=chosen?'#173a4b':'';button.style.color=chosen?'#fff':'';});status.textContent=value?'Drag from the start to the end of a bond.':'Draw freely; pause at the end of a bond to straighten it.';};
-    free.addEventListener('click',()=>selectTool(false));line.addEventListener('click',()=>selectTool(true));tools.append(free,line,status);box.appendChild(tools);selectTool(false);
+    const tools=el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px',role:'group','aria-label':'Drawing tools'});
+    const palette=el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:8px',role:'group','aria-label':'Drawing colors'}),toolButtons=[],modeButtons=[],colorButtons=[];
+    const updateTools=()=>{
+      const selectedColor=settings.tool==='highlighter'?settings.highlightColor:settings.penColor;
+      toolButtons.forEach(button=>{const chosen=button.dataset.sketchTool===settings.tool;button.setAttribute('aria-pressed',String(chosen));button.style.background=chosen?'#173a4b':'';button.style.color=chosen?'white':'';});
+      modeButtons.forEach(button=>{const chosen=button.dataset.sketchMode===settings.mode;button.setAttribute('aria-pressed',String(chosen));button.disabled=settings.tool==='eraser';button.style.background=chosen?'#e1eff4':'';});
+      colorButtons.forEach(button=>{const chosen=button.dataset.sketchColor===selectedColor;button.setAttribute('aria-pressed',String(chosen));button.disabled=settings.tool==='eraser';button.style.outline=chosen?'2px solid #173a4b':'';button.style.outlineOffset=chosen?'1px':'';});
+      canvas.style.cursor=settings.tool==='eraser'?'cell':'crosshair';
+    };
+    [['pen','Pen'],['highlighter','Highlighter'],['eraser','Eraser']].forEach(([key,label])=>{
+      const button=el('button',{type:'button',class:'btn ghost small','data-sketch-tool':key,'aria-pressed':String(settings.tool===key),onclick:()=>{
+        if(D.answered||pointerId!==null)return;settings.tool=key;updateTools();store();
+        status.textContent=key==='eraser'?'Stroke eraser: drag over a stroke to remove the whole stroke. Undo restores erased strokes.':key==='highlighter'?'Highlighter: draw a broad, translucent mark. Choose a color below.':'Pen: draw freely, or hold a nearly straight bond for half a second to snap it.';
+      }},label);toolButtons.push(button);tools.appendChild(button);
+    });
+    [['freehand','Freehand'],['line','Straight line']].forEach(([key,label])=>{
+      const button=el('button',{type:'button',class:'btn ghost small','aria-pressed':String(settings.mode===key),'data-sketch-mode':key,onclick:()=>{if(D.answered||pointerId!==null)return;settings.mode=key;lineMode=key==='line';updateTools();store();status.textContent=lineMode?'Drag from the start to the end of a bond.':'Draw freely; pause at the end of a pen bond to straighten it.';}},label);modeButtons.push(button);tools.appendChild(button);
+    });
+    colors.forEach(([name,color])=>{
+      const button=el('button',{type:'button',class:'btn ghost small','data-sketch-color':color,'aria-label':name+' drawing color','aria-pressed':'false',style:'display:inline-flex;gap:5px;align-items:center;padding:6px 9px;min-height:36px',onclick:()=>{if(D.answered||pointerId!==null)return;if(settings.tool==='highlighter')settings.highlightColor=color;else settings.penColor=color;updateTools();store();status.textContent=name+' '+(settings.tool==='highlighter'?'highlighter':'pen')+' selected.';}});
+      button.appendChild(el('span',{'aria-hidden':'true',style:'width:12px;height:12px;border-radius:50%;display:inline-block;background:'+color+';border:1px solid #566b74'}));button.appendChild(document.createTextNode(name));colorButtons.push(button);palette.appendChild(button);
+    });
+    box.append(tools,palette);statusRow=el('div',{style:'min-height:20px;margin-bottom:6px'});statusRow.appendChild(status);box.appendChild(statusRow);updateTools();
     box.appendChild(el('p',{class:'muted',style:'margin:0 0 8px'},'For a straight bond, draw and hold still for about half a second before lifting. Rings and writing stay freehand.'));
     if(typeof safeStore!=='undefined'&&safeStore.persistent===false)box.appendChild(el('p',{class:'muted','data-sketch-preview':'true',style:'margin:0 0 8px'},savedMessage()));
     canvas.addEventListener('pointerdown',e=>{
-      if(D.answered||active||e.isPrimary===false||(e.pointerType==='mouse'&&e.button!==0))return;
-      e.preventDefault();pointerId=e.pointerId;active=[point(e)];snapped=lineMode;holdAnchor=null;
-      draft.strokes.push(active);canvas.setPointerCapture(pointerId);status.textContent='';armHold(e);paint();
+      if(D.answered||pointerId!==null||e.isPrimary===false||(e.pointerType==='mouse'&&e.button!==0))return;
+      e.preventDefault();pointerId=e.pointerId;snapped=lineMode;holdAnchor=null;alignStyles();
+      // Do not shift the canvas while a pointer is down when a status message
+      // wraps differently on a phone (including the hold-to-snap announcement).
+      statusRow.style.height=statusRow.getBoundingClientRect().height+'px';statusRow.style.overflow='hidden';
+      if(settings.tool==='eraser'){eraseAction={original:draft.strokes.slice(),items:[]};eraseTo(point(e));}
+      else {active=[point(e)];draft.strokes.push(active);draft.strokeStyles.push(settings.tool==='highlighter'?{tool:'highlighter',color:settings.highlightColor,width:20,opacity:.3}:{tool:'pen',color:settings.penColor,width:3,opacity:1});}
+      canvas.setPointerCapture(pointerId);armHold(e);paint();
     });
     canvas.addEventListener('pointermove',e=>{
-      if(!active||e.pointerId!==pointerId)return;e.preventDefault();const next=point(e);
+      if(pointerId===null||e.pointerId!==pointerId||D.answered)return;e.preventDefault();const next=point(e);
+      if(eraseAction){eraseTo(next);return;}
       if(snapped){active.splice(1,active.length-1,next);}else if(next[0]!==active[active.length-1][0]||next[1]!==active[active.length-1][1]){active.push(next);}
       armHold(e);paint();
     });
     canvas.addEventListener('pointerup',e=>end(e));canvas.addEventListener('pointercancel',e=>end(e,true));canvas.addEventListener('lostpointercapture',e=>end(e,true));
   }
-  box.appendChild(canvas);if(!readOnly)box.appendChild(el('button',{type:'button',class:'btn ghost small',onclick:()=>{if(D.answered)return;if(active){end(null,true);return;}draft.strokes.pop();paint();store();status.textContent='Last stroke removed.';}},'Undo last stroke'));
+  box.appendChild(canvas);if(!readOnly)box.appendChild(el('button',{type:'button',class:'btn ghost small','data-sketch-undo':'true','aria-label':'Undo last stroke or erasure',onclick:()=>{
+    if(D.answered)return;if(pointerId!==null){end(null,true);return;}alignStyles();const action=draft.inkHistory.pop();
+    if(action?.kind==='erase'){restoreErased(action.items);status.textContent='Erased strokes restored.';}
+    else if(draft.strokes.length){draft.strokes.pop();draft.strokeStyles.pop();status.textContent='Last stroke removed.';}
+    else {status.textContent='Nothing to undo.';return;}paint();store();
+  }},'Undo'));
   if(!readOnly){
     const label=el('label',{style:'display:flex;gap:10px;align-items:center;min-height:44px;margin-top:8px'}),paper=el('input',{type:'checkbox','data-paper-drawing':'true'});paper.checked=!!draft.paper;
-    paper.addEventListener('change',()=>{draft.paper=paper.checked;store();});label.append(paper,document.createTextNode('I completed this drawing on paper (self-review only)'));box.appendChild(label);
+    paper.addEventListener('change',()=>{if(D.answered){paper.checked=!!draft.paper;return;}draft.paper=paper.checked;store();});label.append(paper,document.createTextNode('I completed this drawing on paper (self-review only)'));box.appendChild(label);
   }else if(draft.paper)box.appendChild(el('p',{class:'muted'},'Reported completed on paper. The paper drawing was not captured or independently checked.'));
   box.appendChild(el('p',{class:'muted'},'Freehand drawings use the model and rubric for self-review; the app does not automatically grade the ink.'));
   host.appendChild(box);paint();return draft;
@@ -10618,7 +10712,46 @@ function startQuizB(){
 function quizAQueue(){
   return CH4_QUIZ_A_PRACTICE_IDS.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
 }
-function startQuizA(){beginCourseDrill(quizAQueue(),{id:'quiz-a-rehearsal',topic:'alkanes'},'mixed','Quiz A · naming and drawing practice');}
+// Fixed rehearsal remains available explicitly; a new practice round rotates.
+const QUIZ_A_CORE_UNITS=['ch4-carbon-map','ch4-name-draw','ch4-isomers','ch4-quiz-parent-attachment'];
+const QUIZ_A_DRAWING_IDS=['CH4-20260919-06','CH4-20260919-08','CH4-QP-20260928-25','CH4-QP-20260928-26','CH4-NM-20260928-02','CH4-NM-20260928-04','CH4-NM-20260928-06','CH4-NM-20260928-08','CH4-NM-20260928-12'];
+// Same target structures occur under different operations. Suppress near-twins
+// within a round without altering their keys, history or authored transfer tags.
+[
+  ['CH4-20260919-01','CH4-20260919-02','CH4-20260919-05'],
+  ['CH4-20260923-15','CH4-20260923-16'],
+  ['CH4-20260923-01','CH4-QP-20260928-05'],
+  ['CH4-20260923-02','CH4-20260923-05','CH4-QP-20260928-03'],
+  ['CH4-20260923-03','CH4-20260923-06']
+].forEach((ids,i)=>ids.forEach(id=>{const q=CH4_QUESTIONS.find(x=>x.id===id);if(q)q.sourceModelIds=[...new Set([...(q.sourceModelIds||[]),'quiz-a-shared-target-'+i])];}));
+function quizAAdaptivePool(){
+  const ids=new Set(CH4_LESSONS.filter(u=>QUIZ_A_CORE_UNITS.includes(u.id)).flatMap(u=>u.practiceIds));
+  return QUESTIONS.filter(q=>ids.has(q.id)&&adaptiveLearningEligible(q));
+}
+function quizAAdaptiveSlots(pool){
+  const ids=filter=>pool.filter(filter).map(q=>q.id);
+  const naming=ids(q=>q.type==='text'&&q.id!=='CH4-20260919-02');
+  const parents=new Set(CH4_LESSONS.find(u=>u.id==='ch4-quiz-parent-attachment')?.practiceIds||[]);
+  const parent=ids(q=>parents.has(q.id)),drawings=ids(q=>QUIZ_A_DRAWING_IDS.includes(q.id));
+  const enumeration=ids(q=>['CH4-20260919-09','CH4-20260919-11'].includes(q.id));
+  const foundation=ids(q=>adaptiveLearningDifficulty(q)<=1),all=pool.map(q=>q.id);
+  return [
+    ['naming a complete structure',naming],['parent and substituent reasoning',parent],
+    ['drawing a named structure',drawings],['drawing a complete isomer set',enumeration],
+    ['foundation retrieval',foundation],['naming a complete structure',naming],
+    ['parent and substituent reasoning',parent],['drawing a named structure',drawings],
+    ['targeted mixed practice',all],['foundation retrieval',foundation]
+  ].map(([label,poolIds])=>({label,poolIds}));
+}
+function startQuizA(){
+  const pool=quizAAdaptivePool();
+  return startAdaptiveLearning({chapter:'ch4',topics:['alkanes'],poolIds:pool.map(q=>q.id),total:10,rotationKey:'quiz-a',slots:quizAAdaptiveSlots(pool),label:'Quiz A · adaptive naming & drawing'});
+}
+function startQuizAFixed(){beginCourseDrill(quizAQueue(),{id:'quiz-a-rehearsal',topic:'alkanes'},'mixed','Quiz A · fixed 9-task rehearsal');}
+function startQuizABicyclic(){
+  const ids=CH4_LESSONS.find(u=>u.id==='ch4-quiz-bicyclo')?.practiceIds||[];
+  return startAdaptiveLearning({chapter:'ch4',topics:['alkanes'],poolIds:ids,total:6,rotationKey:'quiz-a-bicyclic',label:'Supplemental · bicyclic naming practice'});
+}
 function startNamingTier(key){
   const tier=typeof CH4_NAMING_TIERS==='undefined'?null:CH4_NAMING_TIERS[key];
   if(!tier)return;
@@ -10655,9 +10788,14 @@ function quizAssessmentChoices(v){
   const box=el('section',{class:'card qp-check-card','data-quiz-scopes':'true'});
   box.innerHTML='<h2>Prepare for your quiz</h2>';
   const choices=el('div',{class:'qp-assessments'});
-  const a=el('div');a.innerHTML='<h3>Quiz A</h3><p>Naming & drawing structures · 9 practice tasks (actual quiz length not supplied)</p>';
-  a.appendChild(el('button',{class:'btn ghost','data-quiz-a-start':'true',onclick:startQuizA},'Practise naming + drawing →'));
+  const a=el('div');a.innerHTML='<h3>Quiz A</h3><p>10 rotating tasks from '+quizAAdaptivePool().length+' question cards · names, drawings, parent chains & isomers</p>';
+  a.appendChild(el('button',{class:'btn ghost','data-quiz-a-start':'true',onclick:startQuizA},'Start a fresh Quiz A round →'));
+  a.appendChild(el('p',{class:'qp-caption'},'Adaptive practice with optional hints. New rounds vary and include easier checks; small skill banks sometimes repeat. This is practice, not the instructor’s quiz.'));
   renderNamingTiers(a);
+  const alternatives=a.querySelector('[data-naming-tiers]');
+  alternatives.appendChild(el('p',{class:'qp-caption'},'Bicyclic naming is supplemental unless assigned. The fixed rehearsal deliberately repeats the same nine tasks.'));
+  alternatives.appendChild(el('button',{class:'btn ghost','data-quiz-a-bicyclic':'true',onclick:startQuizABicyclic},'Supplemental bicyclic practice'));
+  alternatives.appendChild(el('button',{class:'btn ghost','data-quiz-a-fixed':'true',onclick:startQuizAFixed},'Repeat fixed 9-task rehearsal'));
   const b=el('div');b.innerHTML='<h3>Quiz B</h3><p>Structure & stability · 10 questions · 25 minutes · on paper</p>';
   b.appendChild(el('button',{class:'btn','data-quiz-b-start':'true',onclick:startQuizB},'Start 25-minute rehearsal →'));
   choices.appendChild(a);choices.appendChild(b);box.appendChild(choices);
@@ -10821,7 +10959,7 @@ VIEWS.learn=v=>{
 };
 VIEWS.practice=v=>{quizHeader(v,'Practise Chapter 4','Let the next question adapt, or choose a specific skill below.');if(typeof startAdaptiveLearning==='function')v.appendChild(el('button',{class:'btn',style:'margin-bottom:20px','data-adaptive-ch4-start':'true',onclick:()=>startAdaptiveLearning({chapter:'ch4'})},'Start adaptive practice · 10 tasks →'));if(quizRecentNeeds().length)v.appendChild(el('button',{class:'btn ghost',style:'margin-bottom:20px','data-quiz-repair-start':'true',onclick:startQuizRepair},'Repair recent weak steps →'));renderQuizLibrary(v,'practice');quizPaperCard(v);};
 VIEWS.exam=v=>{
-  const n=quizCheckQueue().length;quizHeader(v,'Check without hints','Quiz A: naming and drawing. Quiz B: structure and stability.');quizAssessmentChoices(v);
+  const n=quizCheckQueue().length;quizHeader(v,'Quiz practice & no-hint checks','Quiz A: naming and drawing. Quiz B: structure and stability. Choose adaptive practice or a fixed no-hint rehearsal.');quizAssessmentChoices(v);
   const c=el('section',{class:'card qp-hero'});c.innerHTML='<span class="qp-eyebrow">'+n+' TASKS · SIX SKILL AREAS</span><h2>Put the rules together</h2><p>Use a blank sheet beside you. The set samples naming, Newman construction, chair construction, conformation energy, and stability. Answers are checked as you go; hints stay off. Any freehand or paper work uses self-review, not automatic grading.</p><p>You can pause and resume. Seeing feedback is practice, so a later repeat is not a fresh test.</p>';
   c.appendChild(el('button',{class:'btn','data-quiz-check-start':'true',onclick:startQuizCheck},'Start '+n+'-task quiz rehearsal →'));v.appendChild(c);
   const coverage=el('section',{class:'card qp-check-card'});coverage.innerHTML='<h2>After repair: cover every skill</h2><p>One task from each of the '+quizUnits().length+' lessons. Unattempted homework-style tasks come first; if the pool is exhausted, repeats are labeled. Pause whenever you need.</p>';
@@ -10858,9 +10996,80 @@ function ch4WorkspaceDetails(label,nodes,klass=''){
   const d=el('details',{class:'cq-details '+klass});
   d.appendChild(el('summary',{},label));nodes.filter(Boolean).forEach(n=>d.appendChild(n));return d;
 }
+// The live canvas keeps its coordinate system and event handlers. Moving the
+// same node into a native modal enlarges the physical writing surface without
+// stretching strokes, replacing the draft, or opening an answer/model.
+function ch4ExpandSketch(sketch){
+  if(!sketch||sketch.dataset.cqExpandable)return;
+  sketch.dataset.cqExpandable='true';
+  const title=sketch.querySelector('h3'),canvas=sketch.querySelector('canvas');
+  if(!title||!canvas)return;
+  const heading=el('div',{class:'cq-sketch-heading'});
+  title.before(heading);heading.appendChild(title);
+  const expand=el('button',{type:'button',class:'btn ghost small','aria-haspopup':'dialog'},'Expand drawing');heading.appendChild(expand);
+  expand.addEventListener('click',()=>{
+    if(document.querySelector('.cq-sketch-dialog[open]'))return;
+    const marker=document.createComment('drawing workspace return position');
+    sketch.before(marker);
+    const dialog=el('dialog',{class:'cq-sketch-dialog','aria-label':'Drawing workspace'});
+    const top=el('div',{class:'cq-sketch-dialog-header'});
+    top.appendChild(el('strong',{},'Drawing workspace'));
+    const close=el('button',{type:'button',class:'btn ghost small',onclick:()=>dialog.close()},'Restore size');top.appendChild(close);dialog.appendChild(top);
+    const body=el('div',{class:'cq-sketch-dialog-body'});body.appendChild(sketch);dialog.appendChild(body);
+    expand.hidden=true;
+    const previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+    let observer,sizeObserver,fitFrame=0,activePointer=null;
+    const fit=()=>{
+      fitFrame=0;if(!dialog.open||activePointer!==null)return;
+      // Measure the actual toolbar, palette, status and Undo/paper controls.
+      // Subtract the current canvas height so this converges independently of
+      // its previous size, including when a status message wraps onto two lines.
+      const bounds=dialog.getBoundingClientRect(),canvasBounds=canvas.getBoundingClientRect(),style=getComputedStyle(dialog);
+      const nonCanvas=body.getBoundingClientRect().bottom-(bounds.top+dialog.clientTop)-canvasBounds.height+parseFloat(style.paddingBottom);
+      const available=Math.max(120,dialog.clientHeight-nonCanvas-3);
+      const width=Math.max(120,Math.floor(Math.min(body.clientWidth,(available-2)*canvas.width/canvas.height+2)));
+      if(canvas.style.maxWidth!==width+'px')canvas.style.maxWidth=width+'px';
+    };
+    const scheduleFit=()=>{if(!fitFrame)fitFrame=requestAnimationFrame(fit);};
+    dialog.addEventListener('pointerdown',event=>{if(event.target===canvas)activePointer=event.pointerId;},true);
+    const endPointer=event=>{if(event.pointerId===activePointer){activePointer=null;scheduleFit();}};
+    dialog.addEventListener('pointerup',endPointer);dialog.addEventListener('pointercancel',endPointer);dialog.addEventListener('lostpointercapture',endPointer);
+    const cleanup=()=>{
+      window.removeEventListener('resize',scheduleFit);observer?.disconnect();sizeObserver?.disconnect();cancelAnimationFrame(fitFrame);
+      canvas.style.maxWidth='';expand.hidden=false;document.body.style.overflow=previousOverflow;
+      if(marker.isConnected)marker.replaceWith(sketch);
+      dialog.remove();if(expand.isConnected)expand.focus({preventScroll:true});
+    };
+    dialog.addEventListener('close',cleanup,{once:true});
+    dialog.addEventListener('keydown',event=>{
+      if(event.key!=='Tab')return;
+      const fields=[...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),summary,[tabindex="0"]')].filter(n=>n.getClientRects().length&&!n.hidden);
+      const first=fields[0],last=fields.at(-1);
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+    });
+    document.body.appendChild(dialog);dialog.showModal();fit();close.focus({preventScroll:true});window.addEventListener('resize',scheduleFit);
+    sizeObserver=new ResizeObserver(scheduleFit);sizeObserver.observe(dialog);sizeObserver.observe(body);
+    // A route/render change may replace the question while the modal is open.
+    // Close rather than restoring an old drawing into a new question.
+    observer=new MutationObserver(()=>{if(!marker.isConnected)dialog.close();});observer.observe(document.getElementById('view'),{childList:true,subtree:true});
+  });
+}
+function ch4CompactSketch(sketch){
+  if(!sketch)return;
+  const extra=[...sketch.querySelectorAll(':scope>p')].filter(n=>!n.hasAttribute('data-sketch-preview'));
+  if(extra.length){
+    const summary=el('p',{class:'muted cq-sketch-intro'},'Draw here or use paper. Ink is self-reviewed.');
+    extra[0].before(summary);
+    sketch.appendChild(ch4WorkspaceDetails('Drawing tips & how checking works',extra,'cq-sketch-help'));
+  }
+  const status=sketch.querySelector('[data-sketch-status]');
+  if(status?.textContent==='Draw freely; pause at the end of a bond to straighten it.')status.textContent='Draw, or hold at the end to straighten a bond.';
+  ch4ExpandSketch(sketch);
+}
 function compactCh4Question(v,D){
   if(!D||D.reviewIdx!=null||D.i>=D.queue.length)return;
-  const q=D.queue[D.i];if(q.courseRoute!=='ch4'&&q.chapter!==4)return;
+  const q=D.queue[D.i];if(!['ch4','ch5'].includes(q.courseRoute)&&![4,5].includes(q.chapter))return;
   const prompt=v.querySelector('.qprompt'),card=prompt?.closest('.card');
   if(!card||card.dataset.cqQuestion)return;
   card.dataset.cqQuestion=q.id;card.classList.add('cq-question');
@@ -10880,7 +11089,8 @@ function compactCh4Question(v,D){
   if(help.length){const d=ch4WorkspaceDetails('Need a hint?',help,'cq-hint');d.open=hintUse(D,q).count>0;controls.appendChild(d);}
   if(tag)tag.textContent=(D.cold?'No-hint check':'Practice')+' · '+(D.i+1)+' / '+D.queue.length+(q.namingTier?' · '+q.namingTier.charAt(0).toUpperCase()+q.namingTier.slice(1):'');
   if(controls.childNodes.length)card.insertBefore(controls,prompt);
-  const workspace=el('div',{class:'cq-workspace'+(q.type==='ch4production'?' cq-build':'')});
+  const isBuild=q.type==='ch4production',isDrawing=q.type==='written'&&q.requiresDrawing;
+  const workspace=el('div',{class:'cq-workspace'+(isBuild?' cq-build':'')+(!isBuild&&(isDrawing||prompt.querySelector('figure'))?' cq-split':'')+(isDrawing?' cq-ink':'')});
   const reference=el('section',{class:'cq-reference','aria-label':'Question and given structure'});
   reference.appendChild(prompt);
   // Side-by-side comparisons on wide screens; retain their original order and
@@ -10908,6 +11118,14 @@ function compactCh4Question(v,D){
     response.appendChild(confidence);
   }
   answer.forEach(n=>response.appendChild(n));
+  if(isDrawing){
+    ch4CompactSketch(response.querySelector('.course-sketch'));
+    const notes=response.querySelector('textarea[aria-label="Optional drawing notes"]');
+    if(notes){const optional=ch4WorkspaceDetails('Add drawing notes (optional)',[notes],'cq-drawing-notes');optional.open=!!notes.value.trim();response.querySelector('.course-sketch').after(optional);}
+    const confidenceRow=response.querySelector('#wgk')?.parentElement;
+    if(confidenceRow){confidenceRow.classList.add('cq-confidence');confidenceRow.querySelector('label[for="wgk"]').textContent='I’m guessing';confidenceRow.querySelector('label[for="wdk"]').textContent='Not learned yet';}
+    const tips=response.querySelector('.cq-sketch-help');if(tips)response.appendChild(tips);
+  }
   if(reasoning){const slot=response.querySelector('[data-ch4-reasoning-slot]');if(slot)slot.appendChild(reasoning);else response.insertBefore(reasoning,answer[0]||null);}
   workspace.appendChild(reference);workspace.appendChild(response);card.appendChild(workspace);
   // On a phone, switch between the supplied structure and the working drawing.
@@ -10941,6 +11159,13 @@ function installCh4QuestionWorkspace(){
   @media(min-width:850px){.cq-figure-comparison{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.cq-figure-comparison>figure{min-width:0}.cq-figure-comparison figcaption{min-height:2.8em}}
   .cq-mobile-tabs button.btn.ghost[aria-pressed="true"],.cq-mobile-tabs button.btn.ghost[aria-pressed="true"]:hover{background:#145f83;color:#fff;border-color:#145f83}
   .cq-reasoning{margin:8px 0}.cq-reasoning-help{font-size:.8rem;line-height:1.4;color:#526b73;margin:0 0 6px!important}.cq-reasoning textarea{display:block;width:100%;min-height:80px;resize:vertical;font:inherit;padding:10px;border:1px solid #a9bfc4;border-radius:8px;background:#fff;color:#233e48}.cq-reasoning textarea:focus-visible{outline:3px solid #c58a2c;outline-offset:2px}.cq-reasoning textarea[readonly]{background:#eef3f4}
+  /* Put answer beside the given on a laptop; save space, not font size. */
+  .cq-question{padding:16px!important}.cq-workspace{gap:14px}.cq-question>.tag{margin-bottom:4px}.cq-quick-help{margin-bottom:4px}.cq-sketch-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.cq-sketch-heading h3{margin:0!important}.cq-sketch-heading .btn{min-height:44px;white-space:nowrap}.cq-sketch-intro{margin:0 0 6px!important}.cq-answer .course-sketch canvas{max-width:620px;margin-inline:auto}.cq-drawing-notes{margin:6px 0}.cq-drawing-notes textarea{box-sizing:border-box}.cq-sketch-help{margin:4px 0}.cq-question .cq-confidence{flex-wrap:wrap}.cq-question .cq-confidence label{min-height:24px;display:inline-flex;align-items:center}
+  @media(min-width:850px){.cq-split{grid-template-columns:minmax(0,1.18fr) minmax(280px,.82fr)}.cq-ink{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr)}.cq-split>.cq-answer{align-self:start}.cq-split .qprompt figure>svg{max-height:210px!important}.cq-split .cq-figure-comparison{grid-template-columns:1fr 1fr}.cq-split .cq-figure-comparison figure>svg{max-height:180px!important}.cq-split .cq-answer .choices{margin-top:0}.cq-split .cq-answer input.answerbox{box-sizing:border-box;width:100%}}
+  .cq-question>.tag{display:inline-flex;align-items:center;min-height:34px}.cq-quick-help:not(:has(details[open])){float:right;max-width:55%!important}.cq-workspace,.cq-mobile-tabs{clear:both}.cq-quick-help:has(details[open]){max-width:none!important}.cq-ink .cq-answer>details.cq-drawing-notes{margin:4px 0}.cq-reference>.cq-sketch-help{margin-top:10px}
+  body:has(.cq-question)>header{padding-block:10px}body:has(.cq-question) #view{padding-top:14px}body:has(.cq-question) #view>.qp-sessionbar{margin-bottom:10px}
+  .cq-sketch-dialog{box-sizing:border-box;width:calc(100vw - 24px);max-width:1280px;height:calc(100dvh - 24px);max-height:calc(100dvh - 24px);padding:14px 18px;border:1px solid #b7ccd1;border-radius:14px;background:#fff;color:#233e48;margin:auto;overflow:auto;overscroll-behavior:contain}.cq-sketch-dialog::backdrop{background:#17313d88}.cq-sketch-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:-14px;background:#fff;z-index:1;padding:4px 0 10px;border-bottom:1px solid #d8e2e5}.cq-sketch-dialog-header .btn{min-height:44px}.cq-sketch-dialog .course-sketch{margin:10px 0 0}.cq-sketch-dialog .cq-sketch-heading{display:none}.cq-sketch-dialog .cq-sketch-intro{font-size:.8rem;line-height:1.4}.cq-sketch-dialog canvas{margin:8px auto;width:100%;height:auto!important;max-height:none!important}.cq-sketch-dialog .cq-sketch-help{display:none}.cq-sketch-dialog [data-sketch-preview],.cq-sketch-dialog [data-sketch-status]{font-size:.8rem}.cq-sketch-dialog .course-sketch>label{font-size:.82rem}.cq-sketch-dialog button:focus-visible{outline:3px solid #217a99;outline-offset:2px}
+  @media(max-width:600px){body:has(.cq-question)>header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:8px 12px}body:has(.cq-question)>header .app-title-copy small{display:none}body:has(.cq-question)>header .countdown,body:has(.cq-question)>header .cn-header-home{display:none}body:has(.cq-question)>header .header-actions{gap:5px;flex-wrap:nowrap}body:has(.cq-question)>header #cq-preview-note{grid-column:1/-1;font-size:.65rem!important}body:has(.cq-question)>header .cn-header-button{font-size:.75rem;min-height:40px;padding:6px 8px}body:has(.cq-question)>header .header-more{height:40px;width:40px}body:has(.cq-question)>header .app-title{margin:0;font-size:1rem}body:has(.cq-question) #view{padding-top:8px}.cq-question>.tag{margin-bottom:2px}.cq-sketch-dialog{width:calc(100vw - 8px);height:calc(100dvh - 8px);max-height:calc(100dvh - 8px);padding:10px}.cq-sketch-dialog-header{top:-10px}.cq-sketch-heading{gap:5px}.cq-sketch-heading .btn{font-size:.75rem;padding:6px 9px}.cq-question .qprompt{margin-bottom:6px}}
   @media(max-width:600px){.cq-question{padding:14px!important}.cq-mobile-tabs{display:flex;gap:6px;margin:4px 0 12px;scroll-margin-top:10px}.cq-mobile-tabs button{flex:1;min-height:44px}.cq-mobile-tabs [aria-pressed=true]{background:#145f83;color:#fff}.cq-build[data-mobile-panel=given]>.cq-answer,.cq-build[data-mobile-panel=answer]>.cq-reference{display:none}.cq-go-build{display:block;width:100%;margin-top:10px}.cq-mobile-stem{display:block;font-size:.88rem;line-height:1.4;margin:0 0 8px}.cq-question .qprompt{font-size:.95rem}.cq-question figure>svg{max-height:210px!important}.cq-question .choices{gap:6px}.cq-question .choices button.choice{padding:10px}.cq-answer .choices:has(svg){grid-template-columns:1fr 1fr}.cq-answer .choices .choice{min-width:0}.cq-answer .choices figure details{font-size:.7rem}.cq-answer .chair-editor{padding:8px}.cq-answer .ce-toolbar{gap:5px}.cq-answer .ce-bank{gap:5px}.cq-answer .ce-bank button{min-height:40px}}
   `;document.head.appendChild(s);
 }
@@ -11302,7 +11527,7 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
  * Derives current routing from immutable attempts; never rewrites old evidence.
  * Fixed quizzes, diagnostics, proof, mastery, and instructor/manual sets are excluded.
  */
-const ADAPTIVE_LEARNING_VERSION=1;
+const ADAPTIVE_LEARNING_VERSION=2;
 function adaptiveLearningEligible(q){
   // These two cards concern course logistics/scope, not chemistry performance.
   return !!q&&q.adaptiveEligible!==false&&!['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);
@@ -11382,8 +11607,12 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   pool=pool.filter(adaptiveLearningEligible);
   const used=new Set(options.usedIds||[]),avoidFamilies=new Set(options.avoidFamilies||[]),byId=new Map(pool.map(q=>[q.id,q]));
   used.forEach(id=>{const q=byId.get(id);if(q)adaptiveLearningFamilies(q).forEach(k=>avoidFamilies.add(k));});
-  const candidates=pool.filter(q=>!used.has(q.id)&&!adaptiveLearningFamilies(q).some(k=>avoidFamilies.has(k)));
+  let candidates=pool.filter(q=>!used.has(q.id)&&!adaptiveLearningFamilies(q).some(k=>avoidFamilies.has(k)));
   if(!candidates.length)return null;
+  const slot=options.slots?.[options.index||0],slotIds=slot?new Set(slot.poolIds):null;
+  const scoped=slotIds?candidates.filter(q=>slotIds.has(q.id)):candidates;
+  const slotFallback=!!slotIds&&!scoped.length;
+  if(scoped.length)candidates=scoped;
   const evidence=adaptiveLearningEvidence(pool,attempts,options),rawLast=options.lastAttempt,rawLastQ=rawLast&&byId.get(rawLast.id);
   const now=options.now||Date.now(),last=rawLastQ&&adaptiveLearningValidAttempt(rawLast,rawLastQ)&&rawLast.ts>=now-30*86400000?rawLast:null,lastQ=last&&rawLastQ,outcome=adaptiveLearningOutcome(last);
   const repair=!!lastQ&&outcome!=='clean-right'&&outcome!=='calibrate';
@@ -11392,6 +11621,17 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   let working=anchor?candidates.filter(q=>adaptiveLearningSkill(q).key===anchor):candidates;
   const repairFallback=!!anchor&&!working.length;
   if(!working.length)working=candidates;
+  // Round plans are selection history, NOT attempts, exposure or mastery evidence.
+  // Avoid the preceding plan when a distinct same-slot/same-skill choice exists.
+  const plannedCounts={},plannedLast={},previousFamilies=new Set();
+  const selections=options.selections||[];
+  selections.forEach((run,index)=>(run.plannedIds||[]).forEach(id=>{
+    const q=byId.get(id);if(!q)return;
+    adaptiveLearningFamilies(q).forEach(key=>{plannedCounts[key]=(plannedCounts[key]||0)+1;plannedLast[key]=index+1;if(index===selections.length-1)previousFamilies.add(key);});
+  }));
+  const alternatives=working.filter(q=>!adaptiveLearningFamilies(q).some(key=>previousFamilies.has(key)));
+  const rotating=!!options.rotationKey;
+  if(rotating&&alternatives.length)working=alternatives;
   const priorCounts={},latestTs={};
   (attempts||[]).forEach(a=>{priorCounts[a.id]=(priorCounts[a.id]||0)+1;latestTs[a.id]=Math.max(latestTs[a.id]||0,a.ts||0);});
   const usedSkills={};used.forEach(id=>{const q=byId.get(id);if(q){const key=adaptiveLearningSkill(q).key;usedSkills[key]=(usedSkills[key]||0)+1;}});
@@ -11405,15 +11645,18 @@ function adaptiveLearningSelect(pool,attempts,options={}){
     const recentlySeen=latestTs[q.id]&&now-latestTs[q.id]<6*36e5;
     const priority=skill.status==='repair'?0:skill.status==='calibrating'?1:2;
     const score=Math.abs(level-desired)*100+(level>desired?15:0)+(recentlySeen?50:0)+(familySeen?18:0)+(q.familiarRepresentation?12:0)+Math.min(10,priorCounts[q.id]||0)+priority*4+(usedSkills[skill.key]||0)*6;
-    return {q,skill,level,desired,score,familySeen};
-  }).sort((a,b)=>a.score-b.score||String(a.q.id).localeCompare(String(b.q.id)));
+    const families=adaptiveLearningFamilies(q),planned=Math.max(0,...families.map(k=>plannedCounts[k]||0)),lastPlanned=Math.max(0,...families.map(k=>plannedLast[k]||0));
+    return {q,skill,level,desired,score:score+(rotating?planned*45:0),familySeen,lastPlanned};
+  }).sort((a,b)=>a.score-b.score||a.lastPlanned-b.lastPlanned||String(a.q.id).localeCompare(String(b.q.id)));
   const pick=ranked[0],role=repair?(repairFallback?'repair-fallback':foundation?'foundation-repair':'repair'):foundation?(pick.level<pick.skill.target?'foundation-check':'foundation-fallback'):pick.skill.promoted?'challenge':'calibration';
   const levelNames=['recall','foundation','intermediate','challenge'];
   let reason=repair?(repairFallback?'The same-skill bank has no unused distinct sibling; continue with another in-scope skill and keep the missed skill in review. ':'A recent '+outcome.replace(/-/g,' ')+' needs another question on this skill. '):foundation?(pick.level<pick.skill.target?'A scheduled easier check keeps the foundations active. ':'A foundation check is due; no easier distinct item is available, so this is same-level retrieval. '):pick.skill.promoted?'Distinct, unassisted in-app first answers support trying a harder task. ':'Start at the available authored level to gauge this skill; no improvement is assumed. ';
   reason+='Selected '+levelNames[pick.level]+' practice. '+(pick.familySeen?'This is review, not fresh-transfer proof. ':'A new in-app item is not proof that it is unfamiliar outside the app. ')+pick.skill.note;
   if(outcome==='format-repair')reason+='The connectivity was recognized; practise the requested naming format at the same level.';
   if(pick.level!==pick.desired)reason+='The exact target level is unavailable among the remaining distinct items.';
-  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role,target:pick.desired,level:pick.level,reason,freshInApp:!pick.familySeen}};
+  if(slot)reason+=' '+(slotFallback?'No distinct item remains for '+slot.label+'; using another in-scope task.':'This slot keeps '+slot.label+' in the round.');
+  if(rotating&&selections.length)reason+=' '+(alternatives.length?'A different item from the previous round is available.':'This small skill pool needs a repeat; use it as retrieval practice, not new proof.');
+  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role,target:pick.desired,level:pick.level,reason,freshInApp:!pick.familySeen,slot:slot?.label||null,slotFallback}};
 }
 function adaptiveLearningPool(options={}){
   let topics=options.topics?.slice(),chapter=options.chapter;
@@ -11424,10 +11667,10 @@ function adaptiveLearningPool(options={}){
   const allowed=new Set(topics||[]),ids=options.poolIds?new Set(options.poolIds):null;
   return QUESTIONS.filter(q=>adaptiveLearningEligible(q)&&allowed.has(q.topic)&&(!ids||ids.has(q.id)));
 }
-function adaptiveLearningQueue(pool,attempts,total=10){
+function adaptiveLearningQueue(pool,attempts,total=10,options={}){
   const queue=[],decisions=[];
   for(let i=0;i<total;i++){
-    const next=adaptiveLearningSelect(pool,attempts,{index:i,usedIds:queue.map(q=>q.id)});
+    const next=adaptiveLearningSelect(pool,attempts,{...options,index:i,usedIds:queue.map(q=>q.id)});
     if(!next)break;queue.push(next.question);decisions.push({...next.decision,index:i});
   }
   return {queue,decisions};
@@ -11438,9 +11681,9 @@ function adaptiveLearningProtected(D){
 function adaptiveLearningAttach(D,pool,options={}){
   pool=pool.filter(adaptiveLearningEligible);
   if(adaptiveLearningProtected(D)||!pool.length||D.i>0||D.answered||(D.log||[]).length)return false;
-  const total=Math.min(options.total||D.queue.length||10,20),plan=adaptiveLearningQueue(pool,S.attempts||[],total);
+  const total=Math.min(options.total||D.queue.length||10,20),plan=adaptiveLearningQueue(pool,S.attempts||[],total,options);
   if(!plan.queue.length)return false;
-  D.queue=plan.queue;D.learningAdaptive={version:ADAPTIVE_LEARNING_VERSION,poolIds:pool.map(q=>q.id),topics:[...new Set(pool.map(q=>q.topic))],chapter:options.chapter||null,total:plan.queue.length,decisions:plan.decisions,branches:[]};
+  D.queue=plan.queue;D.learningAdaptive={version:ADAPTIVE_LEARNING_VERSION,poolIds:pool.map(q=>q.id),topics:[...new Set(pool.map(q=>q.topic))],chapter:options.chapter||null,total:plan.queue.length,decisions:plan.decisions,branches:[],rotationKey:options.rotationKey||null,slots:options.slots||null,selections:options.selections||[]};
   return true;
 }
 function startAdaptiveLearning(options={}){
@@ -11450,7 +11693,11 @@ function startAdaptiveLearning(options={}){
   const total=Math.max(1,Math.min(20,Number(options.total)||10));
   const label=options.label||(options.chapter==='all'?'Adaptive practice · all chapters':'Adaptive practice · '+(typeof CHAPTERS!=='undefined'?CHAPTERS.find(c=>c.id===(options.chapter||'ch4'))?.name||'selected topics':'selected topics'));
   const D={queue:[],i:0,right:0,wrong:0,topic:'__learning_adaptive',answered:false,log:[],runId:makeRunId('learning-adaptive'),scopeName:label};
-  if(!adaptiveLearningAttach(D,pool,{total,chapter:options.chapter||'ch4'}))return false;
+  const selections=options.rotationKey?(S.practiceSelections||[]).filter(x=>x.scope===options.rotationKey).slice(-20):[];
+  if(!adaptiveLearningAttach(D,pool,{total,chapter:options.chapter||'ch4',rotationKey:options.rotationKey,slots:options.slots,selections}))return false;
+  if(options.rotationKey){
+    S.practiceSelections=[...(S.practiceSelections||[]),{runId:D.runId,scope:options.rotationKey,ts:Date.now(),plannedIds:D.queue.map(q=>q.id)}].slice(-30);
+  }
   S.drill=D;snapshotDrill(0);save();go('drill');return true;
 }
 function adaptiveLearningBranch(D,q,attempt){
@@ -11462,9 +11709,10 @@ function adaptiveLearningBranch(D,q,attempt){
   // Preserve every answered/current item and every later reserved item. Only
   // the immediate unanswered slot can change; source siblings cannot co-occur.
   const reserved=D.queue.filter((_,i)=>i!==nextIndex).map(x=>x.id);
-  const picked=adaptiveLearningSelect(pool,S.attempts||[],{index:nextIndex,usedIds:reserved,lastAttempt:attempt});
+  const picked=adaptiveLearningSelect(pool,S.attempts||[],{index:nextIndex,usedIds:reserved,lastAttempt:attempt,rotationKey:metadata.rotationKey,slots:metadata.slots,selections:metadata.selections});
   if(!picked)return null;
   const previous=D.queue[nextIndex].id;D.queue[nextIndex]=picked.question;
+  const selection=(S.practiceSelections||[]).find(x=>x.runId===D.runId);if(selection)selection.plannedIds=D.queue.map(q=>q.id);
   const changed=previous!==picked.question.id;
   const record={after:q.id,signal:adaptiveLearningOutcome(attempt),label:(changed?'':'Keep the planned next item. ')+picked.decision.reason,picks:changed?[picked.question.id]:[],replaced:changed?previous:null,retained:!changed,index:nextIndex,eventKey,ts:Date.now()};
   metadata.decisions=metadata.decisions.filter(x=>x.index!==nextIndex).concat({...picked.decision,index:nextIndex});metadata.branches.push(record);
@@ -11619,7 +11867,7 @@ function openCourseNavigation(){
   dialog.appendChild(el('p',{class:'cn-dialog-note'},'Chapter 4 stays your default. Your current work is kept when you switch.'));
   const nav=el('div',{class:'cn-menu',role:'navigation','aria-label':'Course destinations'});
   const choice=(label,detail,destination,extra='')=>{
-    const b=el('button',{type:'button',class:'cn-menu-link '+extra,onclick:()=>{dialog.close();courseNavigationGo(destination);}});
+    const b=el('button',{type:'button',class:'cn-menu-link '+extra,onclick:()=>{dialog.dataset.navigating='true';dialog.close();courseNavigationGo(destination);}});
     const title=el('strong');title.textContent=label;b.appendChild(title);const note=el('span');note.textContent=detail;b.appendChild(note);return b;
   };
   nav.appendChild(choice('Chapter 4 quiz prep','Return to your focused study desk','quiz','cn-menu-focus'));
@@ -11635,7 +11883,7 @@ function openCourseNavigation(){
     else if(!e.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){e.preventDefault();first?.focus();}
   });
   dialog.addEventListener('click',e=>{const b=dialog.getBoundingClientRect();if(e.target===dialog&&(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom))dialog.close();});
-  dialog.addEventListener('close',()=>{trigger?.setAttribute('aria-expanded','false');if(trigger?.isConnected)trigger.focus({preventScroll:true});});
+  dialog.addEventListener('close',()=>{trigger?.setAttribute('aria-expanded','false');if(!dialog.dataset.navigating&&trigger?.isConnected)trigger.focus({preventScroll:true});});
   document.body.appendChild(dialog);trigger?.setAttribute('aria-expanded','true');dialog.showModal();close.focus({preventScroll:true});
 }
 function installCourseNavigation(){
@@ -11662,6 +11910,450 @@ function installCourseNavigation(){
   const previous=render;render=function(){previous();updateCourseNavigation();};updateCourseNavigation();
 }
 installCourseNavigation();
+
+/* Chapter 5 foundations · 2026-09-29.
+ * Original teaching examples and drawings, mapped to the learner's TOC 5.1–5.4.
+ * Course assessment scope is not yet confirmed. No textbook figures reproduced.
+ * Registration is performed by the Chapter 5 integration module, not here.
+ */
+const CH5_FOUNDATION_SOURCES={
+  intro:'https://openstax.org/books/organic-chemistry/pages/5-9-a-review-of-isomerism',
+  chirality:'https://openstax.org/books/organic-chemistry/pages/5-2-the-reason-for-handedness-in-molecules-chirality',
+  rs:'https://openstax.org/books/organic-chemistry/pages/5-5-sequence-rules-for-specifying-configuration',
+  fischer:'https://openstax.org/books/organic-chemistry/pages/25-2-representing-carbohydrate-stereochemistry-fischer-projections'
+};
+function ch5FEscape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function ch5FText(x,y,s,size=20){return '<text x="'+x+'" y="'+y+'" text-anchor="middle" fill="currentColor" font-size="'+size+'" font-family="system-ui,sans-serif">'+ch5FEscape(s)+'</text>';}
+function ch5FLine(a,b,width=2.6){return '<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="currentColor" stroke-width="'+width+'" stroke-linecap="round"/>';}
+function ch5FBond(a,b,kind='plain'){
+  if(kind==='plain')return ch5FLine(a,b);
+  const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.hypot(dx,dy),px=-dy/d,py=dx/d;
+  if(kind==='wedge')return '<polygon points="'+a.join(',')+' '+[b[0]+7*px,b[1]+7*py].join(',')+' '+[b[0]-7*px,b[1]-7*py].join(',')+'" fill="currentColor"/>';
+  return Array.from({length:7},(_,i)=>{const t=(i+1)/8,w=7*t,p=[a[0]+dx*t,a[1]+dy*t];return ch5FLine([p[0]-w*px,p[1]-w*py],[p[0]+w*px,p[1]+w*py],1.6);}).join('');
+}
+function ch5FFigure(body,title='Given structure',width=380,height=220,description=''){
+  return '<figure class="ch5-structure" style="margin:12px 0;padding:8px;border:1px solid var(--border,#ccdadd);border-radius:12px"><figcaption style="font-size:13px;margin-bottom:4px">'+ch5FEscape(title)+'</figcaption><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+ch5FEscape(description||title)+'" style="display:block;width:100%;max-height:220px;color:var(--text,#193d45)">'+body+'</svg></figure>';
+}
+// UL/UR are ordinary bonds; DL is a solid wedge; DR is a hashed wedge.
+// Labels stay upright when the complete structure is rotated on the page.
+function ch5FTetraBody(labels,options={}){
+  const origin=[170,105],ends={UL:[92,58],UR:[248,58],DL:[102,163],DR:[238,163]},texts={UL:[69,49],UR:[271,49],DL:[77,189],DR:[263,189]},kinds={UL:'plain',UR:'plain',DL:options.reverseDepth?'hash':'wedge',DR:options.reverseDepth?'wedge':'hash'};
+  const rotate=p=>options.rotate180?[340-p[0],210-p[1]]:p;
+  return Object.keys(ends).map(k=>{const label=rotate(texts[k]);return ch5FBond(origin,rotate(ends[k]),kinds[k])+ch5FText(label[0],label[1],labels[k],20);}).join('')+(options.star?ch5FText(170,99,'*',21):'');
+}
+function ch5FTetra(labels,options={}){return ch5FFigure(ch5FTetraBody(labels,options),options.title||'Wedge–dash structure',340,214,options.description||'Two ordinary bonds, one solid wedge toward you and one hashed wedge away from you.');}
+function ch5FTetraPair(a,b,options={}){
+  const title=options.title||'Compare A and B';
+  return '<div class="ch5-tetra-pair" role="group" aria-label="'+ch5FEscape(title)+'"><p style="font-size:13px;margin:8px 0 0">'+ch5FEscape(title)+'</p><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px">'+
+    '<div style="flex:1 1 240px;min-width:0;max-width:380px">'+ch5FTetra(a,Object.assign({},options.a,{title:'A · wedge–dash structure',description:'Structure A. Solid wedge toward you; hashed wedge away from you.'}))+'</div>'+
+    '<div style="flex:1 1 240px;min-width:0;max-width:380px">'+ch5FTetra(b,Object.assign({},options.b,{title:'B · wedge–dash structure',description:'Structure B. Solid wedge toward you; hashed wedge away from you.'}))+'</div></div></div>';
+}
+function ch5FFischerBody(top,bottom,left,right,depth=false){
+  const c=[170,105],points={top:[170,44],bottom:[170,166],left:[92,105],right:[248,105]};
+  return Object.entries(points).map(([k,p])=>ch5FBond(c,p,depth?(['top','bottom'].includes(k)?'hash':'wedge'):'plain')).join('')+ch5FText(170,31,top)+ch5FText(170,193,bottom)+ch5FText(51,112,left)+ch5FText(290,112,right);
+}
+function ch5FFischer(top,bottom,left,right,title='Fischer projection'){return ch5FFigure(ch5FFischerBody(top,bottom,left,right),title,340,214,'Fischer projection: top '+top+', bottom '+bottom+', left '+left+', right '+right+'.');}
+function ch5FFormula(formula,title='Given connectivity'){return ch5FFigure(ch5FText(290,58,formula,24),title,580,95,formula);}
+function ch5FFormulaPair(a,b){return ch5FFigure(ch5FText(310,48,'A: '+a,22)+ch5FText(310,100,'B: '+b,22),'Compare the two connectivities',620,135,a+' compared with '+b);}
+function ch5FRing(){
+  const points=[[170,54],[235,91],[235,165],[170,202],[105,165],[105,91]];
+  return ch5FFigure(points.map((p,i)=>ch5FLine(p,points[(i+1)%6])).join('')+ch5FLine(points[0],[170,25])+ch5FText(170,17,'CH₃',18)+ch5FText(183,57,'*',20),'Methylcyclohexane · marked attachment carbon',340,225,'A six-membered ring with one methyl attached; the ring attachment carbon is marked with a star.');
+}
+function ch5FTetraAudit(priorities,expected,reverseDepth=false){
+  const positions={UL:[-78,47,0],UR:[78,47,0],DL:[-68,-58,reverseDepth?-1:1],DR:[68,-58,reverseDepth?1:-1]};
+  return {kind:'tetra',positions:Object.entries(priorities).map(([group,priority])=>({group,priority,x:positions[group][0],y:positions[group][1],z:positions[group][2]})),expected};
+}
+function ch5FFischerAudit(priorities,expected){
+  const positions={top:[0,1,-1],bottom:[0,-1,-1],left:[-1,0,1],right:[1,0,1]};
+  return {kind:'fischer',positions:Object.entries(priorities).map(([group,priority])=>({group,priority,x:positions[group][0],y:positions[group][1],z:positions[group][2]})),expected};
+}
+function ch5FQ(n,topic,type,diff,prompt,extra){
+  const section=topic==='stereoIntro'?'intro':topic==='chirality'?'chirality':topic==='stereoRS'?'rs':'fischer';
+  const lesson={stereoIntro:'ch5-intro',chirality:'ch5-chirality',stereoRS:'ch5-rs',fischer:'ch5-fischer'}[topic];
+  return Object.assign({id:'CH5-F'+String(n).padStart(2,'0'),chapter:5,courseRoute:'ch5',topic,type,diff,difficulty:diff,adaptiveSkill:lesson,transferFamily:'ch5-foundations-'+n,prompt,
+    source:'Original Chapter 5 practice, mapped to the supplied chapter outline; instructor quiz scope unconfirmed. Chemistry reference: '+CH5_FOUNDATION_SOURCES[section],sourceKind:'original-practice',eligibleForUnseenTransfer:true,
+    reviewMode:type==='written'?'self-reviewed-paper':undefined},extra);
+}
+const CH5_FOUNDATION_QUESTIONS=[
+  ch5FQ(1,'stereoIntro','mc',1,'How are A and B related?'+ch5FFormulaPair('CH₃–CH₂–CH₂–CH₃','CH₃–CH(CH₃)–CH₃'),{choices:['Constitutional isomers','Enantiomers','Different conformations of the same molecule','Different molecular formulas'],answer:0,hints:['Count the atoms, then compare which carbons are connected.'],why:'Both have formula C₄H₁₀, but their carbon connections differ. A is unbranched; B has a branch. That makes them constitutional isomers, not a stereochemical pair.'}),
+  ch5FQ(2,'stereoIntro','mc',2,'The same groups are attached to the central carbon in both drawings. Which relationship fits?'+ch5FTetraPair({UL:'CH₃',UR:'CH₂CH₃',DL:'Cl',DR:'H'},{UL:'CH₃',UR:'CH₂CH₃',DL:'Cl',DR:'H'},{b:{reverseDepth:true}}),{choices:['Identical after rotating the page','Constitutional isomers','Enantiomers','Different formulas'],answer:2,hints:['The ordinary bonds are unchanged. Compare which group comes toward you.','There is one tetrahedral carbon with four different attached groups.'],why:'Swapping front and back at this single stereocenter reverses its configuration while keeping every connection. These are nonsuperimposable mirror images: enantiomers.',stereoAudit:{kind:'pair',relationship:'enantiomers',left:ch5FTetraAudit({UL:3,UR:2,DL:1,DR:4},'S'),right:ch5FTetraAudit({UL:3,UR:2,DL:1,DR:4},'R',true)}}),
+  ch5FQ(3,'stereoIntro','written',2,'Draw the mirror-image enantiomer of this structure. Keep the same groups and connections; show a solid wedge and a hashed wedge. R/S labels are not required yet.'+ch5FTetra({UL:'CH₃',UR:'CH₂CH₂CH₃',DL:'Br',DR:'H'}),{requiresDrawing:true,answer:'The same four groups around the same carbon, with the stereocenter inverted.',model:ch5FTetra({UL:'CH₃',UR:'CH₂CH₂CH₃',DL:'Br',DR:'H'},{reverseDepth:true,title:'One valid enantiomer drawing'})+'<p>Keeping the two ordinary bonds fixed and exchanging wedge/dash directions reverses this center. A rotated equivalent drawing is also valid.</p>',rubric:['CH₃, CH₂CH₂CH₃, Br, and H all remain attached to one carbon','Exactly one stereocenter is inverted','Front/back bonds are explicit','Connectivity is unchanged; rotations of a correct drawing are allowed'],hints:['A mirror image changes handedness, not the length of a carbon chain.'],why:'The new drawing must be non-superimposable on the original without changing any bond connections. Self-check the drawing against the rubric; saved ink is not automatically chemically graded.'}),
+  ch5FQ(4,'stereoIntro','mc',1,'How are these two structures related?'+ch5FFormulaPair('CH₃–CH₂–CH₂–CH₂–CH₃','CH₃–CH(CH₃)–CH₂–CH₃'),{choices:['Enantiomers','The same molecule rotated','Constitutional isomers','Not isomers because both are alkanes'],answer:2,hints:['The formula alone does not tell you the connectivity.'],why:'Each contains five carbons and twelve hydrogens. The branching differs, so these are constitutional isomers. Bending or rotating the unbranched structure would not create the branch.'}),
+  ch5FQ(5,'stereoIntro','mc',2,'B is drawn in a different page orientation. Compare the full wedge/dash information: how are A and B related?'+ch5FTetraPair({UL:'CH₃',UR:'CH₂CH₂CH₃',DL:'Br',DR:'H'},{UL:'CH₃',UR:'CH₂CH₂CH₃',DL:'Br',DR:'H'},{b:{rotate180:true}}),{choices:['Enantiomers','Identical structures','Constitutional isomers','Diastereomers'],answer:1,hints:['Try a 180° turn of the whole page. A page rotation does not swap a wedge with a dash.'],why:'A 180° rotation of the entire drawing carries every group and its bond type into B. This changes the viewing orientation, not the configuration.'}),
+  ch5FQ(6,'stereoIntro','written',2,'Draw both enantiomers of <b>CHBrClF</b> using wedge–dash bonds. Show all four groups on carbon. No R/S names are required.',{requiresDrawing:true,answer:'Two opposite configurations of a carbon attached to H, Br, Cl and F.',model:ch5FTetraPair({UL:'Br',UR:'Cl',DL:'F',DR:'H'},{UL:'Br',UR:'Cl',DL:'F',DR:'H'},{b:{reverseDepth:true},title:'One valid enantiomer pair'}),rubric:['One carbon with H, Br, Cl and F in each drawing','All four carbon bonds are present','The drawings have opposite configurations, not merely different page rotations','Solid/hashed wedges communicate front/back'],hints:['Start with one carbon attached to all four groups. Then invert that single center.'],why:'A tetrahedral carbon with these four different groups has two mirror-image configurations. No extra carbon or changed connection is needed.'}),
+  ch5FQ(7,'chirality','mc',1,'Is the marked carbon a tetrahedral stereocenter?'+ch5FTetra({UL:'CH₃',UR:'CH₂CH₃',DL:'Br',DR:'H'},{star:true}),{choices:['Yes: the four attached groups are different','No: two groups start with carbon','No: H cannot be attached to a stereocenter','Yes: every wedge makes a stereocenter'],answer:0,hints:['Compare complete attached groups, not just the first atom.'],why:'The marked carbon is attached to Br, H, methyl and ethyl. Methyl and ethyl are different groups even though both begin with carbon.'}),
+  ch5FQ(8,'chirality','mc',1,'Is carbon 3 of <b>3-pentanol</b> a stereocenter?'+ch5FFormula('CH₃CH₂–CH(OH)–CH₂CH₃'),{choices:['Yes: it has an OH','Yes: the left and right bonds are drawn differently','No: two attached groups are identical ethyl groups','No: alcohols cannot be chiral'],answer:2,hints:['At the OH-bearing carbon, list the complete group in each direction.'],why:'C3 has OH, H, ethyl and ethyl. The two identical ethyl groups mean that carbon does not have four different groups. This molecule is achiral.'}),
+  ch5FQ(9,'chirality','written',2,'Draw <b>2-fluorobutane</b>. Mark its stereocenter with a star and label the four groups attached to it. Either configuration is acceptable.',{requiresDrawing:true,answer:'C2 is the only stereocenter: F, H, CH₃ and CH₂CH₃.',model:ch5FTetra({UL:'CH₃',UR:'CH₂CH₃',DL:'F',DR:'H'},{star:true,title:'One valid drawing · either configuration is acceptable'}),rubric:['Four-carbon butane connectivity, with F at C2','C2 is starred; no CH₂ or CH₃ carbon is starred','The four groups are F, H, CH₃ and CH₂CH₃','Either stereochemical configuration is accepted'],hints:['A CH₂ carbon has two identical hydrogens, so it cannot be a tetrahedral stereocenter.'],why:'This checks whether you can find the center from a name, rather than treating a wedge as proof of chirality.'}),
+  ch5FQ(10,'chirality','mc',2,'Is the starred ring carbon a stereocenter in <b>methylcyclohexane</b>?'+ch5FRing(),{choices:['Yes, because it has three carbon bonds','No, because its two paths around this ring are equivalent','Yes, because axial and equatorial are different groups','No, because ring carbons can never be stereocenters'],answer:1,hints:['Trace around the unsubstituted ring in both directions from the starred carbon.'],why:'The two paths around this singly substituted ring match. The starred carbon therefore has two equivalent ring attachments, plus H and CH₃. Axial/equatorial describes a conformation, not two different molecular groups.'}),
+  ch5FQ(11,'chirality','num',2,'How many tetrahedral carbon stereocenters are present in <b>2,3-dichloropentane</b>?'+ch5FFormula('CH₃–CH(Cl)–CH(Cl)–CH₂–CH₃'),{answer:2,hints:['Check each CH(Cl) separately, including its complete left and right chains.'],why:'Both C2 and C3 have four different attached groups. C1 and C5 are CH₃, and C4 is CH₂, so those are not stereocenters.'}),
+  ch5FQ(12,'chirality','written',2,'Draw <b>2-chloropentane</b> and <b>3-chloropentane</b>. Star every tetrahedral carbon stereocenter. On your drawing, label the two carbon-chain groups at each Cl-bearing carbon.',{requiresDrawing:true,answer:'2-chloropentane: C2 stereocenter, methyl versus propyl. 3-chloropentane: no stereocenter, ethyl versus ethyl.',model:ch5FFormula('CH₃–CH*(Cl)–CH₂CH₂CH₃','2-chloropentane · * marks the stereocenter')+ch5FFormula('CH₃CH₂–CH(Cl)–CH₂CH₃','3-chloropentane · no stereocenter'),rubric:['Both have five-carbon unbranched connectivity','Cl at C2 in one drawing and C3 in the other','Only C2 of 2-chloropentane is starred','Methyl/propyl are different; ethyl/ethyl are identical'],hints:['Moving a substituent can change whether the two sides of the chain are equivalent.'],why:'Complete chain identity matters. The two carbon attachments do not have to differ at their first atom to be different groups.'}),
+  ch5FQ(13,'stereoRS','mc',1,'A tetrahedral carbon is bonded to <b>Br, Cl, F and H</b>. Choose the CIP order from highest priority (1) to lowest (4).',{choices:['Br > Cl > F > H','Cl > Br > F > H','H > F > Cl > Br','Br > F > Cl > H'],answer:0,hints:['For different directly attached elements, compare atomic numbers.'],why:'The directly attached atomic numbers are Br 35, Cl 17, F 9 and H 1. This ranks the groups; it does not yet tell you R or S.'}),
+  ch5FQ(14,'stereoRS','text',2,'Assign <b>R or S</b> to the stereocenter. Type one letter.'+ch5FTetra({UL:'Cl',UR:'CH₂CH₃',DL:'CH₃',DR:'H'}),{answer:'R',accept:['R','(R)'],hints:['Rank Cl, ethyl, methyl and H.','The hashed H points away. Now trace priorities 1 → 2 → 3.'],why:'Cl is 1, ethyl 2, methyl 3 and H 4. H points away. The 1 → 2 → 3 path is clockwise, so this is R.',stereoAudit:ch5FTetraAudit({UL:1,UR:2,DL:3,DR:4},'R')}),
+  ch5FQ(15,'stereoRS','written',3,'Draw <b>(S)-2-bromopentane</b> with wedge–dash bonds. Label priorities 1–4 and show how you checked the configuration.',{requiresDrawing:true,answer:'Br > propyl > methyl > H; configuration S.',model:ch5FTetra({UL:'CH₃',UR:'CH₂CH₂CH₃',DL:'Br',DR:'H'},{title:'One valid S drawing'})+'<p>Br = 1; propyl = 2; methyl = 3; H = 4. Here H is away and 1 → 2 → 3 is counterclockwise.</p>',rubric:['Five-carbon parent with Br on C2','Four groups at C2 are Br, H, methyl and propyl','Priorities are Br 1, propyl 2, methyl 3, H 4','After correctly orienting priority 4, the configuration is S','Other rotated drawings with S configuration are accepted'],hints:['Build the connectivity first.','Put H away to make the final R/S check direct.'],why:'A correct drawing needs the requested connectivity and handedness. Screen position alone cannot establish S.',stereoAudit:ch5FTetraAudit({UL:3,UR:2,DL:1,DR:4},'S')}),
+  ch5FQ(16,'stereoRS','mc',2,'Choose the correct CIP order for these groups attached to one carbon: <b>OH, CH₂OH, CH₂CH₃ and H</b>.',{choices:['CH₂OH > OH > CH₂CH₃ > H','OH > CH₂CH₃ > CH₂OH > H','OH > CH₂OH > CH₂CH₃ > H','OH > H > CH₂OH > CH₂CH₃'],answer:2,hints:['First compare the directly attached atoms.','For the carbon/carbon tie, compare their next attached atoms in descending order.'],why:'O outranks C, and C outranks H. To break the carbon tie: CH₂OH gives [O,H,H], while ethyl gives [C,H,H]. Therefore CH₂OH outranks ethyl.'}),
+  ch5FQ(17,'stereoRS','text',2,'Assign <b>R or S</b>. Pay attention to where H points.'+ch5FTetra({UL:'I',UR:'CH₂CH₃',DL:'H',DR:'CH₃'}),{answer:'S',accept:['S','(S)'],hints:['H is priority 4, but it is on the solid wedge.','With priority 4 toward you, reverse the apparent clockwise/counterclockwise result.'],why:'I > ethyl > methyl > H. The drawn 1 → 2 → 3 path is clockwise, but H points toward you. Reverse that apparent result: S.',stereoAudit:ch5FTetraAudit({UL:1,UR:2,DL:4,DR:3},'S')}),
+  ch5FQ(18,'stereoRS','written',3,'Copy this structure. Label its CIP priorities 1–4 and assign R or S. In your drawing, show the atom lists that distinguish <b>CHO</b> from <b>CH₂OH</b>.'+ch5FTetra({UL:'OH',UR:'CHO',DL:'CH₂OH',DR:'H'}),{requiresDrawing:true,answer:'OH 1, CHO 2, CH₂OH 3, H 4; R.',model:ch5FTetra({UL:'OH (1)',UR:'CHO (2)',DL:'CH₂OH (3)',DR:'H (4)'},{title:'Priority labels · R'})+'<p>CHO compares as [O,O,H]; CH₂OH compares as [O,H,H]. Count the C=O oxygen twice for CIP comparison. H is away; 1 → 2 → 3 is clockwise.</p>',rubric:['OH is priority 1 and H is priority 4','CHO ranks above CH₂OH','Comparison lists correctly account for the carbonyl double bond','H is away, giving R for this drawing'],hints:['CHO means an aldehyde group, –C(=O)H.','For ranking, treat the carbonyl carbon as attached to two oxygens.'],why:'Do not rank by group size or total mass. The first point of difference in the CIP comparison resolves this carbon/carbon tie.',stereoAudit:ch5FTetraAudit({UL:1,UR:2,DL:3,DR:4},'R'),transferFamily:'ch5-glyceraldehyde-config'}),
+  ch5FQ(19,'fischer','mc',1,'In this <b>Fischer projection</b>, which bonds point toward you?'+ch5FFischer('CH₃','CH₂CH₃','H','Br'),{choices:['The top and bottom bonds','The left and right bonds','All four bonds lie in the page','Only the bond to Br'],answer:1,hints:['A Fischer cross has a fixed depth convention; it is not an ordinary flat cross.'],why:'The horizontal bonds project toward you and the vertical bonds project away. Both horizontal groups have the same depth convention, regardless of their identities.'}),
+  ch5FQ(20,'fischer','text',2,'Assign <b>R or S</b> to this Fischer projection.'+ch5FFischer('CH₃','CH₂CH₃','H','Br'),{answer:'S',accept:['S','(S)'],hints:['Rank Br, ethyl, methyl and H.','H is horizontal, so priority 4 points toward you.'],why:'Br is 1, bottom ethyl 2, top methyl 3 and left H 4. The page path 1 → 2 → 3 is clockwise; because H is toward you, reverse it to S.',stereoAudit:ch5FFischerAudit({top:3,bottom:2,left:4,right:1},'S'),transferFamily:'ch5-fischer-2-bromobutane'}),
+  ch5FQ(21,'fischer','written',3,'Convert this Fischer projection to a wedge–dash structure with the <b>same configuration</b>. Show all four groups. You may rotate the finished drawing.'+ch5FFischer('CO₂H','CH₃','OH','H'),{requiresDrawing:true,answer:'Same configuration as the Fischer: S, with OH, CO₂H, CH₃ and H retained.',model:ch5FTetra({UL:'CH₃',UR:'CO₂H',DL:'OH',DR:'H'},{title:'One equivalent wedge–dash drawing'})+'<p>Both drawings are S: OH > CO₂H > CH₃ > H. In the Fischer, H is toward you. In this model, H is away, so the apparent page paths differ while the actual configuration stays the same.</p>',rubric:['OH, CO₂H, CH₃ and H are all attached to the same carbon','Wedge/dash depth is explicit','The result retains S configuration; it is not the mirror image','Rotated equivalent structures are accepted'],hints:['Horizontal Fischer bonds come toward you.','Check R/S before and after conversion to verify that handedness survived.'],why:'Converting representation must not invert the center. Matching the positions on the page is not enough; match the 3-D configuration.',stereoAudit:{kind:'conversion',left:ch5FFischerAudit({top:2,bottom:3,left:1,right:4},'S'),right:ch5FTetraAudit({UL:3,UR:2,DL:1,DR:4},'S')}}),
+  ch5FQ(22,'fischer','mc',2,'You rotate an entire one-center Fischer projection <b>180° in the plane of the page</b>, then read it using the Fischer convention. What happens to its configuration?',{choices:['It must change R to S','It becomes achiral','It stays the same','It becomes a constitutional isomer'],answer:2,hints:['A 180° turn exchanges top/bottom and left/right together: two exchanges.'],why:'Two pairwise exchanges preserve configuration, so a 180° in-plane Fischer rotation is allowed. A 90° in-plane rotation followed by rereading it as a Fischer would reverse configuration.'}),
+  ch5FQ(23,'fischer','text',2,'Assign <b>R or S</b> to this Fischer projection.'+ch5FFischer('CO₂H','CH₂CH₃','H','NH₂'),{answer:'R',accept:['R','(R)'],hints:['The directly attached N outranks C. Compare CO₂H with ethyl to resolve the carbon tie.','The lowest-priority H is horizontal.'],why:'NH₂ is 1, CO₂H 2, ethyl 3 and H 4. The 1 → 2 → 3 path is counterclockwise on the page. H points toward you, so reverse it: R.',stereoAudit:ch5FFischerAudit({top:2,bottom:3,left:4,right:1},'R')}),
+  ch5FQ(24,'fischer','written',3,'Draw the <b>mirror-image Fischer projection</b>. Keep CHO at the top and CH₂OH at the bottom. Label R/S on the original and on your mirror image.'+ch5FFischer('CHO','CH₂OH','H','OH'),{requiresDrawing:true,answer:'Original R; mirror S, with OH on the left and H on the right.',model:ch5FFischer('CHO','CH₂OH','OH','H','Mirror image · S')+'<p>Original R → mirror S. Priorities are OH 1, CHO 2, CH₂OH 3 and H 4. The horizontal H points toward you in both projections.</p>',rubric:['CHO stays at the top and CH₂OH at the bottom','OH/H exchange left and right','Original is labeled R','Mirror is labeled S; priority 4 being toward you is accounted for'],hints:['For a vertical mirror, exchange left and right without exchanging top and bottom.','Use the multiple-bond rule when comparing CHO and CH₂OH.'],why:'A single left/right exchange at this center creates its enantiomer. It is different from a full 180° page rotation.',stereoAudit:{kind:'pair',relationship:'enantiomers',left:ch5FFischerAudit({top:2,bottom:3,left:4,right:1},'R'),right:ch5FFischerAudit({top:2,bottom:3,left:1,right:4},'S')},transferFamily:'ch5-glyceraldehyde-config'})
+];
+// A cold run means no help in that run, not automatically an unseen molecule.
+// Preserve shared families across recognition, drawing and worked examples.
+for(const [family,ids]of Object.entries({
+  'ch5-2-chlorobutane-config':['CH5-F02','CH5-F14'],
+  'ch5-2-bromopentane-config':['CH5-F03','CH5-F05','CH5-F15'],
+  'ch5-fischer-2-bromobutane':['CH5-F19','CH5-F20']
+}))for(const q of CH5_FOUNDATION_QUESTIONS)if(ids.includes(q.id))q.transferFamily=family;
+for(const id of ['CH5-F02','CH5-F09','CH5-F14','CH5-F19','CH5-F20']){
+  const q=CH5_FOUNDATION_QUESTIONS.find(q=>q.id===id);
+  q.familiarRepresentation=true;q.eligibleForUnseenTransfer=false;
+  q.sourceModelIds=id==='CH5-F09'?['ch5-intro-worked']:['CH5-F19','CH5-F20'].includes(id)?['ch5-rs-worked']:['ch5-fischer-worked'];
+}
+const CH5_FOUNDATION_LESSONS=[
+  {id:'ch5-intro',topic:'stereoIntro',title:'Same connections, different 3-D shape',sections:'5.1',goal:'Separate changed connectivity, changed configuration, and a changed viewing angle.',explain:'Start with the bonds, not the silhouette. A branch moved to a different atom changes connectivity. A wedge/dash change may change configuration. Turning the whole drawing changes neither.',steps:['Compare molecular formulas. Different formulas are not isomers.','Compare atom-to-atom connections. Different connections mean constitutional isomers.','With the same connections, test whether a rotation superimposes the structures. Nonsuperimposable mirror images are enantiomers.'],exampleHtml:()=>ch5FTetraPair({UL:'CH₃',UR:'CH₂CH₃',DL:'F',DR:'H'},{UL:'CH₃',UR:'CH₂CH₃',DL:'F',DR:'H'},{b:{reverseDepth:true},title:'Worked pair · opposite configurations'})+'<p>Same four groups, same connections, opposite front/back at one stereocenter: enantiomers. This is not a chair flip or a page rotation.</p>',practiceIds:['CH5-F01','CH5-F02','CH5-F03'],coldIds:['CH5-F04','CH5-F05','CH5-F06'],source:CH5_FOUNDATION_SOURCES.intro},
+  {id:'ch5-chirality',topic:'chirality',title:'Find the center; compare whole groups',sections:'5.2',goal:'Identify tetrahedral carbon stereocenters without mistaking every branch or wedge for one.',explain:'At each candidate carbon, compare all four complete attached groups. One center with four different groups gives a chiral molecule in these introductory examples. Later, symmetry and other kinds of chirality add important exceptions.',steps:['Exclude CH₃ and CH₂ carbons: they have repeated hydrogens.','At a tetrahedral candidate, list all four attachments, including H.','Trace tied carbon chains or ring paths until they differ—or prove identical.'],exampleHtml:()=>ch5FTetra({UL:'CH₃',UR:'CH₂CH₃',DL:'OH',DR:'H'},{star:true,title:'Worked example · starred stereocenter'})+'<p>OH, H, methyl and ethyl are four different groups. The two carbon groups do not become identical just because each begins with C.</p>',practiceIds:['CH5-F07','CH5-F08','CH5-F09'],coldIds:['CH5-F10','CH5-F11','CH5-F12'],source:CH5_FOUNDATION_SOURCES.chirality},
+  {id:'ch5-rs',topic:'stereoRS',title:'Rank, orient, then assign R/S',sections:'5.3',goal:'Assign and draw a configuration while tracking the lowest-priority group.',explain:'R/S has two separate jobs: rank the groups, then read their arrangement. A clockwise-looking drawing is not automatically R; first locate priority 4.',steps:['Rank directly attached atoms by atomic number; use higher mass for isotopes of the same element.','Resolve ties one layer at a time, comparing sorted atom lists at the first difference. Multiple bonds use duplicate atoms for ranking.','With priority 4 away: 1 → 2 → 3 clockwise is R, counterclockwise is S. If 4 is toward you, reverse the apparent result.'],exampleHtml:()=>ch5FTetra({UL:'Br (1)',UR:'CH₂CH₃ (2)',DL:'CH₃ (3)',DR:'H (4)'},{title:'Worked example · priority 4 is away'})+'<p>Br outranks C; ethyl outranks methyl because [C,H,H] beats [H,H,H]. H is away and 1 → 2 → 3 is clockwise: R.</p>',practiceIds:['CH5-F13','CH5-F14','CH5-F15'],coldIds:['CH5-F16','CH5-F17','CH5-F18'],source:CH5_FOUNDATION_SOURCES.rs},
+  {id:'ch5-fischer',topic:'fischer',title:'Read depth from a Fischer cross',sections:'5.4',goal:'Read, rotate and redraw a Fischer projection without reversing its configuration.',explain:'A Fischer cross encodes depth: horizontal bonds come toward you; vertical bonds go away. It is not an ordinary flat four-bond drawing.',steps:['Identify the four groups at each intersection.','Apply CIP priorities. A horizontal priority 4 requires reversing the apparent 1 → 2 → 3 turn.','Keep configuration when changing drawing style. A 180° page rotation preserves a Fischer; a 90° reinterpretation does not.'],exampleHtml:()=>ch5FFigure(ch5FFischerBody('CH₃','CH₂CH₃','H','Cl',true),'Depth made explicit · horizontal toward, vertical away',340,214)+'<p>H is horizontal, so it points toward you. Cl 1 → ethyl 2 → methyl 3 looks clockwise; reverse it to obtain S.</p>',practiceIds:['CH5-F19','CH5-F20','CH5-F21'],coldIds:['CH5-F22','CH5-F23','CH5-F24'],source:CH5_FOUNDATION_SOURCES.fischer}
+];
+
+/* Chapter 5, sections 5.5–5.11. Original outline-aligned practice, 2026-09-29.
+ * Instructor assessment scope has not been supplied. Sections 5.9–5.11 are
+ * explicitly preview material. All freehand responses use honest self-review.
+ * Original SVGs; no textbook figures or homework answer keys reproduced.
+ */
+const CH5_ADVANCED_SOURCES={
+  optical:'https://openstax.org/books/organic-chemistry/pages/5-3-optical-activity',
+  configuration:'https://openstax.org/books/organic-chemistry/pages/5-5-sequence-rules-for-specifying-configuration',
+  relationships:'https://openstax.org/books/organic-chemistry/pages/5-6-diastereomers',
+  meso:'https://openstax.org/books/organic-chemistry/pages/5-7-meso-compounds',
+  resolution:'https://openstax.org/books/organic-chemistry/pages/5-8-racemic-mixtures-and-the-resolution-of-enantiomers',
+  ez:'https://openstax.org/books/organic-chemistry/pages/7-5-alkene-stereochemistry-and-the-e-z-designation',
+  inversion:'https://openstax.org/books/organic-chemistry/pages/5-10-chirality-at-nitrogen-phosphorus-and-sulfur',
+  axial:'https://goldbook.iupac.org/terms/view/A00547',
+  atropisomers:'https://goldbook.iupac.org/terms/view/A00511/html',
+  conformers:'https://www2.chemistry.msu.edu/faculty/reusch/virttxtjml/sterism3.htm'
+};
+function ch5AEscape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function ch5ASvg(body,label,width=420,height=230){
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+ch5AEscape(label)+'" style="display:block;width:100%;height:auto;max-height:270px;margin:auto;color:#253943"><title>'+ch5AEscape(label)+'</title><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'+body+'</g></svg>';
+}
+function ch5AText(x,y,text,anchor='middle',size=23){return '<text x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" font-size="'+size+'" font-family="system-ui,sans-serif" fill="currentColor" stroke="none">'+ch5AEscape(text)+'</text>';}
+function ch5AFigure(svg,caption){return '<figure class="ch5-figure" style="margin:12px 0;padding:10px;border:1px solid #ccdadd;border-radius:12px;background:#fff;color:#253943">'+svg+'<figcaption style="font-size:.84rem;margin-top:5px;color:#4b626a">'+ch5AEscape(caption)+'</figcaption></figure>';}
+function ch5AFischer(left=['Cl','H'],right=['H','Cl'],top='CH₃',bottom='CH₂CH₃',label='Fischer projection',symmetry=false){
+  const body='<path d="M130 45V185M78 85H182M78 145H182"/>'+ch5AText(130,30,top)+ch5AText(130,212,bottom)+left.map((x,i)=>ch5AText(62,92+i*60,x,'end')).join('')+right.map((x,i)=>ch5AText(198,92+i*60,x,'start')).join('')+(symmetry?'<path d="M27 115H233" stroke="#167e88" stroke-dasharray="6 6"/>':'');
+  return ch5ASvg(body,label,260,228);
+}
+function ch5AFischerPair(leftA,rightA,leftB,rightB,bottom='CH₂CH₃'){
+  return '<div class="ch5-structure-pair" style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px"><div style="flex:1 1 210px;max-width:290px">'+ch5AFigure(ch5AFischer(leftA,rightA,'CH₃',bottom,'Fischer projection I'),'I · horizontal bonds toward you; vertical away')+'</div><div style="flex:1 1 210px;max-width:290px">'+ch5AFigure(ch5AFischer(leftB,rightB,'CH₃',bottom,'Fischer projection II'),'II · same Fischer convention')+'</div></div>';
+}
+// Order: upper-left, lower-left, upper-right, lower-right.
+function ch5AAlkene(groups,label='Alkene structure',priorities=false){
+  const body='<path d="M160 110H260M160 120H260M160 115L112 65M160 115L112 166M260 115L307 65M260 115L307 166"/>'+ch5AText(100,58,groups[0],'end')+ch5AText(100,185,groups[1],'end')+ch5AText(320,58,groups[2],'start')+ch5AText(320,185,groups[3],'start')+(priorities?'<path d="M80 29H354" stroke="#167e88" stroke-dasharray="6 6"/>':'');
+  return ch5ASvg(body,label,460,215);
+}
+function ch5AAllene(groups=['CH₃','H','CH₃','H']){
+  const body='<path d="M108 110H193M108 120H193M222 110H308M222 120H308M108 115L59 62M108 115L59 168"/><path d="M308 115L358 59L371 72Z" fill="currentColor"/><path d="M313 123L315 125M319 128L323 132M325 133L331 139M331 138L340 147M337 143L348 154M343 148L357 162"/>'+ch5AText(51,52,groups[0],'end')+ch5AText(51,188,groups[1],'end')+ch5AText(387,60,groups[2],'start')+ch5AText(380,187,groups[3],'start')+ch5AText(208,124,'C');
+  return ch5ASvg(body,'Allene: left end '+groups[0]+' and '+groups[1]+' in the page; right end '+groups[2]+' toward and '+groups[3]+' away; central carbon is linear',470,220);
+}
+function ch5AGauche(sign){
+  const point=(angle,r)=>{const a=angle*Math.PI/180;return [120+r*Math.cos(a),120+r*Math.sin(a)];};
+  const bond=(angle,rear)=>{const a=point(angle,rear?28:0),b=point(angle,73);return '<path d="M'+a.join(' ')+'L'+b.join(' ')+'" stroke="'+(rear?'#748991':'#14667b')+'"/>';};
+  const back=[-30,90,210],front=[-90,30,150],labels=[];
+  back.forEach((a,i)=>{const p=point(a,99);labels.push(ch5AText(p[0],p[1]+7,i===(sign>0?0:2)?'CH₃':'H'));});
+  front.forEach((a,i)=>{const p=point(a,99);labels.push(ch5AText(p[0],p[1]+7,i===0?'CH₃':'H'));});
+  return ch5ASvg(back.map(a=>bond(a,true)).join('')+'<circle cx="120" cy="120" r="28" stroke="#748991"/>'+front.map(a=>bond(a,false)).join('')+'<circle cx="120" cy="120" r="5" fill="#14667b"/>'+labels.join(''),'Gauche butane, rear methyl '+(sign>0?'clockwise':'counterclockwise')+' from front methyl',240,240);
+}
+function ch5AId(n){return 'CH5-A'+String(n).padStart(2,'0');}
+function ch5AQ(n,lesson,topic,type,diff,prompt,extra={}){
+  return Object.assign({id:ch5AId(n),chapter:5,courseRoute:'ch5',topic,type,diff,prompt,
+    adaptiveSkill:lesson,transferFamily:'ch5-advanced-'+n,
+    source:'Original Chapter 5 practice aligned to the supplied section outline; instructor quiz scope unconfirmed.',
+    sourceKind:'original-practice',eligibleForUnseenTransfer:true,scopeStatus:'outline-based',
+    reviewMode:type==='written'?'self-reviewed-paper':undefined},extra);
+}
+const CH5_ADVANCED_QUESTIONS=[
+  ch5AQ(1,'ch5-optical','stereoOptical','mc',1,'A pure compound is assigned <b>R</b>. What does this tell you about the sign of its optical rotation?',{
+    choices:['It must rotate light in the positive (+) direction.','It must rotate light in the negative (−) direction.','R alone does not determine (+) or (−).','It cannot rotate light.'],answer:2,
+    hints:['Configuration describes geometry; optical rotation is a measured property.'],why:'<b>R/S does not predict (+)/(−).</b> An R compound can have either sign. Its enantiomer has the opposite rotation under the same measurement conditions.',sourceUrl:CH5_ADVANCED_SOURCES.configuration}),
+  ch5AQ(2,'ch5-optical','stereoOptical','num',1,'A sample contains only two enantiomers: <b>70% R and 30% S</b>. What is its enantiomeric excess, as a percentage? Enter a number.',{
+    answer:40,tolerance:0,hints:['Subtract the smaller percentage from the larger.'],why:'ee = 70 − 30 = <b>40% ee in favor of R</b>. The R percentage is 70%; it is not the same as the excess.'}),
+  ch5AQ(3,'ch5-optical','stereoOptical','num',2,'A mixture of only R and S has <b>60% ee in favor of R</b>. What percentage of the mixture is R?',{
+    answer:80,tolerance:0,hints:['R + S = 100%, while R − S = 60%.'],why:'R = (100 + 60)/2 = <b>80%</b>; S = 20%. Check: 80 − 20 = 60% ee.'}),
+  ch5AQ(4,'ch5-optical','stereoOptical','num',2,'The observed rotation is <b>+12.0°</b>, the path length is <b>2.00 dm</b>, and the concentration is <b>0.100 g/mL</b>. Calculate the numerical value of the specific rotation using [α] = α/(l × c).',{
+    answer:60,tolerance:0.05,hints:['Use the supplied decimeters and g/mL directly.'],why:'[α] = +12.0/(2.00 × 0.100) = <b>+60.0</b> in the stated conventional units, °·mL·g⁻¹·dm⁻¹. Keep solvent, temperature, and wavelength fixed when comparing values.',sourceUrl:CH5_ADVANCED_SOURCES.optical}),
+  ch5AQ(5,'ch5-optical','stereoOptical','mc',1,'A solution has <b>zero observed optical rotation</b>. Which conclusion is justified by that observation alone?',{
+    choices:['Every molecule in it must be achiral.','It must contain only a single meso compound.','It might be a racemate or an achiral sample; the observation alone does not distinguish them.','It must contain only the R enantiomer.'],answer:2,
+    hints:['Equal rotations of opposite sign can cancel in a sample.'],why:'A racemate contains chiral molecules but has no net rotation. An achiral compound can also give zero rotation. <b>Optical inactivity is not proof that each molecule is achiral.</b>',sourceUrl:CH5_ADVANCED_SOURCES.resolution}),
+  ch5AQ(6,'ch5-optical','stereoOptical','num',3,'Under identical conditions, an enantiopure R sample rotates light <b>+30.0°</b>. A sample containing only R and S at the same total concentration rotates <b>+18.0°</b>. Assume rotation is proportional to composition. What is the <b>percentage ee</b>?',{
+    answer:60,tolerance:0.05,hints:['Divide the mixture rotation by the enantiopure rotation, then convert to percent.'],why:'ee = (18.0/30.0) × 100 = <b>60% in favor of R</b>, because R was explicitly measured to be (+) here. This corresponds to 80% R and 20% S, not 60% R.'}),
+  ch5AQ(7,'ch5-relationships','stereoRelations','mc',2,'What is the relationship between these two Fischer projections of <b>2,3-dichloropentane</b>?'+ch5AFischerPair(['Cl','H'],['H','Cl'],['H','Cl'],['Cl','H']),{
+    transferFamily:'ch5-dichloropentane-fischer',
+    choices:['Identical','Enantiomers','Diastereomers','Constitutional isomers'],answer:1,
+    hints:['The connectivity is unchanged. Compare each corresponding stereocenter.','The two ends of this chain are not identical.'],why:'Both stereocenters are inverted, and this unsymmetrical molecule has no meso equivalence. The pair are <b>nonsuperimposable mirror images: enantiomers</b>.',sourceUrl:CH5_ADVANCED_SOURCES.relationships}),
+  ch5AQ(8,'ch5-relationships','stereoRelations','mc',2,'What is the relationship between these two Fischer projections of <b>2,3-dichloropentane</b>?'+ch5AFischerPair(['Cl','H'],['H','Cl'],['Cl','Cl'],['H','H']),{
+    transferFamily:'ch5-dichloropentane-fischer',
+    choices:['Identical','Enantiomers','Diastereomers','Constitutional isomers'],answer:2,
+    hints:['One corresponding stereocenter stays the same; the other changes.'],why:'The top stereocenter stays the same and the bottom one changes. They have identical connectivity but are not mirror images: <b>diastereomers</b>.',sourceUrl:CH5_ADVANCED_SOURCES.relationships}),
+  ch5AQ(9,'ch5-relationships','stereoRelations','mc',2,'Classify this Fischer projection of <b>2,3-dichlorobutane</b>.'+ch5AFigure(ch5AFischer(['Cl','Cl'],['H','H'],'CH₃','CH₃','Fischer projection of 2,3-dichlorobutane'),'Both ends are CH₃. Horizontal bonds point toward you; vertical bonds away.'),{
+    choices:['Chiral because any two stereocenters guarantee chirality','Achiral and meso despite having two stereocenters','A racemic mixture of two molecules','Achiral because neither carbon is a stereocenter'],answer:1,
+    familiarRepresentation:true,eligibleForUnseenTransfer:false,sourceModelIds:['ch5-relationships-worked-meso'],
+    hints:['Check the whole molecule for symmetry, not just each individual carbon.'],why:'The two ends match, and this configuration has an internal symmetry plane. It is <b>one achiral meso compound</b>, not a 50:50 mixture. Each central carbon still has four different groups.',sourceUrl:CH5_ADVANCED_SOURCES.meso}),
+  ch5AQ(10,'ch5-relationships','stereoRelations','num',3,'How many distinct configurational stereoisomers does <b>2,3-dibromobutane</b>, CH₃–CH(Br)–CH(Br)–CH₃, have? Count the meso form only once.',{
+    answer:3,hints:['2ⁿ is an upper limit when symmetry can make nominal configurations identical.'],why:'There is one enantiomeric pair, (2R,3R)/(2S,3S), plus one meso form: <b>3 stereoisomers</b>. (2R,3S) and (2S,3R) describe the same meso compound.',sourceUrl:CH5_ADVANCED_SOURCES.meso}),
+  ch5AQ(11,'ch5-relationships','stereoRelations','mc',1,'Which comparison is generally correct for a pair of <b>pure enantiomers under identical achiral conditions</b>?',{
+    choices:['Same boiling point; equal-magnitude, opposite-sign optical rotations','Different boiling points; same-sign optical rotations','Always different solubilities in an achiral solvent','One must be meso'],answer:0,
+    hints:['A chiral environment can distinguish enantiomers; an achiral one cannot distinguish their handedness in this way.'],why:'Pure enantiomers have the same ordinary physical properties in an achiral environment, but opposite optical rotation under matched conditions. Interactions with chiral reagents or biological receptors can differ.',sourceUrl:CH5_ADVANCED_SOURCES.relationships}),
+  ch5AQ(12,'ch5-relationships','stereoRelations','written',3,'Draw the <b>mirror-image Fischer projection</b> of this 2,3-dichloropentane. Keep CH₃ at the top and CH₂CH₃ at the bottom. Label the pair’s relationship.'+ch5AFigure(ch5AFischer(['H','H'],['Cl','Cl']),'Starting Fischer projection; preserve every group.'),{
+    transferFamily:'ch5-dichloropentane-fischer',
+    requiresDrawing:true,answer:'Both Cl groups on the left and both H groups on the right; enantiomers.',
+    model:ch5AFigure(ch5AFischer(['Cl','Cl'],['H','H']),'Mirror image: both centers inverted.')+'<p>The pair are <b>enantiomers</b>. The unequal ends prevent the meso symmetry seen in 2,3-dichlorobutane.</p>',
+    rubric:['CH₃ stays at the top and CH₂CH₃ at the bottom','Both stereocenters switch left/right groups','All groups and carbon connectivity are retained','The pair is labeled enantiomers'],hints:['Reflect left and right at both crossings.'],why:'A mirror reflection inverts both stereocenters. This is a drawing self-review, not an automatic grade of your ink.',sourceUrl:CH5_ADVANCED_SOURCES.relationships}),
+  ch5AQ(13,'ch5-ez','stereoAlkenes','mc',2,'Assign <b>E or Z</b> to this alkene. Rank the two groups at each end separately.'+ch5AFigure(ch5AAlkene(['Br','Cl','CH₂CH₃','CH₃']),'Every group is shown; the two middle lines are the C=C bond.'),{
+    choices:['E','Z','Neither: E/Z is not defined'],answer:1,
+    hints:['On the left, compare atomic numbers. On the right, break the carbon tie at the next atoms.'],why:'Br outranks Cl. Ethyl outranks methyl because [C,H,H] beats [H,H,H]. The two higher-priority groups are on the same side: <b>Z</b>.',sourceUrl:CH5_ADVANCED_SOURCES.ez}),
+  ch5AQ(14,'ch5-ez','stereoAlkenes','mc',1,'Assign <b>E or Z</b> to this alkene.'+ch5AFigure(ch5AAlkene(['Cl','H','CH₃','Br']),'Rank the two groups on each carbon of the double bond.'),{
+    choices:['E','Z','Neither: E/Z is not defined'],answer:0,
+    hints:['The high-priority groups here are Cl and Br.'],why:'Cl outranks H on the left; Br outranks carbon on the right. The high-priority groups are on opposite sides: <b>E</b>.',sourceUrl:CH5_ADVANCED_SOURCES.ez}),
+  ch5AQ(15,'ch5-ez','stereoAlkenes','mc',1,'Can this alkene be assigned E or Z?'+ch5AFigure(ch5AAlkene(['H','H','CH₃','CH₂CH₃']),'Check whether each double-bond carbon has two different groups.'),{
+    choices:['Yes: E','Yes: Z','No: one double-bond carbon has two identical groups'],answer:2,
+    hints:['A meaningful higher/lower choice must exist at both ends.'],why:'The left carbon has H and H. Swapping them creates no different alkene geometry, so <b>E/Z is not defined</b>.',sourceUrl:CH5_ADVANCED_SOURCES.ez}),
+  ch5AQ(16,'ch5-ez','stereoAlkenes','mc',3,'On one alkene carbon, compare <b>–CH₂OH</b> with <b>–CH₂CH₃</b>. Which has higher CIP priority?',{
+    choices:['–CH₂CH₃, because it has more carbon atoms','–CH₂OH, because [O,H,H] outranks [C,H,H]','They tie because both begin with carbon','The group drawn higher on the page'],answer:1,
+    hints:['After the attached-carbon tie, compare its attached atoms in decreasing atomic-number order.'],why:'Both begin with carbon. Their next lists are [O,H,H] and [C,H,H]; O outranks C at the first difference. <b>Priority is not a count of total carbons or visual size.</b>',sourceUrl:CH5_ADVANCED_SOURCES.ez}),
+  ch5AQ(17,'ch5-ez','stereoAlkenes','written',2,'Draw <b>(Z)-pent-2-ene</b> (also written (Z)-2-pentene). Show all four groups around the double bond, then mark the higher-priority group on each end.',{
+    requiresDrawing:true,answer:'CH₃ and CH₂CH₃ on the same side of C=C; one H on each alkene carbon.',
+    model:ch5AFigure(ch5AAlkene(['CH₃','H','CH₂CH₃','H'],'Model of Z-pent-2-ene',true),'CH₃ and CH₂CH₃ are each higher priority than H; same side → Z.'),
+    rubric:['Five total carbons with the double bond between C2 and C3','One alkene carbon bears CH₃ and H; the other bears CH₂CH₃ and H','CH₃ and CH₂CH₃ are placed on the same side','The two carbon groups are marked as higher priority'],hints:['Draw C=C first and inventory the two groups on each carbon.','Z places the two higher-priority groups on the same side.'],why:'This tests constructing the geometry, not recognizing the letter. Rotating the entire drawing does not change Z.',sourceUrl:CH5_ADVANCED_SOURCES.ez}),
+  ch5AQ(18,'ch5-resolution','stereoResolution','mc',1,'<b>Preview · section 5.9.</b> Why can reacting a racemic acid with a <b>single-enantiomer chiral base</b> help separate its enantiomers?',{
+    choices:['It makes both acid enantiomers identical.','It forms diastereomeric salts, which can have different solubilities.','It removes all stereocenters permanently.','It guarantees a 100% yield of one acid enantiomer.'],answer:1,
+    preview:true,familiarRepresentation:true,eligibleForUnseenTransfer:false,sourceModelIds:['ch5-resolution-worked-salts'],hints:['Compare the acid R/base R combination with acid S/base R.'],why:'The resolving base has the same configuration in both salts, while the acid differs. The salts are <b>diastereomeric</b>, so their physical properties can differ enough for separation. Recovery of the acid then removes the resolving agent.',sourceUrl:CH5_ADVANCED_SOURCES.resolution}),
+  ch5AQ(19,'ch5-resolution','stereoResolution','written',2,'<b>Preview · section 5.9.</b> Sketch a three-stage resolution flow for a racemic acid: <b>make distinguishable salts → separate → recover the acid</b>. Use R-acid, S-acid, and one chiral base as labels; no reaction mechanism is required.',{
+    requiresDrawing:true,preview:true,answer:'R/S acid + one enantiomer of base → two diastereomeric salts → separate salts → regenerate enriched R and S acids.',
+    model:'<p><b>R-acid + S-acid</b><br>↓ add one enantiomer of a chiral base<br><b>R-acid/base salt + S-acid/base salt</b> (diastereomeric)<br>↓ separate, for example using differing solubilities<br><b>Separated salts</b><br>↓ regenerate each acid and remove the resolving base<br><b>Separated, enantiomer-enriched acid fractions</b></p>',
+    rubric:['Both starting acid enantiomers are represented','Only one base enantiomer is used as the resolving agent','The intermediate salts are identified as diastereomeric','A separation step occurs before the acids are regenerated','No claim that the resolving agent magically converts all starting material into one enantiomer'],hints:['The base is a temporary chiral partner that changes the relationship of the two products.'],why:'Resolution separates enantiomers; it does not necessarily convert one into the other. Actual purity and yield depend on the separation.',sourceUrl:CH5_ADVANCED_SOURCES.resolution}),
+  ch5AQ(20,'ch5-resolution','stereoResolution','mc',2,'<b>Preview · section 5.9.</b> A student proposes separating two enantiomers simply by ordinary distillation in an <b>achiral environment</b>. What is the central problem?',{
+    choices:['Enantiomers cannot ever be separated.','Their boiling points are the same under these conditions.','Distillation changes every R center into S.','One enantiomer must already be meso.'],answer:1,
+    preview:true,hints:['The two molecules need a chiral interaction or another suitable resolution method to be distinguished.'],why:'Ordinary distillation cannot exploit a boiling-point difference that pure enantiomers do not have under identical achiral conditions. Chiral chromatography or conversion to diastereomeric derivatives can provide discrimination.',sourceUrl:CH5_ADVANCED_SOURCES.resolution}),
+  ch5AQ(21,'ch5-dynamic','stereoDynamic','mc',2,'<b>Preview · section 5.10.</b> An ordinary neutral amine has three different groups on pyramidal nitrogen. Why are its mirror-image forms usually not isolable at room temperature?',{
+    choices:['Nitrogen must be planar at all times.','Rapid pyramidal inversion interconverts the forms.','Every molecule with nitrogen is achiral.','The C–N bonds must permanently break apart.'],answer:1,
+    preview:true,familiarRepresentation:true,eligibleForUnseenTransfer:false,sourceModelIds:['ch5-dynamic-worked-amine'],hints:['Think of an umbrella turning inside out.'],why:'Most ordinary trivalent amines undergo fast pyramidal inversion through a near-planar nitrogen geometry. This interconverts the mirror-image forms too rapidly for ordinary isolation. Special constrained systems and other nitrogen types can behave differently.',sourceUrl:CH5_ADVANCED_SOURCES.inversion}),
+  ch5AQ(22,'ch5-dynamic','stereoDynamic','mc',2,'<b>Preview · section 5.11.</b> This is <b>2,3-pentadiene</b>, an allene. Each terminal double-bond carbon has H and CH₃. Can it be chiral despite having no tetrahedral carbon with four different groups?'+ch5AFigure(ch5AAllene(),'C=C=C: terminal group planes are perpendicular. Solid wedge = toward you; hashed wedge = away.'),{
+    choices:['No; all chirality requires a tetrahedral carbon center.','Yes; the perpendicular ends can create axial chirality.','No; all double-bonded compounds are flat.','Yes; its central carbon is a tetrahedral stereocenter.'],answer:1,
+    preview:true,familiarRepresentation:true,eligibleForUnseenTransfer:false,sourceModelIds:['ch5-dynamic-worked-allene'],hints:['Chirality is a property of the whole three-dimensional structure.'],why:'With different groups at each terminal carbon, this allene has <b>axial chirality</b>. The central carbon is linear (sp), not a tetrahedral stereocenter. Not every allene is chiral; identical groups at either end remove this simple axial chirality.',sourceUrl:CH5_ADVANCED_SOURCES.axial}),
+  ch5AQ(23,'ch5-dynamic','stereoDynamic','mc',3,'<b>Preview · sections 5.10–5.11.</b> Two nonsuperimposable mirror-image conformers are connected by rotation about one bond. What additional fact determines whether they can be isolated as separate forms?',{
+    choices:['Whether their names contain the letter R','Whether interconversion is sufficiently slow under the conditions of separation','Whether they have different molecular formulas','Whether the drawing is clockwise'],answer:1,
+    preview:true,hints:['A shape can be chiral without remaining in that shape long enough to isolate it.'],why:'The rotational barrier, temperature, and experimental timescale matter. Isolable conformers caused by restricted single-bond rotation are called <b>atropisomers</b>. Merely drawing a twisted structure does not establish configurational stability.',sourceUrl:CH5_ADVANCED_SOURCES.atropisomers}),
+  ch5AQ(24,'ch5-resolution','stereoResolution','mc',2,'<b>Preview · section 5.9.</b> Why can a <b>chiral chromatography column</b> sometimes separate a racemate even when an otherwise comparable achiral column cannot?',{
+    choices:['The enantiomers acquire different molecular formulas.','The enantiomers can interact differently with the chiral stationary phase.','The column always converts all S molecules to R.','Optical rotation makes one molecule heavier.'],answer:1,
+    preview:true,hints:['Compare a left glove and a right glove interacting with the same right hand.'],why:'A chiral stationary phase offers a handed environment. The two enantiomers can form different transient interactions and therefore travel through the column at different rates. This is a separation, not a change of molecular formula.',sourceUrl:CH5_ADVANCED_SOURCES.resolution}),
+  ch5AQ(25,'ch5-dynamic','stereoDynamic','mc',2,'<b>Preview · section 5.11.</b> Does this simple allene have axial chirality?'+ch5AFigure(ch5AAllene(['H','H','CH₃','Br']),'The left terminal carbon has two H atoms; the right has CH₃ and Br.'),{
+    choices:['Yes: every allene is chiral.','No: the two identical groups at the left end remove this axial chirality.','Yes: bromine alone makes a molecule chiral.','No: the center carbon is tetrahedral.'],answer:1,
+    preview:true,hints:['For this simple allene, each end must have two different groups.'],why:'The left end contains H/H, so this molecule lacks the axial chirality of the different-groups-at-both-ends example. The central carbon is still linear; its hybridization is not changed by the substituent choice.',sourceUrl:CH5_ADVANCED_SOURCES.axial}),
+  ch5AQ(26,'ch5-dynamic','stereoDynamic','mc',2,'<b>Preview · section 5.10; bridge from Chapter 4.</b> These gauche conformations of butane are nonsuperimposable mirror images. Why are they not ordinarily collected in separate bottles at room temperature?'+
+    '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center"><div style="flex:1 1 210px;max-width:280px">'+ch5AFigure(ch5AGauche(1),'Gauche · rear CH₃ clockwise from front CH₃')+'</div><div style="flex:1 1 210px;max-width:280px">'+ch5AFigure(ch5AGauche(-1),'Gauche · rear CH₃ counterclockwise from front CH₃')+'</div></div>',{
+    choices:['They rapidly interconvert by rotation about the central C–C bond.','Mirror images must always have different molecular formulas.','One drawing is an alkene.','Their interconversion would require breaking a C–C bond.'],answer:0,
+    preview:true,hints:['A chiral conformation is not necessarily a long-lived, isolable configuration.'],why:'The two gauche structures are conformational enantiomers, but ordinary C–C bond rotation rapidly interconverts them (and other butane conformations). This is not a pair of stable, separately isolable carbon configurations at room temperature.',sourceUrl:CH5_ADVANCED_SOURCES.conformers})
+];
+const CH5_ADVANCED_LESSONS=[
+  {id:'ch5-optical',topic:'stereoOptical',title:'Optical rotation and mixtures',sections:['5.5','5.8'],minutes:10,
+    goal:'Separate configuration from rotation, then calculate mixture composition without confusing percent R with percent ee.',
+    explain:'R/S describes configuration; (+)/(−) comes from measurement. A racemate is 50:50 and its opposite rotations cancel. For a mixture containing only two enantiomers, ee is the difference between their percentages.',
+    steps:['Record what the question gives: configuration, measured rotation, composition, or ee.','Use ee = |%R − %S|. Recover the majority percentage with (100 + ee)/2.','For specific rotation, use [α] = α/(l × c), with the stated units and conditions.'],
+    exampleHtml:()=>'<p><b>75% R + 25% S</b> gives <b>50% ee in favor of R</b>. Half the sample can be paired into a racemic portion; the remaining half is excess R.</p><p>That does not tell you the sign of rotation. R must be measured or supplied as (+) or (−).</p>',
+    practiceIds:[1,2,3].map(ch5AId),coldIds:[4,5,6].map(ch5AId),sourceUrls:[CH5_ADVANCED_SOURCES.optical,CH5_ADVANCED_SOURCES.configuration,CH5_ADVANCED_SOURCES.resolution]},
+  {id:'ch5-relationships',topic:'stereoRelations',title:'Same, mirror-image, or diastereomer?',sections:['5.6'],minutes:12,
+    goal:'Compare structures atom by atom and catch the meso exception before labeling a pair.',
+    explain:'First compare connectivity, then three-dimensional arrangement. Enantiomers are nonsuperimposable mirror images; diastereomers are stereoisomers that are not mirror images. A meso compound is one achiral compound with stereocenters—not a mixture.',
+    steps:['Check that the atoms are connected in the same order.','Match corresponding stereocenters before comparing their configurations.','Check whole-molecule symmetry and superimposability; do not blindly apply “all centers flipped”.'],
+    exampleHtml:()=>ch5AFigure(ch5AFischer(['Cl','Cl'],['H','H'],'CH₃','CH₃','Meso 2,3-dichlorobutane with a symmetry plane',true),'Matching ends plus the shown configuration give an internal symmetry plane.')+'<p>This is <b>meso-2,3-dichlorobutane</b>: two stereocenters, but an achiral whole molecule. Replacing one end with ethyl removes this particular symmetry.</p>',
+    practiceIds:[7,9].map(ch5AId),coldIds:[8,10,11,12].map(ch5AId),sourceUrls:[CH5_ADVANCED_SOURCES.relationships,CH5_ADVANCED_SOURCES.meso]},
+  {id:'ch5-ez',topic:'stereoAlkenes',title:'Read and draw E/Z alkenes',sections:['5.7'],minutes:10,
+    goal:'Choose one higher-priority group at each alkene carbon, then read or draw their relative sides.',
+    explain:'E/Z uses CIP priority, not group size or whatever looks most similar. Each double-bond carbon must have two different groups. Same side for the two higher-priority groups is Z; opposite sides is E.',
+    steps:['Inventory the two groups on each alkene carbon. If either pair is identical, stop: no E/Z.','Rank each pair independently using atomic number, then the first point of difference.','Compare the two winners across the double bond: same side Z, opposite sides E.'],
+    exampleHtml:()=>ch5AFigure(ch5AAlkene(['CH₃','H','H','CH₂CH₃'],'E-pent-2-ene worked example'),'CH₃ is higher than H on the left; ethyl is higher than H on the right.')+'<p>The two higher-priority groups are opposite, so this drawing is <b>E</b>. Drawing it upside down would not change that relationship.</p>',
+    practiceIds:[13,15].map(ch5AId),coldIds:[14,16,17].map(ch5AId),sourceUrls:[CH5_ADVANCED_SOURCES.ez]},
+  {id:'ch5-resolution',topic:'stereoResolution',title:'Preview: separating enantiomers',sections:['5.9'],minutes:7,preview:true,
+    goal:'Explain why a chiral partner can make enantiomers separable.',
+    explain:'This later-section preview is not a confirmed quiz requirement. A racemate can be resolved by a method that distinguishes handedness. One approach temporarily combines each enantiomer with the same chiral partner to form diastereomers.',
+    steps:['Start with a mixture of both enantiomers.','Use one enantiomer of a suitable chiral resolving agent; the products are diastereomeric.','Separate the products, then recover the original compounds without losing their configuration.'],
+    exampleHtml:()=>'<p><b>R-acid + R-base</b> and <b>S-acid + R-base</b> are not mirror-image salts: the base stayed R while the acid changed. They are <b>diastereomeric salts</b>, so their solubilities may differ.</p><p>Separation and recovery are still required; adding the base alone does not finish the resolution. Another approach is a chiral chromatography column, whose handed stationary phase can interact differently with the two enantiomers.</p>',
+    practiceIds:[18,20].map(ch5AId),coldIds:[19,24].map(ch5AId),sourceUrls:[CH5_ADVANCED_SOURCES.resolution]},
+  {id:'ch5-dynamic',topic:'stereoDynamic',title:'Preview: chirality beyond carbon centers',sections:['5.10','5.11'],minutes:8,preview:true,
+    goal:'Separate “chiral shape” from “isolable form” and recognize that a carbon stereocenter is not required for chirality.',
+    explain:'These later-section previews are not confirmed quiz requirements. Some mirror-image shapes interconvert rapidly, so they cannot be isolated under ordinary conditions. Other molecules are chiral because of an axis or an overall twist rather than a tetrahedral carbon center.',
+    steps:['Ask whether the complete 3-D structure is superimposable on its mirror image.','If the shapes interconvert, consider the barrier and timescale before claiming they can be isolated.','For a simple allene, check that each end has two different groups and remember that the terminal planes are perpendicular.'],
+    exampleHtml:()=>ch5AFigure(ch5AAllene(),'A substituted allene can be chiral without a tetrahedral carbon stereocenter.')+'<p>In contrast, an ordinary neutral amine with three different groups can invert so rapidly that its mirror-image pyramids cannot be isolated at room temperature. Geometry and persistence are separate questions.</p>',
+    practiceIds:[21,22].map(ch5AId),coldIds:[23,25,26].map(ch5AId),sourceUrls:[CH5_ADVANCED_SOURCES.inversion,CH5_ADVANCED_SOURCES.axial,CH5_ADVANCED_SOURCES.atropisomers,CH5_ADVANCED_SOURCES.conformers]}
+];
+
+/* Chapter 5 preparation, 2026-09-29. Original outline-aligned practice, not an
+ * instructor quiz blueprint. Opening a lesson never records an attempt. */
+const CH5_LESSONS=[...CH5_FOUNDATION_LESSONS,...CH5_ADVANCED_LESSONS];
+const CH5_QUESTIONS=[...CH5_FOUNDATION_QUESTIONS,...CH5_ADVANCED_QUESTIONS];
+const CH5_TOPICS=[...new Set(CH5_LESSONS.map(u=>u.topic))];
+CH5_LESSONS.forEach(u=>{TOPICS[u.topic]={name:u.title,ico:'🪞'};});
+CHAPTERS.push({id:'ch5',ico:'🪞',name:'Chapter 5 — Stereoisomerism',sub:'Prep path · sections 5.1–5.11 · assessment scope unconfirmed',topics:CH5_TOPICS});
+CHAPTER_LEARNING_UNITS.ch5=CH5_LESSONS;
+QUESTIONS.push(...CH5_QUESTIONS);
+
+function ch5Unit(id){return CH5_LESSONS.find(u=>u.id===id);}
+function ch5IsRun(D){return D?.learnReturn?.chapter==='ch5'||D?.learningAdaptive?.chapter==='ch5';}
+function ch5Attempts(unit){
+  const ids=new Set(unit?[...unit.practiceIds,...unit.coldIds]:CH5_QUESTIONS.map(q=>q.id));
+  return (S.attempts||[]).filter(a=>ids.has(a.id));
+}
+function ch5Signal(unit){
+  const rows=ch5Attempts(unit),latest=new Map();rows.forEach(a=>latest.set(a.id,a));
+  const values=[...latest.values()],repair=values.some(a=>!a.ok||a.g||a.dk||a.rf);
+  const cold=values.filter(a=>a.c&&!a.sr&&!a.g&&!a.dk&&!a.rf&&!a.h&&a.ok).length;
+  return {rows,seen:latest.size,repair,cold,label:!rows.length?'Not yet assessed':repair?'Revisit a step':cold?'Building independent evidence':'Practice started'};
+}
+function ch5NextUnit(){
+  return CH5_LESSONS.find(u=>ch5Signal(u).repair)||CH5_LESSONS.find(u=>!ch5Signal(u).cold)||CH5_LESSONS[0];
+}
+function ch5OpenUnit(id,step=0){
+  if(!ch5Unit(id))return;
+  courseNavigationSaveWork();S.learnCh='ch5';S.learnUnit=id;S.learnTopic=null;S.ch5LessonStep=step;go('allLearn');
+}
+function startCh5Lesson(id,phase='practice'){
+  const u=ch5Unit(id);if(!u)return;
+  const cold=phase==='check',ids=cold?u.coldIds:u.practiceIds;
+  const queue=ids.map(id=>QUESTIONS.find(q=>q.id===id));
+  if(!queue.length||queue.some(q=>!q))throw Error('Missing Chapter 5 lesson question');
+  parkCurrentDrill();S.learnCh='ch5';S.learnUnit=id;
+  S.drill={queue,i:0,right:0,wrong:0,topic:u.topic,answered:false,log:[],runId:makeRunId('ch5-'+phase),scopeName:'Chapter 5 · '+u.title,cold,learnReturn:{chapter:'ch5',unit:id,phase},sketchDrafts:{},reasoningDrafts:{}};
+  snapshotDrill(0);save();go('drill');
+}
+function startCh5Adaptive(){
+  // Every skill stays represented. The shared engine rotates within each skill,
+  // responds to errors, and periodically returns to foundations.
+  const slots=CH5_LESSONS.map(u=>({label:u.title,poolIds:[...u.practiceIds,...u.coldIds]}));
+  slots.push({label:'a foundation check',poolIds:CH5_QUESTIONS.filter(q=>q.diff===1).map(q=>q.id)});
+  S.learnCh='ch5';
+  return startAdaptiveLearning({chapter:'ch5',poolIds:CH5_QUESTIONS.map(q=>q.id),total:slots.length,slots,rotationKey:'ch5-outline-prep',label:'Chapter 5 · adaptive mixed practice'});
+}
+function startCh5Coverage(){
+  const rows=S.attempts||[],seen=new Set(rows.map(a=>a.id));
+  const ids=CH5_LESSONS.map(u=>u.coldIds.find(id=>!seen.has(id))||[...u.coldIds].sort((a,b)=>(rows.filter(x=>x.id===a).at(-1)?.ts||0)-(rows.filter(x=>x.id===b).at(-1)?.ts||0))[0]);
+  parkCurrentDrill();S.learnCh='ch5';
+  S.drill={queue:ids.map(id=>QUESTIONS.find(q=>q.id===id)),i:0,right:0,wrong:0,topic:'__ch5_check',answered:false,log:[],runId:makeRunId('ch5-coverage'),scopeName:'Chapter 5 · no-hint coverage check',cold:true,learnReturn:{chapter:'ch5',unit:null,phase:'check'},sketchDrafts:{},reasoningDrafts:{}};
+  snapshotDrill(0);save();go('drill');
+}
+function ch5Actions(){return el('div',{class:'ch5-actions'});}
+function ch5Button(label,fn,secondary=false,attrs={}){return el('button',{class:'btn'+(secondary?' ghost':''),type:'button',...attrs,onclick:fn},label);}
+function renderCh5Library(v){
+  const next=ch5NextUnit(),rows=ch5Attempts(),distinct=new Set(rows.map(a=>a.id)).size;
+  const head=el('section',{class:'card ch5-hero','data-ch5-library':'true'});
+  head.innerHTML='<span class="qp-eyebrow">NEXT CHAPTER · YOUR CHAPTER 4 FOCUS IS UNCHANGED</span><h1>Chapter 5 — Stereoisomerism</h1><p>Same atoms. Different arrangements. Learn to read them, draw them, and explain the difference.</p>';
+  const scope=el('details',{class:'ch5-scope'});scope.innerHTML='<summary>Scope &amp; how your progress is measured</summary><p>Built from your supplied sections 5.1–5.11. These are original practice problems, not copied homework or a confirmed Ciesla quiz blueprint. No Chapter 5 deadline is assumed.</p><p>Reading is exposure. Guessed, hinted, repeated and self-reviewed answers stay distinguishable. Freehand work is saved in normal mode and checked by you against a rubric—not automatically graded. No exam score or mastery claim is inferred from this small bank.</p>';
+  head.appendChild(scope);
+  const resume=ch5IsRun(S.drill)?S.drill:null,saved=S.pausedDrill&&(S.pausedDrill.learnReturn?.chapter==='ch5'||S.pausedDrill.learningAdaptive?.chapter==='ch5');
+  const action=ch5Actions();
+  action.appendChild(ch5Button(saved||resume?'Resume Chapter 5 practice':'Start here · '+next.title,()=>saved?resumeDrill():resume?go('drill'):ch5OpenUnit(next.id),false,{'data-ch5-next':'true'}));
+  action.appendChild(ch5Button('Mixed practice',startCh5Adaptive,true,{'data-ch5-adaptive':'true'}));head.appendChild(action);
+  head.appendChild(el('p',{class:'muted ch5-evidence'},distinct?distinct+' / '+CH5_QUESTIONS.length+' distinct tasks attempted · includes repeats and self-review in the history.':'Not yet assessed · '+CH5_QUESTIONS.length+' original tasks across '+CH5_LESSONS.length+' lessons.'));
+  v.appendChild(head);
+  const grid=el('div',{class:'ch5-grid'});
+  CH5_LESSONS.forEach((u,i)=>{
+    const state=ch5Signal(u),b=el('button',{type:'button',class:'ch5-lesson-card','data-ch5-unit':u.id,onclick:()=>ch5OpenUnit(u.id)});
+    b.appendChild(el('span',{class:'ch5-card-meta'},'LESSON '+(i+1)+' · § '+u.sections));
+    b.appendChild(el('strong',{},u.title));b.appendChild(el('span',{},u.goal));b.appendChild(el('small',{},state.label+' →'));grid.appendChild(b);
+  });v.appendChild(grid);
+  const footer=ch5Actions();footer.appendChild(ch5Button('← Chapter 4 quiz prep',()=>courseNavigationGo('quiz'),true));footer.appendChild(ch5Button('All chapters',()=>courseNavigationGo('overview'),true));v.appendChild(footer);
+}
+function renderCh5Lesson(v,u){
+  const index=CH5_LESSONS.indexOf(u),step=Math.max(0,Math.min(2,S.ch5LessonStep||0));
+  v.appendChild(ch5Button('← Chapter 5 lessons',()=>courseNavigationGo('ch5'),true));
+  const card=el('article',{class:'card ch5-lesson','data-ch5-lesson':u.id});
+  card.innerHTML='<span class="qp-eyebrow">CHAPTER 5 · LESSON '+(index+1)+' / '+CH5_LESSONS.length+' · § '+esc(u.sections)+'</span><h1>'+esc(u.title)+'</h1><p class="ch5-goal">'+esc(u.goal)+'</p>';
+  const tabs=el('div',{class:'ch5-steps','aria-label':'Lesson steps'});
+  ['1 · The rule','2 · Worked example','3 · Your turn'].forEach((label,i)=>tabs.appendChild(ch5Button(label,()=>{S.ch5LessonStep=i;render();},true,{'aria-pressed':String(step===i),'data-ch5-step':String(i)})));card.appendChild(tabs);
+  const body=el('section',{class:'ch5-step-body'});
+  if(step===0){
+    body.innerHTML='<h2>The idea</h2><p>'+esc(u.explain)+'</p><ol>'+u.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>';
+    body.appendChild(ch5Button('See it on a structure →',()=>{S.ch5LessonStep=1;render();}));
+  }else if(step===1){
+    body.innerHTML='<h2>Follow the worked example</h2>'+u.exampleHtml();
+    body.appendChild(ch5Button('Now I’ll try →',()=>{S.ch5LessonStep=2;render();}));
+  }else{
+    body.innerHTML='<h2>Read it → draw it → check it</h2><p>Try '+u.practiceIds.length+' tasks with optional hints. Then use '+u.coldIds.length+' different tasks without hints. Use paper or the expandable drawing canvas; extra written notes are optional.</p>';
+    const row=ch5Actions();row.appendChild(ch5Button('Practice · '+u.practiceIds.length+' tasks',()=>startCh5Lesson(u.id),false,{'data-ch5-practice':u.id}));row.appendChild(ch5Button('No-hint check · '+u.coldIds.length+' tasks',()=>startCh5Lesson(u.id,'check'),true,{'data-ch5-check':u.id}));body.appendChild(row);
+    body.appendChild(el('p',{class:'muted'},'A repeat is retrieval practice, not a fresh test. Drawings use honest self-review against the model and rubric.'));
+  }
+  card.appendChild(body);
+  const sources=(u.sourceUrls||[u.source]).filter(Boolean);
+  if(sources.length){
+    const refs=el('details',{class:'ch5-scope'});refs.appendChild(el('summary',{},'Chemistry references · optional'));
+    refs.appendChild(el('p',{},'Section numbers above follow your chapter outline. These supplementary references may use different chapter numbers.'));
+    sources.forEach((url,i)=>{const link=el('a',{href:url,target:'_blank',rel:'noopener',style:'display:block;margin:8px 0'},'Reference '+(i+1)+' · '+(url.includes('openstax.org')?'OpenStax Organic Chemistry':url.includes('iupac.org')?'IUPAC Gold Book':'Michigan State University'));refs.appendChild(link);});card.appendChild(refs);
+  }
+  v.appendChild(card);
+}
+function renderCh5Result(v,D){
+  const u=ch5Unit(D.learnReturn?.unit),rows=D.log||[],manual=rows.filter(a=>a.sr).length,flagged=rows.filter(a=>a.g||a.dk||a.h||a.rf).length;
+  const card=el('section',{class:'card ch5-result','data-ch5-result':'true'});
+  card.innerHTML='<span class="qp-eyebrow">CHAPTER 5 · '+(D.cold?'NO-HINT CHECK':'PRACTICE')+' COMPLETE</span><h1>'+D.right+' / '+D.queue.length+' tasks marked correct</h1><p>'+manual+' self-reviewed drawing/written tasks · '+flagged+' tasks with hints, uncertainty or review flags. This is practice evidence, not a predicted grade or certified mastery.</p>';
+  const actions=ch5Actions();
+  if(rows.length)actions.appendChild(ch5Button('Review my answers & explanations',()=>{D.reviewIdx=0;render();},true));
+  if(u&&!D.cold)actions.appendChild(ch5Button('Try different questions without hints →',()=>startCh5Lesson(u.id,'check')));
+  else if(u){const next=CH5_LESSONS[CH5_LESSONS.indexOf(u)+1];actions.appendChild(ch5Button(D.wrong?'Revisit this worked example':next?'Next lesson →':'Chapter 5 overview',()=>D.wrong?ch5OpenUnit(u.id,1):next?ch5OpenUnit(next.id):courseNavigationGo('ch5')));}
+  else actions.appendChild(ch5Button('Return to my Chapter 5 path',()=>courseNavigationGo('ch5')));
+  actions.appendChild(ch5Button('Chapter 5 lessons',()=>courseNavigationGo('ch5'),true));card.appendChild(actions);v.appendChild(card);
+}
+const CH5_PREVIOUS_VIEWS={learn:VIEWS.learn,allLearn:VIEWS.allLearn,drill:VIEWS.drill,home:VIEWS.home,practice:VIEWS.practice,exam:VIEWS.exam};
+['learn','allLearn'].forEach(view=>{VIEWS[view]=v=>{
+  if(S.learnCh!=='ch5'){CH5_PREVIOUS_VIEWS[view](v);return;}
+  const unit=ch5Unit(S.learnUnit);if(unit)renderCh5Lesson(v,unit);else renderCh5Library(v);
+};});
+VIEWS.drill=v=>{
+  const D=S.drill;
+  if(ch5IsRun(D))S.learnCh='ch5';
+  if(ch5IsRun(D)&&D.reviewIdx==null){
+    if(D.i>=D.queue.length){renderCh5Result(v,D);return;}
+    const bar=el('div',{class:'qp-context'});bar.appendChild(ch5Button('← Save & return to Chapter 5',()=>courseNavigationGo('ch5'),true));bar.appendChild(el('span',{},D.scopeName));v.appendChild(bar);
+  }
+  CH5_PREVIOUS_VIEWS.drill(v);
+};
+VIEWS.home=v=>{
+  S.learnCh=null;S.learnUnit=null;S.learnTopic=null;
+  CH5_PREVIOUS_VIEWS.home(v);
+  if(typeof PROFILE!=='undefined'&&!PROFILE)return;
+  const next=el('section',{class:'ch5-home-link'});
+  next.appendChild(el('span',{},'Looking ahead? Chapter 5 is ready when you are.'));
+  next.appendChild(ch5Button('Open stereochemistry prep →',()=>courseNavigationGo('ch5'),true));v.appendChild(next);
+};
+VIEWS.practice=v=>S.learnCh==='ch5'?renderCh5Library(v):CH5_PREVIOUS_VIEWS.practice(v);
+VIEWS.exam=v=>{
+  if(S.learnCh!=='ch5'){CH5_PREVIOUS_VIEWS.exam(v);return;}
+  const card=el('section',{class:'card ch5-hero'});
+  card.innerHTML='<span class="qp-eyebrow">CHAPTER 5 · CHECK WITHOUT HINTS</span><h1>Can I apply it on my own?</h1><p>One task from each lesson, including the later-section previews. Unattempted check items come first. This is an outline-coverage sample, not Ciesla’s quiz or a grade prediction. Answer feedback appears as you go; explanations wait until the end.</p>';
+  card.appendChild(ch5Button('Start '+CH5_LESSONS.length+'-task coverage check',startCh5Coverage,false,{'data-ch5-coverage':'true'}));card.appendChild(ch5Button('Choose one lesson instead',()=>courseNavigationGo('ch5'),true));v.appendChild(card);
+};
+const ch5PreviousOpenUnit=openLearningUnit;
+openLearningUnit=(chapter,unit)=>chapter==='ch5'?ch5OpenUnit(unit):ch5PreviousOpenUnit(chapter,unit);
+const ch5PreviousStartLesson=startLessonPractice;
+startLessonPractice=(chapter,unit)=>chapter==='ch5'?startCh5Lesson(unit):ch5PreviousStartLesson(chapter,unit);
+const ch5PreviousRenderNav=renderNav;
+renderNav=()=>{
+  ch5PreviousRenderNav();
+  const active=S.view==='allLearn'&&S.learnCh==='ch5'?'learn':S.view==='drill'&&ch5IsRun(S.drill)?(S.drill.cold?'exam':'practice'):null;
+  if(active)document.querySelectorAll('#nav button').forEach((b,i)=>{const selected=NAV[i]?.id===active;b.classList.toggle('active',selected);if(selected)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+};
+
+const ch5Style=document.createElement('style');ch5Style.id='ch5-prep-style';
+ch5Style.textContent=`
+.ch5-hero h1,.ch5-lesson h1,.ch5-result h1{font-size:clamp(1.3rem,2.8vw,1.85rem);line-height:1.2;margin:10px 0}.ch5-hero p,.ch5-lesson p{line-height:1.55}.ch5-scope{font-size:.84rem;margin:12px 0;color:#49606b}.ch5-scope summary{cursor:pointer;min-height:34px}.ch5-actions,.ch5-steps{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.ch5-actions .btn{margin:0}.ch5-evidence{font-size:.84rem}.ch5-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.ch5-lesson-card{font:inherit;display:flex;flex-direction:column;gap:9px;text-align:left;background:#fff;border:1px solid #c8d7dc;border-radius:14px;padding:18px;cursor:pointer;color:#263e48;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}.ch5-lesson-card strong{font-size:1.02rem}.ch5-lesson-card>span:not(.ch5-card-meta){font-size:.87rem;line-height:1.4}.ch5-card-meta,.ch5-lesson-card small{font-size:.73rem;color:#526979}.ch5-lesson-card small{margin-top:auto;font-weight:700}.ch5-card-meta{letter-spacing:.035em;font-weight:700}.ch5-lesson{margin-top:12px}.ch5-goal{color:#46616d}.ch5-steps .btn{font-size:.85rem;flex:1;min-width:130px}.ch5-steps button.btn.ghost[aria-pressed=true],.ch5-steps button.btn.ghost[aria-pressed=true]:hover{background:#176c72;color:white;border-color:#176c72;box-shadow:inset 0 -3px 0 #0c4148}.ch5-step-body{border-top:1px solid #d7e2e6;padding-top:10px}.ch5-step-body h2{font-size:1.15rem}.ch5-step-body li{margin:10px 0;line-height:1.45}.ch5-step-body figure{margin:12px 0}.ch5-step-body svg{display:block;max-width:100%;max-height:310px;margin:auto}.ch5-home-link{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.85rem;padding:10px 4px 24px;color:#506470}.ch5-home-link .btn{font-size:.85rem}.ch5-lesson-card:focus-visible,.ch5-steps .btn:focus-visible{outline:3px solid #e5a529;outline-offset:3px}
+@media(hover:hover){.ch5-lesson-card:hover{transform:translateY(-2px);border-color:#217f85;box-shadow:0 5px 16px #1b536114}}
+@media(max-width:600px){.ch5-grid{grid-template-columns:1fr}.ch5-actions>.btn{width:100%}.ch5-steps{gap:6px}.ch5-steps .btn{min-width:0;padding:9px 5px;font-size:.76rem}.ch5-step-body svg{max-height:260px}.ch5-home-link .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.ch5-lesson-card{transition:none}.ch5-lesson-card:hover{transform:none}}
+`;
+document.head.appendChild(ch5Style);
+const ch5Linked=new URLSearchParams(location.search);
+if(ch5Linked.get('chapter')==='ch5'||ch5Unit(ch5Linked.get('lesson'))){S.view='allLearn';S.learnCh='ch5';S.learnUnit=ch5Unit(ch5Linked.get('lesson'))?.id||null;S.learnTopic=null;S.ch5LessonStep=0;}
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
