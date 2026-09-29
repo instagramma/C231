@@ -6,7 +6,14 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.96
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.97
+  v3.97 (2026-09-28): LOCAL ADAPTIVE PRACTICE. Shared evidence-aware routing,
+  twelve tiered naming/drawing tasks, specific construction feedback, pointer
+  placement repairs and hold-to-straighten ink. Existing history preserved.
+  Authored difficulty is heuristic; no mastery or quiz-score guarantee. Not published.
+  v3.96.1 (2026-09-28): LOCAL FEEDBACK REPAIR. Chair choices visibly selected;
+  optional reasoning beside answer controls, saved in drafts and immutable attempts.
+  Existing records preserved. Not published by this update.
   v3.96 (2026-09-28): LOCAL HOMEWORK WORKSPACE. Audited all 137 Chapter 4
   questions, restored 43 lesson mappings, added mouse/touch Newman placement,
   compact question-first layout and separate Quiz A/B practice. Quiz B has a
@@ -204,7 +211,7 @@
         widths. Added a three-state, molecule-shaped vitamin-C walkthrough and two consecutive
         checked ascorbate transformations: O3− → C2−, then C2− → carbonyl O1−. Each transition
         requires two arrows and an exact contributor audit. Existing questions remain intact.
-        Local official and upload copies are ready; DEPLOY PENDING.
+        Public v3.96 (deployed 2026-09-28 21:17 PDT, commit ddee053; both Pages URLs verified sha d4cb7fe8…).
   v3.60 (2026-09-09, Wed): SCHEDULE CORRECTION — Gabe: "Exam is actually on September 15. No
         Quiz chapter 3 tomorrow." Ch 3 quiz CANCELLED: removed from KNOWN_QUIZZES + deadlines and
         migrated out of stored checkpoints (tombstone with fresh setAt so the cancellation wins the
@@ -1655,7 +1662,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Chapter 4 · learn, build, check</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.96</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.97</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -4909,14 +4916,14 @@ function save(){
 function snapshotDrill(idx){ const D=S.drill; if(!D||!D.queue) return;
   if(idx>=D.queue.length){ S.pausedDrill=null; }
   else S.pausedDrill={ids:D.queue.map(q=>q.id), i:idx, right:D.right, wrong:D.wrong, topic:D.topic, byTopic:D.byTopic||null, cold:!!D.cold, guessedRight:D.guessedRight||0, hinted:D.hinted||0, reviewFlaggedRight:D.reviewFlaggedRight||0, hintState:D._hintState||null, scopeName:D.scopeName||"", scopeTopics:D.scopeTopics||[], masteryTopic:D.masteryTopic||"", focusSetId:D.focusSetId||"", pathPracticeFor:D.pathPracticeFor||"", focusStartedAt:D.focusStartedAt||0, log:D.log||[], runId:D.runId||"", diagVersion:D.diagVersion||0, diagRoles:D.diagRoles||{}, diagCriticalIds:D.diagCriticalIds||[], diagBondRequirements:D.diagBondRequirements||{}, diagResonanceRequirements:D.diagResonanceRequirements||{}, bondBuildEvidence:D.bondBuildEvidence||{}, resLabEvidence:D.resLabEvidence||{}, adaptive:!!D.adaptive, assignmentId:D.assignmentId||"", assignmentTopics:D.assignmentTopics||[], assignmentWhy:D.assignmentWhy||[], assignmentTotal:D.assignmentTotal||0, assignmentCompletion:D.assignmentCompletion||0, branchLog:D.branchLog||[], structureBuilt:D.structureBuilt||{}, bondStructuresBuilt:D.bondStructuresBuilt||{}, ts:Date.now()};
-  if(S.pausedDrill){S.pausedDrill.arrowDrafts=D.arrowDrafts||{};S.pausedDrill.writtenArrowPassed=D.writtenArrowPassed||{};S.pausedDrill.learnReturn=D.learnReturn||null;["courseUnit","coursePhase","ch4Drafts","ch4Evidence","sketchDrafts"].forEach(k=>{if(D[k]!==undefined)S.pausedDrill[k]=D[k];});}
+  if(S.pausedDrill){S.pausedDrill.arrowDrafts=D.arrowDrafts||{};S.pausedDrill.writtenArrowPassed=D.writtenArrowPassed||{};S.pausedDrill.learnReturn=D.learnReturn||null;["courseUnit","coursePhase","ch4Drafts","ch4Evidence","sketchDrafts","reasoningDrafts","learningAdaptive","navAnswerDrafts"].forEach(k=>{if(D[k]!==undefined)S.pausedDrill[k]=D[k];});}
   safeStore.set("pausedDrill", S.pausedDrill);
 }
 function resumeDrill(){ const p=S.pausedDrill; if(!p) return;
   const queue=(p.ids||[]).map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   if(!queue.length||p.i>=queue.length){ S.pausedDrill=null; safeStore.set("pausedDrill",null); render(); return; }
   S.drill={queue, i:p.i, right:p.right, wrong:p.wrong, topic:p.topic, answered:false, byTopic:p.byTopic||undefined, cold:!!p.cold, guessedRight:p.guessedRight||0, hinted:p.hinted||0, reviewFlaggedRight:p.reviewFlaggedRight||0, _hintState:p.hintState||null, scopeName:p.scopeName, scopeTopics:p.scopeTopics||[], masteryTopic:p.masteryTopic||"", focusSetId:p.focusSetId||"", pathPracticeFor:p.pathPracticeFor||"", focusStartedAt:p.focusStartedAt||0, log:p.log||[], runId:p.runId||"", diagVersion:p.diagVersion||0, diagRoles:p.diagRoles||{}, diagCriticalIds:p.diagCriticalIds||[], diagBondRequirements:p.diagBondRequirements||{}, diagResonanceRequirements:p.diagResonanceRequirements||{}, bondBuildEvidence:p.bondBuildEvidence||{}, resLabEvidence:p.resLabEvidence||{}, adaptive:!!p.adaptive, assignmentId:p.assignmentId||"", assignmentTopics:p.assignmentTopics||[], assignmentWhy:p.assignmentWhy||[], assignmentTotal:p.assignmentTotal||0, assignmentCompletion:p.assignmentCompletion||0, branchLog:p.branchLog||[], structureBuilt:p.structureBuilt||{}, bondStructuresBuilt:p.bondStructuresBuilt||{}}; // v3.76: all assistance signals, including review flags, survive pause/resume
-  S.drill.arrowDrafts=p.arrowDrafts||{};S.drill.writtenArrowPassed=p.writtenArrowPassed||{};S.drill.learnReturn=p.learnReturn||null;["courseUnit","coursePhase","ch4Drafts","ch4Evidence","sketchDrafts"].forEach(k=>{if(p[k]!==undefined)S.drill[k]=p[k];});
+  S.drill.arrowDrafts=p.arrowDrafts||{};S.drill.writtenArrowPassed=p.writtenArrowPassed||{};S.drill.learnReturn=p.learnReturn||null;["courseUnit","coursePhase","ch4Drafts","ch4Evidence","sketchDrafts","reasoningDrafts","learningAdaptive","navAnswerDrafts"].forEach(k=>{if(p[k]!==undefined)S.drill[k]=p[k];});
   go("drill");
 }
 /* v3.14: the FC mastery gate pauses too. It was the one multi-step run with no exit —
@@ -5116,7 +5123,7 @@ function misconceptionTag(q,ans){
 function logAttempt(q,ok,guessed,D,dk,ans){
   const now=Date.now(), openPause=D&&D._clockPausedAt?now-D._clockPausedAt:0;
   const secs=D&&D._shownAt?Math.min(600,Math.max(0,Math.round((now-D._shownAt-(D._hiddenMs||0)-openPause)/1000))):0;
-  const ev={id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic};
+  const ev={id:q.id,ts:Date.now(),ok:ok?1:0,g:guessed?1:0,d:secs,m:(D&&D.topic)||"?",t:q.topic,questionRevision:q.correctedAt||null};
   if(dk) ev.dk=1; // v3.5: "I don't know yet" — never learned ≠ guessed ≠ misconception
   if(D&&D.cold) ev.c=1; // diagnostics/mastery retain heavier evidence weight without adapting their questions
   if(D&&D.runId) ev.u=D.runId;
@@ -5284,7 +5291,7 @@ VIEWS.more = (v) => {
   c.appendChild(grid); v.appendChild(c);
   const account=el("section",{class:"card cream"});
   const status=cloudState==="synced"?"Cloud saved":cloudState==="qa"?"QA preview · not saved":cloudState==="offline"?"Local only":"Syncing";
-  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.96</p>';
+  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.97</p>';
   const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   if(PROFILE==="gabe"&&!QA_MODE)AUDITORS.forEach(k=>row.appendChild(el("button",{class:"btn ghost",onclick:()=>ownerView(k)},"View "+PROFILES[k].name)));
   if(!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:switchProfile},"Switch profile"));
@@ -7303,7 +7310,12 @@ VIEWS.drill = (v) => {
     const gRow=el("div",{style:"display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 2px"});
     gk=el("input",{type:"checkbox",id:"gk"});
     const gl=el("label",{for:"gk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🎲 I guessed on this");
-    rInp=el("input",{class:"answerbox wide",style:"flex:1;min-width:160px;font-size:.85em",placeholder:"(optional) why I chose this…"});
+    if(q.courseRoute==='ch4'||q.chapter===4){
+      D.reasoningDrafts=D.reasoningDrafts||{};
+      rInp=el('textarea',{class:'answerbox wide',rows:2,'data-ch4-reasoning-input':'true','aria-label':'My reasoning (optional)',placeholder:'What led you to your answer?'});
+      rInp.value=D.reasoningDrafts[q.id]||'';
+      rInp.addEventListener('input',()=>{if(D.answered)return;D.reasoningDrafts[q.id]=rInp.value;snapshotDrill(D.i);save();});
+    }else rInp=el("input",{class:"answerbox wide",style:"flex:1;min-width:160px;font-size:.85em",placeholder:"(optional) why I chose this…"});
     // v3.5: honest third state — never learned this. Tick it and STILL answer (your blind try is data too).
     dkk=el("input",{type:"checkbox",id:"dkk"});
     const dkl=el("label",{for:"dkk",class:"muted",style:"cursor:pointer;font-size:.9em"},"🤷 I don't know this yet");
@@ -7317,6 +7329,8 @@ VIEWS.drill = (v) => {
     const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
     const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
     const attempt=logAttempt(q,ok,guessed,D,isDK,submitted); // v3.25: immutable event drives every derived qstat
+    const namingDiagnostic=!ok&&typeof ch4NamingResponseDiagnostic==='function'?ch4NamingResponseDiagnostic(q,submitted):null;
+    if(namingDiagnostic){attempt.feedbackCode=namingDiagnostic.code;attempt.feedbackNote=namingDiagnostic.note;}
     const reviewFlag=!!(reviewCtl&&reviewCtl.active()), reviewNote=reviewFlag?reviewCtl.note():"";
     if(reviewFlag){attempt.rf=1;if(reviewNote)attempt.rn=reviewNote;reviewCtl.persist();if(ok)D.reviewFlaggedRight=(D.reviewFlaggedRight||0)+1;}
     if(attempt.h)D.hinted=(D.hinted||0)+1;
@@ -7327,11 +7341,14 @@ VIEWS.drill = (v) => {
     if(ok&&!guessed&&!reviewFlag&&!(attempt.h>0))S.missed=S.missed.filter(id=>id!==q.id);
     if(D.byTopic){ const bt=D.byTopic[q.topic]||(D.byTopic[q.topic]={r:0,w:0}); bt[ok?"r":"w"]++; if(ok&&guessed) bt.g=(bt.g||0)+1; if(ok&&!guessed&&reviewFlag)bt.rf=(bt.rf||0)+1; } // assisted rights stay visible but never count as clean readiness
     const rat=(rInp&&rInp.value.trim())||"";
+    // Keep the exact explanation on its own immutable attempt. Blank is valid;
+    // the spatial/answer grader never uses this text to award correctness.
+    if(q.courseRoute==='ch4'||q.chapter===4){attempt.reasoning=wrText||rat;attempt.reasoningKind=wrText?'written':'rationale';if(rInp)rInp.readOnly=true;}
     const reasonSignal=reasoningSignalText(wrText||rat); if(reasonSignal)attempt.rs=reasonSignal;
     // v3.15: keep a per-round record so "go back and see what I answered" is possible
-    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, rf:reviewFlag, rn:reviewNote, h:attempt.h||0, hs:attempt.hs||[], hf:attempt.hf||"", ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(wrText||rat||"").slice(0,400),sr:attempt.sr||0,drawing:attempt.drawing||null});
+    (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, rf:reviewFlag, rn:reviewNote, h:attempt.h||0, hs:attempt.hs||[], hf:attempt.hf||"", ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(q.courseRoute==='ch4'||q.chapter===4)?(wrText||rat||""):(wrText||rat||"").slice(0,400),sr:attempt.sr||0,drawing:attempt.drawing||null});
     if(D.courseUnit&&D.i+1>=D.queue.length)recordCourseRound(D);
-    if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
+    if(rat||wrText){ S.wrLog.push({ts:new Date().toISOString(), id:q.id, text:wrText||rat, guessed, ok, kind:wrText?"written":"rationale", pendingReview:!!wrText||q.courseRoute==='ch4'||q.chapter===4}); if(S.wrLog.length>120) S.wrLog=S.wrLog.slice(-120); }
     const branch=adaptiveBranch(D,q,attempt);
     if(D.adaptive)D.assignmentCompletion=Math.max(D.assignmentCompletion||0,Math.round(100*(D.i+1)/(D.assignmentTotal||ADAPTIVE_TOTAL)));
     if(D.adaptive&&D.i+1>=D.queue.length)finishAdaptiveRun(D); // final answer banks completion even if the tab closes before the results card
@@ -7339,7 +7356,8 @@ VIEWS.drill = (v) => {
     D._wrGuessed=false; D._wrDK=false;
     save();
     const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(isDK?"✓ Right — but marked 🤷 don't-know, so it counts as UNLEARNED and stays in rotation. Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" next.":guessed?"✓ Right — but flagged as a guess, so it stays in rotation":reviewFlag?"✓ Right — saved in your 🚩 review queue, so it is practice rather than clean proof.":attempt.h?"✓ Right with "+attempt.h+" hint"+(attempt.h===1?"":"s")+" — guided practice, not clean proof.":"✓ Right without hints"):(isDK?"🤷 Don't know yet — honest data, not a failure. Stays in rotation; hit the 📖 Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" after this round, then re-drill.":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:"")))+'</p>';
-    fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>')+(branch?'<p class="muted" style="font-size:.82em;margin:8px 0 0"><b>Planner branch:</b> '+branch.label+(branch.picks.length?' · '+branch.picks.length+' future slot'+(branch.picks.length===1?'':'s')+' adjusted':' · no unused sibling available')+'.</p>':'');
+    fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>')+(branch?'<details class="cq-details" data-adaptive-next><summary>Next practice step'+(branch.retained?' · planned question retained':branch.picks.length?' · adjusted to your answer':'')+'</summary><p>'+esc(branch.label)+(branch.picks.length?' · '+branch.picks.length+' future slot'+(branch.picks.length===1?'':'s')+' adjusted':branch.retained?'':' · no unused sibling available')+'.</p></details>':'');
+    if(namingDiagnostic){const note=el('p',{'data-answer-diagnostic':namingDiagnostic.code,class:'why'},esc(namingDiagnostic.note));fb.insertBefore(note,fb.firstChild.nextSibling);}
     if(attempt.sr){const verdict=fb.querySelector('p');if(verdict)verdict.textContent=ok?'Self-reviewed: you marked all rubric points complete. Not an automatic drawing grade.':'Self-reviewed: you identified a missing rubric point. Keep your drawing for comparison.';}
     if(isDK&&D.adaptive)fb.appendChild(el("button",{class:"btn teal",style:"margin-top:10px",onclick:()=>{snapshotDrill(D.i+1);S.drill=null;go("learn");}},"📖 Pause and open Learn primer"));
     fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;D._hintState=null;render();}},"Next →"));
@@ -8632,7 +8650,8 @@ function attemptRows(){
   const notes=(S.wrLog||[]).map(w=>({id:w.id,t:Date.parse(w.ts)||0,text:w.text,kind:w.kind}));
   return (S.attempts||[]).map(a=>{
     const n=notes.find(x=>x.id===a.id&&Math.abs(x.t-a.ts)<5000);
-    return {...a, note:n?n.text:null, noteKind:n?n.kind:null};
+    const captured=typeof a.reasoning==='string';
+    return {...a, note:captured?(a.reasoning||null):(n?n.text:null), noteKind:captured?(a.reasoning?(a.reasoningKind||'rationale'):null):(n?n.kind:null)};
   }).sort((x,y)=>y.ts-x.ts);
 }
 function fmtWhen(ts){
@@ -8969,7 +8988,7 @@ const CH4_QUESTIONS=[
   ch4Q(21,'chair','mc','Why does a flat three-carbon ring have substantial angle strain? Inspect the ring and compare its C–C–C angles with tetrahedral carbon.'+ch4Ring([],'Cyclopropane: three ring carbons',3),{choices:['Its ring angles are about 60°, far from the preferred 109.5°','Every carbon has a double bond','All rings must have 120° angles','It has no carbon–carbon sigma bonds'],answer:0,hints:['A triangle has three interior angles totaling 180°.','Compare each ring angle with the preferred angle at an sp³ carbon.'],why:'The roughly 60° ring angles deviate strongly from 109.5°. Cyclopropane also has torsional strain, but the question asked specifically about <b>angle strain</b>.',source:ch4Source('58–64')}),
   ch4Q(22,'chair','ch4production','<b>Place an up CH₃ on carbon 1 in both chair conformations of methylcyclohexane.</b> Keep it up after the flip; decide which chair is more stable.'+ch4Ring([{carbon:1,label:'CH₃',up:true}]),{production:{kind:'chair',substituents:[{id:'methyl',label:'CH3',carbon:1,up:true}],requireFlip:true,preferredChair:'B'},hints:['In chair A, the C1 axial bond points up.','A ring flip swaps axial/equatorial but leaves up/down unchanged.','The more stable chair places methyl equatorial, avoiding its two 1,3-diaxial contacts.'],why:'A: methyl axial up. B: methyl equatorial up. <b>B</b> is more stable. Up describes the ring face; axial describes the bond direction in that chair.',source:ch4Source('65–79')}),
   ch4Q(23,'chair','ch4production','<b>Place the down OH group on carbon 1 in both cyclohexanol chairs.</b> Select the more stable chair.'+ch4Ring([{carbon:1,label:'OH',up:false}]),{production:{kind:'chair',substituents:[{id:'hydroxyl',label:'OH',carbon:1,up:false}],requireFlip:true,preferredChair:'A'},hints:['At C1 in chair A, axial is up; the other bond is equatorial down.','After the flip, that same down OH becomes axial.','Compare steric contacts with the axial H on carbons 3 and 5.'],why:'A has OH equatorial down; B has OH axial down. The equatorial conformation <b>A</b> is more stable. The group must not switch to up during the flip.',source:ch4Source('66–79')}),
-  ch4Q(24,'chair','num','In this chair, how many of the six axial bonds point up? Count the alternating directions in the drawing.'+ch4ChairGuide(),{answer:3,hints:['Start at carbon1 and follow the ring numbering.','The axial directions alternate at successive carbons.'],why:'Three axial bonds point up and three point down. On any carbon, its equatorial bond points to the opposite face from its axial bond.',source:ch4Source('69–72')}),
+  ch4Q(24,'chair','num','In this chair, how many of the six axial bonds point up? Count the alternating directions in the drawing.'+ch4ChairGuide(),{answer:3,hints:['Start at carbon 1 and follow the ring numbering.','The axial directions alternate at successive carbons.'],why:'Three axial bonds point up and three point down. On any carbon, its equatorial bond points to the opposite face from its axial bond.',source:ch4Source('69–72')}),
 
   ch4Q(25,'chair','ch4production','<b>Convert the shown trans-2-methylcyclohexan-1-ol into both chairs.</b> Keep OH down at C1 and CH₃ up at C2.'+ch4Ring([{carbon:1,label:'OH',up:false},{carbon:2,label:'CH₃',up:true}]),{production:{kind:'chair',substituents:[{id:'hydroxyl',label:'OH',carbon:1,up:false},{id:'methyl',label:'CH3',carbon:2,up:true}],requireFlip:true,preferredChair:'A'},hints:['Write the fixed facts first: C1 OH down; C2 methyl up.','Use each chair’s axial direction to decide whether each fixed group belongs axial or equatorial.','One chair can place both groups equatorial.'],why:'A is diequatorial; B is diaxial. Both preserve the trans relationship. <b>A</b> is more stable because neither substituent has axial crowding.',source:ch4Source('73–74')}),
   ch4Q(26,'chair','ch4production','<b>Convert cis-1-bromo-4-methylcyclohexane to both chairs.</b> Both substituents point up; focus on preserving those faces.'+ch4Ring([{carbon:1,label:'Br',up:true},{carbon:4,label:'CH₃',up:true}]),{production:{kind:'chair',substituents:[{id:'bromo',label:'Br',carbon:1,up:true},{id:'methyl',label:'CH3',carbon:4,up:true}],requireFlip:true},hints:['Same face means cis, even when one group is axial and the other equatorial.','In chair A: C1 axial points up, while C4 axial points down.','After the flip, swap each axial/equatorial placement but preserve up.'],why:'A has Br axial up and methyl equatorial up. B has Br equatorial up and methyl axial up. Both are the same cis compound; this question checks correct conversion, not a stability comparison.',source:ch4Source('74,80–84')}),
@@ -8994,19 +9013,19 @@ CH4_QUESTIONS.push(
   ch4Q2(4,'alkanes','mc','Name the substituent drawn below.'+ch4Pic('g_tertbutyl','Given substituent'),{choices:['tert-butyl (1,1-dimethylethyl)','isobutyl (2-methylpropyl)','sec-butyl (1-methylpropyl)','isopropyl (1-methylethyl)','butyl'],answer:0,correctedAt:'2026-09-28',correctionNote:'Specified that tert refers to the carbon neighbors within the butyl fragment before parent attachment.',hints:['Four carbons within the substituent.','Within that four-carbon fragment, how many carbon neighbors does the attachment carbon have?','Three methyl neighbors. For the systematic name, one is C2 of an ethyl chain and the other two are methyl substituents on C1.'],why:'The attachment atom has three carbon neighbors <b>within the butyl fragment</b> → <b>tert-butyl</b> = <b>1,1-dimethylethyl</b>. Written as parent–C(CH₃)₃, the central carbon has <b>no H</b>. If the parent attachment atom is carbon, the central carbon has four carbon neighbors in the complete molecule and is quaternary there.',source:ch4Source('27–28')}),
   ch4Q2(5,'alkanes','mc','Which drawing is <b>sec-butyl</b>?'+ch4PicRow(['g_isobutyl','g_secbutyl','g_tertbutyl','g_butyl'],['A','B','C','D']),{choices:['A','B','C','D'],answer:1,correctedAt:'2026-09-28',correctionNote:'Scoped the secondary-carbon count to the butyl fragment.',hints:['For sec-butyl, count the attachment atom’s two carbon neighbors within the butyl fragment, excluding the parent.','Find the drawing whose "parent" bond lands on a carbon with one methyl and one ethyl arm.'],why:'<b>B</b>: the attachment carbon has a methyl and an ethyl arm <b>within the butyl fragment</b> → sec-butyl. A is isobutyl (fork one carbon in), C is tert-butyl (three carbon neighbors within the fragment), D is plain butyl. The parent is not part of this fragment count.',source:ch4Source('27–28')}),
   ch4Q2(6,'alkanes','mc','Which drawing is <b>isobutyl</b>?'+ch4PicRow(['g_secbutyl','g_tertbutyl','g_isobutyl','g_isopropyl'],['A','B','C','D']),{choices:['A','B','C','D'],answer:2,hints:['"Iso" = a two-methyl fork at the far end of the group.','Four carbons, attached at the end, fork on the next carbon.'],why:'<b>C</b>: attached at an end carbon, with the fork on the second carbon → 2-methylpropyl = isobutyl. D is isopropyl (only three carbons).',source:ch4Source('27–28')}),
-  ch4Q2(7,'alkanes','text','Type the complete IUPAC name. Either the trivial or the systematic substituent name is accepted.'+ch4Pic('n_isopropylheptane'),{answer:'4-isopropylheptane',accept:['4-isopropylheptane','4-(1-methylethyl)heptane','4-1-methylethylheptane'],hints:['Longest chain: seven carbons.','The branch is a 3-carbon group attached at its middle carbon.','Number from either end — the branch lands on 4 both ways.'],why:'Parent heptane; a 3-carbon branch attached at its middle carbon is <b>isopropyl</b> (1-methylethyl), at C4 from either end → <b>4-isopropylheptane</b> ≡ 4-(1-methylethyl)heptane.',source:ch4Source('27–31')}),
+  ch4Q2(7,'alkanes','text','Type the complete IUPAC name. Either the common or a systematic substituent name is accepted.'+ch4Pic('n_isopropylheptane'),{answer:'4-isopropylheptane',accept:['4-isopropylheptane','4-(1-methylethyl)heptane','4-1-methylethylheptane','4-(propan-2-yl)heptane'],correctedAt:'2026-09-28',correctionNote:'Accepted the equivalent propan-2-yl systematic substituent name as promised by the prompt.',hints:['Longest chain: seven carbons.','The branch is a 3-carbon group attached at its middle carbon.','Number from either end — the branch lands on 4 both ways.'],why:'Parent heptane; a 3-carbon branch attached at its middle carbon is <b>isopropyl</b> (1-methylethyl or propan-2-yl), at C4 from either end → <b>4-isopropylheptane</b>. The equivalent systematic forms <b>4-(1-methylethyl)heptane</b> and <b>4-(propan-2-yl)heptane</b> are accepted.',source:ch4Source('27–31')}),
   ch4Q2(8,'alkanes','text','Type the complete IUPAC name. Compare all equally long parent chains before naming branches.'+ch4Pic('n_secbutyloctane'),{answer:'3-methyl-4-propyloctane',accept:['3-methyl-4-propyloctane'],correctedAt:'2026-09-28',correctionNote:'Corrected the equal-length parent-chain tie: the eight-carbon path with two substituents takes priority over the eight-carbon path with one sec-butyl substituent.',hints:['Several continuous paths contain eight carbons. Among equally long paths, choose the one with more substituents.','Follow the longer arm of the apparent sec-butyl fork through its attachment carbon and into the longer side of the rest of the molecule. This eight-carbon parent leaves a methyl and a propyl branch.','Number from the fork-arm end: methyl at C3 and propyl at C4, versus C6 and C5 from the other end.'],why:'Two paths tie at eight carbons. The apparent straight-through octane path leaves one sec-butyl branch, but the path through the longer fork arm leaves <b>two</b> branches and must be chosen. Its locants are 3,4 (not 5,6), giving <b>3-methyl-4-propyloctane</b>. A branch is defined only after the preferred parent is chosen; do not freeze a visually obvious chain too early.',source:ch4Source('17–31')}),
   ch4Q2(9,'alkanes','text','Type the complete IUPAC name. Compare all equally long parent chains before naming branches.'+ch4Pic('n_isobutyloctane'),{answer:'2-methyl-4-propyloctane',accept:['2-methyl-4-propyloctane'],correctedAt:'2026-09-28',correctionNote:'Corrected the equal-length parent-chain tie: the eight-carbon path with two substituents takes priority over the eight-carbon path with one isobutyl substituent.',hints:['The longest paths have eight carbons, but not all leave the same number of branches.','Start at either terminal methyl of the apparent isobutyl fork and trace through the fork toward the longest remaining arm. This leaves two branches.','That parent gives methyl at C2 and propyl at C4; reversing gives 7 and 5.'],why:'The preferred eight-carbon parent passes through one terminal methyl of the fork. It leaves <b>two substituents</b>, rather than the one isobutyl branch left by the other eight-carbon path. Numbering gives 2,4 rather than 5,7; list methyl before propyl: <b>2-methyl-4-propyloctane</b>.',source:ch4Source('17–31')}),
-  ch4Q2(10,'alkanes','text','Type the complete IUPAC name. Trivial or systematic substituent name accepted.'+ch4Pic('n_tertbutylheptane'),{answer:'4-tert-butylheptane',accept:['4-tert-butylheptane','4-tertbutylheptane','4-(1,1-dimethylethyl)heptane','4-11-dimethylethylheptane'],correctedAt:'2026-09-28',correctionNote:'Clarified fragment versus complete-molecule carbon classification.',hints:['Parent: seven carbons. In this particular graph, no equally long path passes through the compact branch.','The branch attachment carbon has three methyl neighbors within the branch: tert-butyl.'],why:'Parent heptane with <b>tert-butyl</b> (1,1-dimethylethyl) at C4 → <b>4-tert-butylheptane</b>. The prefix tert- counts the three carbon neighbors within the substituent fragment; its attachment carbon is quaternary in this complete carbon-bonded molecule.',source:ch4Source('27–31')}),
+  ch4Q2(10,'alkanes','text','Type the complete IUPAC name. A common or systematic substituent name is accepted.'+ch4Pic('n_tertbutylheptane'),{answer:'4-tert-butylheptane',accept:['4-tert-butylheptane','4-tertbutylheptane','4-(1,1-dimethylethyl)heptane','4-11-dimethylethylheptane','4-(2-methylpropan-2-yl)heptane'],correctedAt:'2026-09-28',correctionNote:'Clarified fragment versus complete-molecule carbon classification and accepted the equivalent 2-methylpropan-2-yl systematic form.',hints:['Parent: seven carbons. In this particular graph, no equally long path passes through the compact branch.','The branch attachment carbon has three methyl neighbors within the branch: tert-butyl.'],why:'Parent heptane with <b>tert-butyl</b> (1,1-dimethylethyl or 2-methylpropan-2-yl) at C4 → <b>4-tert-butylheptane</b>. The corresponding parenthesized systematic forms are also accepted. The prefix tert- counts the three carbon neighbors within the substituent fragment; its attachment carbon is quaternary in this complete carbon-bonded molecule.',source:ch4Source('27–31')}),
   ch4Q2(11,'alkanes','mc','Which name is correct <b>using the common substituent name isopropyl</b>?'+ch4Pic('n_isopropylmethylcyclohexane'),{choices:['1-isopropyl-3-methylcyclohexane','3-isopropyl-1-methylcyclohexane','1-methyl-3-isopropylcyclohexane','1-methyl-3-(1-methylethyl)cyclohexane','3-methyl-1-propylcyclohexane'],answer:0,correctedAt:'2026-09-28',correctionNote:'Restricted the requested naming convention because option D is also valid under the systematic substituent convention.',hints:['Ring (6 C) beats the 3-carbon branch → parent is cyclohexane.','Both numbering directions give 1,3 — a tie → alphabet decides who gets the 1.','With the requested common name, iso counts: isopropyl files under I, before methyl under M.'],why:'Using the requested name <b>isopropyl</b>, numbering is tied at 1,3 and alphabetical order puts isopropyl (I) before methyl (M): <b>1-isopropyl-3-methylcyclohexane</b>. Option D is also a valid name for this structure, but uses the <b>systematic</b> substituent name 1-methylethyl instead of the common name requested here. In that system methyl receives C1. Neither naming system changes the molecule.',source:ch4Source('29–31')}),
   ch4Q2(12,'alkanes','mc','Which option correctly gives <b>both</b> the common-substituent name and the systematic-substituent name?'+ch4Pic('n_tertbutylmethylcyclohexane'),{choices:['1-tert-butyl-4-methylcyclohexane','4-tert-butyl-1-methylcyclohexane','1-methyl-4-tert-butylcyclohexane','1-(1,1-dimethylethyl)-4-methylcyclohexane and 1-tert-butyl-4-methylcyclohexane are both correct','1,1-dimethyl-4-methylethylcyclohexane'],answer:3,correctedAt:'2026-09-28',correctionNote:'Asked explicitly for both naming conventions; option A alone is a valid common-substituent name.',hints:['Ring is the parent; substituents land at 1,4 from either direction → tie → alphabet.','tert- is ignored for alphabetization, so tert-butyl files under B.','Systematic (1,1-dimethylethyl) files under D. Either way it beats M.'],why:'The question asks for <b>both</b> names. The valid common-substituent name is <b>1-tert-butyl-4-methylcyclohexane</b> (also shown alone in option A). The valid systematic-substituent name is <b>1-(1,1-dimethylethyl)-4-methylcyclohexane</b>. tert- is ignored, so tert-butyl files under B; the systematic substituent files under D. Both precede methyl, so both assign the four-carbon group C1.',source:ch4Source('29–31')}),
   ch4Q2(13,'alkanes','text','Type the complete IUPAC name.'+ch4Pic('n_ethyldimethylhexane'),{answer:'4-ethyl-2,2-dimethylhexane',accept:['4-ethyl-2,2-dimethylhexane','4-ethyl-22-dimethylhexane'],hints:['Parent: six carbons (trace it — the quaternary carbon is on the chain, its two methyls are branches).','From the left: 2,2,4. From the right: 3,5,5. First point of difference: 2 vs 3 → left wins.','Alphabetize: ethyl (E) before dimethyl (M — ignore "di"). Commas between numbers, dashes between number and letter.'],why:'2,2,4 beats 3,5,5 at the first point of difference. Ethyl (E) before dimethyl (M) → <b>4-ethyl-2,2-dimethylhexane</b>.',source:ch4Source('18–24')}),
   ch4Q2(14,'alkanes','text','Type the complete IUPAC name. Halogens are substituents.'+ch4Pic('n_bromochlorohexane'),{answer:'2-bromo-5-chlorohexane',accept:['2-bromo-5-chlorohexane'],hints:['Parent: hexane. Halogens: drop -ine, add -o.','From the left: Br at 2, Cl at 5 → 2,5. From the right: Cl at 2, Br at 5 → 2,5. A tie.','Tie → alphabet: bromo before chloro, so bromo gets the lower number.'],why:'Numbering ties (2,5 both ways) → alphabetical tiebreak: <b>bromo</b> gets the 2 → <b>2-bromo-5-chlorohexane</b>. Her rule: you only invoke the alphabet when the numbering is identical.',source:ch4Source('20–21')}),
   ch4Q2(15,'alkanes','num','How many <b>primary</b> carbons are in this molecule? (Say "primary," never "one degree" — she penalizes it.)'+ch4Pic('n_trimethylpentane','2,2,4-trimethylpentane'),{answer:5,hints:['Primary = bonded to exactly ONE other carbon. Every chain end and every methyl branch.','Count the CH₃ groups.'],why:'Five CH₃ groups, each bonded to one carbon → <b>5 primary</b>. (Also: 1 secondary, 1 tertiary, 1 quaternary.) This exact classification appeared on Exam 1 Part A.',source:ch4Source('2')}),
-  ch4Q2(16,'alkanes','num','How many <b>quaternary</b> carbons are in this molecule?'+ch4Pic('n_trimethylpentane','2,2,4-trimethylpentane'),{answer:1,hints:['Quaternary = bonded to FOUR other carbons, no H at all.','Look for a carbon with four lines leaving it.'],why:'One carbon (C2) has four carbon neighbours and no hydrogen → <b>1 quaternary</b>.',source:ch4Source('2')}),
-  ch4Q2(17,'alkanes','text','Type the complete IUPAC name using the <b>systematic</b> (parenthesized) substituent name.'+ch4Pic('n_tertbutylnonane'),{answer:'5-(1,1-dimethylethyl)nonane',accept:['5-(1,1-dimethylethyl)nonane','5-11-dimethylethylnonane'],correctedAt:'2026-09-28',correctionNote:'The accepted response now follows the explicitly requested systematic substituent convention.',hints:['Parent: nine carbons; the branch attaches at C5 from either end.','Inside the branch: C1 is the attachment carbon; it carries two methyls → 1,1-dimethylethyl.','Wrap it in parentheses with the parent locant in front.'],why:'<b>5-(1,1-dimethylethyl)nonane</b> is the requested systematic-substituent name. <b>5-tert-butylnonane</b> names the same compound correctly using the common substituent name, but does not fulfill this question’s request to practice the systematic form.',source:ch4Source('27–28')}),
+  ch4Q2(16,'alkanes','num','How many <b>quaternary</b> carbons are in this molecule?'+ch4Pic('n_trimethylpentane','2,2,4-trimethylpentane'),{answer:1,hints:['Quaternary = bonded to FOUR other carbons, no H at all.','Look for a carbon with four lines leaving it.'],why:'One carbon (C2) has four carbon neighbors and no hydrogen → <b>1 quaternary</b>.',source:ch4Source('2')}),
+  ch4Q2(17,'alkanes','text','Type the complete IUPAC name using a <b>systematic</b> (parenthesized) substituent name.'+ch4Pic('n_tertbutylnonane'),{answer:'5-(1,1-dimethylethyl)nonane',accept:['5-(1,1-dimethylethyl)nonane','5-11-dimethylethylnonane','5-(2-methylpropan-2-yl)nonane'],correctedAt:'2026-09-28',correctionNote:'Accepted both equivalent systematic substituent forms while preserving the explicit systematic-form practice requirement.',hints:['Parent: nine carbons; the branch attaches at C5 from either end.','Inside the branch: C1 is the attachment carbon; it carries two methyls → 1,1-dimethylethyl.','Wrap it in parentheses with the parent locant in front.'],why:'<b>5-(1,1-dimethylethyl)nonane</b> and <b>5-(2-methylpropan-2-yl)nonane</b> both satisfy the requested systematic-substituent form. <b>5-tert-butylnonane</b> names the same compound correctly using the common substituent name, but does not fulfill this question’s request to practice a systematic form.',source:ch4Source('27–28')}),
   ch4Q2(18,'alkanes','mc','Ring vs chain: what is the parent, and what is the correct name?'+ch4Pic('n_secbutylcyclopentane'),{choices:['sec-butylcyclopentane — the 5-carbon ring beats the 4-carbon branch','1-cyclopentylbutane — the chain is the parent','2-cyclopentylbutane — the chain is the parent','1-methyl-1-cyclopentylpropane','sec-butylcyclopentane and 2-cyclopentylbutane are both correct'],answer:0,correctedAt:'2026-09-28',correctionNote:'Scoped secondary attachment terminology to the butyl fragment.',hints:['Count carbons: ring 5, branch 4. More carbons = parent.','Highlight the ring; the butyl fragment attaches through its own C2, so it is sec-butyl.','One substituent on a ring needs no locant.'],why:'Ring (5 C) has more carbons than the branch (4 C), so the ring is the parent. The branch attaches through a carbon with two carbon neighbors <b>within the butyl fragment</b> → <b>sec-butylcyclopentane</b>. That same atom has three carbon neighbors once the ring attachment is counted. A single substituent on a ring takes no locant.',source:ch4Source('12–13')}),
-  ch4Q2(19,'alkanes','written','<b>Write out her four naming steps for this structure, in order, then the name.</b> Step 1 parent (highlight it) · Step 2 substituents named · Step 3 numbering with the point-of-difference rule shown · Step 4 assembled alphabetically with correct punctuation.'+ch4Pic('n_ethyldimethylhexane'),{requiresDrawing:true,answer:'Parent hexane; ethyl and two methyl substituents; 2,2,4 beats 3,5,5 at the first difference; 4-ethyl-2,2-dimethylhexane.',model:ch4Pic('n_ethyldimethylhexane','Reference structure')+'<ol><li>Trace a six-carbon parent through the quaternary carbon: hexane.</li><li>Identify one ethyl and two separate methyl branches.</li><li>Compare the sorted locants 2,2,4 with 3,5,5. Choose 2,2,4 because 2 is lower at the first difference.</li><li>Ignore di- for alphabetization: ethyl precedes methyl. Write <b>4-ethyl-2,2-dimethylhexane</b>.</li></ol>',rubric:['One continuous six-carbon parent identified','One ethyl branch and two methyl branches identified','Both locant sets 2,2,4 and 3,5,5 compared at their first difference','Ethyl listed before dimethyl','Complete name 4-ethyl-2,2-dimethylhexane with correct punctuation'],correctedAt:'2026-09-28',correctionNote:'Added the missing written-response answer, worked model and explicit rubric; preserved question identity and chemistry.',why:'<b>1.</b> Parent = hexane (6 C). <b>2.</b> Substituents: ethyl, methyl, methyl → ethyl + dimethyl. <b>3.</b> Compare 2,2,4 with 3,5,5; first point of difference 2 &lt; 3. <b>4.</b> Alphabetize E before M (ignore di): <b>4-ethyl-2,2-dimethylhexane</b>. Commas between numbers, dashes between number and letter. The drawn parent and written steps need manual review; revealing this model does not verify your drawing.',source:ch4Source('17–31')}),
+  ch4Q2(19,'alkanes','written','<b>Name this structure and show Ciesla’s four naming steps.</b> On your drawing or paper: (1) highlight the longest parent chain; (2) label the branches; (3) compare numbering from both ends and choose the lower numbers at the first difference; (4) write the complete name with alphabetized branches and correct punctuation. Short labels are enough—you do not need a paragraph.'+ch4Pic('n_ethyldimethylhexane'),{requiresDrawing:true,answer:'Parent hexane; ethyl and two methyl substituents; 2,2,4 beats 3,5,5 at the first difference; 4-ethyl-2,2-dimethylhexane.',model:ch4Pic('n_ethyldimethylhexane','Reference structure')+'<ol><li>Trace a six-carbon parent through the quaternary carbon: hexane.</li><li>Identify one ethyl and two separate methyl branches.</li><li>Compare the sorted locants 2,2,4 with 3,5,5. Choose 2,2,4 because 2 is lower at the first difference.</li><li>Ignore di- for alphabetization: ethyl precedes methyl. Write <b>4-ethyl-2,2-dimethylhexane</b>.</li></ol>',rubric:['One continuous six-carbon parent identified','One ethyl branch and two methyl branches identified','Both locant sets 2,2,4 and 3,5,5 compared at their first difference','Ethyl listed before dimethyl','Complete name 4-ethyl-2,2-dimethylhexane with correct punctuation'],correctedAt:'2026-09-28',correctionNote:'Added the missing written-response answer, worked model and explicit rubric; then clarified the required short annotations. Preserved question identity and chemistry.',why:'<b>1.</b> Parent = hexane (6 C). <b>2.</b> Substituents: ethyl, methyl, methyl → ethyl + dimethyl. <b>3.</b> Compare 2,2,4 with 3,5,5; first point of difference 2 &lt; 3. <b>4.</b> Alphabetize E before M (ignore di): <b>4-ethyl-2,2-dimethylhexane</b>. Commas between numbers, hyphens between numbers and words. The drawn parent and written steps need manual review; revealing this model does not verify your drawing.',source:ch4Source('17–31')}),
 
   /* --- Lecture 10A: reading, grading, and strain --- */
   ch4Q2(20,'conform','mc','Is this Newman projection staggered or eclipsed, and where does it sit on an energy-vs-rotation diagram?'+ch4Newman(['CH₃','H','H'],['H','H','CH₃'],'eclipsed'),{choices:['Eclipsed — a maximum (peak)','Eclipsed — a minimum (valley)','Staggered — a maximum (peak)','Staggered — a minimum (valley)'],answer:0,hints:['Do the front and back bonds line up, or alternate?','Bonds are electron density; lined-up bonds repel.'],why:'Front and back bonds line up → <b>eclipsed</b>. Overlapping bond density repels, so eclipsed conformations are always the <b>peaks</b>; staggered are always the valleys.',source:ch4Source('44–48')}),
@@ -9018,8 +9037,8 @@ CH4_QUESTIONS.push(
   ch4Q2(26,'conform','mc','Eclipsed ethane (H eclipsing H). Which strains are present?',{choices:['Torsional strain in the course classification — adjacent C–H bonds eclipse','Steric only','Both','Neither'],answer:0,hints:['Bonds line up → torsional, always.','For this ethane example, classify the eclipsing penalty as torsional; that does not mean H can never take part in steric crowding.'],why:'Eclipsed bonds → <b>torsional</b>. In this introductory ethane model, the eclipsing penalty is classified as torsional. Hydrogen can still participate in other steric contacts, such as 1,3-diaxial crowding. Each H/H eclipse ≈ 4 kJ/mol; three of them ≈ 12 kJ/mol for ethane.',source:ch4Source('46–50')}),
   ch4Q2(27,'conform','mc','For a butane-like hydrocarbon bond in the course steric model (one dominant bulky group on each carbon), which arrangement is usually lowest and which is highest in energy?',{choices:['Lowest = staggered with the two largest groups anti (180°); highest = the two largest groups eclipsed (0°)','Lowest = gauche; highest = anti','Lowest = eclipsed; highest = staggered','It depends on which groups they are — there is no general rule'],answer:0,hints:['She said it does not matter whether the groups are ethyl, isopropyl, butyl — it is about size.','Big groups want to be as far apart as possible.'],why:'<b>Largest groups anti</b> (180°, staggered) is the global minimum; <b>largest groups eclipsed</b> (0°) is the global maximum. This is the course steric trend for these hydrocarbon examples, not a universal energy rule for every heteroatom-containing molecule.',source:ch4Source('55')}),
   ch4Q2(28,'conform','mc','Rank butane conformations from LOWEST to HIGHEST energy. (Dihedral = CH₃↔CH₃.)',{choices:['anti (180°) < gauche (60°) < eclipsed CH₃/H (120°) < eclipsed CH₃/CH₃ (0°)','gauche (60°) < anti (180°) < eclipsed CH₃/CH₃ (0°) < eclipsed CH₃/H (120°)','anti (180°) < eclipsed CH₃/H (120°) < gauche (60°) < eclipsed CH₃/CH₃ (0°)','eclipsed CH₃/CH₃ (0°) < eclipsed CH₃/H (120°) < gauche (60°) < anti (180°)'],answer:0,hints:['Staggered valleys are always below eclipsed peaks.','Among the valleys: anti below gauche. Among the peaks: CH₃/H below CH₃/CH₃.'],why:'Two valleys, two peaks. Valleys: <b>anti</b> (lowest) then <b>gauche</b>. Peaks: <b>CH₃/H eclipsed</b> then <b>CH₃/CH₃ eclipsed</b> (highest). She will ask for this relative ordering on a diagram, not the numbers.',source:ch4Source('51–55')}),
-  ch4Q2(29,'conform','mc','"Draw the Newman projection looking down the <b>C2–C3</b> bond." Which carbon is the front carbon (the center dot), and what must you do first?'+ch4Pic('n_methylbutane','2-methylbutane'),{choices:['C2 is the front carbon; first number the parent chain by the Ch 4 IUPAC rules, because the numbering is not given','C3 is the front carbon; the numbers are read from left to right on the page','Either carbon can be the front; it makes no difference','C2 is the front carbon; number the chain from whichever end is drawn on the left'],answer:0,hints:['"Cx–Cy" → Cx is in front. Her wording.','If you are given numbers, you have to number the molecule yourself first — the numbering is not on the page.','Her top tip: highlight the bond, then write out all three attachments on each carbon before drawing.'],why:'<b>C2 is the front</b> (the first carbon named). The numbers are IUPAC locants, so you must number the chain by the naming rules first (lowest locant to the branch → the methyl carbon is C2). Then list the three groups on C2 (CH₃, CH₃, H) and on C3 (CH₃, H, H) before drawing.',source:ch4Source('40–44')}),
-  ch4Q2(30,'conform','mc','Her most commonly marked Newman error. Which statement is correct about the <b>back</b> carbon\'s bonds?',{choices:['They stop at the circle — the front carbon physically blocks the view of the back carbon\'s nucleus','They run all the way into the center dot, the same as the front bonds','They should be drawn dashed','They are omitted; only the front carbon is drawn'],answer:0,hints:['The center dot is the front carbon; the circle represents the back carbon. Rear bonds start at the circle’s edge.','Bonds that continue into the middle are drawn as if they reach a nucleus you cannot see.'],why:'<b>Back-carbon bonds stop at the circle.</b> The front carbon eclipses the back carbon\'s nucleus, so you cannot see the back bonds reaching it. Drawing them into the center is her #1 marked error.',source:ch4Source('40–44')}),
+  ch4Q2(29,'conform','mc','Draw the Newman projection looking <b>from C2 toward C3 (C2 → C3)</b>. Which carbon is the front carbon (the center dot), and what must you do first?'+ch4Pic('n_methylbutane','2-methylbutane'),{choices:['C2 is the front carbon; first number the parent chain by the Chapter 4 IUPAC rules, because the numbering is not given','C3 is the front carbon; the numbers are read from left to right on the page','Either carbon can be the front; it makes no difference','C2 is the front carbon; number the chain from whichever end is drawn on the left'],answer:0,hints:['The arrow C2 → C3 means you look from C2 toward C3; C2 is nearer your eye.','The prompt gives locants, not labels on the drawing: first number the molecule by the IUPAC rules.','Highlight the viewed bond, then write out all three attachments on each carbon before drawing.'],why:'<b>C2 is the front</b> because the viewing direction is explicitly C2 → C3. Number the chain by the naming rules first: the methyl branch is attached to C2. Then list the three groups on C2 (CH₃, CH₃, H) and on C3 (CH₃, H, H). Naming an undirected C2–C3 bond alone does not universally specify which end is nearer; use the stated eye, arrow, or course convention.',source:ch4Source('40–44')}),
+  ch4Q2(30,'conform','mc','Which statement correctly describes how to draw the <b>back</b> carbon\'s bonds in a Newman projection?',{choices:['They meet the edge of the circle, which represents the back carbon','They run all the way into the center dot, the same as the front bonds','They should be drawn dashed','They are omitted; only the front carbon is drawn'],answer:0,hints:['The center dot represents the front carbon; the circle represents the back carbon.','Use the two different attachment points to make front and back bonds distinguishable.'],why:'<b>Back-carbon bonds meet the circle’s edge; front-carbon bonds meet the center dot.</b> This drawing convention distinguishes the two carbons viewed along the same bond. The circle is not an extra atom or a literal boundary of the carbon’s nucleus.',source:ch4Source('40–44')}),
   ch4Q2(31,'conform','mc','On a Newman projection you draw a bond leaving the back circle and write nothing at its end. How will she read it?',{choices:['As a CH₃ (methyl) — an unlabeled bond means a carbon; hydrogens MUST be written in','As a hydrogen — unlabeled bonds are always H','As an error she ignores','As a lone pair'],answer:0,hints:['Bond-line convention: an unlabeled line-end is carbon.','"If it\'s a hydrogen and you draw that, you will lose points."'],why:'An unlabeled line-end is a <b>carbon</b> by bond-line convention, so she reads it as CH₃. <b>Label every H.</b> This is check #4 on her grading list.',source:ch4Source('40–44')}),
   ch4Q2(32,'conform','written','<b>Define torsional strain and steric strain in one sentence each, then give one conformation that has ONLY steric strain and one that has BOTH.</b> Draw the two Newman projections you name.',{requiresDrawing:true,answer:'Torsional: strain from eclipsing bonds. Steric: repulsion between nonbonded atoms or groups brought too close. Staggered gauche butane has steric but no eclipsing strain; fully eclipsed methyl/methyl butane has both.',model:ch4Newman(['CH₃','H','H'],['CH₃','H','H'],'staggered','Gauche butane: steric, no eclipsing')+ch4Newman(['CH₃','H','H'],['CH₃','H','H'],'eclipsed','Fully eclipsed butane: torsional and steric')+'<p><b>Torsional strain</b> is associated with eclipsing bonds. <b>Steric strain</b> is repulsion between nonbonded atoms or groups that approach too closely. The methyls are 60° apart in the first drawing and eclipse at 0° in the second. Each carbon has one CH₃ and two explicitly labeled H atoms.</p>',rubric:['Torsional strain defined using eclipsing bonds','Steric strain defined using close nonbonded groups','Gauche butane drawn staggered with methyls 60 degrees apart','Fully eclipsed butane drawn with methyls aligned at 0 degrees','Both front and rear carbons have CH3,H,H; rear bonds meet the circle, not the center'],correctedAt:'2026-09-28',correctionNote:'Added the missing written-response answer, two Newman models and explicit drawing rubric; preserved question identity and chemistry.',why:'<b>Only steric</b>: gauche butane (staggered, methyls 60° apart). <b>Both</b>: fully eclipsed butane (CH₃ eclipsing CH₃, 0°). Check your drawings against the grading list: back bonds stop at the circle · correct conformation · correct atom on each bond · every H labeled. These introductory strain labels compare the stated conformations; a staggered drawing is not automatically free of steric strain.',source:ch4Source('46–55')}),
   ch4Q2(33,'conform','mc','Model kits. What did she say about them for exams?',{choices:['Allowed in exams; she recommends buying your own since she does not have one per person — build with one ball per group, no hydrogens on substituents','Not allowed in exams','Allowed only for the final','Required — she provides one per student'],answer:0,hints:['"The people who can do three-dimensional analysis mentally are in the minority."','Her build tip: one colored ball per group, or the model gets bulky and you cannot see the geometry.'],why:'<b>Allowed, bring your own.</b> Her tip: don\'t build out every CH₃ — one ball per group, three on the front carbon, three on the back, color-coded.',source:ch4Source('40')}),
@@ -9031,8 +9050,8 @@ CH4_QUESTIONS.push(
   ch4Q2(41,'conform','ch4production','<b>Same molecule, eye on the other side.</b> Draw the Newman projection as viewed from this eye.'+ch4WedgeView({n:4,front:3,back:2,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:ch4NewmanFromWedge({n:4,front:3,back:2,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),hints:['Now C3 is nearest the eye → C3 is the front carbon. Br goes on the front.','Reversing the viewing direction mirrors left/right for the wedge and dash.'],why:'Front (C3): CH₃ in-plane, Br wedge, H dash. Back (C2): CH₃ in-plane opposite, Cl dash, H wedge. Compare with the previous item: same molecule, the left/right of wedge vs dash has flipped because you are looking from the other end.',source:ch4Source('40–48','SkillBuilder 4.7')}),
   ch4Q2(42,'conform','ch4production','<b>Draw the Newman projection as viewed from the eye.</b>'+ch4WedgeView({n:5,front:3,back:2,subs:{3:{wedge:'OH'}},flipY:true}),{production:ch4NewmanFromWedge({n:5,front:3,back:2,subs:{3:{wedge:'OH'}},flipY:true}),hints:['Front carbon = C3 (nearest the eye). Its groups: the chain toward C4/C5 (an ethyl, in-plane), OH (wedge), H (implied, dash).','Back carbon = C2: chain toward C1 (a methyl, in-plane), and two H.','The two in-plane chain groups are anti (opposite) in a flat zigzag.'],why:'Front (C3): CH₂CH₃ in-plane, OH wedge, H dash. Back (C2): CH₃ in-plane and opposite, H, H. When a carbon carries two H, which H is which does not matter — only the OH side does.',source:ch4Source('40–48','SkillBuilder 4.7')}),
   ch4Q2(43,'conform','ch4production','<b>Draw the Newman projection as viewed from the eye.</b> Two non-hydrogen groups on the front carbon.'+ch4WedgeView({n:5,front:3,back:4,subs:{3:{wedge:'Cl',dash:'CH₃'},4:{dash:'Br'}}}),{production:ch4NewmanFromWedge({n:5,front:3,back:4,subs:{3:{wedge:'Cl',dash:'CH₃'},4:{dash:'Br'}}}),hints:['Front C3 has NO hydrogen: chain (ethyl, in-plane), Cl (wedge), CH₃ (dash).','Back C4: chain (methyl, in-plane), Br (dash), H (wedge, implied).','Wedge and dash sit on opposite sides; the same side-rule applies on both carbons because the eye has not moved.'],why:'Front (C3): CH₂CH₃ in-plane, Cl wedge, CH₃ dash. Back (C4): CH₃ in-plane opposite, Br dash, H wedge. Cl (wedge) and H-on-back (wedge) are on the same side; CH₃ (dash) and Br (dash) are on the other side.',source:ch4Source('40–48','SkillBuilder 4.7')}),
-  ch4Q2(44,'conform','ch4production','<b>Number the chain first, then draw the Newman projection looking down the C2–C3 bond.</b> No eye is given: "C2–C3" means C2 is the front carbon, and the numbers come from the IUPAC rules, not from the page.'+ch4WedgeView({n:5,front:4,back:3,subs:{4:{dash:'Cl'}},eye:false,title:'Given structure — number it yourself (lowest locant to the substituent)'}),{production:ch4NewmanFromWedge({n:5,front:4,back:3,subs:{4:{dash:'Cl'}},eye:false},{viewingLabel:'Look down the C2–C3 bond: C2 in front.'}),hints:['Pentane with one Cl. Number from the end that gives Cl the lowest locant: from the right, Cl is on C2. So the RIGHT-hand carbon bearing Cl is C2 — that is your front carbon.','Now the view direction is C2 → C3, i.e., from the right end looking left.','Front C2: CH₃ in-plane, Cl dash, H wedge. Back C3: CH₂CH₃ in-plane (the rest of the chain), H, H.'],why:'Correct numbering puts Cl on C2 counting from the right, so C2 is the right-hand substituted carbon and it is the front. Front: CH₃, Cl (dash), H. Back (C3): CH₂CH₃ in-plane opposite, two H. Her top tip for this: highlight the C2–C3 bond and write out all three groups on each carbon before you draw.',source:ch4Source('40–44','SkillBuilder 4.7')}),
-  ch4Q2(45,'conform','ch4production','<b>Number the chain, then draw the Newman looking down the C3–C4 bond.</b>'+ch4WedgeView({n:6,front:3,back:4,subs:{3:{wedge:'Br'}},eye:false,flipY:true,title:'Given structure — number it yourself'}),{production:ch4NewmanFromWedge({n:6,front:3,back:4,subs:{3:{wedge:'Br'}},eye:false,flipY:true},{viewingLabel:'Look down the C3–C4 bond: C3 in front.'}),hints:['Hexane with Br on the third carbon from the left (that is 3 from the left, 4 from the right → number from the left).','C3 is front: chain toward C1 (an ethyl, in-plane), Br wedge, H dash. C4 is back: chain toward C6 (an ethyl, in-plane), H, H.'],why:'Number from the left (Br gets 3, not 4). Front C3: CH₂CH₃ in-plane, Br wedge, H dash. Back C4: CH₂CH₃ in-plane and opposite, H, H.',source:ch4Source('40–44','SkillBuilder 4.7')}),
+  ch4Q2(44,'conform','ch4production','<b>Number the chain first, then draw the Newman projection looking from C2 toward C3 (C2 → C3).</b> No eye symbol is given. Use the stated direction: C2 is in front. The carbon numbers come from the IUPAC rules, not their left-to-right positions on the page.'+ch4WedgeView({n:5,front:4,back:3,subs:{4:{dash:'Cl'}},eye:false,title:'Given structure — number it yourself (lowest locant to the substituent)'}),{production:ch4NewmanFromWedge({n:5,front:4,back:3,subs:{4:{dash:'Cl'}},eye:false},{viewingLabel:'Look from C2 toward C3: C2 in front.'}),hints:['Pentane with one Cl. Number from the end that gives Cl the lowest locant: from the right, Cl is on C2. So the RIGHT-hand carbon bearing Cl is C2 — that is your front carbon.','Now the view direction is C2 → C3, i.e., from the right end looking left.','Front C2: CH₃ in-plane, Cl dash, H wedge. Back C3: CH₂CH₃ in-plane (the rest of the chain), H, H.'],why:'Correct numbering puts Cl on C2 counting from the right. The explicit C2 → C3 viewing direction makes that right-hand substituted carbon the front. Front: CH₃, Cl (dash), H. Back (C3): CH₂CH₃ in-plane opposite, two H. Highlight the C2–C3 bond and write out all three groups on each carbon before drawing.',source:ch4Source('40–44','SkillBuilder 4.7')}),
+  ch4Q2(45,'conform','ch4production','<b>Number the chain, then draw the Newman looking from C3 toward C4 (C3 → C4).</b>'+ch4WedgeView({n:6,front:3,back:4,subs:{3:{wedge:'Br'}},eye:false,flipY:true,title:'Given structure — number it yourself'}),{production:ch4NewmanFromWedge({n:6,front:3,back:4,subs:{3:{wedge:'Br'}},eye:false,flipY:true},{viewingLabel:'Look from C3 toward C4: C3 in front.'}),hints:['Hexane with Br on the third carbon from the left (that is 3 from the left, 4 from the right → number from the left).','C3 is front: chain toward C1 (an ethyl, in-plane), Br wedge, H dash. C4 is back: chain toward C6 (an ethyl, in-plane), H, H.'],why:'Number from the left (Br gets 3, not 4). The explicit C3 → C4 viewing direction makes C3 the front. Front C3: CH₂CH₃ in-plane, Br wedge, H dash. Back C4: CH₂CH₃ in-plane and opposite, H, H.',source:ch4Source('40–44','SkillBuilder 4.7')}),
   ch4Q2(46,'conform','ch4production','<b>Rotate to the requested conformer.</b> Start from the drawing, then turn the <i>back</i> wheel until Cl (front) and Br (back) are <b>eclipsed</b> (0° apart). Preserve the order of the three groups around EACH carbon; do not swap two groups.'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:{kind:'newman',front:['CH₃','Cl','H'],back:['CH₃','Br','H'],targetMode:'eclipsed',targetPair:{a:'Cl',b:'Br',gap:0},targetFront:['CH₃','Cl','H'],targetBack:['CH₃','Br','H'],rotationEquivalent:true,viewingLabel:'Eye nearest C2: C2 is the front carbon.'},correctedAt:'2026-09-28',correctionNote:'Added the required per-carbon orientation so a Cl/Br gap alone cannot accept an inverted stereocenter.',hints:['Map the given staggered structure first. Its Cl and Br are initially anti.','Rotate only the back carbon by 180° (three 60° steps) to align Br with Cl. The back groups move together.','If you turn the entire completed Newman afterward, rotate both carbons equally; never exchange two labels.'],why:'Preserve each carbon’s clockwise group order while rotating its bonds. From this particular starting drawing, a 180° back-carbon turn gives Cl/Br eclipsing, CH₃/CH₃ eclipsing, and H/H eclipsing. The construction check verifies both the 0° Cl–Br relationship and the unchanged per-carbon configuration. Eclipsing creates torsional strain; this task does not establish the global energy maximum for this substituted molecule.',source:ch4Source('44–55')}),
   ch4Q2(47,'conform','ch4production','<b>Build the specified anti conformer.</b> Map the given structure, keeping Cl (front) and Br (back) <b>anti</b> (180° apart), staggered. Decide whether a back-wheel turn is actually needed; preserve each carbon’s group order.'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{production:{kind:'newman',front:['CH₃','Cl','H'],back:['CH₃','Br','H'],targetMode:'staggered',targetPair:{a:'Cl',b:'Br',gap:180},targetFront:['CH₃','Cl','H'],targetBack:['H','CH₃','Br'],rotationEquivalent:true,viewingLabel:'Eye nearest C2: C2 is the front carbon.'},correctedAt:'2026-09-28',correctionNote:'The shown structure already has Cl/Br and methyl/methyl anti. Corrected the false gauche explanation and rejected orientation-inverted gap-only matches.',hints:['Trace the actual wedge/dash mapping before turning anything. Cl and Br are already opposite in the given conformation.','Both the methyl pair and the Cl/Br pair can be anti in this same Newman.','A whole-picture rotation is equivalent; swapping two groups on only one carbon changes its configuration.'],why:'The given structure already satisfies <b>Cl/Br anti</b>, so no relative wheel rotation is required after it is mapped correctly. Its two methyl groups are also anti, not gauche. Several corresponding front/back pairs can simultaneously be 180° apart. The check preserves the indicated per-carbon configuration and does not claim this is the molecule’s global energy minimum.',source:ch4Source('51–55')}),
   ch4Q2(48,'conform','mc','From the eye shown, which statement about the front carbon\'s groups is correct?'+ch4WedgeView({n:4,front:2,back:3,subs:{2:{dash:'Cl'},3:{wedge:'Br'}}}),{choices:['CH₃ points straight up or straight down; Cl and H sit 60° either side of the opposite direction, on opposite left/right sides','Cl points straight up because it is drawn vertically on the page','All three groups can go anywhere as long as they are 120° apart','Cl and Br are on the front carbon'],answer:0,hints:['Bonds drawn flat on the page (the zigzag) project to straight up or straight down in the Newman.','Wedge and dash project to opposite left/right sides.'],why:'The in-plane chain bond projects to the vertical; the wedge and the dash project to the two remaining slots, one each side. Which side is which depends on where the eye is — so decide it once and keep it for both carbons.',source:ch4Source('40–44')}),
@@ -9276,7 +9295,7 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
   if(reviewOnly)draft.locked=true;
   let suppressPlacementClick=false;
   const persist=()=>{if(typeof snapshotDrill==='function'&&typeof S!=='undefined'&&S.drill===D){snapshotDrill(D.i);if(typeof save==='function')save();}};
-  const button=(text,pressed,fn)=>el('button',{class:'btn ghost small',type:'button','aria-pressed':!!pressed,onclick:fn},text);
+  const button=(text,pressed,fn)=>el('button',{class:'btn ghost small',type:'button','aria-pressed':String(!!pressed),onclick:fn},text);
   const bindSlots=(container,board)=>container.querySelectorAll('[data-ch4-slot]').forEach(slot=>{
     const activate=()=>{
       if(draft.locked||suppressPlacementClick)return;const key=slot.dataset.ch4Slot;
@@ -9339,6 +9358,7 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
     });
   }
   function draw(){
+    const reasoning=host.querySelector('.cq-reasoning');
     host.innerHTML='';host.classList.add('ch4-production');host.classList.toggle('ch4-enlarged',!!draft.zoom);host.dataset.ch4Production=p.kind;
     host.appendChild(el('h3',{},draft.locked?'Your submitted construction':p.kind==='newman'?'Build the Newman projection':'Build both chair conformations'));
     if(p.kind==='newman'){ /* v3.91 — Ciesla's grading list, said aloud in Lecture 10A while walking the room */
@@ -9380,8 +9400,10 @@ function renderCh4Production(host,q,D,finish,reviewOnly=false){
     }
     bindSlots(host);
     bindNewmanDrag();
+    const reasoningSlot=el('div',{'data-ch4-reasoning-slot':'true'});if(reasoning){reasoningSlot.appendChild(reasoning);reasoning.querySelector('textarea').readOnly=!!draft.locked;}host.appendChild(reasoningSlot);
     if(draft.locked){
-      host.appendChild(el('p',{class:'ch4-saved'},'Saved with this question ID. Your diagram stays visible and cannot be changed after submission.'));
+      const preview=typeof safeStore!=='undefined'&&safeStore.persistent===false;
+      host.appendChild(el('p',{class:'ch4-saved'},preview?'Preview only — this construction is not saved to your practice history.':'Saved with this question ID. Your diagram stays visible and cannot be changed after submission.'));
       if(draft.result&&(!D.cold||reviewOnly)){
         const feedback=el('div',{class:'ch4-feedback'}),misses=draft.result.checks.filter(c=>!c.ok);
         feedback.innerHTML=draft.result.ok?'<b>Construction checked</b><p>'+esc(p.kind==='newman'?'The groups are attached to the correct front and back carbons, with the requested spatial arrangement.':'Each group stays on its numbered carbon and keeps its up/down direction through the ring flip. Axial and equatorial swap.')+'</p>':'<b>Compare these parts of your construction</b><ul>'+misses.map(c=>'<li>'+esc(c.text)+'</li>').join('')+'</ul>';host.appendChild(feedback);
@@ -9567,16 +9589,70 @@ function renderCourseLessonExtras(lesson,u){
   lesson.appendChild(el('p',{class:'muted'},'Source: '+(u.source||'Canvas Chapter 4 objectives and lecture deck')+'.'));
 }
 /* A freehand response is retained for review, never machine-certified from strokes. */
+function courseSketchNearStraight(points){
+  // Be conservative: pauses in rings, zigzags, loops and letters must not erase them.
+  if(points.length<2)return false;
+  const [ax,ay]=points[0],[bx,by]=points[points.length-1],dx=bx-ax,dy=by-ay,chord=Math.hypot(dx,dy);
+  if(chord<24)return false;
+  let path=0,maxDeviation=0;
+  for(let i=1;i<points.length;i++){
+    path+=Math.hypot(points[i][0]-points[i-1][0],points[i][1]-points[i-1][1]);
+    maxDeviation=Math.max(maxDeviation,Math.abs(dy*(points[i][0]-ax)-dx*(points[i][1]-ay))/chord);
+  }
+  return path/chord<=1.06&&maxDeviation<=Math.min(8,Math.max(2.5,chord*.035));
+}
 function renderCourseSketch(host,q,D,readOnly=false,provided=null){
   D.sketchDrafts=D.sketchDrafts||{};
   const draft=provided||(D.sketchDrafts[q.id]||(D.sketchDrafts[q.id]={strokes:[],text:''}));
   const box=el('section',{class:'course-sketch'});box.innerHTML='<h3>Your drawing</h3><p class="muted">Draw here, or use paper and tick the box below. Written notes are optional; include any labels or explanation requested in the question on your drawing or paper.</p>';
   const canvas=el('canvas',{width:800,height:420,'aria-label':'Draw your structure here',style:'width:100%;height:auto;display:block;border:1px solid #a9bac1;border-radius:10px;background:white;touch-action:none'}),ctx=canvas.getContext('2d');
   const paint=()=>{ctx.clearRect(0,0,800,420);ctx.strokeStyle='#173a4b';ctx.lineWidth=3;ctx.lineCap='round';for(const stroke of draft.strokes){ctx.beginPath();stroke.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();}};
-  let active=null;const point=e=>{const r=canvas.getBoundingClientRect();return [Math.round((e.clientX-r.left)*800/r.width),Math.round((e.clientY-r.top)*420/r.height)];};
+  let active=null,pointerId=null,holdTimer=null,lineMode=false,snapped=false,holdAnchor=null;
+  const point=e=>{const r=canvas.getBoundingClientRect();return [Math.round(Math.max(0,Math.min(800,(e.clientX-r.left)*800/r.width))),Math.round(Math.max(0,Math.min(420,(e.clientY-r.top)*420/r.height)))];};
   const store=()=>{snapshotDrill(D.i);save();};
-  if(!readOnly){canvas.addEventListener('pointerdown',e=>{if(D.answered)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);active=[point(e)];draft.strokes.push(active);paint();});canvas.addEventListener('pointermove',e=>{if(!active)return;active.push(point(e));paint();});const end=()=>{if(active){active=null;store();}};canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);}
-  box.appendChild(canvas);if(!readOnly)box.appendChild(el('button',{class:'btn ghost small',onclick:()=>{if(D.answered)return;draft.strokes.pop();paint();store();}},'Undo last stroke'));
+  const savedMessage=()=>typeof safeStore!=='undefined'&&safeStore.persistent===false?'Preview only — drawings in this preview are not saved.':'Drawing recorded. Use Export to keep a backup.';
+  const status=el('span',{class:'muted','aria-live':'polite','data-sketch-status':'true'});
+  const stopHold=()=>{clearTimeout(holdTimer);holdTimer=null;};
+  const armHold=e=>{
+    if(lineMode||snapped)return;
+    // Ignore tiny device jitter while holding, but restart after intentional movement.
+    if(holdAnchor&&Math.hypot(e.clientX-holdAnchor[0],e.clientY-holdAnchor[1])<3)return;
+    holdAnchor=[e.clientX,e.clientY];stopHold();
+    holdTimer=setTimeout(()=>{
+      if(!active||D.answered||!canvas.isConnected||!courseSketchNearStraight(active))return;
+      active.splice(1,active.length-1,active[active.length-1].slice());snapped=true;
+      status.textContent='Straight line snapped. Keep holding to adjust the end.';paint();
+    },500);
+  };
+  const end=(e,cancel=false)=>{
+    if(!active||(e&&e.pointerId!==pointerId))return;
+    stopHold();
+    if(cancel){const index=draft.strokes.indexOf(active);if(index>=0)draft.strokes.splice(index,1);}
+    const finishedPointer=pointerId;active=null;pointerId=null;holdAnchor=null;snapped=false;
+    if(canvas.hasPointerCapture(finishedPointer))canvas.releasePointerCapture(finishedPointer);
+    status.textContent=cancel?'Stroke canceled.':savedMessage();paint();store();
+  };
+  if(!readOnly){
+    const tools=el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px','aria-label':'Drawing tools'});
+    const free=el('button',{type:'button',class:'btn ghost small','aria-pressed':'true','data-sketch-tool':'freehand'},'Freehand');
+    const line=el('button',{type:'button',class:'btn ghost small','aria-pressed':'false','data-sketch-tool':'line'},'Straight line');
+    const selectTool=value=>{if(D.answered||active)return;lineMode=value;[free,line].forEach((button,i)=>{const chosen=Boolean(i)===value;button.setAttribute('aria-pressed',String(chosen));button.style.background=chosen?'#173a4b':'';button.style.color=chosen?'#fff':'';});status.textContent=value?'Drag from the start to the end of a bond.':'Draw freely; pause at the end of a bond to straighten it.';};
+    free.addEventListener('click',()=>selectTool(false));line.addEventListener('click',()=>selectTool(true));tools.append(free,line,status);box.appendChild(tools);selectTool(false);
+    box.appendChild(el('p',{class:'muted',style:'margin:0 0 8px'},'For a straight bond, draw and hold still for about half a second before lifting. Rings and writing stay freehand.'));
+    if(typeof safeStore!=='undefined'&&safeStore.persistent===false)box.appendChild(el('p',{class:'muted','data-sketch-preview':'true',style:'margin:0 0 8px'},savedMessage()));
+    canvas.addEventListener('pointerdown',e=>{
+      if(D.answered||active||e.isPrimary===false||(e.pointerType==='mouse'&&e.button!==0))return;
+      e.preventDefault();pointerId=e.pointerId;active=[point(e)];snapped=lineMode;holdAnchor=null;
+      draft.strokes.push(active);canvas.setPointerCapture(pointerId);status.textContent='';armHold(e);paint();
+    });
+    canvas.addEventListener('pointermove',e=>{
+      if(!active||e.pointerId!==pointerId)return;e.preventDefault();const next=point(e);
+      if(snapped){active.splice(1,active.length-1,next);}else if(next[0]!==active[active.length-1][0]||next[1]!==active[active.length-1][1]){active.push(next);}
+      armHold(e);paint();
+    });
+    canvas.addEventListener('pointerup',e=>end(e));canvas.addEventListener('pointercancel',e=>end(e,true));canvas.addEventListener('lostpointercapture',e=>end(e,true));
+  }
+  box.appendChild(canvas);if(!readOnly)box.appendChild(el('button',{type:'button',class:'btn ghost small',onclick:()=>{if(D.answered)return;if(active){end(null,true);return;}draft.strokes.pop();paint();store();status.textContent='Last stroke removed.';}},'Undo last stroke'));
   if(!readOnly){
     const label=el('label',{style:'display:flex;gap:10px;align-items:center;min-height:44px;margin-top:8px'}),paper=el('input',{type:'checkbox','data-paper-drawing':'true'});paper.checked=!!draft.paper;
     paper.addEventListener('change',()=>{draft.paper=paper.checked;store();});label.append(paper,document.createTextNode('I completed this drawing on paper (self-review only)'));box.appendChild(label);
@@ -10005,7 +10081,8 @@ function ch4QPNameDrawing(kind='trimethyl'){
     points=[[245,80],[285,145],[245,210],[165,210],[125,145],[165,80],[345,145],[385,80],[395,205],[465,165]];
     edges=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[1,6],[6,7],[6,8],[8,9]];
   }else{
-    points=[[65,155],[140,110],[215,155],[290,110],[365,155],[440,110],[115,45],[165,45],[290,205]];
+    // At the C4 zigzag peak, the single methyl projects outward/upward.
+    points=[[65,155],[140,110],[215,155],[290,110],[365,155],[440,110],[115,45],[165,45],[290,30]];
     edges=[[0,1],[1,2],[2,3],[3,4],[4,5],[1,6],[1,7],[3,8]];
   }
   return ch4Figure('One valid bond-line answer · rotations of the whole drawing are equivalent',edges.map(([a,b])=>ch4Line(...points[a],...points[b])).join(''),540,250);
@@ -10061,7 +10138,7 @@ const CH4_QUIZ_PREP_QUESTIONS=[
   ch4QPQ(26,'alkanes','written','Draw <b>sec-butylcyclohexane</b> as a bond-line structure. Mark the branch carbon attached to the ring. No stereochemistry is specified.',{requiresDrawing:true,answer:'Cyclohexane–CH(CH3)–CH2–CH3; the attached branch carbon bears a methyl arm and an ethyl arm; C10H20.',model:ch4QPNameDrawing('secbutylring')+'<p>The ring joins <b>CH(CH₃)CH₂CH₃</b>, not CH₂CH(CH₃)₂. The attachment carbon is within the four-carbon substituent and has a one-carbon arm and a two-carbon arm. The ring has six carbons and remains the parent.</p>',rubric:['Six-membered parent ring','Four carbons in the substituent, excluding the ring carbon','Ring joined to CH bearing methyl and ethyl arms','Not isobutyl or tert-butyl connectivity','No invented required wedge/dash configuration'],hints:['“sec” identifies the attachment position within the butyl fragment.','Sketch parent–CH(CH3)CH2CH3 before converting to bond-line form.'],why:'This tests actual attachment construction rather than recognizing a familiar Y shape. A rotated drawing is valid if connectivity remains unchanged.'}),
   ch4QPQ(27,'conform','ch4production','Build the Newman at <b>point C</b>. Look C2 → C3. Hold the front CH₃ at 12 o’clock and rotate only the rear carbon <b>clockwise</b> from the supplied start.'+ch4Newman(['CH₃','H','H'],['CH₃','H','H'],'eclipsed','Start at graph 0°')+ch4QPRotationGraph('eclipsed',2),{production:{kind:'newman',front:['CH₃','H','H'],back:['CH₃','H','H'],targetMode:'eclipsed',targetFront:['CH₃','H','H'],targetBack:['H','CH₃','H'],rotationEquivalent:false,viewingLabel:'C2 front, C3 back; keep the front methyl at 12 o’clock.'},hints:['Read point C on the horizontal axis first.','From 12 o’clock, a clockwise 120° turn reaches 4 o’clock.'],why:'Point C is <b>120° of rear rotation</b>. The front methyl remains at 12 and the rear methyl reaches 4. The bonds eclipse, but CH₃ does not eclipse CH₃, so this peak is below the fully eclipsed start. The supplied direction distinguishes the 4-o’clock answer from its mirror.'}),
   ch4QPQ(28,'conform','ch4production','Build the Newman at <b>point E</b>. Look C2 → C3. Hold the front CH₃ at 12 o’clock and rotate only the rear carbon <b>counterclockwise</b> from the supplied start.'+ch4Newman(['CH₃','H','H'],['H','CH₃','H'],'staggered','Start at graph 0°')+ch4QPRotationGraph('anti',4),{production:{kind:'newman',front:['CH₃','H','H'],back:['CH₃','H','H'],targetMode:'staggered',targetFront:['CH₃','H','H'],targetBack:['H','H','CH₃'],rotationEquivalent:false,viewingLabel:'C2 front, C3 back; keep the front methyl at 12 o’clock.'},hints:['Graph 0° labels rotation from the given anti starting view, not a zero methyl–methyl angle.','Point E means a 240° counterclockwise turn of the rear methyl from 6 o’clock.'],why:'The rear methyl starts at 6. A <b>240° counterclockwise</b> turn puts it at 10, while the front methyl stays at 12. That is a staggered gauche conformer with a <b>60° smaller methyl–methyl dihedral</b>. Rotation traveled (240°) and final smaller dihedral (60°) are different quantities.'}),
-  ch4QPQ(29,'alkanes','text','Type the complete name of this bicyclic compound.'+ch4QPBicyclo([4,2,1],[{node:'b0c1',label:'Me'},{node:'b1c1',label:'Et'}]),{answer:'8-ethyl-2-methylbicyclo[4.2.1]nonane',accept:['8-ethyl-2-methylbicyclo[4.2.1]nonane'],hints:['The bridge lengths exclude both shared bridgeheads.','Traverse the four-internal-carbon bridge before the two-carbon bridge. Compare the two starting bridgeheads.'],why:'The parent has 4 + 2 + 1 + 2 = 9 carbons. Starting at A gives Me at C2 and Et at C8; starting at B gives Me at C5 and Et at C7. The set 2,8 wins at the first difference. Alphabetize ethyl before methyl: <b>8-ethyl-2-methylbicyclo[4.2.1]nonane</b>.'}),
+  ch4QPQ(29,'alkanes','text','Type the complete name of this bicyclic compound.'+ch4QPBicyclo([4,2,1],[{node:'b0c1',label:'Me'},{node:'b1c1',label:'Et'}]),{answer:'8-ethyl-2-methylbicyclo[4.2.1]nonane',accept:['8-ethyl-2-methylbicyclo[4.2.1]nonane'],hints:['The bridge lengths exclude both shared bridgeheads.','Traverse the four-internal-carbon bridge before the two-carbon bridge. Compare the two starting bridgeheads.'],why:'<p><b>Start at A for this structure—not because it is at the top.</b> Follow the longest bridge first, then the next longest, then the shortest:</p><ol><li>A is C1. Down the left bridge: <b>C2 (Me), C3, C4, C5</b>, then B is C6.</li><li>Return up the right bridge: <b>C7, C8 (Et)</b>, back to A.</li><li>The middle bridge contains the remaining carbon: <b>C9</b>.</li></ol>'+ch4QPBicyclo([4,2,1],[{node:'b0c1',label:'Me'},{node:'b1c1',label:'Et'}],true,'Numbered answer: original A = C1; original B = C6')+'<p>Starting at A gives locants <b>2,8</b>; starting at B gives <b>5,7</b>. Compare the sorted lists: 2 is lower than 5, so A wins. The parent has 4 + 2 + 1 + 2 = 9 carbons. Write ethyl before methyl alphabetically: <b>8-ethyl-2-methylbicyclo[4.2.1]nonane</b>.</p><p>Numbering rule: <a href="https://iupac.qmul.ac.uk/BlueBook/P2.html#P-23.2.3" target="_blank" rel="noopener noreferrer">IUPAC P-23.2.3</a>.</p>'}),
   ch4QPQ(30,'chair','written','Classify Me/Br as cis or trans, then draw both numbered chairs of this compound. In this double-Newman orientation, the vertical front-carbon bonds are axial up; the vertical rear-carbon bonds are axial down.'+ch4QPDouble(0,false,{rightFrontAxial:'Me',rightRearEquatorial:'Br'}),{requiresDrawing:true,answer:'C1 Me up and C2 Br up: cis-1-bromo-2-methyl relationship; with supplied carbon labels, Chair A C1 Me axial up/C2 Br equatorial up; Chair B C1 Me equatorial up/C2 Br axial up.',model:ch4QPChair('A',{groups:[{carbon:1,site:'a',label:'Me'},{carbon:2,site:'e',label:'Br'}],title:'Model A · retain the supplied C1/C2 labels'})+ch4QPChair('B',{groups:[{carbon:1,site:'e',label:'Me'},{carbon:2,site:'a',label:'Br'}],title:'Model B · actual ring flip'})+'<p>C1 is the right dot, so its vertical Me is axial up. C2 is the right rear circle: its axial H points down, so its equatorial Br is up. The two groups are <b>cis</b>, even though one is attached to a front carbon and the other to a rear carbon. The supplied carbon labels are a tracking convention, not a request to renumber the molecule for an IUPAC name.</p>',rubric:['Me attached to C1; Br attached to C2 in both chairs','Me and Br both up, therefore cis','One axial and one equatorial substituent in each chair','Each group swaps axial/equatorial in the flip','Six-carbon ring connected; no group migrated or disappeared'],hints:['Use the right dot and right rear circle to identify the two occupied ring carbons.','On each carbon the axial and equatorial bonds have opposite faces.'],why:'This combines a new substituted double-Newman drawing with actual chair production. Front/rear are viewing positions, not the cis/trans answer. The paper construction remains self-reviewed, not automatically certified.'}),
   ch4QPQ(31,'conform','written','Convert this Newman into a <b>sawhorse</b>, with the front carbon at lower left and the rear carbon at upper right. Preserve its conformation and label every shown group.'+ch4Newman(['OH','CH₃','H'],['CH₂CH₃','H','Cl'],'staggered','Given Newman · center dot = front; circle = rear'),{requiresDrawing:true,answer:'Front: OH up, CH3 lower right, H lower left. Rear: ethyl upper right, H down, Cl upper left. Preserve staggered conformation.',model:ch4QPSawhorseModel()+'<p>Slide the rear carbon up/right to expose the central bond without turning either carbon about that bond. Front inventory: OH, methyl, H. Rear inventory: ethyl, Cl, H. The original staggered relationship and the cyclic order of groups remain unchanged.</p>',rubric:['Front carbon at lower left; rear carbon at upper right','OH, methyl and H stay on front carbon','Ethyl, Cl and H stay on rear carbon','Staggered relationship and handed order preserved','Every explicit H and condensed attachment labeled correctly'],hints:['Make a separate three-group list for the dot and circle before drawing.','Expose the viewed C–C bond; do not rotate a wheel as you change representation.'],why:'Changing Newman to sawhorse changes how the same conformation is shown, not which groups are connected or their dihedral relationships. This is paper production with a self-review model, not an automatic ink grade.',source:CH4_QUIZ_PREP_SOURCE+' Added for the user-supplied Quiz B objective: interconvert wedge/dash, sawhorse and Newman representations.'}),
   ch4QPQ(32,'chair','written','Draw a most-stable chair of each isomer. Which isomer releases <b>more heat per mole</b> on complete combustion to the same products under identical conditions? Explain using the chairs.'+ch4Ring([{carbon:1,label:'Me',up:true},{carbon:4,label:'Me',up:true}],'Isomer A')+ch4Ring([{carbon:1,label:'Me',up:true},{carbon:4,label:'Me',up:false}],'Isomer B'),{requiresDrawing:true,answer:'A is cis-1,4-dimethylcyclohexane: one axial and one equatorial methyl. B is trans-1,4: its favored chair is diequatorial. A has greater steric energy and releases more heat; its combustion ΔH is more negative.',model:ch4QPChair('A',{groups:[{carbon:1,site:'a',label:'Me'},{carbon:4,site:'e',label:'Me'}],title:'A · one axial methyl in either chair'})+ch4QPChair('B',{groups:[{carbon:1,site:'e',label:'Me'},{carbon:4,site:'e',label:'Me'}],title:'B · favored diequatorial chair'})+'<p><b>A releases more heat.</b> Both are C₈H₁₆ and form 8 CO₂ + 8 H₂O per mole on complete combustion. In the course steric model, A cannot avoid one axial methyl; B can put both methyl groups equatorial. A starts higher in energy, so reaching the same combustion products releases a greater amount of heat. Its signed ΔHcomb is therefore more negative. These are two configurational isomers, not two isolated samples of rapidly interconverting chairs.</p>',rubric:['A drawn cis-1,4 with one axial and one equatorial methyl','B drawn trans-1,4 in its diequatorial favored chair','Same carbon counts and common combustion products recognized','A identified as higher-energy and greater heat released','More heat released correctly distinguished from a less-negative signed ΔH'],hints:['A has two groups on the same face; B has opposite faces.','Compare the lowest-energy available chair of EACH isomer, then compare their starting energies.'],why:'This directly connects substituted-ring stereochemistry, axial crowding and heats of combustion. The comparison is between same-formula isomers under the same conditions; a raw heat comparison across different formulas would need a different basis.',source:CH4_QUIZ_PREP_SOURCE+' Added for the user-supplied Quiz B substituted-cyclohexane combustion objective; deck pp. 38, 77–84 supply the stability and chair principles.'})
@@ -10158,6 +10235,284 @@ const CH4_QUIZ_B_BLUEPRINT=[
 ];
 const CH4_QUIZ_A_PRACTICE_IDS=[ch4QP19(5),ch4QP19(7),...[8,9,14,17].map(ch4QPSepId),...[25,26,29].map(ch4QPId)];
 
+/* Bounded Chapter 4 naming expansion · September 28, 2026.
+ * Load after ch4-quiz-prep-content.js, before registering CH4 arrays with the app.
+ * Three clean redraws preserve learner-supplied homework connectivity. The
+ * remaining nine are original practice, not predictions of the paper quiz.
+ * Repeated/homework graphs are explicitly familiar, never automatic fresh proof.
+ */
+const ch4NMId=n=>'CH4-NM-20260928-'+String(n).padStart(2,'0');
+const CH4_NAMING_TIERS={
+  foundation:{id:'foundation',title:'Foundation',label:'Foundation',description:'Trace, number, name, and draw one or two branches.',ids:[1,2,3,4].map(ch4NMId)},
+  intermediate:{id:'intermediate',title:'Intermediate',label:'Intermediate',description:'Mixed branches, ring numbering, and first-point-of-difference choices.',ids:[5,6,7,8].map(ch4NMId)},
+  challenge:{id:'challenge',title:'Challenge',label:'Challenge',description:'Competing parents and bicyclic numbering. Bicyclic work is supplemental unless assigned.',ids:[9,10,11,12].map(ch4NMId)}
+};
+function ch4NMTree(n,branches=[]){
+  const g={nodes:{},edges:[],elements:{},parent:Array.from({length:n},(_,i)=>'p'+(i+1)),kind:'tree'};
+  for(let i=1;i<=n;i++){g.nodes['p'+i]=[60+(i-1)*75,i%2?175:130];if(i>1)g.edges.push(['p'+(i-1),'p'+i]);}
+  branches.forEach((b,j)=>{
+    const p=g.nodes['p'+b.at],sign=b.at%2?1:-1,siblings=branches.filter(x=>x.at===b.at),index=siblings.indexOf(b),dx=siblings.length>1?(index-(siblings.length-1)/2)*52:0;
+    let previous='p'+b.at;
+    for(let k=1;k<=(b.length||1);k++){const id='s'+j+'c'+k;g.nodes[id]=[p[0]+dx+(k>1?(k%2?0:45):0),p[1]+sign*55*k];g.edges.push([previous,id]);previous=id;if(b.element)g.elements[id]=b.element;}
+  });
+  return g;
+}
+function ch4NMRing(n){
+  const g={nodes:{},edges:[],elements:{},ring:Array.from({length:n},(_,i)=>'r'+(i+1)),kind:'ring'};
+  for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;g.nodes['r'+(i+1)]=[300+95*Math.cos(a),175+95*Math.sin(a)];g.edges.push(['r'+(i+1),'r'+((i+1)%n+1)]);}
+  return g;
+}
+function ch4NMArm(g,start,prefix,points){let previous=start;points.forEach((p,i)=>{const id=prefix+(i+1);g.nodes[id]=p;g.edges.push([previous,id]);previous=id;});return g;}
+function ch4NMBicyclo(counts,substituents=[]){
+  const base=ch4QPBicycloModel(counts),g={nodes:JSON.parse(JSON.stringify(base.nodes)),edges:base.edges.map(e=>e.slice()),elements:{},kind:'bicyclo',bridgeCounts:counts.slice(),bridges:base.bridges.map(b=>b.slice()),parent:base.order.slice()};
+  substituents.forEach((s,i)=>{const p=g.nodes[s.at],side=s.at.startsWith('b0')?-1:1;ch4NMArm(g,s.at,'s'+i+'c',Array.from({length:s.length},(_,k)=>[p[0]+side*55*(k+1),p[1]+(k%2?-15:15)]));});return g;
+}
+const CH4_NM_GRAPHS=(()=>{
+  const gs={
+    1:ch4NMTree(7,[{at:2,length:1}]),
+    2:ch4NMTree(7,[{at:3,length:1}]),
+    4:ch4NMTree(6,[{at:2,length:1},{at:2,length:1}]),
+    5:ch4NMTree(7,[{at:3,length:2},{at:4,length:1}]),
+    8:ch4NMTree(6,[{at:3,length:2},{at:3,length:1}]),
+    11:ch4NMBicyclo([3,2,1],[{at:'b0c2',length:1},{at:'b1c2',length:2}]),
+    12:ch4NMTree(7,[{at:2,length:1},{at:2,length:1},{at:3,length:2},{at:4,element:'Br'}])
+  };
+  gs[3]=ch4NMRing(4);ch4NMArm(gs[3],'r2','ethyl',[[450,145],[505,177]]);
+  gs[6]=ch4NMRing(5);ch4NMArm(gs[6],'r1','ethyl',[[300,28],[350,0]]);ch4NMArm(gs[6],'r2','methyl',[[450,125]]);
+  // Exact connectivity from the learner's six-membered homework ring:
+  // Me at top, upper left, bottom and lower right; n-propyl at lower left.
+  gs[7]=ch4NMRing(6);
+  for(const [at,id,p]of[['r1','meTop',[300,25]],['r3','meRight',[430,250]],['r4','meBottom',[300,322]],['r6','meLeft',[170,100]]])ch4NMArm(gs[7],at,id,[p]);
+  ch4NMArm(gs[7],'r5','propyl',[[166,248],[114,218],[62,248]]);
+  // Exact fused 6+5 homework graph, kept in its familiar page orientation.
+  gs[9]=ch4NMBicyclo([4,3,0]);Object.assign(gs[9].nodes,{A:[355,105],B:[355,205],b0c1:[280,60],b0c2:[205,105],b0c3:[205,205],b0c4:[280,250],b1c1:[440,80],b1c2:[500,155],b1c3:[440,230]});
+  ch4NMArm(gs[9],'b0c2','ethyl',[[145,70],[85,105]]);ch4NMArm(gs[9],'b1c1','methyl',[[458,25]]);
+  // Exact graph of CH3CH(Br)CH2C(CH3)2CH2CH(C(CH3)3)CH2CH3.
+  // Keeping the last CH2CH3 intact avoids the learner's earlier lost carbon.
+  gs[10]=ch4NMTree(8);Object.assign(gs[10].nodes,{br:[135,73],m4a:[259,65],m4b:[311,65],t:[435,66],ta:[383,20],tb:[435,4],tc:[487,20]});
+  gs[10].elements.br='Br';gs[10].edges.push(['p2','br'],['p4','m4a'],['p4','m4b'],['p6','t'],['t','ta'],['t','tb'],['t','tc']);
+  gs[10].parent=['ta','t','p6','p5','p4','p3','p2','p1'];
+  return gs;
+})();
+function ch4NMFigure(n,title='Given bond-line structure',numbered=false){
+  const g=CH4_NM_GRAPHS[n],values=Object.values(g.nodes),minX=Math.min(...values.map(p=>p[0]))-30,minY=Math.min(...values.map(p=>p[1]))-30,w=Math.max(...values.map(p=>p[0]))-minX+30,h=Math.max(...values.map(p=>p[1]))-minY+35;
+  const at=id=>[g.nodes[id][0]-minX,g.nodes[id][1]-minY];
+  let body=g.edges.map(([a,b])=>{
+    const p=at(a),q=at(b),label=g.elements[b]||g.elements[a];
+    if(label){const length=Math.hypot(q[0]-p[0],q[1]-p[1]),short=15/length;if(g.elements[b])return ch4Line(...p,q[0]+(p[0]-q[0])*short,q[1]+(p[1]-q[1])*short);return ch4Line(p[0]+(q[0]-p[0])*short,p[1]+(q[1]-p[1])*short,...q);}
+    return ch4Line(...p,...q);
+  }).join('');
+  // A collinear one-carbon bridge must show an atom, not look like the direct
+  // zero-carbon bridge. A filled carbon point makes that distinction explicit.
+  if(g.kind==='bicyclo')for(const bridge of g.bridges)if(bridge.length===1){const p=at(bridge[0]);body+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="currentColor"/>';}
+  Object.entries(g.elements).forEach(([id,label])=>{const p=at(id);body+=ch4Label(p[0],p[1]+6,label,21);});
+  if(numbered)(g.parent||g.ring||[]).forEach((id,i)=>{const p=at(id);body+=ch4Label(p[0]+11,p[1]+21,String(i+1),14);});
+  return ch4Figure(title,body,w,h);
+}
+const CH4_NM_HOMEWORK_SOURCES={
+  7:'Learner-supplied homework image in the study conversation (attachment codex-clipboard-8673f609-764f-4e8e-8e8a-5530910a5ebc.png). Clean redraw of the same carbon connectivity; not an official quiz item.',
+  9:'Learner-supplied homework screenshot codex-clipboard-32adc97b-c265-4602-90db-f8688c696eee.png. Clean redraw of the same fused-ring connectivity; not an official quiz item.',
+  10:'Learner-supplied CHEM 231 tutorial screenshot codex-clipboard-730cd594-72e0-43d7-be2a-cc35a3ca91e0.png. Condensed formula rebuilt as a complete bond-line graph; not an official quiz item.'
+};
+function ch4NMQ(n,type,prompt,extra){
+  const tier=n<=4?'foundation':n<=8?'intermediate':'challenge',homework=Boolean(CH4_NM_HOMEWORK_SOURCES[n]);
+  return Object.assign({id:ch4NMId(n),chapter:4,courseRoute:'ch4',topic:'alkanes',type,diff:n<=4?1:n<=8?2:3,namingTier:tier,namingGraphId:n,
+    prompt,source:CH4_NM_HOMEWORK_SOURCES[n]||'Original Chapter 4 naming/drawing practice, September 28, 2026, aligned to alkane and cycloalkane naming rules. Not an official quiz item.',
+    sourceKind:homework?'learner-homework-redraw':'original-practice',familiarRepresentation:homework,novelty:homework?'familiar-homework':'new-practice-not-assumed-unseen',eligibleForUnseenTransfer:!homework,
+    transferFamily:'ch4-naming-'+n,activityCategory:'homework-style',reviewMode:type==='written'?'self-reviewed-paper':undefined},extra);
+}
+const CH4_NAMING_QUESTIONS=[
+  ch4NMQ(1,'text','Name the structure. Choose the parent before numbering.'+ch4NMFigure(1),{answer:'2-methylheptane',accept:['2-methylheptane'],hints:['Trace between terminal carbons; do not count a branch twice.','Compare the branch position from both ends.'],why:'The longest parent has seven carbons. Numbering places the methyl on C2 rather than C6: <b>2-methylheptane</b>.',transferFamily:'ch4-2-methylheptane'}),
+  ch4NMQ(2,'written','Draw <b>3-methylheptane</b> as a bond-line structure. Label the parent numbering and give the molecular formula.',{requiresDrawing:true,answer:'Seven-carbon parent with methyl at C3; C8H18.',model:ch4NMFigure(2,'Model: 3-methylheptane',true)+'<p>Seven parent carbons plus one methyl = eight total: C₈H₁₈.</p>',rubric:['Seven-carbon longest parent','One-carbon methyl branch at C3','Eight total carbons','Formula C8H18; all carbon valences valid'],hints:['Heptane sets the parent length.','The branch adds a new carbon outside the parent.'],why:'Name → structure requires building the specified connectivity. Turning or reflecting the whole ordinary bond-line drawing is fine; moving the branch is not.',transferFamily:'ch4-3-methylheptane'}),
+  ch4NMQ(3,'text','Name this compound. Decide whether the ring or the side chain is the parent.'+ch4NMFigure(3),{answer:'ethylcyclobutane',accept:['ethylcyclobutane','1-ethylcyclobutane'],hints:['Count ring carbons separately from the attached chain.','A monosubstituted ring does not need a locant.'],why:'The four-carbon ring is larger than the two-carbon chain, so the parent is cyclobutane: <b>ethylcyclobutane</b>. There are six carbons in the complete molecule.',transferFamily:'ch4-ethylcyclobutane'}),
+  ch4NMQ(4,'written','Draw <b>2,2-dimethylhexane</b>. Show a numbered parent and give the total carbon count.',{requiresDrawing:true,answer:'Six-carbon parent; two methyl groups on C2; eight total carbons (C8H18).',model:ch4NMFigure(4,'Model: 2,2-dimethylhexane',true),rubric:['Six-carbon longest parent','Two separate one-carbon branches on the same C2','Eight total carbons','C2 has four carbon bonds and no hydrogen'],hints:['The repeated 2 means both methyl groups attach to the same carbon.','Each methyl adds one carbon; the attachment carbon is already in hexane.'],why:'Both branches belong at C2. Their endpoints add two carbons to the six-carbon parent.',transferFamily:'ch4-2-2-dimethylhexane'}),
+  ch4NMQ(5,'text','Write the complete name, including both branches in alphabetical order.'+ch4NMFigure(5),{answer:'3-ethyl-4-methylheptane',accept:['3-ethyl-4-methylheptane'],hints:['Compare all equally long parents before assigning branch names.','Compare sorted locants at the first difference, not by adding them.'],why:'A seven-carbon parent leaves ethyl and methyl. Locants 3,4 beat 4,5. Ethyl comes before methyl: <b>3-ethyl-4-methylheptane</b>.',transferFamily:'ch4-3-ethyl-4-methylheptane'}),
+  ch4NMQ(6,'written','Draw <b>1-ethyl-2-methylcyclopentane</b>. Number the ring and count all carbons. No cis/trans relationship is specified.',{requiresDrawing:true,answer:'Five-membered ring, ethyl at C1, methyl on adjacent C2; eight total carbons (C8H16).',model:ch4NMFigure(6,'Model: 1-ethyl-2-methylcyclopentane',true),rubric:['Five-membered ring','Two-carbon ethyl branch at C1','One-carbon methyl branch on adjacent C2','Eight carbons total; no stereochemical requirement invented'],hints:['Ethyl has two carbons beyond the ring attachment carbon.','Positions 1 and 2 are neighbors.'],why:'Ring and branches must retain their full lengths. Ordinary single bonds are sufficient because the name does not specify stereochemistry.',transferFamily:'ch4-1-ethyl-2-methylcyclopentane'}),
+  ch4NMQ(7,'text','Homework redraw: name the substituted ring. Keep every one-carbon branch and the complete three-carbon branch.'+ch4NMFigure(7,'Homework structure · clean redraw, same connectivity'),{answer:'1,2,4,5-tetramethyl-3-propylcyclohexane',accept:['1,2,4,5-tetramethyl-3-propylcyclohexane'],hints:['Start at a substituted ring carbon and compare both numbering directions.','Compare the full sorted locant lists before alphabetical ordering.','Ignore tetra- when alphabetizing methyl versus propyl.'],why:'The ring has six carbons. Its five occupied positions can be numbered 1,2,3,4,5. Propyl is at C3 and methyl groups at C1,C2,C4,C5: <b>1,2,4,5-tetramethyl-3-propylcyclohexane</b>. This redraw is familiar practice, not a new independent transfer result.',transferFamily:'ch4-homework-tetramethyl-propyl-cyclohexane'}),
+  ch4NMQ(8,'written','Draw <b>3-ethyl-3-methylhexane</b>. Mark C3 and give the molecular formula.',{requiresDrawing:true,answer:'Six-carbon parent with ethyl and methyl both on C3; C9H20.',model:ch4NMFigure(8,'Model: 3-ethyl-3-methylhexane',true)+'<p>6 + 2 + 1 = 9 carbons, so C₉H₂₀.</p>',rubric:['Six-carbon longest parent','Two-carbon ethyl on C3','One-carbon methyl also on C3','C3 has four carbon bonds; formula C9H20'],hints:['Both locants are 3, so both branches begin at the same parent carbon.','Ethyl and methyl add different numbers of carbons.'],why:'The shared branch point must preserve both distinct fragments and carbon valence. A branch count alone is not enough.',transferFamily:'ch4-3-ethyl-3-methylhexane'}),
+  ch4NMQ(9,'text','Homework redraw: name this fused bicyclic compound. Use longest-bridge-first numbering before comparing substituent locants.'+ch4NMFigure(9,'Homework fused-ring structure · clean redraw'),{answer:'3-ethyl-9-methylbicyclo[4.3.0]nonane',accept:['3-ethyl-9-methylbicyclo[4.3.0]nonane'],hints:['Identify the two shared ring-junction carbons.','The brackets count carbons between bridgeheads, excluding the bridgeheads themselves.','Only then compare the two possible starting bridgeheads.'],why:'The bridges contain 4,3,0 internal carbons. Add two shared bridgeheads: nine parent carbons. Valid numbering gives 3,9 rather than 4,7, so <b>3-ethyl-9-methylbicyclo[4.3.0]nonane</b>. This repeats your homework graph and earlier repair example; it does not count as new independent transfer.',transferFamily:'ch4-3-ethyl-9-methyl-bicyclo430',supplemental:true}),
+  ch4NMQ(10,'text','Tutorial redraw: name this complete structure. Several longest chains tie—compare how many substituents each leaves.'+ch4NMFigure(10,'Tutorial structure · complete condensed formula redrawn'),{answer:'7-bromo-3-ethyl-2,2,5,5-tetramethyloctane',accept:['7-bromo-3-ethyl-2,2,5,5-tetramethyloctane'],hints:['The horizontal path is not automatically the preferred parent.','Try a path starting at one methyl of the upper three-methyl fork.','After parent selection, compare both complete locant lists before alphabetizing.'],why:'Both leading candidates contain eight carbons. Passing through the upper three-methyl fork leaves more substituents. From a fork tip the locants are 2,2,3,5,5,7; reversing gives 2,4,4,6,7,7. The first difference favors the former. List bromo, ethyl, then methyl: <b>7-bromo-3-ethyl-2,2,5,5-tetramethyloctane</b>. The full graph has 14 carbons and Br; the formula is C₁₄H₂₉Br.',transferFamily:'ch4-tutorial-bromo-ethyl-tetramethyloctane'}),
+  ch4NMQ(11,'written','Draw <b>6-ethyl-3-methylbicyclo[3.2.1]octane</b>. Number all parent carbons and show all three bridges.',{requiresDrawing:true,supplemental:true,answer:'Eight-carbon bicyclic parent with bridges of 3,2,1 internal carbons; methyl at C3, ethyl at C6; C11H20.',model:ch4NMFigure(11,'Model: 6-ethyl-3-methylbicyclo[3.2.1]octane',true),rubric:['Two shared bridgeheads plus bridges of 3,2,1 internal carbons','All eight distinct parent carbons counted once','Longest bridge numbered first','Methyl at C3 and complete two-carbon ethyl at C6','Valid carbon valences; both rings remain closed'],hints:['Bracket counts exclude the two bridgeheads.','Cross the three-internal-carbon bridge first, then the two-carbon bridge.','The one-carbon shortest bridge also needs an explicit corner or carbon point.'],why:'3 + 2 + 1 + 2 = eight parent carbons. The preferred direction gives 3,6 rather than 3,7. Adding methyl and ethyl gives eleven carbons in a saturated bicyclic graph, C₁₁H₂₀. This is supplemental bicyclic drawing practice, not a guarantee of quiz scope.',transferFamily:'ch4-6-ethyl-3-methyl-bicyclo321'}),
+  ch4NMQ(12,'written','Draw <b>4-bromo-3-ethyl-2,2-dimethylheptane</b>. Number the parent, label Br explicitly, and give the molecular formula.',{requiresDrawing:true,answer:'Seven-carbon parent; Br C4, ethyl C3, two methyls C2; C11H23Br.',model:ch4NMFigure(12,'Model: 4-bromo-3-ethyl-2,2-dimethylheptane',true)+'<p>7 + 2 + 2 = eleven carbons. One Br replaces one H of C₁₁H₂₄, giving C₁₁H₂₃Br.</p>',rubric:['Seven-carbon longest parent','Two methyls on C2 and two-carbon ethyl on C3','Br directly attached to C4, explicitly labeled','Eleven total carbons; formula C11H23Br','No carbon has more than four bonds'],hints:['Draw the parent first, then add each complete branch.','A halogen label is not another carbon.','Count total carbons before calculating hydrogen count.'],why:'This integrates parent length, repeated locants, different branch sizes, and halogen valence. No wedge/dash stereochemistry is specified.',transferFamily:'ch4-4-bromo-3-ethyl-2-2-dimethylheptane'})
+];
+CH4_QUESTIONS.push(...CH4_NAMING_QUESTIONS);
+// All are reachable in the existing naming route. Familiar redraws are guided;
+// original prompts are cold candidates only if actual history shows no support.
+ch4QPAttach('ch4-name-draw',[7,10].map(ch4NMId),[1,2,3,4,5,6,8,12].map(ch4NMId));
+ch4QPAttach('ch4-quiz-bicyclo',[ch4NMId(9)],[ch4NMId(11)]);
+for(const id of['ch4-name-draw','ch4-quiz-bicyclo']){
+  const u=CH4_LESSONS.find(x=>x.id===id);if(u)u.homeworkIds=[...new Set([...(u.homeworkIds||[]),...u.coldIds.filter(qid=>qid.startsWith('CH4-NM-'))])];
+}
+// Existing redraws of the same fused graph share a family across modules.
+for(const q of CH4_QUESTIONS)if(q.id==='CH4-QP-20260928-09')q.transferFamily='ch4-3-ethyl-9-methyl-bicyclo430';
+
+/* Authored task-complexity tiers · September 28, 2026.
+ * Load after all Chapter 4 question modules, before the app registers them.
+ * These are instructional heuristics, NOT empirically calibrated difficulty,
+ * estimates of Gabe's ability, mastery thresholds, or predictions of marks.
+ * A written answer is not automatically harder than multiple choice. Tiers
+ * describe the thinking/representation demands of the actual task, not format.
+ * Hints, prior exposure, correctness and independence are tracked separately.
+ * New naming-expansion items already carry their own authored tiers.
+ */
+const CH4_DIFFICULTY_CRITERIA=Object.freeze({
+  1:'Foundation: recognize one feature, recall one rule, or perform one explicit counting/placement operation.',
+  2:'Application: apply a rule to a structure, carry out a routine construction/comparison, or combine a short sequence of familiar operations.',
+  3:'Synthesis: coordinate representations or constraints, preserve spatial order through a transformation, enumerate graphs, or integrate construction with explanation.'
+});
+const CH4_AUTHORED_DIFFICULTY=Object.freeze({
+  // Initial course tasks: isolated carbon-map reads → complete naming/drawing.
+  'CH4-20260919-01':1, // Count a short parent path.
+  'CH4-20260919-02':1, // Identify one marked methyl.
+  'CH4-20260919-03':1, // Immediate carbon neighbors.
+  'CH4-20260919-04':2, // Compare longer competing paths.
+  'CH4-20260919-05':2,
+  'CH4-20260919-06':2,
+  'CH4-20260919-07':2,
+  'CH4-20260919-08':2,
+  'CH4-20260919-09':3, // Enumerate all distinct C5 graphs, reject duplicates.
+  'CH4-20260919-10':2,
+  'CH4-20260919-11':3, // Enumerate all distinct C6 graphs.
+  'CH4-20260919-12':2,
+  'CH4-20260919-13':1, // Symmetric ethane; all six groups identical.
+  'CH4-20260919-14':2,
+  'CH4-20260919-15':2, // Routine butane wedge/dash conversion.
+  'CH4-20260919-16':3, // Reverse eye without rotating the bond.
+  'CH4-20260919-17':1,
+  'CH4-20260919-18':2,
+  'CH4-20260919-19':2,
+  'CH4-20260919-20':3, // Complete energy profile plus matching Newmans.
+  'CH4-20260919-21':1,
+  'CH4-20260919-22':2,
+  'CH4-20260919-23':2,
+  'CH4-20260919-24':1,
+  // Same intrinsic complexity: two-chair construction preserving given faces.
+  'CH4-20260919-25':2,
+  'CH4-20260919-26':2,
+  'CH4-20260919-27':2,
+  'CH4-20260919-28':2,
+  'CH4-20260919-29':3, // Track unlike groups and compare competing axial costs.
+  'CH4-20260919-30':2,
+  'CH4-20260919-31':3,
+  'CH4-20260919-32':2,
+  'CH4-20260919-33':3, // Asymmetric sawhorse → Newman, handed order retained.
+  'CH4-20260919-34':3, // Chair → connected double Newman plus H accounting.
+
+  // Lecture naming: substituent recognition, routine names, then parent ties.
+  'CH4-20260923-01':1,
+  'CH4-20260923-02':1,
+  'CH4-20260923-03':1,
+  'CH4-20260923-04':1,
+  'CH4-20260923-05':1,
+  'CH4-20260923-06':1,
+  'CH4-20260923-07':2,
+  'CH4-20260923-08':3,
+  'CH4-20260923-09':3,
+  'CH4-20260923-10':2,
+  'CH4-20260923-11':2,
+  'CH4-20260923-12':2,
+  'CH4-20260923-13':2,
+  'CH4-20260923-14':2,
+  'CH4-20260923-15':1,
+  'CH4-20260923-16':1,
+  'CH4-20260923-17':3, // Nested systematic substituent naming.
+  'CH4-20260923-18':2,
+  'CH4-20260923-19':2, // Explicit routine naming steps, not harder for prose.
+  'CH4-20260923-20':1,
+  'CH4-20260923-21':1,
+  'CH4-20260923-22':2,
+  'CH4-20260923-23':1,
+  'CH4-20260923-24':2,
+  'CH4-20260923-25':2,
+  'CH4-20260923-26':1,
+  'CH4-20260923-27':1,
+  'CH4-20260923-28':2,
+  'CH4-20260923-29':1,
+  'CH4-20260923-30':1,
+  'CH4-20260923-31':1,
+  'CH4-20260923-32':3, // Definitions + choose and draw two contrasting cases.
+  'CH4-20260923-33':1, // Course-policy recall; not a chemistry mastery item.
+  // No IDs 34–39 exist in this dated source block.
+  'CH4-20260923-40':3,
+  'CH4-20260923-41':3,
+  'CH4-20260923-42':2, // Only one distinct wedge group; rear has identical Hs.
+  'CH4-20260923-43':3,
+  'CH4-20260923-44':3, // Number first, then derive the directed view.
+  'CH4-20260923-45':3,
+  'CH4-20260923-46':3, // Wedge mapping + constrained one-wheel rotation.
+  'CH4-20260923-47':3,
+  'CH4-20260923-48':2,
+  'CH4-20260923-49':2,
+
+  // Lecture 11: face recognition → chairs, strain and combustion applications.
+  'CH4-L11-20260924-01':1,
+  'CH4-L11-20260924-02':1,
+  'CH4-L11-20260924-03':2,
+  'CH4-L11-20260924-04':2,
+  'CH4-L11-20260924-05':1,
+  'CH4-L11-20260924-06':2,
+  'CH4-L11-20260924-07':2,
+  'CH4-L11-20260924-08':3,
+  'CH4-L11-20260924-09':1,
+  'CH4-L11-20260924-10':2,
+  'CH4-L11-20260924-11':2,
+  'CH4-L11-20260924-12':2,
+  'CH4-L11-20260924-13':2,
+  'CH4-L11-20260924-14':1,
+  'CH4-L11-20260924-15':1,
+  'CH4-L11-20260924-16':2,
+  'CH4-L11-20260924-17':2,
+  'CH4-L11-20260924-18':2,
+  'CH4-L11-20260924-19':2,
+  'CH4-L11-20260924-20':1,
+  'CH4-L11-20260924-21':2,
+  'CH4-L11-20260924-22':1,
+  'CH4-L11-20260924-23':1,
+  'CH4-L11-20260924-24':2,
+  'CH4-L11-20260924-25':3,
+  'CH4-L11-20260924-26':2,
+  'CH4-L11-20260924-27':2,
+  'CH4-L11-20260924-28':1, // Scope recall, not chemistry transfer.
+
+  // Quiz-prep repairs: read one feature → apply → integrate representations.
+  'CH4-QP-20260928-01':2,
+  'CH4-QP-20260928-02':3,
+  'CH4-QP-20260928-03':1,
+  'CH4-QP-20260928-04':1,
+  'CH4-QP-20260928-05':1,
+  'CH4-QP-20260928-06':3,
+  'CH4-QP-20260928-07':1,
+  'CH4-QP-20260928-08':2,
+  'CH4-QP-20260928-09':3,
+  'CH4-QP-20260928-10':1,
+  'CH4-QP-20260928-11':3,
+  'CH4-QP-20260928-12':2,
+  'CH4-QP-20260928-13':1,
+  'CH4-QP-20260928-14':1,
+  'CH4-QP-20260928-15':2,
+  'CH4-QP-20260928-16':1,
+  'CH4-QP-20260928-17':3,
+  'CH4-QP-20260928-18':2,
+  'CH4-QP-20260928-19':1,
+  'CH4-QP-20260928-20':2,
+  'CH4-QP-20260928-21':2,
+  'CH4-QP-20260928-22':3,
+  'CH4-QP-20260928-23':1,
+  'CH4-QP-20260928-24':2,
+  'CH4-QP-20260928-25':2,
+  'CH4-QP-20260928-26':2,
+  'CH4-QP-20260928-27':3,
+  'CH4-QP-20260928-28':3,
+  'CH4-QP-20260928-29':3,
+  'CH4-QP-20260928-30':3,
+  'CH4-QP-20260928-31':3,
+  'CH4-QP-20260928-32':3
+});
+// Content, keys, hints, history, familiarity and route membership are untouched.
+for(const q of CH4_QUESTIONS){
+  if(Object.prototype.hasOwnProperty.call(CH4_AUTHORED_DIFFICULTY,q.id))q.diff=CH4_AUTHORED_DIFFICULTY[q.id];
+}
+
 /* September 28 quiz-prep release. Navigation only; existing attempts and drafts remain authoritative.
    Quiz scope/date reported by Gabe, not scraped from an instructor announcement. */
 const CH4_QUIZ_DATE = '2026-09-29';
@@ -10241,7 +10596,7 @@ function quizCoverageEvidence(){
       const corrected=q?.correctedAt?Date.parse(q.correctedAt):0;
       const familyIds=q?.transferFamily?new Set(CH4_QUESTIONS.filter(x=>x.transferFamily===q.transferFamily).map(x=>x.id)):null;
       const familySeen=familyIds&&(S.attempts||[]).some(x=>x!==a&&familyIds.has(x.id)&&x.ts<=a.ts);
-      return !familySeen&&a.c&&a.ok&&!quizNeedsWork(a)&&!quizNeedsWork(current)&&Date.now()-a.ts<=7*86400000&&(!corrected||a.ts>=corrected);
+      return q?.eligibleForUnseenTransfer!==false&&!familySeen&&a.c&&a.ok&&!quizNeedsWork(a)&&!quizNeedsWork(current)&&Date.now()-a.ts<=7*86400000&&(!corrected||a.ts>=corrected);
     });
     return {unit:u,fresh:fresh.length,constructed:fresh.filter(a=>['text','num','ch4production'].includes(QUESTIONS.find(q=>q.id===a.id)?.type)).length,manual:rows.filter(a=>a.sr).length,needs:[...latest.values()].some(quizNeedsWork)};
   });
@@ -10264,6 +10619,24 @@ function quizAQueue(){
   return CH4_QUIZ_A_PRACTICE_IDS.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
 }
 function startQuizA(){beginCourseDrill(quizAQueue(),{id:'quiz-a-rehearsal',topic:'alkanes'},'mixed','Quiz A · naming and drawing practice');}
+function startNamingTier(key){
+  const tier=typeof CH4_NAMING_TIERS==='undefined'?null:CH4_NAMING_TIERS[key];
+  if(!tier)return;
+  const queue=tier.ids.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
+  if(queue.length)beginCourseDrill(queue,{id:'naming-tier-'+key,topic:'alkanes'},'practice','Naming & drawing · '+tier.label);
+}
+function renderNamingTiers(v){
+  if(typeof CH4_NAMING_TIERS==='undefined')return;
+  const d=el('details',{class:'qp-naming-tiers','data-naming-tiers':'true'});
+  d.appendChild(el('summary',{},'More naming practice · 3 difficulty tiers'));
+  d.appendChild(el('p',{class:'qp-caption'},'Four tasks per tier: name a structure or draw a name. Includes homework redraws and new structures. Draw on paper or in the app; written explanations are optional.'));
+  Object.entries(CH4_NAMING_TIERS).forEach(([key,tier])=>{
+    const b=el('button',{class:'qp-skill','data-naming-tier':key,onclick:()=>startNamingTier(key)});
+    b.innerHTML='<span><strong>'+esc(tier.label)+' · '+tier.ids.length+' tasks</strong><small>'+esc(tier.description)+'</small></span><span aria-hidden="true">→</span>';
+    d.appendChild(b);
+  });
+  v.appendChild(d);
+}
 let quizClockInterval=null;
 function renderQuizClock(v,D){
   if(D?.courseUnit!=='quiz-b-rehearsal'||D.i>=D.queue.length||D.reviewIdx!=null)return;
@@ -10284,6 +10657,7 @@ function quizAssessmentChoices(v){
   const choices=el('div',{class:'qp-assessments'});
   const a=el('div');a.innerHTML='<h3>Quiz A</h3><p>Naming & drawing structures · 9 practice tasks (actual quiz length not supplied)</p>';
   a.appendChild(el('button',{class:'btn ghost','data-quiz-a-start':'true',onclick:startQuizA},'Practise naming + drawing →'));
+  renderNamingTiers(a);
   const b=el('div');b.innerHTML='<h3>Quiz B</h3><p>Structure & stability · 10 questions · 25 minutes · on paper</p>';
   b.appendChild(el('button',{class:'btn','data-quiz-b-start':'true',onclick:startQuizB},'Start 25-minute rehearsal →'));
   choices.appendChild(a);choices.appendChild(b);box.appendChild(choices);
@@ -10330,7 +10704,7 @@ function renderQuizLibrary(v,mode='learn'){
     const units=quizGroupUnits(g);if(!units.length)return;
     const block=el('details',{class:'card qp-strand'});
     block.innerHTML='<summary><span><strong>'+esc(g.title)+'</strong><small>'+esc(g.note)+'</small></span><span class="qp-count">'+units.length+' lessons</span></summary>';
-    units.forEach(u=>block.appendChild(quizLessonButton(u,mode)));section.appendChild(block);
+    units.forEach(u=>block.appendChild(quizLessonButton(u,mode)));if(g.key==='name')renderNamingTiers(block);section.appendChild(block);
   });
   // No silent omission if a future content update adds another unit.
   const known=new Set(quizUnits().map(u=>u.id)),extra=CH4_LESSONS.filter(u=>!known.has(u.id));
@@ -10351,13 +10725,15 @@ function startQuizPaper(){
   beginCourseDrill(queue,{id:'quiz-paper',topic:'chair'},'proof','Chapter 4 · paper drawing check (self-review)');
 }
 function renderQuizHome(v){
-  const soon=todayStr()<=CH4_QUIZ_DATE,u=quizSuggestedUnit(),p=S.pausedDrill?.courseUnit?S.pausedDrill:null;
+  const soon=todayStr()<=CH4_QUIZ_DATE,u=quizSuggestedUnit(),p=(S.pausedDrill?.courseUnit||S.pausedDrill?.learningAdaptive)?S.pausedDrill:null;
   quizHeader(v,soon?'Your Chapter 4 quiz prep':'Your Chapter 4 study desk',soon?'Quiz: Tuesday, September 29 · scope confirmed by you':'Learn the tricky step, practise it, then check without hints.');
   const hero=el('section',{class:'card qp-hero','data-quiz-hub':'ch4'});
   const st=u?quizUnitEvidence(u).stage:'checked';
-  hero.innerHTML='<span class="qp-eyebrow">'+(p?'SAVED FOR YOU':'START HERE')+'</span><h2>'+(p?'Continue where you stopped':u?esc(u.title):'Put the chapter together')+'</h2><p>'+(p?esc(p.scopeName)+' · '+p.i+' of '+p.ids.length+' tasks complete':st==='repair'?'A recent check left this step open. Revisit the example, then try a different task.':u?esc(u.goal):'Try a short mix across all six Chapter 4 skill areas.')+'</p>';
-  hero.appendChild(el('button',{class:'btn qp-primary','data-quiz-next':'true',onclick:()=>p?resumeDrill():quizContinue(u)},p?'Resume my work →':st==='proof'?'Try the no-hint check →':st==='practice'?'Start supported practice →':u?'Walk me through it →':'Start quiz rehearsal →'));
-  hero.appendChild(el('p',{class:'qp-caption'},'One step at a time. You can pause any practice set and return here.'));v.appendChild(hero);
+  const adaptiveReady=typeof startAdaptiveLearning==='function';
+  hero.innerHTML='<span class="qp-eyebrow">'+(p?'SAVED FOR YOU':'START HERE')+'</span><h2>'+(p?'Continue where you stopped':adaptiveReady?'Practice that adapts to you':u?esc(u.title):'Put the chapter together')+'</h2><p>'+(p?esc(p.scopeName)+' · '+p.i+' of '+p.ids.length+' tasks complete':adaptiveReady?'Ten Chapter 4 tasks. The next question adjusts to your answers, with occasional easier checks to keep the foundations solid.':u?esc(u.goal):'Try a short mix across all six Chapter 4 skill areas.')+'</p>';
+  hero.appendChild(el('button',{class:'btn qp-primary','data-quiz-next':'true',onclick:()=>p?resumeDrill():adaptiveReady?startAdaptiveLearning({chapter:'ch4'}):quizContinue(u)},p?'Resume my work →':adaptiveReady?'Start adaptive practice →':u?'Walk me through it →':'Start quiz rehearsal →'));
+  if(u&&!p&&adaptiveReady)hero.appendChild(el('button',{class:'qp-back',style:'display:block;margin-top:12px',onclick:()=>quizOpenLesson(u.id,0)},'Teach me the next step first →'));
+  hero.appendChild(el('p',{class:'qp-caption'},'You can pause and return. Adaptation guides practice; it is not a mastery certificate or a quiz-score prediction.'));v.appendChild(hero);
   quizAssessmentChoices(v);
   const mix=el('details',{class:'card qp-strand'}),n=quizCheckQueue().length;
   mix.innerHTML='<summary>General Chapter 4 mix & repair</summary><p>'+n+' tasks across the whole chapter. This is broader than Quiz B.</p>';
@@ -10365,7 +10741,7 @@ function renderQuizHome(v){
   if(quizRecentNeeds().length)buttons.appendChild(el('button',{class:'btn ghost','data-quiz-repair-start':'true',onclick:startQuizRepair},'Repair recent weak steps'));
   mix.appendChild(buttons);v.appendChild(mix);
   const heading=el('h2',{class:'qp-section-title'},'Pick a skill instead');v.appendChild(heading);renderQuizLibrary(v);quizPaperCard(v);
-  const saved=[...(S.pausedDrill&&!S.pausedDrill.courseUnit?[S.pausedDrill]:[]),...(S.parkedDrills||[])];
+  const saved=[...(S.pausedDrill&&!S.pausedDrill.courseUnit&&!S.pausedDrill.learningAdaptive?[S.pausedDrill]:[]),...(S.parkedDrills||[])];
   if(saved.length){const d=el('details',{class:'card qp-strand'});d.innerHTML='<summary>Saved other work · '+saved.length+'</summary>';saved.forEach(x=>d.appendChild(el('button',{class:'qp-skill',onclick:()=>x===S.pausedDrill?resumeDrill():resumeParkedDrill(x.runId)},esc(x.scopeName||'Earlier round')+' →')));v.appendChild(d);}
   v.appendChild(courseSourceNote());
 }
@@ -10427,6 +10803,7 @@ function installQuizPrepUI(){
   @media(max-width:600px){.qp-heading{margin:5px 0 18px}.qp-library{grid-template-columns:1fr}.qp-hero,.qp-lesson{padding:20px!important}.qp-journey{grid-template-columns:1fr;gap:12px;margin:18px 0 24px}.qp-journey>div{align-items:center}.qp-journey small{margin-top:0}.qp-heading h1,.qp-lesson h1{font-size:1.65rem}.qp-actions{flex-direction:column;align-items:stretch}.qp-actions .btn{width:100%;white-space:normal}.qp-context{flex-wrap:wrap}.qp-count{display:none}.qp-strand summary strong{font-size:.96rem}.qp-lesson-body ol{padding-left:22px}}
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
   .qp-assessments{display:grid;grid-template-columns:1fr 1fr;gap:18px}.qp-assessments h3{font-size:1rem}.qp-assessments p{font-size:.86rem;line-height:1.45;margin:8px 0 12px}.qp-assessments .btn{white-space:normal;min-height:44px}.qp-quiz-clock{padding:8px 12px;background:#edf5f9;border-radius:8px;font-variant-numeric:tabular-nums;font-size:.85rem;margin-bottom:10px}.qp-quiz-clock.expired{background:#fff1dd}.qp-quiz-clock small{display:block;color:var(--muted-tx);font-size:.75rem}
+  .qp-naming-tiers{border-top:1px solid var(--line);margin-top:16px;padding-top:8px}.qp-naming-tiers>summary{cursor:pointer;font-size:.85rem;font-weight:650;min-height:44px;display:flex;align-items:center;gap:8px}.qp-naming-tiers>summary:before{content:'▸'}.qp-naming-tiers[open]>summary:before{content:'▾'}.qp-strand .qp-naming-tiers>summary:after{content:none}.qp-naming-tiers .qp-skill{min-height:64px}
   @media(max-width:600px){.qp-assessments{grid-template-columns:1fr;gap:20px}.qp-assessments .btn{width:100%}}
   `;document.head.appendChild(style);
 }
@@ -10442,7 +10819,7 @@ VIEWS.learn=v=>{
   if(u&&!S.learnTopic){renderQuizLesson(v,u);return;}
   quizHeader(v,'Learn one skill','Open the area you want. Each lesson separates the rule, example, and practice.');renderQuizLibrary(v);
 };
-VIEWS.practice=v=>{quizHeader(v,'Practise Chapter 4','Choose a skill for supported practice, or repair your recent weak steps.');if(quizRecentNeeds().length)v.appendChild(el('button',{class:'btn',style:'margin-bottom:20px','data-quiz-repair-start':'true',onclick:startQuizRepair},'Repair recent weak steps →'));renderQuizLibrary(v,'practice');quizPaperCard(v);};
+VIEWS.practice=v=>{quizHeader(v,'Practise Chapter 4','Let the next question adapt, or choose a specific skill below.');if(typeof startAdaptiveLearning==='function')v.appendChild(el('button',{class:'btn',style:'margin-bottom:20px','data-adaptive-ch4-start':'true',onclick:()=>startAdaptiveLearning({chapter:'ch4'})},'Start adaptive practice · 10 tasks →'));if(quizRecentNeeds().length)v.appendChild(el('button',{class:'btn ghost',style:'margin-bottom:20px','data-quiz-repair-start':'true',onclick:startQuizRepair},'Repair recent weak steps →'));renderQuizLibrary(v,'practice');quizPaperCard(v);};
 VIEWS.exam=v=>{
   const n=quizCheckQueue().length;quizHeader(v,'Check without hints','Quiz A: naming and drawing. Quiz B: structure and stability.');quizAssessmentChoices(v);
   const c=el('section',{class:'card qp-hero'});c.innerHTML='<span class="qp-eyebrow">'+n+' TASKS · SIX SKILL AREAS</span><h2>Put the rules together</h2><p>Use a blank sheet beside you. The set samples naming, Newman construction, chair construction, conformation energy, and stability. Answers are checked as you go; hints stay off. Any freehand or paper work uses self-review, not automatic grading.</p><p>You can pause and resume. Seeing feedback is practice, so a later repeat is not a fresh test.</p>';
@@ -10450,7 +10827,7 @@ VIEWS.exam=v=>{
   const coverage=el('section',{class:'card qp-check-card'});coverage.innerHTML='<h2>After repair: cover every skill</h2><p>One task from each of the '+quizUnits().length+' lessons. Unattempted homework-style tasks come first; if the pool is exhausted, repeats are labeled. Pause whenever you need.</p>';
   coverage.appendChild(el('button',{class:'btn ghost','data-quiz-coverage-start':'true',onclick:startQuizCoverage},'Start '+quizCoverageQueue().length+'-skill coverage check →'));v.appendChild(coverage);renderQuizCoverage(v);quizPaperCard(v);
 };
-VIEWS.more=v=>{QUIZ_LEGACY_VIEWS.more(v);const c=el('details',{class:'card qp-strand'});c.innerHTML='<summary>Earlier chapters and full-course tools</summary><p>Kept here so your Chapter 4 prep stays focused. Existing progress and saved work are unchanged.</p>';[['All chapter lessons','allLearn'],['All practice tools','allPractice'],['Earlier exam routes','allExam']].forEach(([label,view])=>c.appendChild(el('button',{class:'qp-skill',onclick:()=>{S.learnCh=null;S.learnUnit=null;S.learnTopic=null;go(view);}},label+' →')));v.appendChild(c);};
+VIEWS.more=v=>{QUIZ_LEGACY_VIEWS.more(v);const c=el('details',{class:'card qp-strand'});c.innerHTML='<summary>Earlier chapters and full-course tools</summary><p>Kept here so your Chapter 4 prep stays focused. Existing progress and saved work are unchanged.</p>';[['All chapter lessons','allLearn'],['All practice tools','allPractice'],['Earlier exam routes','allExam']].forEach(([label,view])=>c.appendChild(el('button',{class:'qp-skill',onclick:()=>{S.learnCh=null;S.learnUnit=null;S.learnTopic=null;go(view);}},label+' →')));if(typeof startAdaptiveLearning==='function'){const d=el('details',{'data-adaptive-scopes':'true',class:'qp-naming-tiers'});d.innerHTML='<summary>Adaptive practice in any chapter</summary><p class="muted">The same engine stays within the scope you choose. Difficulty levels guide selection; they are not calibrated test scores.</p>';[...CHAPTERS,{id:'all',name:'All available chapters'}].forEach(ch=>d.appendChild(el('button',{class:'qp-skill','data-adaptive-scope':ch.id,onclick:()=>startAdaptiveLearning({chapter:ch.id})},esc(ch.name)+' →')));c.appendChild(d);}v.appendChild(c);};
 const quizOriginalOpenLearningUnit=openLearningUnit;
 openLearningUnit=(chapter,unit)=>{S.quizLessonStep=0;quizOriginalOpenLearningUnit(chapter,unit);};
 // Keep a clear exit and progress label above the existing, state-preserving answer engine.
@@ -10468,6 +10845,15 @@ if(quizLinkedLesson){const linked=CH4_LESSONS.find(u=>u.id===quizLinkedLesson);S
 
 /* v3.96: homework-first Chapter 4 workspace. Move existing nodes, never replace
  * answer handlers, keys, drafts, hints, or historical evidence. */
+function ch4NamingResponseDiagnostic(q,value){
+  if(q.id!=='CH4-20260923-17')return null;
+  const compact=String(value).toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(['5tertbutylnonane','5tbutylnonane'].includes(compact))return {
+    code:'naming-form',
+    note:'You identified the correct parent, attachment position, and tert-butyl group. This exercise specifically requests the systematic branch name; the naming form is what needs correction, not the carbon skeleton.'
+  };
+  return null;
+}
 function ch4WorkspaceDetails(label,nodes,klass=''){
   const d=el('details',{class:'cq-details '+klass});
   d.appendChild(el('summary',{},label));nodes.filter(Boolean).forEach(n=>d.appendChild(n));return d;
@@ -10492,7 +10878,7 @@ function compactCh4Question(v,D){
   }
   const controls=el('div',{class:'cq-quick-help'});
   if(help.length){const d=ch4WorkspaceDetails('Need a hint?',help,'cq-hint');d.open=hintUse(D,q).count>0;controls.appendChild(d);}
-  if(tag)tag.textContent=(D.cold?'No-hint check':'Practice')+' · '+(D.i+1)+' / '+D.queue.length;
+  if(tag)tag.textContent=(D.cold?'No-hint check':'Practice')+' · '+(D.i+1)+' / '+D.queue.length+(q.namingTier?' · '+q.namingTier.charAt(0).toUpperCase()+q.namingTier.slice(1):'');
   if(controls.childNodes.length)card.insertBefore(controls,prompt);
   const workspace=el('div',{class:'cq-workspace'+(q.type==='ch4production'?' cq-build':'')});
   const reference=el('section',{class:'cq-reference','aria-label':'Question and given structure'});
@@ -10506,15 +10892,23 @@ function compactCh4Question(v,D){
     if(run.length>1){const grid=el('div',{class:'cq-figure-comparison'});prompt.insertBefore(grid,fig);run.forEach(n=>grid.appendChild(n));}
   });
   const response=el('section',{class:'cq-answer','aria-label':'Your answer'});
+  let reasoning=null;
   if(confidence){
     confidence.classList.add('cq-confidence');
-    const why=confidence.querySelector('input[type="text"],input:not([type])');
-    if(why)meta.push(why);
+    const why=confidence.querySelector('[data-ch4-reasoning-input],input[type="text"],input:not([type])');
+    if(why){
+      reasoning=ch4WorkspaceDetails('Add my reasoning (optional)',[why],'cq-reasoning');
+      const summary=reasoning.querySelector('summary'),update=()=>{summary.textContent=why.value.trim()?'My reasoning (optional)':'Add my reasoning (optional)';};
+      why.addEventListener('input',update);update();reasoning.open=!!why.value.trim();
+      const preview=typeof safeStore!=='undefined'&&safeStore.persistent===false;
+      const note=el('p',{class:'cq-reasoning-help'},preview?'Optional. Preview only—these notes are not saved to your practice history.':'Optional. Saves with your answer; leave blank if you prefer.');reasoning.insertBefore(note,why);
+    }
     const g=confidence.querySelector('label[for="gk"]'),dk=confidence.querySelector('label[for="dkk"]');
     if(g)g.textContent='I’m guessing';if(dk)dk.textContent='Not learned yet';
     response.appendChild(confidence);
   }
   answer.forEach(n=>response.appendChild(n));
+  if(reasoning){const slot=response.querySelector('[data-ch4-reasoning-slot]');if(slot)slot.appendChild(reasoning);else response.insertBefore(reasoning,answer[0]||null);}
   workspace.appendChild(reference);workspace.appendChild(response);card.appendChild(workspace);
   // On a phone, switch between the supplied structure and the working drawing.
   // The complete question is always available; no information is deleted or rewritten.
@@ -10546,12 +10940,22 @@ function installCh4QuestionWorkspace(){
   @media(min-width:850px){#view:has(.cq-question){max-width:1150px;margin-inline:auto}.cq-build{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)}.cq-build .cq-reference{align-self:start;position:sticky;top:12px}.cq-question:has(.cq-build)>.cq-quick-help{max-width:48%}}
   @media(min-width:850px){.cq-figure-comparison{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.cq-figure-comparison>figure{min-width:0}.cq-figure-comparison figcaption{min-height:2.8em}}
   .cq-mobile-tabs button.btn.ghost[aria-pressed="true"],.cq-mobile-tabs button.btn.ghost[aria-pressed="true"]:hover{background:#145f83;color:#fff;border-color:#145f83}
+  .cq-reasoning{margin:8px 0}.cq-reasoning-help{font-size:.8rem;line-height:1.4;color:#526b73;margin:0 0 6px!important}.cq-reasoning textarea{display:block;width:100%;min-height:80px;resize:vertical;font:inherit;padding:10px;border:1px solid #a9bfc4;border-radius:8px;background:#fff;color:#233e48}.cq-reasoning textarea:focus-visible{outline:3px solid #c58a2c;outline-offset:2px}.cq-reasoning textarea[readonly]{background:#eef3f4}
   @media(max-width:600px){.cq-question{padding:14px!important}.cq-mobile-tabs{display:flex;gap:6px;margin:4px 0 12px;scroll-margin-top:10px}.cq-mobile-tabs button{flex:1;min-height:44px}.cq-mobile-tabs [aria-pressed=true]{background:#145f83;color:#fff}.cq-build[data-mobile-panel=given]>.cq-answer,.cq-build[data-mobile-panel=answer]>.cq-reference{display:none}.cq-go-build{display:block;width:100%;margin-top:10px}.cq-mobile-stem{display:block;font-size:.88rem;line-height:1.4;margin:0 0 8px}.cq-question .qprompt{font-size:.95rem}.cq-question figure>svg{max-height:210px!important}.cq-question .choices{gap:6px}.cq-question .choices button.choice{padding:10px}.cq-answer .choices:has(svg){grid-template-columns:1fr 1fr}.cq-answer .choices .choice{min-width:0}.cq-answer .choices figure details{font-size:.7rem}.cq-answer .chair-editor{padding:8px}.cq-answer .ce-toolbar{gap:5px}.cq-answer .ce-bank{gap:5px}.cq-answer .ce-bank button{min-height:40px}}
   `;document.head.appendChild(s);
 }
 installCh4QuestionWorkspace();
 const ch4WorkspacePreviousDrill=VIEWS.drill;
-VIEWS.drill=v=>{const D=S.drill;ch4WorkspacePreviousDrill(v);compactCh4Question(v,D);};
+function renderAdaptiveQuestionReason(v,D){
+  if(!D||D.reviewIdx!=null||D.i>=D.queue.length||typeof adaptiveLearningCurrentDecision!=='function')return;
+  const decision=adaptiveLearningCurrentDecision(D),card=v.querySelector('.qprompt')?.closest('.card');
+  if(!decision||!card||card.querySelector('[data-adaptive-reason]'))return;
+  const details=ch4WorkspaceDetails('Why this question?',[],'cq-adaptive-reason');details.dataset.adaptiveReason='true';
+  const reason=el('p');reason.textContent=decision.reason;details.appendChild(reason);
+  const caveat=el('p',{class:'muted'});caveat.textContent='The next task can change with your answer. Difficulty labels are authored estimates, not a mastery score. Hints, guessing, and self-reviewed drawings do not count as independent proof.';details.appendChild(caveat);
+  card.appendChild(details);
+}
+VIEWS.drill=v=>{const D=S.drill;ch4WorkspacePreviousDrill(v);compactCh4Question(v,D);renderAdaptiveQuestionReason(v,D);};
 if(new URLSearchParams(location.search).get('qa')==='1'){
   const h=document.querySelector('header');
   if(h&&!document.getElementById('cq-preview-note'))h.appendChild(el('span',{id:'cq-preview-note',style:'font-size:.72rem;color:#665530'},'Preview · practice is not saved'));
@@ -10636,20 +11040,33 @@ function chairFlipPlacements(placements){
 }
 function gradeCh4ChairEditor(q,draft){
   const p=q.production,subs=p.substituents||[],checks=[];
+  const location=(board,key)=>/^[1-6][ae]$/.test(key)?'C'+key[0]+', '+(key[1]==='a'?'axial':'equatorial')+' '+(chairUp(board,Number(key[0]),key[1])?'up':'down'):'unrecognized bond '+key;
   (p.requireFlip===false?['A']:['A','B']).forEach(board=>{
     const slots=(draft.placements||{})[board]||{};
     const occupied=Object.entries(slots).filter(([,v])=>chairValue(q,v)!=='H');
     const expected=subs.map(s=>chairCanonical(s.label)).filter(v=>v!=='H').sort();
-    checks.push({key:board+'-complete',ok:occupied.every(([key])=>/^[1-6][ae]$/.test(key))&&
-      JSON.stringify(occupied.map(([,v])=>chairValue(q,v)).sort())===JSON.stringify(expected),
-      text:'Chair '+board+': use exactly the groups in the given molecule; restore any extra substituents to H.'});
+    const complete=occupied.every(([key])=>/^[1-6][ae]$/.test(key))&&JSON.stringify(occupied.map(([,v])=>chairValue(q,v)).sort())===JSON.stringify(expected);
+    checks.push({key:board+'-complete',ok:complete,
+      text:complete?'Chair '+board+': the group inventory is correct.':'Chair '+board+': expected '+(expected.map(chairLabel).join(', ')||'no non-H groups')+'; found '+(occupied.map(([key,v])=>chairLabel(chairValue(q,v))+' at '+location(board,key)).join('; ')||'no non-H groups')+'. Add any missing group or restore extra groups to H.'});
     subs.forEach(sub=>{
-      const site=chairUp(board,sub.carbon,'a')===sub.up?'a':'e';
-      checks.push({key:board+'-'+sub.id,ok:chairValue(q,slots[sub.carbon+site])===chairCanonical(sub.label),
-        text:'Chair '+board+': '+chairLabel(sub.label)+' belongs on C'+sub.carbon+' and must stay '+(sub.up?'up':'down')+'. Track the carbon number before checking axial/equatorial.'});
+      const site=chairUp(board,sub.carbon,'a')===sub.up?'a':'e',ok=chairValue(q,slots[sub.carbon+site])===chairCanonical(sub.label);
+      const actual=occupied.filter(([,v])=>chairValue(q,v)===chairCanonical(sub.label)).map(([key])=>location(board,key));
+      checks.push({key:board+'-'+sub.id,ok,
+        text:'Chair '+board+': '+chairLabel(sub.label)+(ok?' is correctly at ':' belongs at ')+location(board,sub.carbon+site)+'.'+(ok?'':' Your '+chairLabel(sub.label)+': '+(actual.join('; ')||'not placed')+'. Keep the carbon number and up/down face unchanged during a flip.')});
     });
   });
-  if(p.preferredChair)checks.push({key:'stability',ok:draft.preferred===p.preferredChair,text:'Compare the axial substituents to choose the lower-energy chair.'});
+  if(p.preferredChair){
+    const labels={A:'Chair A',B:'Chair B',equal:'Equal energy'},penalties={CH3:7.6,CH2CH3:8,OH:4.2,'C(CH3)3':22.8};
+    const axial=board=>subs.filter(s=>chairCanonical(s.label)!=='H'&&chairUp(board,s.carbon,'a')===s.up);
+    const known=subs.every(s=>chairCanonical(s.label)==='H'||Object.prototype.hasOwnProperty.call(penalties,chairCanonical(s.label)));
+    const total=board=>axial(board).reduce((sum,s)=>sum+penalties[chairCanonical(s.label)],0);
+    const inventory=board=>'Chair '+board+' has '+(axial(board).length?'axial '+axial(board).map(s=>chairLabel(s.label)+' at C'+s.carbon).join(' and '):'no axial non-H substituents');
+    const validPair=checks.every(c=>c.ok),equal=p.preferredChair==='equal';
+    let why=(validPair?'':'For the correct chair pair, ')+inventory('A')+'; '+inventory('B')+'. ';
+    if(known)why+='Using the course\'s approximate additive axial penalties: A ≈ '+Number(total('A').toFixed(1))+' kJ/mol; B ≈ '+Number(total('B').toFixed(1))+' kJ/mol. ';
+    why+=equal?'The axial strain penalties balance, so neither chair is lower in energy.':'The lower-energy chair reduces the total strain from axial substituents and their 1,3-diaxial interactions.';
+    checks.push({key:'stability',ok:draft.preferred===p.preferredChair,text:'You selected '+(labels[draft.preferred]||'no energy choice')+'. Correct choice: '+labels[p.preferredChair]+'. '+why});
+  }
   return {ok:checks.every(c=>c.ok),checks};
 }
 function chairEditorStyle(){
@@ -10659,13 +11076,13 @@ function chairEditorStyle(){
     .chair-editor *{box-sizing:border-box}.chair-editor h3{font-size:22px;margin:0 0 8px}.chair-editor h4{font-size:18px;margin:0}.chair-editor p{margin:8px 0}.chair-editor .ce-muted{color:#526b73;font-size:14px}
     .ce-toolbar,.ce-bank{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chair-editor button{font:inherit;cursor:pointer;min-height:44px;padding:9px 14px;background:white;color:var(--ce-ink);border:1px solid #a9bfc4;border-radius:10px;line-height:1.2}
     .chair-editor button:hover{border-color:var(--ce-teal)}.chair-editor button:focus-visible{outline:3px solid #c58a2c;outline-offset:3px}.chair-editor button[aria-pressed="true"],.chair-editor button.ce-primary{background:var(--ce-teal);color:white;border-color:var(--ce-teal)}
-    .chair-editor button:disabled{opacity:.45;cursor:default}.ce-bank button{min-width:48px;touch-action:none;user-select:none;-webkit-user-select:none;font-weight:650}.ce-board{border-top:1px solid var(--ce-line);padding-top:16px;margin-top:16px}
-    .ce-canvas{background:white;border:1px solid #d6e1e3;border-radius:14px;overflow-x:auto;max-width:100%}.ce-canvas svg{display:block;width:100%;min-width:530px;max-width:760px;height:auto;margin:auto}.ce-enlarged .ce-canvas svg{min-width:700px}
+    .chair-editor button:disabled{opacity:.45;cursor:default}.chair-editor [data-chair-energy][aria-pressed="true"]:disabled{opacity:1}.ce-energy-status{font-size:14px;font-weight:650}.ce-bank button{min-width:48px;touch-action:none;user-select:none;-webkit-user-select:none;font-weight:650}.ce-board{border-top:1px solid var(--ce-line);padding-top:16px;margin-top:16px}
+    .ce-canvas{background:white;border:1px solid #d6e1e3;border-radius:14px;overflow-x:auto;max-width:100%}.ce-canvas svg{display:block;width:100%;min-width:530px;max-width:760px;height:auto;margin:auto;touch-action:none}.ce-enlarged .ce-canvas svg{min-width:700px}
     .ce-carbon,.ce-bond-slot{cursor:pointer;outline:none;touch-action:manipulation}.ce-carbon .ce-carbon-hit{fill:transparent}.ce-carbon .ce-number{fill:white;stroke:#a9bfc4;stroke-width:1.5}.ce-carbon[aria-expanded="true"] .ce-number{fill:#e0f2f0;stroke:#126a70;stroke-width:2}
     .ce-carbon:focus-visible .ce-carbon-hit{stroke:#c58a2c;stroke-width:3}.ce-bond-slot .ce-slot-hit{fill:#f0f4f5;stroke:#bdcdd0;stroke-width:1.4}.ce-bond-slot.ce-occupied .ce-slot-hit{fill:#e0f2f0;stroke:#126a70;stroke-width:2}
     .ce-bond-slot.ce-target .ce-slot-hit,.ce-bond-slot.ce-drop .ce-slot-hit,.ce-bond-slot:focus-visible .ce-slot-hit{fill:#fff3d7;stroke:#af7619;stroke-width:3}.ce-bond-slot[aria-disabled="true"]{cursor:default}.ce-bond-slot text,.ce-carbon text{pointer-events:none;user-select:none}
-    .ce-readonly .ce-carbon{cursor:default}.ce-note{background:#e9f4f3;border-left:3px solid var(--ce-teal);padding:10px 14px;border-radius:4px}.ce-feedback{background:#fff3db;padding:12px 16px;border-radius:10px}.ce-feedback ul{padding-left:20px}.ce-feedback li{margin:8px 0}
-    .ce-status{min-height:24px;font-size:14px;color:#3e6069}.ce-caption{margin:8px 4px;font-size:13px;color:#526b73}.chair-editor summary{cursor:pointer;padding:12px 0}.ce-drag{opacity:.65}
+    .ce-readonly .ce-carbon{cursor:default}.ce-readonly svg{touch-action:auto}.ce-note{background:#e9f4f3;border-left:3px solid var(--ce-teal);padding:10px 14px;border-radius:4px}.ce-feedback{background:#fff3db;padding:12px 16px;border-radius:10px}.ce-feedback ul{padding-left:20px}.ce-feedback li{margin:8px 0}
+    .ce-status{min-height:24px;font-size:14px;color:#3e6069}.ce-caption{margin:8px 4px;font-size:13px;color:#526b73}.chair-editor summary{cursor:pointer;padding:12px 0}.ce-drag{opacity:.65}.ce-bond-slot.ce-occupied,.ce-bond-slot.ce-occupied .ce-slot-hit{cursor:grab;touch-action:none}.ce-drag-ghost{position:fixed;z-index:10000;pointer-events:none;transform:translate(-50%,-50%);padding:8px 12px;border:2px solid #126a70;border-radius:10px;background:#e0f2f0;color:#233e48;font:650 16px system-ui,sans-serif;box-shadow:0 4px 12px #0003}
     @media(max-width:500px){.chair-editor{padding:12px}.ce-bank{gap:6px}.ce-bank button{padding:8px 10px}.chair-editor h3{font-size:20px}}
   `;document.head.appendChild(style);
 }
@@ -10696,7 +11113,7 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
   if(draft.chairEditorVersion!==1){draft.selected=null;draft.target=null;draft.chairEditorVersion=1;}
   if(reviewOnly)draft.locked=true;
   chairPrepareGeometry(draft,existing);
-  let message='',suppressClick=false;
+  let message='',suppressClick=false,activeDragCancel=null;
   const persist=()=>{
     if(typeof snapshotDrill==='function'&&typeof S!=='undefined'&&S.drill===D){snapshotDrill(D.i);if(typeof save==='function')save();}
     if(typeof D.onChairDraft==='function')D.onChairDraft(ch4Clone(draft));
@@ -10708,7 +11125,9 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
     if(JSON.stringify(before)!==JSON.stringify(snapshot())){draft.history.push(before);draft.history=draft.history.slice(-40);draft.future=[];}
     return true;
   };
-  const button=(text,fn,attrs={})=>el('button',Object.assign({type:'button',onclick:fn},attrs),esc(text));
+  // ARIA values are strings, not HTML boolean attributes. el(true) produces
+  // an empty attribute, which neither announces nor styles a selected button.
+  const button=(text,fn,attrs={})=>el('button',Object.assign({type:'button',onclick:fn},Object.fromEntries(Object.entries(attrs).map(([k,v])=>[k,k.startsWith('aria-')?String(v):v]))),esc(text));
   const redraw=focus=>{persist();draw();if(focus){const node=host.querySelector(focus);if(node)node.focus({preventScroll:true});}};
   function place(key,label){
     const [board,where]=key.split(':');if(!boards.includes(board)||!/^[1-6][ae]$/.test(where))return;
@@ -10724,42 +11143,85 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
     redraw('[data-chair-bank="'+board+':'+label+'"]');
   }
   function bindDrawing(container){
-    const activate=(node,fn)=>{node.addEventListener('click',fn);node.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();fn();}});};
+    // SVG-child touch-action is not enough in every browser. The root owns
+    // drawing gestures; empty-space drags retain horizontal panning on phones.
+    container.addEventListener('pointerdown',event=>{
+      if(event.button!==0||event.isPrimary===false||event.target.closest('[data-chair-slot],[data-chair-carbon]')||container.scrollWidth<=container.clientWidth+1)return;
+      if(activeDragCancel)activeDragCancel();
+      const start={id:event.pointerId,x:event.clientX,scroll:container.scrollLeft};let ended=false;
+      const move=e=>{if(e.pointerId!==start.id)return;e.preventDefault();container.scrollLeft=start.scroll-(e.clientX-start.x);};
+      const end=e=>{
+        if(ended||e?.pointerId!=null&&e.pointerId!==start.id)return;ended=true;
+        window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',end);window.removeEventListener('blur',end);container.removeEventListener('lostpointercapture',end);activeDragCancel=null;
+        if(container.hasPointerCapture?.(start.id))container.releasePointerCapture(start.id);
+      };
+      activeDragCancel=end;window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end);window.addEventListener('pointercancel',end);window.addEventListener('blur',end);container.addEventListener('lostpointercapture',end);
+      try{container.setPointerCapture(start.id);}catch(_){}
+    });
+    const activate=(node,fn)=>{node.addEventListener('click',()=>{if(!suppressClick)fn();});node.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();fn();}});};
     container.querySelectorAll('[data-chair-carbon]').forEach(node=>activate(node,()=>{
       if(draft.locked)return;const [board,n]=node.dataset.chairCarbon.split(':'),carbon=Number(n),list=draft.expanded[board]||[];
       draft.expanded[board]=list.includes(carbon)?list.filter(x=>x!==carbon):list.concat(carbon);
       if(draft.target?.startsWith(board+':'+carbon))draft.target=null;
       redraw('[data-chair-carbon="'+board+':'+carbon+'"]');
     }));
-    container.querySelectorAll('[data-chair-slot]').forEach(node=>activate(node,()=>{
-      if(draft.locked)return;const key=node.dataset.chairSlot,board=key.split(':')[0];
-      if(draft.selected?.board===board){place(key,draft.selected.label);return;}
-      draft.target=draft.target===key?null:key;
-      message=draft.target?'Choose a group from chair '+board+'’s bank. H restores hydrogen.':'Bond selection cleared.';
-      redraw('[data-chair-slot="'+key+'"]');
-    }));
+    container.querySelectorAll('[data-chair-slot]').forEach(node=>{
+      const key=node.dataset.chairSlot,[board,where]=key.split(':');
+      activate(node,()=>{
+        if(draft.locked)return;
+        if(draft.selected?.board===board){place(key,draft.selected.label);return;}
+        draft.target=draft.target===key?null:key;
+        message=draft.target?'Choose a group from chair '+board+'’s bank. H restores hydrogen.':'Bond selection cleared.';
+        redraw('[data-chair-slot="'+key+'"]');
+      });
+      const label=chairValue(q,draft.placements[board]?.[where]);
+      if(label!=='H')bindDrag(node,board,label,key);
+    });
   }
-  function bindDrag(tile,board,label){
+  function bindDrag(tile,board,label,origin=null){
     tile.addEventListener('pointerdown',event=>{
-      if(draft.locked||event.button!==0)return;
-      const start={x:event.clientX,y:event.clientY,id:event.pointerId};let moved=false,over=null;
-      tile.setPointerCapture(event.pointerId);
-      const clear=()=>{host.querySelectorAll('.ce-drop').forEach(n=>n.classList.remove('ce-drop'));tile.classList.remove('ce-drag');};
+      if(draft.locked||D.answered||event.button!==0||event.isPrimary===false)return;
+      if(activeDragCancel)activeDragCancel();
+      const start={x:event.clientX,y:event.clientY,id:event.pointerId};let moved=false,over=null,ghost=null,ended=false;
+      const hitAt=e=>{
+        const hit=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-chair-slot]');
+        return hit&&host.contains(hit)&&hit.dataset.chairSlot.startsWith(board+':')&&hit.getAttribute('aria-disabled')!=='true'?hit:null;
+      };
+      const clear=()=>{host.querySelectorAll('.ce-drop').forEach(n=>n.classList.remove('ce-drop'));tile.classList.remove('ce-drag');ghost?.remove();};
+      const clean=()=>{
+        window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',cancel);window.removeEventListener('blur',cancel);
+        tile.removeEventListener('lostpointercapture',cancel);clear();activeDragCancel=null;
+        if(tile.hasPointerCapture?.(start.id))tile.releasePointerCapture(start.id);
+        if(moved){suppressClick=true;setTimeout(()=>{suppressClick=false;},0);}
+      };
       const move=e=>{
         if(e.pointerId!==start.id)return;
         moved=moved||Math.hypot(e.clientX-start.x,e.clientY-start.y)>7;if(!moved)return;
-        clear();tile.classList.add('ce-drag');const hit=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-chair-slot]');
-        over=hit&&host.contains(hit)&&hit.dataset.chairSlot.startsWith(board+':')?hit:null;
+        e.preventDefault();suppressClick=true;tile.classList.add('ce-drag');
+        if(!ghost){ghost=el('div',{class:'ce-drag-ghost','aria-hidden':'true'},esc(chairLabel(label)));document.body.appendChild(ghost);}
+        ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';
+        over?.classList.remove('ce-drop');over=hitAt(e);
         if(over)over.classList.add('ce-drop');
       };
       const end=e=>{
-        if(e.pointerId!==start.id)return;
-        tile.removeEventListener('pointermove',move);tile.removeEventListener('pointerup',end);tile.removeEventListener('pointercancel',end);
-        const key=over?.dataset.chairSlot;clear();
-        if(tile.hasPointerCapture(start.id))tile.releasePointerCapture(start.id);
-        if(moved){suppressClick=true;setTimeout(()=>{suppressClick=false;},0);if(e.type==='pointerup'&&key)place(key,label);}
+        if(e.pointerId!==start.id||ended)return;ended=true;
+        const key=moved?hitAt(e)?.dataset.chairSlot:null;clean();
+        if(!key||key===origin)return;
+        if(!origin){place(key,label);return;}
+        const where=key.split(':')[1],from=origin.split(':')[1];
+        if(!edit(()=>{
+          const slots=draft.placements[board],value=slots[from],replaced=slots[where];
+          if(!value)return;
+          slots[where]=value;
+          if(replaced&&chairValue(q,replaced)!=='H')slots[from]=replaced;else delete slots[from];
+        }))return;
+        draft.target=null;draft.selected=null;message=chairLabel(label)+' moved to chair '+board+', C'+where[0]+' '+(where[1]==='a'?'axial':'equatorial')+'.';
+        redraw('[data-chair-slot="'+key+'"]');
       };
-      tile.addEventListener('pointermove',move);tile.addEventListener('pointerup',end);tile.addEventListener('pointercancel',end);
+      const cancel=e=>{if(ended||e?.pointerId!=null&&e.pointerId!==start.id)return;ended=true;clean();};
+      activeDragCancel=cancel;
+      window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end);window.addEventListener('pointercancel',cancel);window.addEventListener('blur',cancel);tile.addEventListener('lostpointercapture',cancel);
+      try{tile.setPointerCapture(event.pointerId);}catch(_){/* Window listeners retain a mouse drag when capture is unavailable. */}
     });
   }
   function addBoard(container,state,board,interactive){
@@ -10774,10 +11236,12 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
       });section.appendChild(bank);
     }
     const visual=el('div',{class:'ce-canvas'+(state.locked?' ce-readonly':'')});visual.innerHTML=chairEditorSvg(q,state,board);section.appendChild(visual);
-    section.appendChild(el('p',{class:'ce-caption'},interactive?'Tap a numbered carbon to show/hide H bonds. Choose a group, then tap a bond—or drag onto it. On a narrow screen, swipe inside the drawing to reach all six carbons.':'Carbon numbers identify the same atoms in both chairs. On a narrow screen, swipe inside the drawing to see the entire chair.'));
+    section.appendChild(el('p',{class:'ce-caption'},interactive?'Tap a numbered carbon to show/hide H bonds. Tap a group, then a bond—or drag a group onto a visible bond. Drag placed groups to move or swap them within that chair. On a narrow screen, swipe inside the drawing to reach all six carbons.':'Carbon numbers identify the same atoms in both chairs. On a narrow screen, swipe inside the drawing to see the entire chair.'));
     container.appendChild(section);if(interactive)bindDrawing(visual);
   }
   function draw(){
+    if(activeDragCancel)activeDragCancel();
+    const reasoning=host.querySelector('.cq-reasoning');
     host.innerHTML='';host.classList.add('chair-editor');host.classList.toggle('ce-enlarged',!!draft.zoom);host.dataset.ch4Production='chair';
     host.appendChild(el('h3',{},draft.locked?'Your submitted chairs':boards.length===1?'Build the chair':'Build both chair conformations'));
     host.appendChild(el('p',{class:'ce-muted'},'Keep each group on the same numbered carbon. A ring flip exchanges axial and equatorial; up/down stays the same.'));
@@ -10799,14 +11263,21 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
     boards.forEach(board=>addBoard(host,draft,board,!draft.locked));
     if(p.preferredChair){
       host.appendChild(el('p',{},'Which chair is lower in energy?'));
-      const choices=el('div',{class:'ce-toolbar','aria-label':'Lower-energy chair'});
-      [['A','Chair A'],['B','Chair B'],['equal','Equal energy']].forEach(([value,label])=>choices.appendChild(button(label,()=>{edit(()=>draft.preferred=value);redraw();},{disabled:!!draft.locked,'aria-pressed':draft.preferred===value})));host.appendChild(choices);
+      const choices=el('div',{class:'ce-toolbar',role:'group','aria-label':'Lower-energy chair'});
+      [['A','Chair A'],['B','Chair B'],['equal','Equal energy']].forEach(([value,label])=>{
+        const selected=draft.preferred===value;
+        choices.appendChild(button((selected?'✓ ':'')+label,()=>{if(!edit(()=>draft.preferred=value))return;redraw('[data-chair-energy="'+value+'"]');},{disabled:!!draft.locked,'data-chair-energy':value,'aria-label':label,'aria-pressed':selected}));
+      });host.appendChild(choices);
+      const selectedLabel={A:'Chair A',B:'Chair B',equal:'Equal energy'}[draft.preferred];
+      host.appendChild(el('p',{class:'ce-energy-status','aria-live':'polite'},selectedLabel?'Selected: '+selectedLabel:'No energy choice selected yet.'));
     }
+    const reasoningSlot=el('div',{'data-ch4-reasoning-slot':'true'});if(reasoning){reasoningSlot.appendChild(reasoning);reasoning.querySelector('textarea').readOnly=!!draft.locked;}host.appendChild(reasoningSlot);
     if(draft.locked){
-      host.appendChild(el('p',{class:'ce-note'},'Your construction is saved with this question. It is read-only after submission.'));
+      host.appendChild(el('p',{class:'ce-note'},typeof safeStore!=='undefined'&&safeStore.persistent===false?'Preview only — this construction is not saved to your practice history. It is read-only after submission.':'Your construction is saved with this question. It is read-only after submission.'));
       if(draft.result&&(!D.cold||reviewOnly)){
-        const misses=draft.result.checks.filter(c=>!c.ok),feedback=el('div',{class:'ce-feedback'});
-        feedback.innerHTML=draft.geometryVersion===1?'<b>Historical position-check result: '+(draft.result.ok?'passed':'needs review')+'.</b> This result was recorded before the Chair A drawing was repaired.':draft.result.ok?'<b>Construction checked.</b> Each group has the correct carbon and face in both chairs.':'<b>Review your construction</b><ul>'+misses.map(c=>'<li>'+esc(c.text)+'</li>').join('')+'</ul>';host.appendChild(feedback);
+        const misses=draft.result.checks.filter(c=>!c.ok),passed=draft.result.checks.filter(c=>c.ok),stability=draft.result.checks.find(c=>c.key==='stability'),feedback=el('div',{class:'ce-feedback'});
+        const onlyEnergy=misses.length===1&&misses[0].key==='stability';
+        feedback.innerHTML=draft.geometryVersion===1?'<b>Historical position-check result: '+(draft.result.ok?'passed':'needs review')+'.</b> This result was recorded before the Chair A drawing was repaired.':draft.result.ok?'<b>Construction checked.</b> Each group has the correct carbon and face in both chairs.'+(stability?'<p>'+esc(stability.text)+'</p>':''):'<b>'+(onlyEnergy?'Your chair placements are correct. The energy choice needs correction.':'Review these parts of your construction.')+'</b><ul>'+misses.map(c=>'<li>'+esc(c.text)+'</li>').join('')+'</ul>'+(passed.length?'<details><summary>What you got right · '+passed.length+' checks</summary><ul>'+passed.map(c=>'<li>'+esc(c.text)+'</li>').join('')+'</ul></details>':'');host.appendChild(feedback);
         if(!draft.result.ok||draft.geometryVersion===1){const comparison=el('details',{});comparison.appendChild(el('summary',{},draft.geometryVersion===1?'Corrected reference: matching carbon order':'Compare with one correct construction'));const model=ch4ProductionModel(q);model.geometryVersion=2;boards.forEach(board=>addBoard(comparison,model,board,false));host.appendChild(comparison);}
       }return;
     }
@@ -10826,6 +11297,371 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
 }
 
 /* END CHAIR SUBSTITUENT EDITOR */
+
+/* Shared practice scheduler. Authored difficulty is not mastery or learner ability.
+ * Derives current routing from immutable attempts; never rewrites old evidence.
+ * Fixed quizzes, diagnostics, proof, mastery, and instructor/manual sets are excluded.
+ */
+const ADAPTIVE_LEARNING_VERSION=1;
+function adaptiveLearningEligible(q){
+  // These two cards concern course logistics/scope, not chemistry performance.
+  return !!q&&q.adaptiveEligible!==false&&!['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);
+}
+function adaptiveLearningDifficulty(q){
+  const naming={foundation:1,intermediate:2,challenge:3};
+  if(Object.prototype.hasOwnProperty.call(naming,q.namingTier))return naming[q.namingTier];
+  const d=Number.isFinite(q.diff)?q.diff:typeof itemDifficulty==='function'?itemDifficulty(q):2;
+  return Math.max(0,Math.min(3,Math.round(d)));
+}
+function adaptiveLearningFamilies(q){
+  const out=['id:'+q.id,'source:'+q.id];
+  if(q.transferFamily)out.push('transfer:'+q.transferFamily);
+  if(typeof CONCEPT_FAMILY!=='undefined'&&CONCEPT_FAMILY[q.id])out.push('concept:'+CONCEPT_FAMILY[q.id]);
+  (q.sourceModelIds||[]).forEach(id=>out.push('source:'+id));
+  return out;
+}
+function adaptiveLearningSkill(q){
+  if(q.adaptiveSkill)return {key:q.adaptiveSkill,label:q.skill||q.adaptiveSkill,granularity:'authored-skill'};
+  const units=typeof CHAPTER_LEARNING_UNITS!=='undefined'?Object.values(CHAPTER_LEARNING_UNITS).flat():[];
+  const unit=units.find(u=>(u.practiceIds||[]).includes(q.id));
+  if(unit)return {key:unit.id,label:unit.title||unit.id,granularity:'lesson'};
+  const family=typeof CONCEPT_FAMILY!=='undefined'&&CONCEPT_FAMILY[q.id];
+  return family?{key:'concept:'+family,label:q.skill||family,granularity:'concept-family'}:{key:'topic:'+q.topic,label:typeof TOPICS!=='undefined'?TOPICS[q.topic]?.name||q.topic:q.topic,granularity:'topic-heuristic'};
+}
+function adaptiveLearningOutcome(a){
+  if(!a)return 'calibrate';
+  if(a.rf)return 'review-flag';
+  if(a.dk)return 'learn-first';
+  if(a.feedbackCode==='naming-form')return 'format-repair';
+  if(!a.ok)return a.g?'uncertain-miss':'miss';
+  if(a.sr||a.drawing?.kind==='freehand-self-review')return 'self-review';
+  if(a.g)return 'guessed-right';
+  if(a.h>0||a.drawing?.clean===false||a.drawing?.firstTry===false||a.drawing?.checks>1)return 'supported-right';
+  return 'clean-right';
+}
+function adaptiveLearningValidAttempt(a,q){
+  if(!Number.isFinite(a.ts))return false;
+  // A date-only correction cannot prove whether a legacy same-day answer used
+  // the old or repaired key. New events carry an exact content-revision label.
+  let correction=q.correctedAt?Date.parse(q.correctedAt):0;
+  if(q.correctedAt&&a.questionRevision!==q.correctedAt&&/^\d{4}-\d{2}-\d{2}$/.test(q.correctedAt))correction=new Date(q.correctedAt+'T23:59:59.999').getTime()+1;
+  if(correction&&a.questionRevision!==q.correctedAt&&a.ts<correction)return false;
+  if(a.drawing?.kind==='chair'&&a.drawing.geometryVersion!==2)return false;
+  return true;
+}
+function adaptiveLearningEvidence(pool,attempts,options={}){
+  pool=pool.filter(adaptiveLearningEligible);
+  const now=options.now||Date.now(),cutoff=now-30*86400000,byId=new Map(pool.map(q=>[q.id,q])),allById=new Map((typeof QUESTIONS!=='undefined'?QUESTIONS:pool).map(q=>[q.id,q])),skills={},seen=new Set();
+  pool.forEach(q=>{const s=adaptiveLearningSkill(q);if(!skills[s.key])skills[s.key]={...s,levels:[],recent:[],cleanByLevel:{},target:1,freshClean:0};skills[s.key].levels.push(adaptiveLearningDifficulty(q));});
+  const rows=[...(attempts||[])].sort((a,b)=>(a.ts||0)-(b.ts||0));
+  rows.forEach(a=>{
+    const q=byId.get(a.id)||allById.get(a.id);if(!adaptiveLearningEligible(q))return;
+    const family=adaptiveLearningFamilies(q),first=!family.some(k=>seen.has(k));family.forEach(k=>seen.add(k));
+    if(!byId.has(q.id))return;
+    if((a.ts||0)<cutoff||!adaptiveLearningValidAttempt(a,q))return;
+    const skill=skills[adaptiveLearningSkill(q).key],level=adaptiveLearningDifficulty(q),outcome=adaptiveLearningOutcome(a);
+    const unfamiliar=q.eligibleForUnseenTransfer!==false&&!q.familiarRepresentation&&q.sourceKind!=='learner-homework-redraw';
+    const freshClean=first&&unfamiliar&&outcome==='clean-right';
+    skill.recent.push({id:q.id,ts:a.ts,level,outcome,freshClean});
+    if(freshClean){(skill.cleanByLevel[level]||(skill.cleanByLevel[level]=[])).push(q.id);skill.freshClean++;}
+  });
+  Object.values(skills).forEach(skill=>{
+    skill.levels=[...new Set(skill.levels)].sort((a,b)=>a-b);
+    const minimum=skill.levels.find(x=>x>=1)??skill.levels[0]??1,maximum=Math.max(...skill.levels);
+    let target=minimum;
+    for(const level of skill.levels)if((skill.cleanByLevel[level]||[]).length>=2)target=Math.max(target,Math.min(maximum,level+1));
+    const latest=skill.recent.at(-1);
+    if(latest&&['miss','uncertain-miss','learn-first'].includes(latest.outcome))target=Math.max(minimum,Math.min(target,latest.level-1));
+    skill.target=target;skill.baseline=minimum;skill.promoted=target>minimum;skill.latest=latest||null;
+    skill.status=latest&&latest.outcome!=='clean-right'?'repair':skill.freshClean>=2?'building':'calibrating';
+    skill.note=skill.granularity==='topic-heuristic'?'Topic-level routing estimate; difficulty is not calibrated.':'Practice routing estimate, not a mastery judgment.';
+  });
+  return {version:ADAPTIVE_LEARNING_VERSION,skills,seenFamilies:[...seen]};
+}
+function adaptiveLearningSelect(pool,attempts,options={}){
+  pool=pool.filter(adaptiveLearningEligible);
+  const used=new Set(options.usedIds||[]),avoidFamilies=new Set(options.avoidFamilies||[]),byId=new Map(pool.map(q=>[q.id,q]));
+  used.forEach(id=>{const q=byId.get(id);if(q)adaptiveLearningFamilies(q).forEach(k=>avoidFamilies.add(k));});
+  const candidates=pool.filter(q=>!used.has(q.id)&&!adaptiveLearningFamilies(q).some(k=>avoidFamilies.has(k)));
+  if(!candidates.length)return null;
+  const evidence=adaptiveLearningEvidence(pool,attempts,options),rawLast=options.lastAttempt,rawLastQ=rawLast&&byId.get(rawLast.id);
+  const now=options.now||Date.now(),last=rawLastQ&&adaptiveLearningValidAttempt(rawLast,rawLastQ)&&rawLast.ts>=now-30*86400000?rawLast:null,lastQ=last&&rawLastQ,outcome=adaptiveLearningOutcome(last);
+  const repair=!!lastQ&&outcome!=='clean-right'&&outcome!=='calibrate';
+  const foundation=((options.index||0)+1)%5===0;
+  const anchor=repair?adaptiveLearningSkill(lastQ).key:null;
+  let working=anchor?candidates.filter(q=>adaptiveLearningSkill(q).key===anchor):candidates;
+  const repairFallback=!!anchor&&!working.length;
+  if(!working.length)working=candidates;
+  const priorCounts={},latestTs={};
+  (attempts||[]).forEach(a=>{priorCounts[a.id]=(priorCounts[a.id]||0)+1;latestTs[a.id]=Math.max(latestTs[a.id]||0,a.ts||0);});
+  const usedSkills={};used.forEach(id=>{const q=byId.get(id);if(q){const key=adaptiveLearningSkill(q).key;usedSkills[key]=(usedSkills[key]||0)+1;}});
+  const ranked=working.map(q=>{
+    const skill=evidence.skills[adaptiveLearningSkill(q).key],level=adaptiveLearningDifficulty(q);
+    const lower=skill.levels.filter(x=>x<skill.target),base=skill.levels.find(x=>x>=1)??skill.levels[0];
+    let desired=foundation?(lower.at(-1)??base):skill.target;
+    if(repair&&adaptiveLearningSkill(q).key===anchor)desired=Math.max(base,Math.min(desired,adaptiveLearningDifficulty(lastQ)-(['self-review','format-repair'].includes(outcome)?0:1)));
+    if(outcome==='format-repair'&&adaptiveLearningSkill(q).key===anchor)desired=adaptiveLearningDifficulty(lastQ);
+    const familySeen=adaptiveLearningFamilies(q).some(k=>evidence.seenFamilies.includes(k));
+    const recentlySeen=latestTs[q.id]&&now-latestTs[q.id]<6*36e5;
+    const priority=skill.status==='repair'?0:skill.status==='calibrating'?1:2;
+    const score=Math.abs(level-desired)*100+(level>desired?15:0)+(recentlySeen?50:0)+(familySeen?18:0)+(q.familiarRepresentation?12:0)+Math.min(10,priorCounts[q.id]||0)+priority*4+(usedSkills[skill.key]||0)*6;
+    return {q,skill,level,desired,score,familySeen};
+  }).sort((a,b)=>a.score-b.score||String(a.q.id).localeCompare(String(b.q.id)));
+  const pick=ranked[0],role=repair?(repairFallback?'repair-fallback':foundation?'foundation-repair':'repair'):foundation?(pick.level<pick.skill.target?'foundation-check':'foundation-fallback'):pick.skill.promoted?'challenge':'calibration';
+  const levelNames=['recall','foundation','intermediate','challenge'];
+  let reason=repair?(repairFallback?'The same-skill bank has no unused distinct sibling; continue with another in-scope skill and keep the missed skill in review. ':'A recent '+outcome.replace(/-/g,' ')+' needs another question on this skill. '):foundation?(pick.level<pick.skill.target?'A scheduled easier check keeps the foundations active. ':'A foundation check is due; no easier distinct item is available, so this is same-level retrieval. '):pick.skill.promoted?'Distinct, unassisted in-app first answers support trying a harder task. ':'Start at the available authored level to gauge this skill; no improvement is assumed. ';
+  reason+='Selected '+levelNames[pick.level]+' practice. '+(pick.familySeen?'This is review, not fresh-transfer proof. ':'A new in-app item is not proof that it is unfamiliar outside the app. ')+pick.skill.note;
+  if(outcome==='format-repair')reason+='The connectivity was recognized; practise the requested naming format at the same level.';
+  if(pick.level!==pick.desired)reason+='The exact target level is unavailable among the remaining distinct items.';
+  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role,target:pick.desired,level:pick.level,reason,freshInApp:!pick.familySeen}};
+}
+function adaptiveLearningPool(options={}){
+  let topics=options.topics?.slice(),chapter=options.chapter;
+  if(!topics){
+    chapter=chapter||((typeof currentChapterId==='function'&&currentChapterId())||'ch4');
+    topics=chapter==='all'?[...new Set(QUESTIONS.map(q=>q.topic))]:(typeof CHAPTERS!=='undefined'?CHAPTERS.find(c=>c.id===chapter)?.topics||[]:[]);
+  }
+  const allowed=new Set(topics||[]),ids=options.poolIds?new Set(options.poolIds):null;
+  return QUESTIONS.filter(q=>adaptiveLearningEligible(q)&&allowed.has(q.topic)&&(!ids||ids.has(q.id)));
+}
+function adaptiveLearningQueue(pool,attempts,total=10){
+  const queue=[],decisions=[];
+  for(let i=0;i<total;i++){
+    const next=adaptiveLearningSelect(pool,attempts,{index:i,usedIds:queue.map(q=>q.id)});
+    if(!next)break;queue.push(next.question);decisions.push({...next.decision,index:i});
+  }
+  return {queue,decisions};
+}
+function adaptiveLearningProtected(D){
+  return !D||D.cold||!!D.masteryTopic||!!D.diagVersion||!!D.focusSetId||!!D.learnReturn||D.coursePhase==='proof'||D.coursePhase==='mixed'||!!D.namingTier||!!D.manualTier||String(D.courseUnit||'').startsWith('naming-')||/^__(cum|scope|pulse|lec)/.test(D.topic||'');
+}
+function adaptiveLearningAttach(D,pool,options={}){
+  pool=pool.filter(adaptiveLearningEligible);
+  if(adaptiveLearningProtected(D)||!pool.length||D.i>0||D.answered||(D.log||[]).length)return false;
+  const total=Math.min(options.total||D.queue.length||10,20),plan=adaptiveLearningQueue(pool,S.attempts||[],total);
+  if(!plan.queue.length)return false;
+  D.queue=plan.queue;D.learningAdaptive={version:ADAPTIVE_LEARNING_VERSION,poolIds:pool.map(q=>q.id),topics:[...new Set(pool.map(q=>q.topic))],chapter:options.chapter||null,total:plan.queue.length,decisions:plan.decisions,branches:[]};
+  return true;
+}
+function startAdaptiveLearning(options={}){
+  const pool=adaptiveLearningPool(options);
+  if(!pool.length){if(typeof alert==='function')alert('There are no practice questions in that scope yet.');return false;}
+  if(typeof parkCurrentDrill==='function')parkCurrentDrill();
+  const total=Math.max(1,Math.min(20,Number(options.total)||10));
+  const label=options.label||(options.chapter==='all'?'Adaptive practice · all chapters':'Adaptive practice · '+(typeof CHAPTERS!=='undefined'?CHAPTERS.find(c=>c.id===(options.chapter||'ch4'))?.name||'selected topics':'selected topics'));
+  const D={queue:[],i:0,right:0,wrong:0,topic:'__learning_adaptive',answered:false,log:[],runId:makeRunId('learning-adaptive'),scopeName:label};
+  if(!adaptiveLearningAttach(D,pool,{total,chapter:options.chapter||'ch4'}))return false;
+  S.drill=D;snapshotDrill(0);save();go('drill');return true;
+}
+function adaptiveLearningBranch(D,q,attempt){
+  if(adaptiveLearningProtected(D)||!D.learningAdaptive)return null;
+  const nextIndex=D.i+1;if(nextIndex>=D.queue.length)return null;
+  const metadata=D.learningAdaptive,pool=QUESTIONS.filter(x=>metadata.poolIds.includes(x.id));
+  const eventKey=[q.id,attempt.ts||0,D.i].join('|');
+  if(metadata.branches.some(x=>x.eventKey===eventKey))return null;
+  // Preserve every answered/current item and every later reserved item. Only
+  // the immediate unanswered slot can change; source siblings cannot co-occur.
+  const reserved=D.queue.filter((_,i)=>i!==nextIndex).map(x=>x.id);
+  const picked=adaptiveLearningSelect(pool,S.attempts||[],{index:nextIndex,usedIds:reserved,lastAttempt:attempt});
+  if(!picked)return null;
+  const previous=D.queue[nextIndex].id;D.queue[nextIndex]=picked.question;
+  const changed=previous!==picked.question.id;
+  const record={after:q.id,signal:adaptiveLearningOutcome(attempt),label:(changed?'':'Keep the planned next item. ')+picked.decision.reason,picks:changed?[picked.question.id]:[],replaced:changed?previous:null,retained:!changed,index:nextIndex,eventKey,ts:Date.now()};
+  metadata.decisions=metadata.decisions.filter(x=>x.index!==nextIndex).concat({...picked.decision,index:nextIndex});metadata.branches.push(record);
+  D.branchLog=D.branchLog||[];D.branchLog.push(record);
+  if(D.adaptive){const run=(S.adaptiveRuns||[]).find(x=>x.id===D.assignmentId);if(run){run.branches=run.branches||[];run.branches.push(record);run.questionIds=D.queue.map(x=>x.id);}}
+  return record;
+}
+function adaptiveLearningCurrentDecision(D){return D?.learningAdaptive?.decisions?.find(x=>x.index===D.i)||null;}
+function adaptiveLearningAdoptLegacy(D){
+  if(!D?.adaptive||D.learningAdaptive||adaptiveLearningProtected(D))return false;
+  const topics=(D.assignmentTopics?.length?D.assignmentTopics:[...new Set((D.queue||[]).map(q=>q.topic))]).slice();
+  const pool=adaptiveLearningPool({topics}).filter(q=>q.type!=='written');
+  if(!pool.length)return false;
+  // Resume is not a new round: preserve all chosen, answered, and future slots.
+  D.learningAdaptive={version:ADAPTIVE_LEARNING_VERSION,poolIds:pool.map(q=>q.id),topics,chapter:null,total:D.queue.length,legacyAdopted:true,decisions:D.queue.map((q,index)=>({id:q.id,index,skill:adaptiveLearningSkill(q).key,granularity:adaptiveLearningSkill(q).granularity,role:'retained',level:adaptiveLearningDifficulty(q),reason:'Retained from your saved adaptive round. Only the next unanswered slot may adapt after a new answer.'})),branches:[]};
+  return true;
+}
+function installAdaptiveLearningEngine(){
+  if(typeof adaptiveBranch==='function'&&!adaptiveBranch._sharedLearning){
+    const previous=adaptiveBranch;
+    adaptiveBranch=function(D,q,a){
+      if(D?.adaptive&&!D.learningAdaptive)adaptiveLearningAdoptLegacy(D);
+      // Never pass a legacy adaptive answer back into the old uncertainty branch.
+      return D?.learningAdaptive?adaptiveLearningBranch(D,q,a):D?.adaptive?null:previous(D,q,a);
+    };adaptiveBranch._sharedLearning=true;
+  }
+  if(typeof startDrill==='function'&&!startDrill._sharedLearning){
+    const previous=startDrill;
+    startDrill=function(topic){
+      const result=previous(topic),D=S.drill;
+      const formalScaffold=topic==='formal'&&['f0','f0b','f1','f2'].some(id=>!((S.qstats[id]?.r||0)+(S.qstats[id]?.w||0)));
+      if(topic!=='__missed'&&!formalScaffold&&D?.topic===topic&&!adaptiveLearningProtected(D)){
+        const pool=QUESTIONS.filter(q=>q.topic===topic&&q.type!=='written');
+        if(adaptiveLearningAttach(D,pool,{total:D.queue.length})){snapshotDrill(D.i);save();render();}
+      }
+      return result;
+    };startDrill._sharedLearning=true;
+  }
+  if(typeof buildAdaptiveQueue==='function'&&!buildAdaptiveQueue._sharedLearning){
+    buildAdaptiveQueue=function(plan){return adaptiveLearningQueue(QUESTIONS.filter(q=>(plan.topics||[]).includes(q.topic)&&q.type!=='written'),S.attempts||[],plan.total||10).queue;};
+    buildAdaptiveQueue._sharedLearning=true;
+  }
+  if(typeof startAdaptiveAssignment==='function'&&!startAdaptiveAssignment._sharedLearning){
+    const previous=startAdaptiveAssignment;
+    startAdaptiveAssignment=function(plan){
+      const before=S.drill,result=previous(plan),D=S.drill;
+      if(D!==before&&D?.adaptive&&!adaptiveLearningProtected(D)){
+        const pool=QUESTIONS.filter(q=>(D.assignmentTopics||[]).includes(q.topic)&&q.type!=='written');
+        if(adaptiveLearningAttach(D,pool,{total:D.assignmentTotal||10})){
+          const ids=D.queue.map(q=>q.id),run=(S.adaptiveRuns||[]).find(x=>x.id===D.assignmentId);
+          if(run)run.questionIds=ids;if(S.adaptivePlan?.id===D.assignmentId)S.adaptivePlan.questionIds=ids;
+          snapshotDrill(D.i);save();render();
+        }
+      }
+      return result;
+    };startAdaptiveAssignment._sharedLearning=true;
+  }
+}
+installAdaptiveLearningEngine();
+if(typeof module!=='undefined'&&module.exports)module.exports={adaptiveLearningDifficulty,adaptiveLearningFamilies,adaptiveLearningSkill,adaptiveLearningOutcome,adaptiveLearningValidAttempt,adaptiveLearningEvidence,adaptiveLearningSelect,adaptiveLearningQueue,adaptiveLearningProtected};
+
+/* Course navigation only. Chapter 4 stays Home; existing chapter views and
+ * lesson content are reused. Opening the menu creates no learning evidence. */
+const COURSE_NAV_ANSWER_FIELDS='input.answerbox,textarea.answerbox,select.answerbox,#gk,#dkk,#wgk,#wdk,input[id^="pick-"]';
+function courseNavigationAllowed(){return typeof PROFILE==='undefined'||!!PROFILE;}
+function courseNavigationCaptureAnswer(){
+  const D=S.drill,q=D?.queue?.[D.i];if(S.view!=='drill'||!q||D.answered)return;
+  const fields=[...document.querySelectorAll('#view '+COURSE_NAV_ANSWER_FIELDS.split(',').join(',#view '))];
+  if(!fields.length)return;
+  const rows=fields.map((n,index)=>({index,id:n.id||'',tag:n.tagName,type:n.type||'',value:n.value,checked:!!n.checked}));
+  (D.navAnswerDrafts||(D.navAnswerDrafts={}))[q.id]=rows;
+}
+function courseNavigationRestoreAnswer(){
+  const D=S.drill,q=D?.queue?.[D.i];if(S.view!=='drill'||!q||D.answered)return;
+  const rows=D.navAnswerDrafts?.[q.id];if(!rows)return;
+  const fields=[...document.querySelectorAll('#view '+COURSE_NAV_ANSWER_FIELDS.split(',').join(',#view '))];
+  rows.forEach(row=>{
+    const n=row.id?fields.find(x=>x.id===row.id):fields[row.index];
+    if(!n||n.tagName!==row.tag||(n.type||'')!==row.type||n.disabled||n.readOnly)return;
+    if(n.type==='checkbox'||n.type==='radio')n.checked=row.checked;else n.value=row.value;
+  });
+}
+function courseNavigationSaveWork(){
+  const D=S.drill;
+  if(!D?.queue)return;
+  courseNavigationCaptureAnswer();
+  if(D.i<D.queue.length){snapshotDrill(D.answered?D.i+1:D.i);save();}
+  S.drill=null;
+}
+function courseNavigationGo(destination){
+  if(!courseNavigationAllowed())return;
+  if(!['quiz','overview'].includes(destination)&&!CHAPTERS.some(ch=>ch.id===destination))return;
+  courseNavigationSaveWork();
+  if(destination==='quiz'){
+    S.learnCh=null;S.learnUnit=null;S.learnTopic=null;S.quizLessonStep=0;go('home');
+  }else if(destination==='overview'){
+    S.learnCh=null;S.learnUnit=null;S.learnTopic=null;go('courseOverview');
+  }else{
+    const chapter=CHAPTERS.find(ch=>ch.id===destination);if(!chapter)return;
+    S.learnCh=chapter.id;S.learnUnit=null;S.learnTopic=null;go('allLearn');
+  }
+  const heading=document.querySelector('#view h1,#view h2');
+  if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
+}
+function renderCourseOverview(v){
+  const header=el('section',{class:'cn-overview-heading'});
+  header.appendChild(el('span',{class:'cn-eyebrow'},'CHEM 231 · COURSE LIBRARY'));
+  header.appendChild(el('h1',{},'All chapters'));
+  header.appendChild(el('p',{},'Review any chapter here. Chapter 4 quiz prep remains your home screen.'));
+  header.appendChild(el('button',{class:'cn-home-link',type:'button',onclick:()=>courseNavigationGo('quiz')},'← Return to Chapter 4 quiz prep'));
+  v.appendChild(header);
+  if(S.pausedDrill){
+    const saved=el('section',{class:'cn-saved','aria-label':'Saved practice'});
+    const text=el('div');text.appendChild(el('b',{},'Your practice is waiting'));
+    const detail=el('p');detail.textContent=(S.pausedDrill.scopeName||'Saved round')+' · '+S.pausedDrill.i+' of '+S.pausedDrill.ids.length+' tasks complete';text.appendChild(detail);saved.appendChild(text);
+    saved.appendChild(el('button',{class:'cn-home-link',type:'button',onclick:resumeDrill},'Resume saved practice →'));v.appendChild(saved);
+  }
+  const grid=el('div',{class:'cn-chapter-grid'});
+  CHAPTERS.forEach(ch=>{
+    const count=(CHAPTER_LEARNING_UNITS[ch.id]||[]).length,card=el('button',{class:'cn-chapter-card',type:'button','data-course-chapter':ch.id,onclick:()=>courseNavigationGo(ch.id)});
+    const top=el('span',{class:'cn-chapter-meta'});top.textContent=ch.id==='ch4'?'CURRENT FOCUS':ch.id==='prelim'?'FOUNDATIONS':'CHAPTER LIBRARY';card.appendChild(top);
+    const title=el('strong');title.textContent=ch.name;card.appendChild(title);
+    const desc=el('span',{class:'cn-chapter-detail'});desc.textContent=count?count+' lessons · open the skill you need':ch.topics.length+' topics · foundations and references';card.appendChild(desc);
+    card.appendChild(el('span',{class:'cn-chapter-open'},'Open chapter →'));grid.appendChild(card);
+  });v.appendChild(grid);
+}
+function updateCourseNavigation(){
+  if(!courseNavigationAllowed()){document.getElementById('cn-open')?.remove();document.getElementById('cn-quiz-home')?.remove();return;}
+  courseNavigationRestoreAnswer();
+  const action=document.querySelector('.header-actions');if(!action)return;
+  if(!document.getElementById('cn-open')){
+    const button=el('button',{id:'cn-open',class:'cn-header-button',type:'button','aria-haspopup':'dialog','aria-controls':'cn-dialog','aria-expanded':'false',onclick:openCourseNavigation},'All chapters');
+    action.insertBefore(button,action.querySelector('.header-more'));
+    const home=el('button',{id:'cn-quiz-home',class:'cn-header-home',type:'button','aria-label':'Return to Chapter 4 quiz prep',onclick:()=>courseNavigationGo('quiz')},'Chapter 4 prep');action.insertBefore(home,button);
+  }
+  const atHome=S.view==='home';document.getElementById('cn-quiz-home').hidden=atHome;
+  const small=document.querySelector('.app-title-copy small');
+  if(small){
+    if(!small.dataset.courseOriginal)small.dataset.courseOriginal=small.textContent;
+    small.textContent=S.view==='courseOverview'?'Course library · all chapters':S.view==='allLearn'&&S.learnCh?(CHAPTERS.find(ch=>ch.id===S.learnCh)?.name.split(' — ')[0]||'Course library')+' · lessons':small.dataset.courseOriginal;
+  }
+}
+function openCourseNavigation(){
+  if(!courseNavigationAllowed())return;
+  let dialog=document.getElementById('cn-dialog');
+  if(dialog?.open)return;
+  if(dialog)dialog.remove();
+  const trigger=document.getElementById('cn-open');
+  dialog=el('dialog',{id:'cn-dialog',class:'cn-dialog','aria-labelledby':'cn-dialog-title'});
+  const head=el('div',{class:'cn-dialog-head'});head.appendChild(el('h2',{id:'cn-dialog-title'},'Where would you like to go?'));
+  const close=el('button',{class:'cn-close',type:'button','aria-label':'Close chapter navigation',onclick:()=>dialog.close()},'×');head.appendChild(close);dialog.appendChild(head);
+  dialog.appendChild(el('p',{class:'cn-dialog-note'},'Chapter 4 stays your default. Your current work is kept when you switch.'));
+  const nav=el('div',{class:'cn-menu',role:'navigation','aria-label':'Course destinations'});
+  const choice=(label,detail,destination,extra='')=>{
+    const b=el('button',{type:'button',class:'cn-menu-link '+extra,onclick:()=>{dialog.close();courseNavigationGo(destination);}});
+    const title=el('strong');title.textContent=label;b.appendChild(title);const note=el('span');note.textContent=detail;b.appendChild(note);return b;
+  };
+  nav.appendChild(choice('Chapter 4 quiz prep','Return to your focused study desk','quiz','cn-menu-focus'));
+  nav.appendChild(choice('Course overview','See every available chapter','overview'));
+  const label=el('p',{class:'cn-menu-label'},'OPEN A CHAPTER');nav.appendChild(label);
+  CHAPTERS.forEach(ch=>{const lessons=(CHAPTER_LEARNING_UNITS[ch.id]||[]).length;nav.appendChild(choice(ch.name,ch.id==='ch4'?'Naming · Newman projections · chairs':(lessons?lessons+' lessons · ':'')+ch.topics.length+' topics',ch.id));});
+  dialog.appendChild(nav);
+  dialog.addEventListener('keydown',e=>{
+    if(e.key!=='Tab')return;
+    const fields=[...dialog.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]')].filter(n=>n.getClientRects().length);
+    const first=fields[0],last=fields.at(-1);
+    if(e.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){e.preventDefault();last?.focus();}
+    else if(!e.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){e.preventDefault();first?.focus();}
+  });
+  dialog.addEventListener('click',e=>{const b=dialog.getBoundingClientRect();if(e.target===dialog&&(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom))dialog.close();});
+  dialog.addEventListener('close',()=>{trigger?.setAttribute('aria-expanded','false');if(trigger?.isConnected)trigger.focus({preventScroll:true});});
+  document.body.appendChild(dialog);trigger?.setAttribute('aria-expanded','true');dialog.showModal();close.focus({preventScroll:true});
+}
+function installCourseNavigation(){
+  if(!courseNavigationAllowed()||document.getElementById('course-navigation-style'))return;
+  const style=document.createElement('style');style.id='course-navigation-style';
+  style.textContent=`
+  .header-actions{flex-wrap:wrap}.cn-header-button,.cn-header-home{font:inherit;font-size:.81rem;font-weight:700;min-height:42px;padding:8px 12px;border-radius:10px;cursor:pointer;transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+  .cn-header-button{background:#fff;border:1px solid #aeb9bf;color:#263d45}.cn-header-home{background:transparent;border:1px solid transparent;color:#246651}.cn-header-home[hidden]{display:none}
+  .cn-dialog{box-sizing:border-box;width:min(560px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px);padding:24px;border:1px solid #c5d3d8;border-radius:18px;background:#fff;color:#243942;box-shadow:0 18px 70px #132d3940;overflow:auto;overscroll-behavior:contain;margin:auto}
+  .cn-dialog::backdrop{background:#17313d66}.cn-dialog[open]{animation:cn-enter .16s ease-out}.cn-dialog-head{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}.cn-dialog-head h2{font-size:1.2rem;margin:6px 0;line-height:1.3}.cn-close{flex:0 0 44px;width:44px;height:44px;border:1px solid #cad6dc;border-radius:10px;background:#fff;color:#344d58;font:inherit;font-size:1.5rem;cursor:pointer}.cn-dialog-note{font-size:.88rem;line-height:1.5;color:#536772;margin:8px 0 18px}
+  .cn-menu{display:grid;gap:7px!important;position:static!important;background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important;width:auto!important;overflow:visible!important}.cn-menu-link{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:4px;background:#fff;border:1px solid #d7e1e5;border-radius:11px;padding:12px 14px;min-height:60px;color:#233b46;font:inherit;cursor:pointer;white-space:normal;overflow-wrap:anywhere;transition:background-color .16s ease,border-color .16s ease,transform .16s ease}.cn-menu-link strong{font-size:.93rem}.cn-menu-link>span{font-size:.78rem;color:#536772}.cn-menu-focus{background:#edf6f1;border-color:#b4d3c3}.cn-menu-label{font-size:.7rem;letter-spacing:.08em;font-weight:750;color:#647782;margin:12px 0 2px}
+  .cn-overview-heading{margin:4px 0 24px}.cn-overview-heading h1{font-size:1.9rem;margin:8px 0}.cn-overview-heading p{color:var(--muted-tx);line-height:1.5}.cn-eyebrow{font-size:.72rem;letter-spacing:.09em;color:#486b60;font-weight:750}.cn-home-link{background:transparent;border:0;color:#246651;font:inherit;font-weight:700;text-align:left;min-height:44px;padding:8px 0;cursor:pointer;text-underline-offset:4px}.cn-chapter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.cn-chapter-card{display:flex;flex-direction:column;text-align:left;align-items:flex-start;gap:12px;padding:22px;min-width:0;border:1px solid #d0dcde;border-radius:14px;background:#fff;color:#243942;font:inherit;cursor:pointer;transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease}.cn-chapter-meta{font-size:.68rem;letter-spacing:.07em;font-weight:750;color:#496b5d}.cn-chapter-card strong{font-size:1.1rem;line-height:1.4}.cn-chapter-detail{font-size:.8rem;color:#596e76;line-height:1.4}.cn-chapter-open{margin-top:auto;color:#246651;font-size:.84rem;font-weight:700}.cn-saved{display:flex;gap:14px;align-items:center;justify-content:space-between;background:#edf6f1;border:1px solid #c1d8cd;border-radius:12px;padding:16px;margin-bottom:20px}.cn-saved p{font-size:.82rem;margin:5px 0 0;color:#536772}
+  .cn-header-button:focus-visible,.cn-header-home:focus-visible,.cn-menu-link:focus-visible,.cn-close:focus-visible,.cn-home-link:focus-visible,.cn-chapter-card:focus-visible{outline:3px solid #217a99;outline-offset:3px}
+  @media(hover:hover){.cn-header-button:hover,.cn-menu-link:hover,.cn-close:hover{background:#f0f7f5;border-color:#93b9ab}.cn-header-home:hover,.cn-home-link:hover{text-decoration:underline}.cn-header-button:hover,.cn-chapter-card:hover{transform:translateY(-1px);box-shadow:0 3px 10px #294c3910}.cn-chapter-card:hover{background:#f8fcf9;border-color:#93b9ab}}
+  @keyframes cn-enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:600px){.cn-dialog{padding:18px}.cn-dialog-head h2{font-size:1.08rem}.cn-chapter-grid{grid-template-columns:1fr}.cn-chapter-card{padding:18px;gap:9px}.cn-saved{align-items:flex-start;flex-direction:column}.cn-header-button,.cn-header-home{padding:8px 10px}.cn-header-home{margin-right:auto}.cn-overview-heading h1{font-size:1.65rem}}
+  .qp-strand>summary,.qp-skill,.qp-stepper button{transition:background-color .13s ease,border-color .13s ease,box-shadow .13s ease}
+  @media(hover:hover){.qp-strand>summary:hover,.qp-skill:hover{background-color:#f0f7f4}.qp-stepper button:hover{background-color:#edf5f0}}
+  @media(prefers-reduced-motion:reduce){.cn-dialog[open]{animation:none}.cn-header-button,.cn-header-home,.cn-menu-link,.cn-chapter-card,.qp-strand>summary,.qp-skill,.qp-stepper button{transition:none!important;transform:none!important}}
+  `.replaceAll('.16s','.14s');document.head.appendChild(style);
+  VIEWS.courseOverview=renderCourseOverview;NAV_GROUP.courseOverview='more';
+  const remember=e=>{if(e.target.matches(COURSE_NAV_ANSWER_FIELDS)&&S.view==='drill'&&!S.drill?.answered){courseNavigationCaptureAnswer();snapshotDrill(S.drill.i);}};
+  document.addEventListener('input',remember);document.addEventListener('change',remember);
+  const previous=render;render=function(){previous();updateCourseNavigation();};updateCourseNavigation();
+}
+installCourseNavigation();
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
