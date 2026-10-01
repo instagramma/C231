@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.99.1
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.100
+  v3.100 (2026-10-01): LOCAL QUIZ PRACTICE UPDATE. Rotating Quiz B from the
+  scoped bank; fixed timed rehearsal remains available. Returned Quiz A is
+  cleanly redrawn as familiar practice, never new-readiness evidence.
+  Existing attempts and saved rounds preserved. Not published by this update.
   v3.99.1 (2026-09-29): LOCAL PENCIL GESTURE FIX. Canvas-only native
   selection/callout guards preserve rapid handwriting and surrounding page UI.
   v3.99 (2026-09-29): LOCAL CHAPTER 5 PREP. Outline-aligned stereochemistry
@@ -2149,7 +2153,7 @@ function diagCriticalAudit(D){
 }
 function buildReadinessDiagnostic(scopeTopics,type,needScore){
   const picked=[],used=new Set(),roles={},critical=[],bondRequirements={},resonanceRequirements={};
-  const ranked=qs=>shuffle(qs.filter(q=>q&&!used.has(q.id))).sort((a,b)=>needScore(b)-needScore(a));
+  const ranked=qs=>shuffle(qs.filter(q=>q&&q.readinessEligible!==false&&!used.has(q.id))).sort((a,b)=>needScore(b)-needScore(a));
   const take=(qs,role,isCritical=false)=>{const q=ranked(qs)[0];if(!q)return null;picked.push(q);used.add(q.id);roles[q.id]=role;if(isCritical)critical.push(q.id);return q;};
   const byIds=ids=>ids.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   const chapter2Core=["bondline","fgroups","resonance","arrows"];
@@ -2230,7 +2234,7 @@ function buildPulseCheck(scopeTopics,needScore){
   const chs=pulseChaptersFor(scopeTopics);
   if(!chs.length) return {queue:[],roles:{},critical:[],bondRequirements:{},resonanceRequirements:{}};
   const used=new Set(),picked=[],roles={};
-  const eligible=k=>QUESTIONS.filter(q=>q.topic===k&&q.type!=="written"&&itemDifficulty(q)>=1&&!used.has(q.id));
+  const eligible=k=>QUESTIONS.filter(q=>q.topic===k&&q.readinessEligible!==false&&q.type!=="written"&&itemDifficulty(q)>=1&&!used.has(q.id));
   const take=(qs,role)=>{const q=shuffle(qs).sort((a,b)=>needScore(b)-needScore(a))[0]; if(!q)return null; picked.push(q); used.add(q.id); roles[q.id]=role; return q;};
   chs.forEach(c=>c.topics.forEach(k=>take(eligible(k),(TOPICS[k]&&TOPICS[k].name)||k)));
   const countIn=c=>picked.filter(q=>c.topics.indexOf(q.topic)>=0).length;
@@ -5307,7 +5311,7 @@ VIEWS.more = (v) => {
   c.appendChild(grid); v.appendChild(c);
   const account=el("section",{class:"card cream"});
   const status=cloudState==="synced"?"Cloud saved":cloudState==="qa"?"QA preview · not saved":cloudState==="offline"?"Local only":"Syncing";
-  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.97</p>';
+  account.innerHTML='<span class="tag violet">ACCOUNT</span><h3 style="margin:4px 0">'+P.ico+' '+P.name+(P.role==="auditor"?' · auditor':'')+'</h3><p class="muted" style="margin:0 0 10px">'+status+' · version 3.100</p>';
   const row=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
   if(PROFILE==="gabe"&&!QA_MODE)AUDITORS.forEach(k=>row.appendChild(el("button",{class:"btn ghost",onclick:()=>ownerView(k)},"View "+PROFILES[k].name)));
   if(!QA_MODE)row.appendChild(el("button",{class:"btn ghost",onclick:switchProfile},"Switch profile"));
@@ -5337,7 +5341,7 @@ function masteryDaysFor(topic){
   return [...new Set(((S.masteryDays||{})[topic])||[])];
 }
 function masteryPoolFor(topic){
-  return QUESTIONS.filter(q=>q.topic===topic && q.type!=="written" && qDiff(q)>=1);
+  return QUESTIONS.filter(q=>q.topic===topic && q.readinessEligible!==false && q.type!=="written" && qDiff(q)>=1);
 }
 function masteryEligible(topic){ return masteryPoolFor(topic).length>=MASTERY_N; }
 function bankMasteryDay(topic){
@@ -6694,8 +6698,10 @@ const LEVEL_STYLE={gap:{ico:"🔴",label:"gap"},shaky:{ico:"🟡",label:"shaky"}
    can't test yet are NAMED, never silently dropped from the average. */
 function topicCleanPct(k){
   let r=0,w=0,g=0;
-  QUESTIONS.forEach(q=>{ if(q.topic===k){ const s=S.qstats[q.id]; if(s){ r+=(s.r||0); w+=(s.w||0); g+=(s.gr||0); } } });
-  g+=assistedRightNotGuessed(k);
+  QUESTIONS.forEach(q=>{ if(q.topic===k&&q.readinessEligible!==false){ const s=S.qstats[q.id]; if(s){ r+=(s.r||0); w+=(s.w||0); g+=(s.gr||0); } } });
+  // Returned assessment review still records normal attempts, but cannot raise
+  // or lower this legacy readiness percentage. Keep assistance on the same pool.
+  g+=(S.attempts||[]).filter(a=>a.t===k&&a.ok&&!a.g&&((a.h||0)>0||a.rf||a.sr)&&QUESTIONS.find(q=>q.id===a.id)?.readinessEligible!==false).length;
   const tt=r+w; return tt?Math.round(100*Math.max(0,r-g)/tt):null;
 }
 function scopeForCheckpoint(cp){
@@ -9451,7 +9457,7 @@ const COURSE_UPDATE = {
   homework:'https://smccd.instructure.com/courses/73887/assignments/2086517',
   objectives:'https://smccd.instructure.com/courses/73887/pages/chapter-4-overview-and-learning-objectives',
   examNote:'Exam 2: week of October 19 on the tentative schedule; exact date and scope need confirmation.',
-  quizNote:'Gabe supplied Chapter 4 Quiz A: Naming and drawing structures, and Quiz B: Structure and Stability. Quiz B is 10 questions × 2 points, 25 minutes, on paper in lab; preparation covers projection conversions, butane energy, strain, chairs, faces, stability and combustion. Quiz A length/time was not supplied. These are original practice tasks, not the instructor’s quiz.'
+  quizNote:'Gabe supplied Chapter 4 Quiz A: Naming and drawing structures, and Quiz B: Structure and Stability. Quiz B is 10 questions × 2 points, 25 minutes, on paper in lab; preparation covers projection conversions, butane energy, strain, chairs, faces, stability and combustion. The returned Quiz A has ten multiple-choice questions and is available as explicitly familiar review. Other practice is original preparation, not the instructor’s quiz.'
 };
 const CH4_VIDEO_RESOURCES = {
   'ch4-carbon-map':{id:'F8RCR_1jIAk',title:'Naming alkanes · instructor-selected video',page:'naming-alkanes-pre-reading-and-pre-viewing'},
@@ -9546,20 +9552,22 @@ function recordCourseRound(D){
   const rows=D.log||[],prior=(S.flightRuns||[]).find(r=>r.runId===D.runId);
   const assisted=r=>!r.ok||r.g||r.dk||r.rf||r.h>0;
   const manual=rows.filter(r=>QUESTIONS.find(q=>q.id===r.id)?.type==='written').length;
-  const clean=rows.length===D.queue.length&&rows.every(r=>!assisted(r))&&!manual;
+  const clean=D.courseUnit!=='quiz-a-returned'&&rows.length===D.queue.length&&rows.every(r=>!assisted(r))&&!manual;
   if(!prior){S.flightRuns.push({runId:D.runId,setId:courseRunKey(D.courseUnit,D.coursePhase),ts:Date.now(),date:todayStr(),right:D.right,total:D.queue.length,pct:Math.round(D.right/D.queue.length*100),clean,manual,ids:D.queue.map(q=>q.id),repairIds:rows.filter(assisted).map(r=>r.id),reviewed:false});save();}
 }
 function finishCourseRound(v,D){
   recordCourseRound(D);
   const rows=D.log||[],assisted=r=>!r.ok||r.g||r.dk||r.rf||r.h>0;
   const manual=rows.filter(r=>QUESTIONS.find(q=>q.id===r.id)?.type==='written').length;
-  const clean=rows.length===D.queue.length&&rows.every(r=>!assisted(r))&&!manual;
+  const returned=D.courseUnit==='quiz-a-returned';
+  const clean=!returned&&rows.length===D.queue.length&&rows.every(r=>!assisted(r))&&!manual;
   const u=CH4_LESSONS.find(x=>x.id===D.courseUnit),next=u&&CH4_LESSONS[CH4_LESSONS.indexOf(u)+1],repairs=rows.filter(assisted);
   const c=el('section',{class:'card teal','data-course-result':D.coursePhase});
-  c.innerHTML='<span class="tag teal">'+(D.coursePhase==='practice'?'PRACTICE COMPLETE · CHECK AVAILABLE':'SET COMPLETE')+'</span><h2>'+D.right+' / '+D.queue.length+' tasks</h2><p>'+(D.coursePhase==='practice'?'Your next step is a different set of questions without hints.':manual?'Drawings and explanations you reviewed yourself are saved as self-review. They still need an independent check.':clean?'Every task in this small set passed without hints or flags. Keep building evidence across new tasks and another day.':'Review the specific steps below, then continue. The app will keep these skills in review.')+'</p>';
+  c.innerHTML='<span class="tag teal">'+(returned?'RETURNED QUIZ · FAMILIAR REVIEW':D.coursePhase==='practice'?'PRACTICE COMPLETE · CHECK AVAILABLE':'SET COMPLETE')+'</span><h2>'+D.right+' / '+D.queue.length+' tasks</h2><p>'+(returned?'This is your practice result on previously seen questions—not a new quiz score or fresh-readiness evidence. Review the reasoning, then apply it to different structures.':D.coursePhase==='practice'?'Your next step is a different set of questions without hints.':manual?'Drawings and explanations you reviewed yourself are saved as self-review. They still need an independent check.':clean?'Every task in this small set passed without hints or flags. Keep building evidence across new tasks and another day.':'Review the specific steps below, then continue. The app will keep these skills in review.')+'</p>';
   const row=el('div',{class:'path-controls'});
   if(rows.length)row.appendChild(el('button',{class:'btn ghost',onclick:()=>{D.reviewIdx=0;render();}},'Review my work'));
-  if(D.coursePhase==='practice'&&u)row.appendChild(el('button',{class:'btn',onclick:()=>startCoursePractice(u.id,'proof')},'Next · try different questions →'));
+  if(returned)row.appendChild(el('button',{class:'btn',onclick:startQuizA},'Practise different naming structures →'));
+  else if(D.coursePhase==='practice'&&u)row.appendChild(el('button',{class:'btn',onclick:()=>startCoursePractice(u.id,'proof')},'Next · try different questions →'));
   else if(next)row.appendChild(el('button',{class:'btn',onclick:()=>{S.drill=null;openLearningUnit('ch4',next.id);}},'Next lesson · '+next.title+' →'));
   else row.appendChild(el('button',{class:'btn',onclick:()=>{S.drill=null;go('home');}},'Show my next step →'));
   c.appendChild(row);
@@ -10452,6 +10460,137 @@ for(const id of['ch4-name-draw','ch4-quiz-bicyclo']){
 // Existing redraws of the same fused graph share a family across modules.
 for(const q of CH4_QUESTIONS)if(q.id==='CH4-QP-20260928-09')q.transferFamily='ch4-3-ethyl-9-methyl-bicyclo430';
 
+/* Returned Quiz 4A · clean, familiar practice · October 1, 2026.
+ * Source: the learner-supplied returned Quiz4A.pdf, September 29, 2026.
+ * No scan, annotations, learner identity, grade, or response is embedded.
+ * Load after ch4-naming-expansion.js, before CH4_QUESTIONS is registered.
+ * These are the original ten multiple-choice items, not unseen readiness tests.
+ */
+const ch4RealAId=n=>'CH4-REAL-A-20260929-'+String(n).padStart(2,'0');
+function ch4RealAGraph(nodes,edges,extra={}){
+  return Object.assign({nodes,edges,elements:{},kind:'tree'},extra);
+}
+function ch4RealARing(points){
+  const nodes=Object.fromEntries(points.map((p,i)=>['r'+(i+1),p]));
+  return ch4RealAGraph(nodes,points.map((_,i)=>['r'+(i+1),'r'+((i+1)%points.length+1)]),{kind:'ring',ring:points.map((_,i)=>'r'+(i+1))});
+}
+function ch4RealAArm(g,at,prefix,points){
+  let prev=at;points.forEach((point,i)=>{const id=prefix+(i+1);g.nodes[id]=point;g.edges.push([prev,id]);prev=id;});return g;
+}
+function ch4RealAIPr(g,at,stem,tips,prefix='ip'){
+  ch4RealAArm(g,at,prefix,[stem]);tips.forEach((p,i)=>ch4RealAArm(g,prefix+'1',prefix+'m'+i,[p]));return g;
+}
+const CH4_REAL_A_GRAPHS=(()=>{
+  const g={};
+  // Q1: three tied seven-carbon parents; the left-to-right path leaves
+  // four substituents, whereas a path through the upper arm leaves three.
+  g.q1=ch4RealAGraph({c:[250,175],l1:[205,201],l2:[160,175],l3:[115,201],lm:[205,253],r1:[295,164],r2:[330,201],r3:[375,190],rm:[316,249],u1:[250,122],u2:[296,96],u3:[296,43],cm:[278,225]},[['c','l1'],['l1','l2'],['l2','l3'],['l1','lm'],['c','r1'],['r1','r2'],['r2','r3'],['r2','rm'],['c','u1'],['u1','u2'],['u2','u3'],['c','cm']],{preferredParent:['r3','r2','r1','c','l1','l2','l3'],identity:'2,4,5-trimethyl-4-propylheptane',expectedCarbons:13});
+  g.q2=ch4NMTree(8);g.q2.nodes={p1:[30,50],p2:[70,74],p3:[110,50],p4:[150,74],p5:[190,50],p6:[230,74],p7:[270,50],p8:[310,74]};
+  ch4RealAArm(g.q2,'p2','m',[[70,118]]);ch4RealAIPr(g.q2,'p4',[150,118],[[110,141],[190,141]]);ch4RealAArm(g.q2,'p6','e',[[230,118],[270,141]]);
+  Object.assign(g.q2,{preferredParent:['p1','p2','p3','p4','p5','p6','p7','p8'],identity:'octane parent',expectedCarbons:14});
+  g.q3=ch4RealAGraph({a:[25,90],b:[65,67],c:[105,90],d:[145,67],e:[185,90],f:[225,67],h:[265,90],m3:[105,134],m6:[225,23],p1:[185,134],p2:[225,157],p3:[225,202]},[['a','b'],['b','c'],['c','d'],['d','e'],['e','f'],['f','h'],['c','m3'],['f','m6'],['e','p1'],['p1','p2'],['p2','p3']],{preferredParent:['a','b','c','d','e','p1','p2','p3'],identity:'3-methyl-5-(1-methylethyl)octane',expectedCarbons:12});
+  g.q4=ch4RealARing([[100,65],[140,94],[125,139],[75,139],[60,94]]);
+  ch4RealAArm(g.q4,'r1','a',[[68,31]]);ch4RealAArm(g.q4,'r1','b',[[132,31]]);ch4RealAArm(g.q4,'r3','c',[[153,178]]);
+  Object.assign(g.q4,{identity:'1,1,3-trimethylcyclopentane',expectedCarbons:8});
+  g.q5=ch4RealARing([[82,37],[142,37],[161,96],[112,132],[63,96]]);
+  Object.assign(g.q5.nodes,{clLeft:[20,60],hLeft:[21,128],hRight:[203,60],clRight:[207,128]});
+  Object.assign(g.q5.elements,{clLeft:'Cl',hLeft:'H',hRight:'H',clRight:'Cl'});
+  g.q5.edges.push(['r5','clLeft','wedge'],['r5','hLeft','dash'],['r3','hRight','wedge'],['r3','clRight','dash']);
+  Object.assign(g.q5,{identity:'trans-1,3-dichlorocyclopentane',expectedCarbons:5,substituents:[{at:'r5',group:'Cl',face:'toward'},{at:'r3',group:'Cl',face:'away'}]});
+  g.q6=ch4RealARing([[62,71],[103,57],[130,94],[104,128],[62,116]]);
+  ch4RealAArm(g.q6,'r2','m1',[[119,12]]);ch4RealAArm(g.q6,'r3','m2',[[178,94]]);ch4RealAArm(g.q6,'r4','e',[[119,173],[91,205]]);
+  Object.assign(g.q6,{identity:'1-ethyl-2,3-dimethylcyclopentane',expectedCarbons:9});
+  g.q7I=ch4RealAGraph({p1:[20,105],p2:[49,88],p3:[78,105],p4:[107,88],p5:[136,105],p6:[165,88]},[['p1','p2'],['p2','p3'],['p3','p4'],['p4','p5'],['p5','p6']]);
+  ch4RealAIPr(g.q7I,'p4',[107,52],[[78,35],[136,35]]);
+  Object.assign(g.q7I,{preferredParent:['ipm01','ip1','p4','p3','p2','p1'],identity:'3-ethyl-2-methylhexane',isopropylSubstituent:false,expectedCarbons:9});
+  g.q7II=ch4RealAGraph({p1:[20,105],p2:[49,88],p3:[78,105],p4:[107,88],p5:[136,105],p6:[165,88],p7:[194,105]},[['p1','p2'],['p2','p3'],['p3','p4'],['p4','p5'],['p5','p6'],['p6','p7']]);
+  ch4RealAIPr(g.q7II,'p4',[107,52],[[78,35],[136,35]]);
+  Object.assign(g.q7II,{preferredParent:['p1','p2','p3','p4','p5','p6','p7'],identity:'4-(1-methylethyl)heptane',isopropylSubstituent:true,expectedCarbons:10});
+  g.q7III=ch4RealARing([[55,67],[85,78],[81,112],[48,119],[32,88]]);
+  ch4RealAIPr(g.q7III,'r2',[119,62],[[119,27],[149,79]]);
+  Object.assign(g.q7III,{identity:'(1-methylethyl)cyclopentane',isopropylSubstituent:true,expectedCarbons:8});
+  // Q8 keeps all five original connectivity distractors; branches differ by
+  // both length and attachment, rather than merely by drawing orientation.
+  g.q8I=ch4RealAGraph({a:[20,90],b:[38,57],c:[78,57],d:[98,91],e:[138,91],m1:[96,25],m2:[78,126]},[['a','b'],['b','c'],['c','d'],['d','e'],['c','m1'],['d','m2']],{identity:'2,3-dimethylpentane',expectedCarbons:7});
+  g.q8II=ch4RealAGraph({c:[80,90],l1:[40,90],l2:[20,124],r1:[100,124],r2:[140,124],ip:[100,56],m1:[80,23],m2:[140,56]},[['c','l1'],['l1','l2'],['c','r1'],['r1','r2'],['c','ip'],['ip','m1'],['ip','m2']],{identity:'3-ethyl-2-methylpentane',expectedCarbons:8});
+  g.q8III=ch4RealAGraph({c:[88,80],a1:[58,50],a2:[20,62],b1:[119,50],b2:[157,62],c1:[58,110],c2:[20,99],d1:[119,110],d2:[157,99]},[['c','a1'],['a1','a2'],['c','b1'],['b1','b2'],['c','c1'],['c1','c2'],['c','d1'],['d1','d2']],{identity:'3,3-diethylpentane',expectedCarbons:9});
+  g.q8IV=ch4RealAGraph({c:[82,83],a1:[42,83],a2:[22,117],b1:[102,49],b2:[142,49],d1:[102,117],d2:[142,117],m:[62,49]},[['c','a1'],['a1','a2'],['c','b1'],['b1','b2'],['c','d1'],['d1','d2'],['c','m']],{identity:'3-ethyl-3-methylpentane',expectedCarbons:8});
+  g.q8V=ch4RealAGraph({c:[82,83],a1:[42,83],a2:[22,117],b1:[102,49],b2:[142,49],b3:[162,83],d1:[102,117],d2:[142,117],m:[62,49]},[['c','a1'],['a1','a2'],['c','b1'],['b1','b2'],['b2','b3'],['c','d1'],['d1','d2'],['c','m']],{identity:'3-ethyl-3-methylhexane',expectedCarbons:9});
+  // Q9: the triangle is a separate three-carbon ring connected by one bond,
+  // not a fused or spiro ring. All five distractors retain that distinction.
+  for(const roman of ['I','II','III','IV','V'])g['q9'+roman]=ch4RealARing([[80,95],[111,118],[99,153],[61,153],[49,118]]);
+  for(const roman of ['I','II','III']){
+    const r=g['q9'+roman];Object.assign(r.nodes,{t1:[80,54],t2:[63,23],t3:[97,23]});r.edges.push(['r1','t1'],['t1','t2'],['t2','t3'],['t3','t1']);r.kind='two-linked-rings';r.expectedCarbons=9;
+  }
+  ch4RealAArm(g.q9I,'r2','m',[[150,106]]);
+  ch4RealAArm(g.q9II,'r3','m',[[121,188]]);
+  ch4RealAArm(g.q9III,'t3','m',[[132,2]]);
+  Object.assign(g.q9I,{identity:'1-cyclopropyl-2-methylcyclopentane'});
+  Object.assign(g.q9II,{identity:'1-cyclopropyl-3-methylcyclopentane'});
+  Object.assign(g.q9III,{identity:'(2-methylcyclopropyl)cyclopentane'});
+  for(const roman of ['IV','V']){
+    const r=g['q9'+roman];Object.assign(r.nodes,{t1:[60,54],t2:[60,23],t3:[31,40]});r.edges.push(['r1','t1'],['t1','t2'],['t2','t3'],['t3','t1']);r.kind='two-linked-rings';r.expectedCarbons=9;
+  }
+  ch4RealAArm(g.q9IV,'r1','m',[[98,62]]);ch4RealAArm(g.q9V,'t1','m',[[91,71]]);
+  Object.assign(g.q9IV,{identity:'1-cyclopropyl-1-methylcyclopentane'});Object.assign(g.q9V,{identity:'(1-methylcyclopropyl)cyclopentane'});
+  // Q10 uses the same projected chair orientation as the paper. IDs follow
+  // left-bottom → left-top → back-middle → right-top → right-bottom → front-middle.
+  for(const roman of ['I','II','III','IV','V']){
+    g['q10'+roman]=ch4RealARing([[70,108],[95,66],[150,82],[205,66],[180,108],[125,92]]);
+    g['q10'+roman].kind='chair';
+  }
+  ch4RealAArm(g.q10I,'r1','ethyl',[[70,154],[109,178]]);ch4RealAArm(g.q10I,'r4','methyl',[[205,20]]);
+  Object.assign(g.q10I,{identity:'trans-1-ethyl-4-methylcyclohexane',expectedCarbons:9,substituents:[{at:'r1',group:'ethyl',orientation:'axial',face:'down'},{at:'r4',group:'methyl',orientation:'axial',face:'up'}]});
+  ch4RealAIPr(g.q10II,'r1',[35,77],[[0,87],[45,34]]);ch4RealAArm(g.q10II,'r4','methyl',[[205,20]]);
+  Object.assign(g.q10II,{identity:'cis-1-isopropyl-4-methylcyclohexane',expectedCarbons:10,substituents:[{at:'r1',group:'isopropyl',orientation:'equatorial',face:'up'},{at:'r4',group:'methyl',orientation:'axial',face:'up'}]});
+  ch4RealAIPr(g.q10III,'r6',[102,137],[[58,137],[125,177]]);ch4RealAArm(g.q10III,'r4','methyl',[[205,20]]);
+  Object.assign(g.q10III,{identity:'trans-1-isopropyl-3-methylcyclohexane',expectedCarbons:10,substituents:[{at:'r6',group:'isopropyl',orientation:'equatorial',face:'down'},{at:'r4',group:'methyl',orientation:'axial',face:'up'}]});
+  ch4RealAArm(g.q10IV,'r1','methyl1',[[70,155]]);ch4RealAArm(g.q10IV,'r4','methyl2',[[205,20]]);
+  Object.assign(g.q10IV,{identity:'trans-1,4-dimethylcyclohexane',expectedCarbons:8,substituents:[{at:'r1',group:'methyl',orientation:'axial',face:'down'},{at:'r4',group:'methyl',orientation:'axial',face:'up'}]});
+  ch4RealAIPr(g.q10V,'r1',[35,77],[[0,97],[35,31]]);ch4RealAArm(g.q10V,'r4','methyl',[[243,91]]);
+  Object.assign(g.q10V,{identity:'trans-1-isopropyl-4-methylcyclohexane',expectedCarbons:10,substituents:[{at:'r1',group:'isopropyl',orientation:'equatorial',face:'up'},{at:'r4',group:'methyl',orientation:'equatorial',face:'down'}]});
+  return g;
+})();
+function ch4RealAFigure(key,title='Given structure'){
+  const g=CH4_REAL_A_GRAPHS[key],points=Object.values(g.nodes),minX=Math.min(...points.map(p=>p[0]))-24,minY=Math.min(...points.map(p=>p[1]))-24;
+  const w=Math.max(...points.map(p=>p[0]))-minX+24,h=Math.max(...points.map(p=>p[1]))-minY+24,at=id=>[g.nodes[id][0]-minX,g.nodes[id][1]-minY];
+  let body='<g data-returned-quiz-graph="'+key+'">';
+  for(const [a,b,style] of g.edges){
+    const p=at(a),q=at(b),dx=q[0]-p[0],dy=q[1]-p[1],len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len,tip=g.elements[b]?[q[0]-ux*15,q[1]-uy*15]:q;
+    if(style==='wedge')body+='<polygon points="'+p.join(',')+' '+[tip[0]-uy*7,tip[1]+ux*7].join(',')+' '+[tip[0]+uy*7,tip[1]-ux*7].join(',')+'" fill="currentColor" stroke="none"/>';
+    else if(style==='dash'){
+      for(let i=1;i<=6;i++){const t=i/6,x=p[0]+(tip[0]-p[0])*t,y=p[1]+(tip[1]-p[1])*t,r=6*t;body+=ch4Line(x-uy*r,y+ux*r,x+uy*r,y-ux*r,'stroke-width="2"');}
+    }else body+=ch4Line(...p,...tip);
+  }
+  Object.entries(g.elements).forEach(([id,label])=>{const p=at(id);body+=ch4Label(p[0],p[1]+6,label,20);});
+  body+='</g>';
+  return ch4Figure(title,body,w,h);
+}
+function ch4RealAGallery(question,romans){
+  return '<div class="returned-quiz-structures" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px">'+romans.map(roman=>'<div>'+ch4RealAFigure('q'+question+roman,roman)+'</div>').join('')+'</div>';
+}
+function ch4RealAQ(n,prompt,extra){
+  const skills={1:'ch4-quiz-parent-attachment',2:'ch4-carbon-map',3:'ch4-quiz-parent-attachment',4:'ch4-name-draw',5:'ch4-cis-trans-faces',6:'ch4-name-draw',7:'ch4-quiz-parent-attachment',8:'ch4-name-draw',9:'ch4-name-draw',10:'ch4-cis-trans-faces'};
+  return Object.assign({id:ch4RealAId(n),chapter:4,courseRoute:'ch4',topic:'alkanes',type:'mc',diff:2,adaptiveSkill:skills[n],prompt:'<p class="returned-quiz-label" style="font-size:13px;font-weight:700;color:#526775;margin:0 0 8px">Returned Quiz A · question '+n+' · familiar practice</p>'+prompt,
+    source:'Returned Quiz 4A, question '+n+'; clean redraw of supplied paper, not a new assessment.',sourceKind:'learner-assessment-redraw',familiarRepresentation:true,eligibleForUnseenTransfer:false,readinessEligible:false,novelty:'returned-quiz-familiar',activityCategory:'returned-quiz-practice',returnedQuizQuestion:n,returnedQuiz:'Quiz 4A · September 29, 2026',transferFamily:'ch4-returned-quiz-a-'+n,sourceModelIds:['quiz4a-20260929-q'+n]},extra);
+}
+const CH4_RETURNED_QUIZ_A_QUESTIONS=[
+  ch4RealAQ(1,'What is the IUPAC name of the following compound?'+ch4RealAFigure('q1'),{diff:3,choices:['4-Isobutyl-3,4-dimethylheptane','4-sec-Butyl-2,4-dimethylheptane','2,4,5-Trimethyl-4-propylheptane','3,4,6-Trimethyl-4-propylheptane','4-Isobutyl-4,5-dimethylheptane'],answer:2,hints:['Find all candidates for the longest continuous chain before numbering.','Several parents contain seven carbons. Prefer the one that leaves more substituents.','After choosing the parent, compare the full locant lists from both ends.'],why:'<b>2,4,5-trimethyl-4-propylheptane.</b> Several paths tie at seven carbons. The path from a right-hand terminal methyl across the middle to the far-left end leaves four substituents: three methyl groups and one propyl group. A path into the upper arm leaves fewer substituents, so it loses before numbering is compared. On the preferred heptane parent, the complete locant set 2,4,4,5 beats 3,4,4,6. Methyl is alphabetized before propyl. The sec-butyl name uses the wrong parent choice, not merely the wrong punctuation.'}),
+  ch4RealAQ(2,'What is the parent chain of the following compound?'+ch4RealAFigure('q2'),{diff:1,choices:['pentane','hexane','heptane','octane','nonane'],answer:3,hints:['Count carbon vertices and line ends, not the number of drawn bonds.','Trace a continuous terminal-to-terminal path without visiting a carbon twice.'],why:'<b>octane.</b> The longest continuous chain contains eight carbons. The visible top zigzag is one valid eight-carbon path; turning into the two-carbon branch on the right can give an equally long path, not a longer one. Branch carbons are part of the molecule, but you cannot count a fork twice when tracing a parent.'}),
+  ch4RealAQ(3,'What is the IUPAC name of the following compound?'+ch4RealAFigure('q3'),{diff:3,choices:['2,5-Dimethyl-3-propylheptane','3,6-Dimethyl-5-propylheptane','6-Methyl-4-(1-methylethyl)octane','2-Methyl-3-(2-methylbutyl)hexane','3-Methyl-5-(1-methylethyl)octane'],answer:4,hints:['The longest chain can bend. Try entering the downward three-carbon arm.','Count the longest path first; then number from both ends.','For the branched substituent, start its own numbering at its attachment carbon.'],why:'<b>3-methyl-5-(1-methylethyl)octane.</b> Start at the far-left endpoint, cross the middle, then follow the downward arm to its endpoint: eight carbons, so the parent is octane, not the seven-carbon path used in the heptane choices. Numbering from the left gives 3,5 rather than 4,6. The branch at C5 is CH(CH₃)₂: isopropyl, systematically 1-methylethyl. Within that branch, the attachment carbon is carbon 1 of an ethyl chain and carries one additional methyl.'}),
+  ch4RealAQ(4,'What is the IUPAC name of the following compound?'+ch4RealAFigure('q4'),{diff:1,choices:['1,1,3-trimethylcyclopentane','1,3,3-trimethylcyclopentane','1,1,3-trimethylcyclopropane','1,3,3-trimethylcyclopropane','1-methyl-3-isopropylcyclopentane'],answer:0,hints:['Count only the ring vertices to identify the parent.','Two one-carbon branches attached directly to one ring carbon are two methyl groups.','Compare the complete substituent locant lists.'],why:'<b>1,1,3-trimethylcyclopentane.</b> The ring has five carbons. Two separate methyl groups attach directly to the top ring carbon, and a third methyl is two ring bonds away. Starting at the doubly substituted carbon gives 1,1,3, which beats 1,3,3 at the first difference. The fork is not an isopropyl substituent: its central carbon belongs to the ring.'}),
+  ch4RealAQ(5,'Select the full name for the following molecule.'+ch4RealAFigure('q5','Given wedge–dash structure'),{diff:2,choices:['cis-1,3-Dichlorocyclopentane','trans-1,4-Dichlorocyclopentane','cis-1,2-Dichlorocyclopentane','trans-1,3-Dichlorocyclopentane','1,1-Dichlorocyclopentane'],answer:3,hints:['Follow the shorter path around the ring between the two chlorinated carbons.','Compare the faces of the two Cl groups, not Cl with H.'],why:'<b>trans-1,3-dichlorocyclopentane.</b> The chlorine-bearing carbons are separated by two ring bonds, so the lowest locants are 1,3 rather than 1,4. One Cl is drawn on a solid wedge toward you; the other is dashed away. Opposite faces mean trans. The page positions of the labels do not determine cis/trans.'}),
+  ch4RealAQ(6,'What is the IUPAC name of the following compound?'+ch4RealAFigure('q6'),{diff:2,choices:['2,3-dimethyl-1-ethyl-cyclopropane','1-ethyl-2,3-dimethylcyclopentane','3-ethyl-1,2-dimethyl-cyclopentane','1-ethyl-2,3-methylcyclohexane','1,2,3-ethyl-dimethylcyclopentane'],answer:1,hints:['Identify the ring size and the length of each side chain.','Two directions can give the same complete locant set, 1,2,3.','When those locant sets tie, which substituent comes first alphabetically?'],why:'<b>1-ethyl-2,3-dimethylcyclopentane.</b> The five-carbon ring carries one ethyl and two methyl groups on three consecutive carbons. Two numberings give the same set 1,2,3. In that tie, ethyl comes before methyl alphabetically, so ethyl receives C1. Ignore di- when alphabetizing. The 3-ethyl-1,2-dimethyl choice has the right ring and substituent sizes but assigns the tied numbering the wrong way. Original distractor wording is preserved.'}),
+  ch4RealAQ(7,'Which of the following have an isopropyl group as a substituent on the parent chain?'+ch4RealAGallery(7,['I','II','III']),{diff:3,choices:['I','II','III','I and II','II and III'],answer:4,hints:['A visible Y shape is not enough: choose the parent before identifying its substituents.','For I, compare equal-length parents that do and do not enter the upper fork.','Isopropyl attaches to the parent through CH bearing two methyl groups.'],why:'<b>II and III.</b> In II, the seven-carbon parent leaves CH(CH₃)₂ as an isopropyl substituent. In III, cyclopentane is the parent and the attached three-carbon fork is isopropyl. In I, an equally long six-carbon parent can pass through the upper fork; that choice leaves two substituents rather than one and is preferred. Therefore the apparent isopropyl group in I does not remain intact as a substituent on the preferred parent.'}),
+  ch4RealAQ(8,'Which of the following is 3-ethyl-3-methylpentane?'+ch4RealAGallery(8,['I','II','III','IV','V']),{diff:2,choices:['I','II','III','IV','V'],answer:3,hints:['Build the name mentally: a five-carbon parent, with ethyl and methyl both attached to carbon 3.','The central carbon has four carbon bonds and no hydrogen.','Count the lengths of all four arms at that central carbon.'],why:'<b>IV.</b> Carbon 3 connects to three two-carbon arms and one one-carbon arm. Two ethyl-length arms form the five-carbon parent through the center; the remaining arms are ethyl and methyl, both on C3. There are eight carbons total. I has adjacent branch points and seven carbons. II puts methyl and ethyl on different parent carbons. III has four two-carbon arms (nine carbons). V has a three-carbon arm, making its longest parent hexane.'}),
+  ch4RealAQ(9,'Which of the following is 1-cyclopropyl-3-methylcyclopentane?'+ch4RealAGallery(9,['I','II','III','IV','V']),{diff:2,choices:['I','II','III','IV','V'],answer:1,hints:['The five-membered ring is the parent. The triangle is a three-carbon substituent.','Starting at the ring carbon connected to the triangle, count the shorter route to the methyl branch.','Check which ring actually carries the methyl.'],why:'<b>II.</b> The cyclopentane parent has cyclopropyl at C1 and methyl at C3. I places methyl at C2. III places methyl on the cyclopropyl ring rather than the cyclopentane parent. IV puts cyclopropyl and methyl on the same parent carbon. V puts methyl on the cyclopropyl attachment carbon. Count the attachment atoms and their connectivity, not how close two labels look.'}),
+  ch4RealAQ(10,'Which of the following is <b>trans-1-isopropyl-3-methylcyclohexane</b>?'+ch4RealAGallery(10,['I','II','III','IV','V']),{diff:3,choices:['I','II','III','IV','V'],answer:2,hints:['First check the group identities: isopropyl is a three-carbon fork; methyl is one carbon.','Next count ring bonds between the substituted carbons to confirm 1,3.','Finally compare up/down faces. Axial/equatorial alone does not determine cis/trans.'],why:'<b>III.</b> The isopropyl group attaches to the inner foreground carbon and is equatorial down. The methyl on the upper-right carbon is axial up. Those substituted carbons are two ring bonds apart (1,3), and the groups are on opposite faces (trans). I contains ethyl rather than isopropyl. II has cis-1,4 substitution. IV contains two methyl groups. V is trans-1,4, not trans-1,3. For trans-1,3 substitution, one group is axial and the other equatorial in either chair.'})
+];
+const CH4_RETURNED_QUIZ_A_IDS=CH4_RETURNED_QUIZ_A_QUESTIONS.map(q=>q.id);
+CH4_QUESTIONS.push(...CH4_RETURNED_QUIZ_A_QUESTIONS);
+// Deliberately do not attach these to core units/cold pools. The dedicated
+// returned-paper practice route owns them and must retain their familiar label.
+
 /* Authored task-complexity tiers · September 28, 2026.
  * Load after all Chapter 4 question modules, before the app registers them.
  * These are instructional heuristics, NOT empirically calibrated difficulty,
@@ -10632,7 +10771,7 @@ const CH4_QUIZ_GROUPS = [
 ];
 function quizUnits(){return CH4_QUIZ_GROUPS.flatMap(g=>g.ids).map(id=>CH4_LESSONS.find(u=>u.id===id)).filter(Boolean);}
 function quizGroupUnits(g){return g.ids.map(id=>CH4_LESSONS.find(u=>u.id===id)).filter(Boolean);}
-function quizUnitForQuestion(id){return CH4_LESSONS.find(u=>u.practiceIds.includes(id));}
+function quizUnitForQuestion(id){return CH4_LESSONS.find(u=>u.practiceIds.includes(id))||CH4_LESSONS.find(u=>u.id===QUESTIONS.find(q=>q.id===id)?.adaptiveSkill);}
 function quizNeedsWork(r){return !r.ok||!!r.g||!!r.dk||!!r.rf||r.h>0||!!r.sr||!!S.questionFlags?.[r.id]?.active;}
 function quizUnitEvidence(u){
   const proof=courseRun(u.id,'proof'),practice=courseRun(u.id,'practice');
@@ -10721,6 +10860,48 @@ function startQuizB(){
   beginCourseDrill(queue,{id:'quiz-b-rehearsal',topic:'__course'},'mixed','Quiz B · Structure and Stability · 25-minute pacing practice');
   S.drill.focusStartedAt=Date.now();snapshotDrill(0);save();render();
 }
+// The timed paper rehearsal is deliberately fixed. Ordinary B practice draws
+// from the whole in-scope bank, preserving builders and paper work each round.
+const QUIZ_B_CORE_UNITS=['ch4-newman-view','ch4-conformer-energy','ch4-chair-basics','ch4-chair-flip','ch4-chair-stability','ch4-cis-trans-faces','ch4-ring-strain-study','ch4-combustion-stability','ch4-chair-paper-check','ch4-quiz-shape-tracking','ch4-quiz-double-newman'];
+[
+  ['CH4-20260923-40','CH4-20260923-41','CH4-20260923-46','CH4-20260923-47','CH4-20260923-48'],
+  ['CH4-20260919-26','CH4-L11-20260924-08'],
+  ['CH4-20260919-34','CH4-QP-20260928-18','CH4-QP-20260928-19','CH4-QP-20260928-20','CH4-QP-20260928-22'],
+  ['CH4-20260923-21','CH4-20260923-22','CH4-20260919-14','CH4-QP-20260928-28'],
+  ['CH4-20260919-15','CH4-20260919-17'],
+  ['CH4-20260919-18','CH4-20260919-19']
+].forEach((ids,i)=>ids.forEach(id=>{const q=CH4_QUESTIONS.find(x=>x.id===id);if(q)q.sourceModelIds=[...new Set([...(q.sourceModelIds||[]),'quiz-b-shared-target-'+i])];}));
+function quizBAdaptivePool(){
+  const ids=new Set(CH4_LESSONS.filter(u=>QUIZ_B_CORE_UNITS.includes(u.id)).flatMap(u=>u.practiceIds));
+  return QUESTIONS.filter(q=>ids.has(q.id)&&adaptiveLearningEligible(q));
+}
+function quizBAdaptiveSlots(pool){
+  const ids=filter=>pool.filter(filter).map(q=>q.id);
+  const units=names=>new Set(CH4_LESSONS.filter(u=>names.includes(u.id)).flatMap(u=>u.practiceIds));
+  const within=names=>{const set=units(names);return ids(q=>set.has(q.id));};
+  const foundations=ids(q=>adaptiveLearningDifficulty(q)<=1);
+  return [
+    ['acyclic Newman construction',ids(q=>q.production?.kind==='newman')],
+    ['chair shape, faces and bond positions',within(['ch4-chair-basics','ch4-cis-trans-faces','ch4-quiz-shape-tracking']).filter(id=>id!=='CH4-20260919-21')],
+    ['chair construction and ring flips',ids(q=>q.production?.kind==='chair')],
+    ['butane conformations and energy',within(['ch4-conformer-energy'])],
+    ['foundation retrieval',foundations],
+    ['drawing on paper without a supplied skeleton',ids(q=>q.type==='written'&&q.requiresDrawing)],
+    ['acyclic and ring strain',within(['ch4-ring-strain-study']).concat(ids(q=>q.id==='CH4-20260919-21'))],
+    ['cyclohexane and double Newman views',within(['ch4-quiz-double-newman']).concat(ids(q=>q.id==='CH4-20260919-34'))],
+    ['substituted-chair stability and combustion',within(['ch4-chair-stability','ch4-combustion-stability']).concat(ids(q=>['CH4-L11-20260924-24','CH4-L11-20260924-26'].includes(q.id)))],
+    ['foundation retrieval',foundations]
+  ].map(([label,poolIds])=>({label,poolIds:[...new Set(poolIds)]}));
+}
+function startQuizBAdaptive(){
+  const pool=quizBAdaptivePool();
+  return startAdaptiveLearning({chapter:'ch4',topics:[...new Set(pool.map(q=>q.topic))],poolIds:pool.map(q=>q.id),total:10,rotationKey:'quiz-b',slots:quizBAdaptiveSlots(pool),label:'Quiz B · adaptive structure & stability'});
+}
+function startReturnedQuizA(){
+  const ids=typeof CH4_RETURNED_QUIZ_A_IDS==='undefined'?[]:CH4_RETURNED_QUIZ_A_IDS;
+  const queue=ids.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
+  if(queue.length)beginCourseDrill(queue,{id:'quiz-a-returned',topic:'alkanes'},'practice','Returned Quiz A · familiar practice, not a fresh test');
+}
 function quizAQueue(){
   return CH4_QUIZ_A_PRACTICE_IDS.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
 }
@@ -10803,15 +10984,26 @@ function quizAssessmentChoices(v){
   const a=el('div');a.innerHTML='<h3>Quiz A</h3><p>10 rotating tasks from '+quizAAdaptivePool().length+' question cards · names, drawings, parent chains & isomers</p>';
   a.appendChild(el('button',{class:'btn ghost','data-quiz-a-start':'true',onclick:startQuizA},'Start a fresh Quiz A round →'));
   a.appendChild(el('p',{class:'qp-caption'},'Adaptive practice with optional hints. New rounds vary and include easier checks; small skill banks sometimes repeat. This is practice, not the instructor’s quiz.'));
+  if(typeof CH4_RETURNED_QUIZ_A_IDS!=='undefined'){
+    a.appendChild(el('button',{class:'btn ghost','data-quiz-a-returned':'true',onclick:startReturnedQuizA},'Practise my returned Quiz A · '+CH4_RETURNED_QUIZ_A_IDS.length+' questions'));
+    a.appendChild(el('p',{class:'qp-caption'},'The actual returned questions, cleanly redrawn with explanations. Familiar review only—not fresh-test readiness evidence.'));
+  }
   renderNamingTiers(a);
   const alternatives=a.querySelector('[data-naming-tiers]');
   alternatives.appendChild(el('p',{class:'qp-caption'},'Bicyclic naming is supplemental unless assigned. The fixed rehearsal deliberately repeats the same nine tasks.'));
   alternatives.appendChild(el('button',{class:'btn ghost','data-quiz-a-bicyclic':'true',onclick:startQuizABicyclic},'Supplemental bicyclic practice'));
   alternatives.appendChild(el('button',{class:'btn ghost','data-quiz-a-fixed':'true',onclick:startQuizAFixed},'Repeat fixed 9-task rehearsal'));
-  const b=el('div');b.innerHTML='<h3>Quiz B</h3><p>Structure & stability · 10 questions · 25 minutes · on paper</p>';
-  b.appendChild(el('button',{class:'btn','data-quiz-b-start':'true',onclick:startQuizB},'Start 25-minute rehearsal →'));
+  const b=el('div');b.innerHTML='<h3>Quiz B</h3><p>10 rotating tasks from '+quizBAdaptivePool().length+' question cards · structure & stability</p>';
+  b.appendChild(el('button',{class:'btn','data-quiz-b-adaptive':'true',onclick:startQuizBAdaptive},'Start a different Quiz B round →'));
+  b.appendChild(el('p',{class:'qp-caption'},'Newman and chair builders, a paper drawing, energy, strain and easier checks. Optional hints; recent questions and known look-alikes are avoided when alternatives exist.'));
+  const timed=el('details',{class:'qp-naming-tiers','data-quiz-b-fixed-options':'true'});
+  timed.appendChild(el('summary',{},'Timed paper rehearsal · fixed 10-task set'));
+  timed.appendChild(el('p',{class:'qp-caption'},'25-minute pacing practice for the supplied Quiz B objectives. This deliberately repeats the same ten tasks; choose rotating practice above for variety.'));
+  timed.appendChild(el('button',{class:'btn ghost','data-quiz-b-start':'true',onclick:startQuizB},'Repeat 25-minute rehearsal →'));
+  b.appendChild(timed);
+  b.appendChild(el('p',{class:'qp-caption'},'Question cards are not all different molecules. Some conversion and drawing skills still have only one or two examples; repeats are review, not new proof.'));
   choices.appendChild(a);choices.appendChild(b);box.appendChild(choices);
-  box.appendChild(el('p',{class:'qp-caption'},'Have blank paper ready. These are original practice tasks, not the quiz. Drawing self-review is not an automatic paper grade.'));v.appendChild(box);
+  box.appendChild(el('p',{class:'qp-caption'},'Have blank paper ready. Except for the labeled returned Quiz A set, these are preparation tasks—not the instructor’s quiz. Drawing self-review is not an automatic paper grade.'));v.appendChild(box);
 }
 function startQuizRepair(){
   const needs=quizRecentNeeds(),units=[...new Set(needs.map(a=>quizUnitForQuestion(a.id)).filter(Boolean))];
@@ -10923,15 +11115,17 @@ function renderQuizLesson(v,u){
 }
 function renderQuizResult(v,D){
   recordCourseRound(D);
+  const returned=D.courseUnit==='quiz-a-returned';
   const rows=D.log||[],needs=rows.filter(quizNeedsWork),manual=rows.filter(r=>QUESTIONS.find(q=>q.id===r.id)?.type==='written').length;
   const u=CH4_LESSONS.find(x=>x.id===D.courseUnit),card=el('section',{class:'card qp-result','data-course-result':D.coursePhase});
-  card.innerHTML='<span class="qp-eyebrow">'+(D.cold?'NO-HINT CHECK':'PRACTICE')+' COMPLETE</span><h1>'+D.right+' / '+D.queue.length+' tasks</h1><p>'+(manual?'Some responses were self-reviewed. Use the model and keep the paper work for an independent check.':needs.length?'You have a specific next step—not a whole chapter to restart.':D.cold?'This set passed without hints or review flags. Try a different skill next.':'Next, see whether the rule holds on different questions without hints.')+'</p>';
+  card.innerHTML='<span class="qp-eyebrow">'+(returned?'RETURNED QUIZ · FAMILIAR REVIEW':D.cold?'NO-HINT CHECK':'PRACTICE')+' COMPLETE</span><h1>'+D.right+' / '+D.queue.length+' tasks</h1><p>'+(returned?'This is practice on previously seen questions—not a new quiz score or fresh-readiness evidence. Review the reasoning, then apply it to different structures.':manual?'Some responses were self-reviewed. Use the model and keep the paper work for an independent check.':needs.length?'You have a specific next step—not a whole chapter to restart.':D.cold?'This set passed without hints or review flags. Try a different skill next.':'Next, see whether the rule holds on different questions without hints.')+'</p>';
   if(D.courseUnit==='quiz-b-rehearsal'){
     const last=Math.max(D.focusStartedAt||0,...(S.attempts||[]).filter(a=>a.u===D.runId).map(a=>a.ts)),seconds=Math.max(0,Math.round((last-(D.focusStartedAt||last))/1000));
     card.appendChild(el('p',{class:'muted','data-quiz-timing-result':'true'},'Elapsed: '+Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')+' of 25:00, including pauses. Quiz B: 10 questions × 2 points = 20 points on paper. This practice check is not your paper score or a mastery certification.'));
   }
   const actions=el('div',{class:'qp-actions'});
-  if(D.coursePhase==='practice'&&u)actions.appendChild(el('button',{class:'btn',onclick:()=>startCoursePractice(u.id,'proof')},'Next · check different questions →'));
+  if(returned)actions.appendChild(el('button',{class:'btn',onclick:startQuizA},'Practise different naming structures →'));
+  else if(D.coursePhase==='practice'&&u)actions.appendChild(el('button',{class:'btn',onclick:()=>startCoursePractice(u.id,'proof')},'Next · check different questions →'));
   else if(needs.length){const target=quizUnitForQuestion(needs[0].id);if(target)actions.appendChild(el('button',{class:'btn','data-quiz-result-repair':'true',onclick:()=>{S.drill=null;quizOpenLesson(target.id,1);}},'Work through the missed step →'));}
   else actions.appendChild(el('button',{class:'btn',onclick:()=>{S.drill=null;go('home');}},'Choose my next step →'));
   if(rows.length)actions.appendChild(el('button',{class:'btn ghost',onclick:()=>{D.reviewIdx=0;render();window.scrollTo(0,0);}},'Review my answers'));
