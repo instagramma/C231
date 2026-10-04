@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.103
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.104
+  v3.104 (2026-10-03): UNCROPPED WORKSHEET VIEW. Normal photos use their full
+  natural height with ordinary page scrolling. Only explicit enlargement uses a
+  bounded scrolling frame; zoom control is above the photo. Originals unchanged.
   v3.103 (2026-10-03): CLASS PHOTOS IN THE APP. Three original annotated IR
   worksheet pages, on-demand viewing, enlarge/fit controls, and links from the
   repair desk and lessons. Original group work is clearly separate from checked
@@ -1706,7 +1709,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Chapter 4 · learn, build, check</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.103</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.104</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -14101,16 +14104,16 @@ function etRenderSources(v){
   const tabs=el('div',{role:'navigation','aria-label':'Worksheet pages',class:'et-source-tabs'});
   ET_SOURCE_PAGES.forEach((s,i)=>tabs.appendChild(etBtn('Page '+(i+1),()=>{S.transferSourcePage=i;S.transferSourceZoom=false;render();},i!==page,{'aria-pressed':String(i===page),'aria-label':s.title,'data-source-page':String(i)})));card.appendChild(tabs);
   card.appendChild(el('h2',{},source.title));card.appendChild(el('p',{class:'muted'},source.caption));
-  const frame=el('div',{class:'et-source-frame',tabindex:0,role:'region','aria-label':'Worksheet photo; scroll to read when enlarged'}),img=el('img',{src,alt:source.caption,decoding:'async','data-source-image':'true'});
+  card.appendChild(etBtn(S.transferSourceZoom?'Back to page width':'Enlarge photo',()=>{S.transferSourceZoom=!S.transferSourceZoom;render();},true,{'data-source-zoom':'true','aria-pressed':String(!!S.transferSourceZoom)}));
+  const frame=el('div',{class:'et-source-frame'+(S.transferSourceZoom?' is-enlarged':''),tabindex:S.transferSourceZoom?0:-1,role:'region','aria-label':S.transferSourceZoom?'Enlarged worksheet photo; scroll inside to read':'Full worksheet photo; scroll the page to read'}),img=el('img',{src,alt:source.caption,decoding:'async','data-source-image':'true'});
   img.style.width=S.transferSourceZoom?'1536px':'100%';img.style.maxWidth='none';img.style.height='auto';
   img.addEventListener('error',()=>frame.appendChild(el('p',{role:'alert'},'The photo could not load. Check your connection, or use the original-photo link below.')));frame.appendChild(img);card.appendChild(frame);
-  card.appendChild(etBtn(S.transferSourceZoom?'Fit to screen':'Enlarge photo',()=>{S.transferSourceZoom=!S.transferSourceZoom;render();},true,{'data-source-zoom':'true'}));
   card.appendChild(el('a',{href:src,target:'_blank',rel:'noopener',class:'btn ghost'},'Open original photo'));
   const next=el('section',{class:'why'});next.innerHTML='<h3>Use the photo, then practise the method</h3><p>The checked lesson explains donor paths, the exact measured bond, stiffness and wavenumber. Its new problems are separate from these annotated pages.</p>';next.appendChild(etBtn('Learn the resonance → IR method',()=>etOpen('resonance-ir')));card.appendChild(next);v.appendChild(card);
   if(S.pausedDrill?.transferCoach)v.appendChild(etBtn('Resume saved training',resumeDrill,true));
 }
 VIEWS.transferSources=etRenderSources;NAV_GROUP.transferSources='home';
-const etSourceStyle=el('style');etSourceStyle.textContent='.et-source-frame{max-height:70vh;overflow:auto;border:1px solid #bccbc6;border-radius:8px;background:#e7ebe8;overscroll-behavior:contain}.et-source-frame img{display:block}.et-source-tabs{display:flex;gap:6px}.et-source-tabs .btn{flex:1;min-width:0}.et-source-frame:focus-visible{outline:3px solid #16856c;outline-offset:3px}';document.head.appendChild(etSourceStyle);
+const etSourceStyle=el('style');etSourceStyle.textContent='.et-source-frame{border:1px solid #bccbc6;border-radius:8px;background:#e7ebe8}.et-source-frame.is-enlarged{max-height:70vh;overflow:auto;overscroll-behavior:contain}.et-source-frame img{display:block}.et-source-tabs{display:flex;gap:6px}.et-source-tabs .btn{flex:1;min-width:0}.et-source-frame:focus-visible{outline:3px solid #16856c;outline-offset:3px}';document.head.appendChild(etSourceStyle);
 // Extend, never replace, the existing saved-work contract.
 const ET_PREV_SNAPSHOT=snapshotDrill;
 snapshotDrill=function(idx){ET_PREV_SNAPSHOT(idx);if(S.drill?.transferCoach&&S.pausedDrill){S.pausedDrill.transferCoach=JSON.parse(JSON.stringify(S.drill.transferCoach));S.pausedDrill.sketchDrafts=S.drill.sketchDrafts||{};safeStore.set('pausedDrill',S.pausedDrill);}};
