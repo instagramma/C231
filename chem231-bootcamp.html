@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.102
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.103
+  v3.103 (2026-10-03): CLASS PHOTOS IN THE APP. Three original annotated IR
+  worksheet pages, on-demand viewing, enlarge/fit controls, and links from the
+  repair desk and lessons. Original group work is clearly separate from checked
+  teaching; viewing it grants no performance credit. Private profile remains local.
   v3.102 (2026-10-03): EXAM TRANSFER REPAIR. Stepwise worked lessons,
   48 bounded generation/check tasks, drawing access, saved drafts and delayed
   retrieval in four repair tracks. Guided work is not independent evidence.
@@ -1702,7 +1706,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Chapter 4 · learn, build, check</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.102</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.103</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -12084,7 +12088,7 @@ function updateCourseNavigation(){
   const small=document.querySelector('.app-title-copy small');
   if(small){
     if(!small.dataset.courseOriginal)small.dataset.courseOriginal=small.textContent;
-    const transferActive=['transferCoach','transferLesson'].includes(S.view)||(S.view==='drill'&&S.drill?.transferCoach);
+    const transferActive=['transferCoach','transferLesson','transferSources'].includes(S.view)||(S.view==='drill'&&S.drill?.transferCoach);
     small.textContent=transferActive?'Exam transfer · learn, draw, check':S.view==='courseOverview'?'Course library · all chapters':S.view==='allLearn'&&S.learnCh?(CHAPTERS.find(ch=>ch.id===S.learnCh)?.name.split(' — ')[0]||'Course library')+' · lessons':small.dataset.courseOriginal;
   }
 }
@@ -13851,7 +13855,8 @@ ET_QUESTIONS.push(etItem('resonance',12,'check',etSpecies('CH₂(A)=CH(B)–CH(C
 
 /* Resonance -> IR transfer, prompted by the supplied in-class wavenumber sheet.
  * Original exercises, not a reconstruction of an instructor key. The class
- * photographs are private group-work evidence and are NOT embedded in the app.
+ * photographs are available in the separate class-work viewer at Gabe's request;
+ * their handwriting is group-work evidence, not a verified answer key.
  * Sources: William Reusch (MSU), Infrared Spectroscopy / Carbonyl Reactivity;
  * George E. McManis, Applied Spectroscopy 24 (1970), 10.1366/000370270774372489.
  */
@@ -13990,6 +13995,7 @@ function etRenderLesson(v){
   v.appendChild(etBtn('← Training desk',()=>go('transferCoach'),true));
   const card=el('article',{class:'card et-card','data-transfer-lesson':t.id});
   card.innerHTML='<span class="tag teal">SHORT LESSON · STEP '+(step+1)+' OF '+panels.length+'</span><h1>'+t.title+'</h1><p>'+t.reason+'</p><progress class="et-progress" max="'+panels.length+'" value="'+(step+1)+'" aria-label="Lesson step"></progress><section class="et-panel" data-transfer-panel="'+step+'"><h2 tabindex="-1" id="et-step-heading">'+panel.title+'</h2>'+panel.body+'</section>';
+  if(['resonance','resonance-ir'].includes(t.id))card.insertBefore(etBtn('See the original class worksheet photos',etOpenSources,true,{'data-transfer-sources':'true'}),card.querySelector('.et-progress'));
   // These two contrasts are clearer as stacked cards than a narrow mobile table.
   card.querySelectorAll('.et-panel table').forEach(table=>{
     const comparison=el('div',{class:'et-bond-comparison'});
@@ -14010,6 +14016,7 @@ function etHomeCard(v,compact=false){
   card.innerHTML='<span class="tag teal">EXAM TRANSFER TRAINING</span><h'+(compact?'2':'1')+'>'+(pending?'Continue your saved training':wait?'Let this settle. Keep the next chapter moving.':t.title)+'</h'+(compact?'2':'1')+'><p>'+(pending?esc(S.pausedDrill.scopeName):wait?'The next scheduled retrieval check is '+new Date(s.due).toLocaleString()+'. Earlier reviews remain available; they do not count as delayed checks.':t.reason)+'</p><p><b>'+(pending?'Resume exactly where you stopped':s.label)+'</b> · correctness first; timing stays descriptive.</p>';
   card.appendChild(etBtn(pending?'Resume saved training':wait?'Open Chapter 5 lessons':s.phase==='guided'?'Start the short lesson':'Start 3 independent problems',()=>pending?resumeDrill():wait?courseNavigationGo('ch5'):s.phase==='guided'?etOpen(t.id):etStart(t.id,s.phase),false,{'data-transfer-next':'true'}));
   if(compact)card.appendChild(etBtn('See the repair tracks',()=>{courseNavigationSaveWork();go('transferCoach');},true));
+  card.appendChild(etBtn('Class worksheet photos · 3 pages',etOpenSources,true,{'data-transfer-sources':'true'}));
   card.appendChild(el('p',{class:'muted'},'No rank or grade prediction. Guided answers, repeats, fresh attempts and delayed checks are different evidence.'));v.appendChild(card);
 }
 function etRenderDesk(v){
@@ -14076,6 +14083,34 @@ function etRenderResult(v,D){
   card.appendChild(etBtn(state.phase==='check'?'Try different problems without help':state.phase==='guided'?'Repair with the worked example':'See my next training step',()=>state.phase==='check'?etStart(meta.skill,'check'):state.phase==='guided'?etOpen(meta.skill):go('transferCoach')));
   card.appendChild(el('p',{class:'muted'},'No rank, mastery badge or predicted exam score is awarded.'));v.appendChild(card);
 }
+// Original class work is reference material, not a checked key or performance.
+// Separate JPEGs are requested only on this view, not on every app launch.
+const ET_SOURCE_PAGES=[
+  {file:'ciesla-ir-20261003-page1.jpeg',title:'Page 1 · vibrations, regions and Hooke’s law',caption:'Questions 1–3. Original in-class group worksheet and handwritten selections.'},
+  {file:'ciesla-ir-20261003-page2.jpeg',title:'Page 2 · C–H and carbonyl comparisons',caption:'Questions 4–5 and the prompt for question 6. The structures for question 6 continue on page 3.'},
+  {file:'ciesla-ir-20261003-page3.jpeg',title:'Page 3 · conjugation, esters and C–O',caption:'Question 6 structures, question 7 ester comparison, and question 8 C–O explanation. Handwritten reasoning includes revisions and possible errors.'}
+];
+function etOpenSources(){
+  if(S.drill?.transferCoach){S.drill.transferCoach.help=true;}
+  courseNavigationSaveWork();S.transferSourcePage=0;S.transferSourceZoom=false;go('transferSources');
+}
+function etRenderSources(v){
+  v.appendChild(etBtn('← Training desk',()=>go('transferCoach'),true));
+  const page=Math.max(0,Math.min(S.transferSourcePage||0,ET_SOURCE_PAGES.length-1)),source=ET_SOURCE_PAGES[page],src='assets/question-sources/'+source.file,card=el('article',{class:'card et-card','data-transfer-source-view':'true'});
+  card.innerHTML='<span class="tag teal">YOUR CLASS MATERIALS · 3 ORIGINAL PHOTOS</span><h1>IR spectroscopy worksheet</h1><p>These are the actual photos you supplied, with the original handwriting. <b>Class/group work is not a verified answer key.</b> Opening this reference creates no correct-answer or mastery credit.</p>';
+  const tabs=el('div',{role:'navigation','aria-label':'Worksheet pages',class:'et-source-tabs'});
+  ET_SOURCE_PAGES.forEach((s,i)=>tabs.appendChild(etBtn('Page '+(i+1),()=>{S.transferSourcePage=i;S.transferSourceZoom=false;render();},i!==page,{'aria-pressed':String(i===page),'aria-label':s.title,'data-source-page':String(i)})));card.appendChild(tabs);
+  card.appendChild(el('h2',{},source.title));card.appendChild(el('p',{class:'muted'},source.caption));
+  const frame=el('div',{class:'et-source-frame',tabindex:0,role:'region','aria-label':'Worksheet photo; scroll to read when enlarged'}),img=el('img',{src,alt:source.caption,decoding:'async','data-source-image':'true'});
+  img.style.width=S.transferSourceZoom?'1536px':'100%';img.style.maxWidth='none';img.style.height='auto';
+  img.addEventListener('error',()=>frame.appendChild(el('p',{role:'alert'},'The photo could not load. Check your connection, or use the original-photo link below.')));frame.appendChild(img);card.appendChild(frame);
+  card.appendChild(etBtn(S.transferSourceZoom?'Fit to screen':'Enlarge photo',()=>{S.transferSourceZoom=!S.transferSourceZoom;render();},true,{'data-source-zoom':'true'}));
+  card.appendChild(el('a',{href:src,target:'_blank',rel:'noopener',class:'btn ghost'},'Open original photo'));
+  const next=el('section',{class:'why'});next.innerHTML='<h3>Use the photo, then practise the method</h3><p>The checked lesson explains donor paths, the exact measured bond, stiffness and wavenumber. Its new problems are separate from these annotated pages.</p>';next.appendChild(etBtn('Learn the resonance → IR method',()=>etOpen('resonance-ir')));card.appendChild(next);v.appendChild(card);
+  if(S.pausedDrill?.transferCoach)v.appendChild(etBtn('Resume saved training',resumeDrill,true));
+}
+VIEWS.transferSources=etRenderSources;NAV_GROUP.transferSources='home';
+const etSourceStyle=el('style');etSourceStyle.textContent='.et-source-frame{max-height:70vh;overflow:auto;border:1px solid #bccbc6;border-radius:8px;background:#e7ebe8;overscroll-behavior:contain}.et-source-frame img{display:block}.et-source-tabs{display:flex;gap:6px}.et-source-tabs .btn{flex:1;min-width:0}.et-source-frame:focus-visible{outline:3px solid #16856c;outline-offset:3px}';document.head.appendChild(etSourceStyle);
 // Extend, never replace, the existing saved-work contract.
 const ET_PREV_SNAPSHOT=snapshotDrill;
 snapshotDrill=function(idx){ET_PREV_SNAPSHOT(idx);if(S.drill?.transferCoach&&S.pausedDrill){S.pausedDrill.transferCoach=JSON.parse(JSON.stringify(S.drill.transferCoach));S.pausedDrill.sketchDrafts=S.drill.sketchDrafts||{};safeStore.set('pausedDrill',S.pausedDrill);}};
