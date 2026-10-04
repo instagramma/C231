@@ -6,7 +6,33 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.100
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.102
+  v3.102 (2026-10-03): EXAM TRANSFER REPAIR. Stepwise worked lessons,
+  48 bounded generation/check tasks, drawing access, saved drafts and delayed
+  retrieval in four repair tracks. Guided work is not independent evidence.
+  Resonance ranking distinguishes symmetry equivalence from unresolved ties;
+  qualitative hybrids include minor contributors and preserve invariant charges.
+  Arrow Lab verdicts require the pattern and reasoning as well as the product.
+  v3.101 (2026-10-02, Fri): ARROW LAB — RESONANCE YOU DRAW, CHECKED STROKE BY STROKE.
+        Gabe's retrospective: the app failed him on resonance; he wants real-time, accurate
+        feedback on drawings AND reasoning. Data: he passed all 8 fixed Resonance Lab targets on
+        9/3 (incl. a clean cold run), never reopened it, then scored 7/13 on resonance MC on 9/15.
+        The old lab tap-placed arrows, edited bonds with +/- buttons, and graded by exact match
+        after the fact ("at least one arrow has the wrong tail or head"). New Arrow Lab: a pen
+        stroke IS the curved arrow (tail snaps to a lone pair or pi bond, head to a bond or atom);
+        the contributor is drawn by hand on a bare sigma skeleton (extra bond lines, lone-pair
+        dots, + / - signs). Every stroke is read back ("Read as: lone pair on O2 -> C-O2") and
+        checked at once by a deterministic engine: legal pattern, octets (with the electron
+        count), formal charge arithmetic (FC = V - 2LP - bonds), net charge and pair conservation.
+        Any correct contributor is accepted; the engine enumerates the textbook set for 28
+        structures across Klein's five patterns plus traps (sp3 blocker, in-plane lone pair,
+        no pi/no lp), ranks them (octets -> fewer charges -> electronegativity placement) and
+        draws the hybrid. He names the pattern BEFORE seeing the result and gives a ranking
+        reason; claimed-vs-actual pattern/rank/reason and every rule violation are logged per
+        build (attempt id AL-<molecule>-<task>, drawing.kind "arrow-lab") and summarised in a
+        "Your patterns" box. Spot-the-error cases use her valid/invalid format. All old
+        Resonance Lab entry points now open the Arrow Lab; the old lab stays reachable.
+        Engine, content and recognizer verified by qa-arrowlab-*.js (1182 checks). Not published.
   v3.100 (2026-10-01): LOCAL QUIZ PRACTICE UPDATE. Rotating Quiz B from the
   scoped bank; fixed timed rehearsal remains available. Returned Quiz A is
   cleanly redrawn as familiar practice, never new-readiness evidence.
@@ -1676,7 +1702,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Chapter 4 · learn, build, check</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.97</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">•••</button><span id="verbadge" class="sr-only">v3.102</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -12058,7 +12084,8 @@ function updateCourseNavigation(){
   const small=document.querySelector('.app-title-copy small');
   if(small){
     if(!small.dataset.courseOriginal)small.dataset.courseOriginal=small.textContent;
-    small.textContent=S.view==='courseOverview'?'Course library · all chapters':S.view==='allLearn'&&S.learnCh?(CHAPTERS.find(ch=>ch.id===S.learnCh)?.name.split(' — ')[0]||'Course library')+' · lessons':small.dataset.courseOriginal;
+    const transferActive=['transferCoach','transferLesson'].includes(S.view)||(S.view==='drill'&&S.drill?.transferCoach);
+    small.textContent=transferActive?'Exam transfer · learn, draw, check':S.view==='courseOverview'?'Course library · all chapters':S.view==='allLearn'&&S.learnCh?(CHAPTERS.find(ch=>ch.id===S.learnCh)?.name.split(' — ')[0]||'Course library')+' · lessons':small.dataset.courseOriginal;
   }
 }
 function openCourseNavigation(){
@@ -12560,6 +12587,1504 @@ ch5Style.textContent=`
 document.head.appendChild(ch5Style);
 const ch5Linked=new URLSearchParams(location.search);
 if(ch5Linked.get('chapter')==='ch5'||ch5Unit(ch5Linked.get('lesson'))){S.view='allLearn';S.learnCh='ch5';S.learnUnit=ch5Unit(ch5Linked.get('lesson'))?.id||null;S.learnTopic=null;S.ch5LessonStep=0;}
+
+/* BEGIN ARROW LAB (resonance you draw), 2026-10-02 */
+/* Resonance engine, 2026-10-02. Pure, deterministic electron bookkeeping for the
+ * Arrow Lab. No DOM. Every verdict carries the counting that produced it, because
+ * the point is that Gabe can see WHY, not just pass/fail.
+ *
+ * Model: a contributor is a fixed sigma framework (atoms + which atoms are bonded,
+ * plus each atom's implicit hydrogens) and a STATE: bond orders + lone-pair counts.
+ * Formal charge is never stored; it is always derived:  FC = V − 2·LP − H − Σ(bond orders).
+ * Electrons around an atom = 2·LP + 2·(H + Σ orders).  Second-row atoms hold at most 8.
+ *
+ * Arrow spec (same strings the v3.46 Resonance Lab used):
+ *   from: "lp:<atomId>"  or "bond:<a-b>"          to: "atom:<atomId>" or "bond:<a-b>"
+ * All arrows in one move act simultaneously on the START structure. */
+
+const RX_VALENCE={H:1,B:3,C:4,N:5,O:6,F:7,P:5,S:6,Cl:7,Br:7,I:7};
+const RX_EN={H:2.20,B:2.04,C:2.55,N:3.04,O:3.44,F:3.98,P:2.19,S:2.58,Cl:3.16,Br:2.96,I:2.66};
+const RX_SECOND_ROW=new Set(["B","C","N","O","F"]);
+
+function rxKey(a,b){return [a,b].sort().join("-");}
+function rxKeyAtoms(key){return key.split("-");}
+
+/* Hydrogen count written in a label such as "CH₃", "NH₂", "OH", "CH". */
+function rxLabelH(label){
+  const m=String(label||"").match(/H([₀-₉0-9]?)/);
+  if(!m)return 0;
+  if(!m[1])return 1;
+  return "₀₁₂₃₄₅₆₇₈₉".indexOf(m[1])>=0?"₀₁₂₃₄₅₆₇₈₉".indexOf(m[1]):Number(m[1]);
+}
+
+/* Normalize a target graph into a framework + state. Implicit hydrogens come from
+ * the label when it shows them, otherwise they are inferred so the declared charge is
+ * consistent (h = V − 2LP − Σorders − charge). The two are cross-checked. */
+function rxBuild(graph){
+  const nodes=graph.nodes.map(n=>({id:n.id,el:n.el,label:n.label||n.el,x:n.x,y:n.y}));
+  const bonds=graph.bonds.map(b=>({key:rxKey(b.a,b.b),a:b.a,b:b.b}));
+  const state={lp:{},order:{}};
+  const byId=Object.fromEntries(nodes.map(n=>[n.id,n]));
+  bonds.forEach(b=>{state.order[b.key]=b.order=graph.bonds.find(x=>rxKey(x.a,x.b)===b.key).order;});
+  const issues=[];
+  nodes.forEach(n=>{
+    const src=graph.nodes.find(x=>x.id===n.id);
+    const lp=src.lp||0,charge=src.charge||0,V=RX_VALENCE[n.el];
+    const sum=bonds.filter(b=>b.a===n.id||b.b===n.id).reduce((s,b)=>s+state.order[b.key],0);
+    const inferred=V-2*lp-sum-charge;
+    const shown=rxLabelH(n.label);
+    n.h=src.h!=null?src.h:inferred;
+    if(src.h==null&&/H/.test(n.label)&&shown!==inferred)issues.push(n.id+": label shows "+shown+" H but charge/bonds imply "+inferred);
+    if(n.h<0)issues.push(n.id+": negative hydrogen count — graph inconsistent");
+    state.lp[n.id]=lp;
+  });
+  const fw={nodes,bonds,byId,neighbors:{}};
+  nodes.forEach(n=>fw.neighbors[n.id]=[]);
+  bonds.forEach(b=>{fw.neighbors[b.a].push(b.b);fw.neighbors[b.b].push(b.a);});
+  return {fw,state,issues};
+}
+
+function rxCloneState(s){return {lp:{...s.lp},order:{...s.order}};}
+function rxStateSig(s){return Object.keys(s.order).sort().map(k=>k+":"+s.order[k]).join(",")+"|"+Object.keys(s.lp).sort().map(k=>k+":"+s.lp[k]).join(",");}
+function rxBondsOf(fw,id){return fw.bonds.filter(b=>b.a===id||b.b===id);}
+function rxSumOrders(fw,s,id){return rxBondsOf(fw,id).reduce((t,b)=>t+s.order[b.key],0);}
+
+/* Per-atom bookkeeping with the arithmetic spelled out. */
+function rxAtom(fw,s,id){
+  const n=fw.byId[id],V=RX_VALENCE[n.el],lp=s.lp[id],sum=rxSumOrders(fw,s,id),bondsTotal=sum+n.h;
+  const fc=V-2*lp-bondsTotal, electrons=2*lp+2*bondsTotal;
+  const secondRow=RX_SECOND_ROW.has(n.el);
+  return {id,el:n.el,label:n.label,lp,h:n.h,bondOrders:sum,fc,electrons,
+    octet:secondRow?(electrons===8?"full":electrons>8?"over":"short"):"n/a",
+    fcText:"FC("+n.label+") = "+V+" − 2·"+lp+" − "+bondsTotal+" = "+(fc>0?"+":"")+fc,
+    electronText:n.label+": "+lp+" lone pair"+(lp===1?"":"s")+" ("+(2*lp)+" e⁻) + "+bondsTotal+" bond"+(bondsTotal===1?"":"s")+" ("+(2*bondsTotal)+" e⁻) = "+electrons+" e⁻"};
+}
+function rxCharges(fw,s){const c={};fw.nodes.forEach(n=>{c[n.id]=rxAtom(fw,s,n.id).fc;});return c;}
+function rxNetCharge(fw,s){return fw.nodes.reduce((t,n)=>t+rxAtom(fw,s,n.id).fc,0);}
+function rxPairCount(fw,s){return Object.values(s.order).reduce((t,o)=>t+o,0)+Object.values(s.lp).reduce((t,l)=>t+l,0);}
+
+/* ---------- arrow parsing & legality ---------- */
+function rxParseEnd(str){
+  const m=/^(lp|bond|atom):(.+)$/.exec(String(str||""));
+  if(!m)return null;
+  return {kind:m[1],id:m[1]==="bond"?rxKey(...m[2].split("-")):m[2]};
+}
+/* Check ONE arrow against the start state and the other arrows of the same move.
+ * Returns {ok, code, text}. Codes are stable so the UI can log patterns of error. */
+function rxArrowLegality(fw,start,arrow,others=[]){
+  const from=rxParseEnd(arrow.from),to=rxParseEnd(arrow.to);
+  const L=id=>fw.byId[id]?fw.byId[id].label:id;
+  const bondLabel=key=>{const [a,b]=rxKeyAtoms(key);return L(a)+"–"+L(b);};
+  if(!from||!to)return {ok:false,code:"malformed",text:"Arrow endpoints not recognized."};
+  if(from.kind==="atom")return {ok:false,code:"tail-on-atom",text:"An arrow tail must start on electrons: a lone pair or a π bond — not on the atom symbol."};
+  if(from.kind==="lp"){
+    if(!fw.byId[from.id])return {ok:false,code:"malformed",text:"Unknown atom."};
+    const have=start.lp[from.id]||0,used=others.filter(o=>o.from===arrow.from).length;
+    if(have===0)return {ok:false,code:"tail-no-lp",text:L(from.id)+" has no lone pair to move. Tails start on electrons that exist in the structure you are drawing from."};
+    const piOn=rxBondsOf(fw,from.id).reduce((t,b)=>t+Math.max(0,start.order[b.key]-1),0);
+    if(piOn>0)return {ok:false,code:"lp-in-plane",text:L(from.id)+" is already part of a π bond, so its lone pair sits in an sp² orbital IN THE PLANE of the molecule — it cannot overlap the π system. Only a lone pair on an atom with all single bonds delocalizes."};
+    if(used+1>have)return {ok:false,code:"tail-lp-overdrawn",text:L(from.id)+" has "+have+" lone pair"+(have===1?"":"s")+" but "+(used+1)+" arrows start there."};
+    if(to.kind==="atom")return {ok:false,code:"lp-to-atom",text:"A lone pair can only move INTO a bond with a neighbor. Moving a lone pair onto another atom would transfer electrons between atoms — that is a reaction, not resonance."};
+    if(to.kind==="bond"){
+      if(start.order[to.id]==null)return {ok:false,code:"head-new-bond",text:"There is no σ bond between "+bondLabel(to.id)+". Resonance never creates a new connection; a lone pair becomes a π bond only on an EXISTING bond to a neighbor."};
+      if(!rxKeyAtoms(to.id).includes(from.id))return {ok:false,code:"head-not-adjacent",text:"The lone pair on "+L(from.id)+" can only become a π bond to a direct neighbor of "+L(from.id)+". "+bondLabel(to.id)+" does not touch "+L(from.id)+"."};
+    }
+  }
+  if(from.kind==="bond"){
+    const order=start.order[from.id];
+    if(order==null)return {ok:false,code:"malformed",text:"Unknown bond."};
+    if(order<2)return {ok:false,code:"tail-sigma",text:bondLabel(from.id)+" is a single (σ) bond. σ electrons never move in resonance — only π bonds and lone pairs do."};
+    const used=others.filter(o=>o.from===arrow.from).length;
+    if(used+1>order-1)return {ok:false,code:"tail-pi-overdrawn",text:bondLabel(from.id)+" has "+(order-1)+" π pair"+(order-1===1?"":"s")+" but "+(used+1)+" arrows start there."};
+    const [a,b]=rxKeyAtoms(from.id);
+    if(to.kind==="atom"){
+      if(to.id!==a&&to.id!==b)return {ok:false,code:"head-not-endpoint",text:"A π bond's electrons can only collapse onto one of ITS two atoms ("+L(a)+" or "+L(b)+"), becoming a lone pair there."};
+    }else if(to.kind==="bond"){
+      if(to.id===from.id)return {ok:false,code:"head-same-bond",text:"Tail and head are on the same bond — nothing moves."};
+      if(start.order[to.id]==null)return {ok:false,code:"head-new-bond",text:"There is no σ bond between "+bondLabel(to.id)+". A π bond can only shift to an EXISTING adjacent bond."};
+      const [c,d]=rxKeyAtoms(to.id),shared=[a,b].filter(x=>x===c||x===d);
+      if(shared.length!==1)return {ok:false,code:"head-not-adjacent",text:"A π bond can only shift to a bond that shares exactly one atom with it. "+bondLabel(from.id)+" and "+bondLabel(to.id)+" are not adjacent."};
+    }
+  }
+  if(to.kind==="bond"){
+    const heads=others.filter(o=>rxParseEnd(o.to)?.kind==="bond"&&rxParseEnd(o.to).id===to.id).length;
+    if(start.order[to.id]+heads+1>3)return {ok:false,code:"head-order-over-3",text:bondLabel(to.id)+" cannot exceed a triple bond."};
+  }
+  return {ok:true,code:"ok",text:"Legal arrow."};
+}
+
+/* Apply a set of arrows simultaneously. Returns {state, charges, problems, changed}. */
+function rxApply(fw,start,arrows){
+  const s=rxCloneState(start);
+  arrows.forEach(ar=>{
+    const from=rxParseEnd(ar.from),to=rxParseEnd(ar.to);
+    if(from.kind==="lp")s.lp[from.id]-=1;
+    if(from.kind==="bond")s.order[from.id]-=1;
+    if(to.kind==="atom")s.lp[to.id]+=1;
+    if(to.kind==="bond")s.order[to.id]+=1;
+  });
+  return s;
+}
+
+/* Validate a RESULT state against the start: the checks Ciesla grades. */
+function rxValidate(fw,start,s){
+  const problems=[];
+  fw.bonds.forEach(b=>{if(s.order[b.key]<1)problems.push({code:"sigma-broken",atom:null,bond:b.key,text:"The σ framework changed: "+fw.byId[b.a].label+"–"+fw.byId[b.b].label+" no longer has a bond. Resonance moves electrons, never atoms."});});
+  fw.nodes.forEach(n=>{
+    if(s.lp[n.id]<0)problems.push({code:"lp-negative",atom:n.id,text:n.label+" would have a negative lone-pair count."});
+    const A=rxAtom(fw,s,n.id);
+    if(A.octet==="over")problems.push({code:"octet-over",atom:n.id,text:A.electronText+". A second-row atom cannot hold more than 8. Another arrow must take a pair AWAY from "+n.label+" in the same move."});
+  });
+  const net0=rxNetCharge(fw,start),net1=rxNetCharge(fw,s);
+  if(net0!==net1)problems.push({code:"net-charge",text:"Net charge changed from "+net0+" to "+net1+"."});
+  const p0=rxPairCount(fw,start),p1=rxPairCount(fw,s);
+  if(p0!==p1)problems.push({code:"pair-count",text:"Electron-pair count changed from "+p0+" to "+p1+"; pairs move, they are not created or destroyed."});
+  return {ok:problems.length===0,problems,unchanged:rxStateSig(start)===rxStateSig(s)};
+}
+
+/* Full evaluation of a move as drawn: per-arrow legality + result validity. */
+function rxEvaluateMove(fw,start,arrows){
+  const perArrow=arrows.map((a,i)=>rxArrowLegality(fw,start,a,arrows.filter((_,j)=>j!==i)));
+  const legal=perArrow.every(x=>x.ok);
+  if(!legal)return {legal:false,perArrow,result:null,validity:null};
+  const result=rxApply(fw,start,arrows);
+  const validity=rxValidate(fw,start,result);
+  return {legal:true,perArrow,result,validity,charges:rxCharges(fw,result)};
+}
+
+/* ---------- candidate generation ---------- */
+function rxCandidateArrows(fw,s){
+  const out=[];
+  fw.nodes.forEach(n=>{
+    if((s.lp[n.id]||0)>0)rxBondsOf(fw,n.id).forEach(b=>out.push({from:"lp:"+n.id,to:"bond:"+b.key}));
+  });
+  fw.bonds.forEach(b=>{
+    if(s.order[b.key]>=2){
+      out.push({from:"bond:"+b.key,to:"atom:"+b.a});
+      out.push({from:"bond:"+b.key,to:"atom:"+b.b});
+      fw.bonds.forEach(o=>{if(o.key!==b.key&&[b.a,b.b].filter(x=>x===o.a||x===o.b).length===1)out.push({from:"bond:"+b.key,to:"bond:"+o.key});});
+    }
+  });
+  return out;
+}
+function rxCombos(arr,k){
+  const out=[];
+  (function rec(startIdx,acc){if(acc.length===k){out.push(acc.slice());return;}for(let i=startIdx;i<arr.length;i++){acc.push(arr[i]);rec(i+1,acc);acc.pop();}})(0,[]);
+  return out;
+}
+/* "Reasonable" = the contributors chemists actually draw (Klein's five patterns).
+ * A move can be perfectly LEGAL electron pushing and still produce a structure nobody
+ * writes (benzene as a C⁺/C⁻ zwitterion). The lab accepts legal moves but tells him
+ * when the result does not belong in the set, and why. Rules:
+ *  R1 the move may not add more than one new (+,−) pair of formal charges;
+ *  R2 if it adds a pair, at least one NEW charge must sit on a heteroatom (not C/H) —
+ *     that is the electronegativity payoff (C=O → C⁺–O⁻, amide, enol ether, enone);
+ *  R3 every π→atom collapse must either land on the more electronegative atom of its
+ *     bond, or be the octet repair for a partner atom that another arrow is feeding. */
+function rxReasonable(fw,start,arrows,result){
+  const c0=rxCharges(fw,start),c1=rxCharges(fw,result);
+  const n0=Object.values(c0).reduce((t,v)=>t+Math.abs(v),0),n1=Object.values(c1).reduce((t,v)=>t+Math.abs(v),0);
+  if(n1-n0>2)return {ok:false,code:"too-much-separation",text:"This move creates two new pairs of charges at once; contributors like that are never significant."};
+  if(n1-n0===2){
+    const newCharged=fw.nodes.filter(n=>c0[n.id]===0&&c1[n.id]!==0);
+    if(!newCharged.some(n=>n.el!=="C"&&n.el!=="H"))return {ok:false,code:"charges-on-carbon",text:"Legal pushing, but it separates charge with both new charges on carbon — no electronegativity payoff, so this contributor is left out of the set."};
+  }
+  const parsed=arrows.map(a=>({from:rxParseEnd(a.from),to:rxParseEnd(a.to)}));
+  const polarPi=parsed.length===1&&parsed[0].from.kind==="bond"&&parsed[0].to.kind==="atom";
+  // any π→atom collapse onto the MORE electronegative atom supplies the payoff that justifies a new carbon sextet
+  const polarCollapse=parsed.some(p=>{if(p.from.kind!=="bond"||p.to.kind!=="atom")return false;const [a,b]=rxKeyAtoms(p.from.id),partner=p.to.id===a?b:a;return RX_EN[fw.byId[p.to.id].el]>RX_EN[fw.byId[partner].el];});
+  for(const p of parsed){
+    if(p.from.kind==="bond"&&p.to.kind==="atom"){
+      const [a,b]=rxKeyAtoms(p.from.id),partner=p.to.id===a?b:a;
+      const moreEN=RX_EN[fw.byId[p.to.id].el]>RX_EN[fw.byId[partner].el];
+      const repair=parsed.some(q=>q!==p&&q.to.kind==="bond"&&rxKeyAtoms(q.to.id).includes(partner));
+      if(!moreEN&&!repair)return {ok:false,code:"collapse-no-payoff",text:"Collapsing the "+fw.byId[a].label+"="+fw.byId[b].label+" π bond onto "+fw.byId[p.to.id].label+" gains nothing: "+fw.byId[p.to.id].label+" is not the more electronegative atom and nothing forced the collapse. Not a contributor chemists draw."};
+    }
+  }
+  /* R4: the move may not increase the number of incomplete octets — except the single
+   * polar-π collapse, whose whole point is C⁺/X⁻ — and it may never put a sextet on a
+   * heteroatom (an electron-poor N or O is never a significant contributor). */
+  const short=(s)=>fw.nodes.map(n=>rxAtom(fw,s,n.id)).filter(A=>A.octet==="short"&&A.el!=="B");
+  const s0=short(start),s1=short(result);
+  const newShort=s1.filter(A=>!s0.some(B=>B.id===A.id));
+  if(newShort.some(A=>A.el!=="C"))return {ok:false,code:"heteroatom-sextet",text:"This leaves "+newShort.filter(A=>A.el!=="C").map(A=>A.label).join(", ")+" with only 6 electrons. An electron-poor N or O contributor is never significant — push the other way."};
+  if(s1.length>s0.length&&!polarCollapse)return {ok:false,code:"new-sextet",text:"This creates a new incomplete octet on "+newShort.map(A=>A.label).join(", ")+" without the polar-π payoff. Not a contributor to draw."};
+  /* R5: a polar-π collapse next to an existing anion is dominated — the anion's lone
+   * pair would simply fill the new sextet (that is the allylic-lone-pair pattern, which
+   * is the contributor you should draw instead). */
+  if(polarPi){
+    const sextet=newShort[0];
+    if(sextet&&fw.neighbors[sextet.id].some(nb=>c0[nb]<0&&start.lp[nb]>0))return {ok:false,code:"dominated-by-donation",text:"Legal, but "+fw.byId[fw.neighbors[sextet.id].find(nb=>c0[nb]<0)].label+"'s lone pair sits right next to the new sextet on "+sextet.label+". The real contributor comes from pushing that lone pair in (allylic lone pair pattern), not from leaving C⁺ beside C⁻."};
+  }
+  return {ok:true,code:"ok",text:""};
+}
+/* All valid single MOVES (1..maxArrows simultaneous arrows) from a state. */
+function rxMovesFrom(fw,s,maxArrows=3,{reasonableOnly=true}={}){
+  const cands=rxCandidateArrows(fw,s),moves=[],seen=new Set();
+  for(let k=1;k<=maxArrows;k++){
+    rxCombos(cands,k).forEach(set=>{
+      const ev=rxEvaluateMove(fw,s,set);
+      if(!ev.legal||!ev.validity.ok||ev.validity.unchanged)return;
+      if(reasonableOnly&&!rxReasonable(fw,s,set,ev.result).ok)return;
+      const sig=rxStateSig(ev.result);
+      if(seen.has(sig))return;
+      seen.add(sig);moves.push({arrows:set,state:ev.result,sig});
+    });
+  }
+  return moves;
+}
+function rxChargeCount(fw,s){return fw.nodes.reduce((t,n)=>t+Math.abs(rxAtom(fw,s,n.id).fc),0);}
+/* Every contributor reachable from the start (BFS over reasonable moves).
+ * "core" contributors carry the minimum possible number of formal charges — the
+ * charge-delocalization set she asks for. Charge-separated "extra" forms (one more
+ * +/− pair, e.g. C⁺–O⁻ of a carbonyl, N⁺/O⁻ of an amide) are reached only from core
+ * forms and are not expanded further, so the set stays the textbook set. */
+function rxEnumerate(fw,start,{maxArrows=3,limit=40,reasonableOnly=true}={}){
+  const startSig=rxStateSig(start),seen=new Map([[startSig,{state:rxCloneState(start),sig:startSig,via:null,depth:0,charges:rxChargeCount(fw,start)}]]);
+  const queue=[seen.get(startSig)];
+  let min=seen.get(startSig).charges;
+  while(queue.length&&seen.size<limit){
+    const cur=queue.shift();
+    if(cur.charges>min)continue;                       // extra forms are leaves
+    rxMovesFrom(fw,cur.state,maxArrows,{reasonableOnly}).forEach(m=>{
+      if(seen.has(m.sig)||seen.size>=limit)return;
+      const charges=rxChargeCount(fw,m.state);
+      if(charges>min+(min===0?2:0))return;              // neutral molecules may separate one +/− pair; charged species keep the core set
+      const entry={state:m.state,sig:m.sig,via:{fromSig:cur.sig,arrows:m.arrows},depth:cur.depth+1,charges};
+      seen.set(m.sig,entry);
+      if(charges<min){min=charges;}                    // a less-charged form resets the floor (rare)
+      queue.push(entry);
+    });
+  }
+  const all=[...seen.values()];
+  all.forEach(c=>{c.core=c.charges===min;});
+  return all;
+}
+
+/* ---------- ranking (Klein §2.9 / Ciesla: octets → fewer charges → placement) ---------- */
+function rxFactors(fw,s){
+  const atoms=fw.nodes.map(n=>rxAtom(fw,s,n.id));
+  const octetShort=atoms.filter(a=>a.octet==="short"&&a.el!=="B");
+  const charged=atoms.filter(a=>a.fc!==0);
+  const neg=charged.filter(a=>a.fc<0),pos=charged.filter(a=>a.fc>0);
+  const negEN=neg.reduce((t,a)=>t+RX_EN[a.el]*Math.abs(a.fc),0);
+  const posEN=pos.reduce((t,a)=>t+RX_EN[a.el]*a.fc,0);
+  let likeAdjacent=0;
+  fw.bonds.forEach(b=>{const fa=rxAtom(fw,s,b.a).fc,fb=rxAtom(fw,s,b.b).fc;if(fa&&fb&&Math.sign(fa)===Math.sign(fb))likeAdjacent++;});
+  return {octetShort,chargeCount:charged.reduce((t,a)=>t+Math.abs(a.fc),0),neg,pos,negEN,posEN,likeAdjacent,atoms};
+}
+function rxCompare(fa,fb){
+  if(fa.octetShort.length!==fb.octetShort.length)return fa.octetShort.length-fb.octetShort.length;
+  if(fa.chargeCount!==fb.chargeCount)return fa.chargeCount-fb.chargeCount;
+  if(fa.likeAdjacent!==fb.likeAdjacent)return fa.likeAdjacent-fb.likeAdjacent;
+  if(Math.abs(fa.negEN-fb.negEN)>1e-6)return fb.negEN-fa.negEN;     // − on more electronegative atom is better
+  if(Math.abs(fa.posEN-fb.posEN)>1e-6)return fa.posEN-fb.posEN;     // + on less electronegative atom is better
+  return 0;
+}
+/* Exact graph equivalence within this fixed-framework model. A heuristic tie
+ * is NOT proof of equivalent contributors. Preserve elements, attached H,
+ * lone-pair counts, and every bond order under a one-to-one atom mapping.
+ * This is a graph test, not a numerical resonance-weight/energy calculation. */
+function rxEquivalent(fw,a,b){
+  const ids=fw.nodes.map(n=>n.id),candidates={};
+  ids.forEach(id=>{const n=fw.byId[id];candidates[id]=ids.filter(to=>{const m=fw.byId[to];return n.el===m.el&&n.h===m.h&&a.lp[id]===b.lp[to]&&fw.neighbors[id].length===fw.neighbors[to].length&&rxSumOrders(fw,a,id)===rxSumOrders(fw,b,to);});});
+  if(ids.some(id=>!candidates[id].length))return false;
+  ids.sort((x,y)=>candidates[x].length-candidates[y].length||fw.neighbors[y].length-fw.neighbors[x].length);
+  const mapping={},used=new Set();
+  function search(i){if(i===ids.length)return true;const id=ids[i];for(const to of candidates[id]){
+    if(used.has(to))continue;
+    if(Object.entries(mapping).some(([old,mapped])=>(a.order[rxKey(id,old)]||0)!==(b.order[rxKey(to,mapped)]||0)))continue;
+    mapping[id]=to;used.add(to);if(search(i+1))return true;delete mapping[id];used.delete(to);
+  }return false;}
+  return search(0);
+}
+/* Rank contributors into heuristic tiers. Tied scores alone do not establish
+ * equal energies, equivalence, equal weights, or numerical bond orders. */
+function rxRank(fw,contributors){
+  const rows=contributors.map(c=>({...c,factors:rxFactors(fw,c.state)}));
+  rows.sort((a,b)=>rxCompare(a.factors,b.factors));
+  const tiers=[];
+  rows.forEach(r=>{const last=tiers[tiers.length-1];if(last&&rxCompare(last[0].factors,r.factors)===0)last.push(r);else tiers.push([r]);});
+  const top=tiers[0][0].factors;
+  tiers.forEach((tier,ti)=>tier.forEach(r=>{
+    const f=r.factors,why=[];
+    if(ti===0){
+      if(f.octetShort.length===0)why.push("every second-row atom has a full octet");
+      if(f.chargeCount===0)why.push("no formal charges");
+      else why.push(f.chargeCount+" formal charge"+(f.chargeCount===1?"":"s")+" — the fewest available");
+      if(tier.length>1)why.push(tier.every(other=>rxEquivalent(fw,r.state,other.state))?"the tied contributors are equivalent in this framework":"these ranking rules tie; non-equivalent contributors may have different weights, which this engine does not calculate");
+    }else{
+      if(f.octetShort.length>top.octetShort.length)why.push(f.octetShort.map(a=>a.label+" has only "+a.electrons+" e⁻ (incomplete octet)").join("; "));
+      else if(f.chargeCount>top.chargeCount)why.push("more formal charges ("+f.chargeCount+" vs "+top.chargeCount+")");
+      else if(f.likeAdjacent>top.likeAdjacent)why.push("like charges on adjacent atoms");
+      else if(f.negEN<top.negEN-1e-6)why.push("negative charge sits on a LESS electronegative atom ("+f.neg.map(a=>a.label).join(", ")+") than in the major contributor");
+      else if(f.posEN>top.posEN+1e-6)why.push("positive charge sits on a MORE electronegative atom ("+f.pos.map(a=>a.label).join(", ")+") than in the major contributor");
+    }
+    r.tier=ti;r.label=ti===0?(tier.length>1?(tier.every(other=>rxEquivalent(fw,r.state,other.state))?"major (equivalent)":"top rule tier; relative weights unresolved"):"major"):"minor";r.why=why.join("; ");
+  }));
+  return {rows,tiers};
+}
+
+/* Qualitative hybrid over the enumerated textbook contributor set, INCLUDING
+ * its minor contributors. Do not omit delocalization sites because their
+ * contributors rank below the top tier. No equal/numerical weights are assumed.
+ * Explicit useTiers remains available for a specifically restricted question. */
+function rxHybrid(fw,ranked,{useTiers=null}={}){
+  const tiers=ranked.tiers;
+  const used=useTiers?tiers.filter((_,i)=>useTiers.includes(i)).flat():ranked.rows;
+  const delta={},partial={};
+  fw.nodes.forEach(n=>{
+    const fcs=used.map(r=>rxAtom(fw,r.state,n.id).fc);
+    const min=Math.min(...fcs),max=Math.max(...fcs);
+    if(min!==max){delta[n.id]=max>0&&min>=0?"δ+":min<0&&max<=0?"δ−":"δ±";}
+    else if(min!==0)delta[n.id]=min>0?"+":"−";
+  });
+  fw.bonds.forEach(b=>{const os=used.map(r=>r.state.order[b.key]);if(Math.min(...os)!==Math.max(...os))partial[b.key]=true;});
+  return {delta,partial,used};
+}
+
+/* Which textbook pattern a legal move is. Used to compare his CLAIMED reason to the actual one. */
+function rxClassify(fw,start,arrows){
+  const parsed=arrows.map(a=>({from:rxParseEnd(a.from),to:rxParseEnd(a.to)}));
+  const lpTails=parsed.filter(p=>p.from.kind==="lp"),piTails=parsed.filter(p=>p.from.kind==="bond");
+  const charges=rxCharges(fw,start);
+  if(parsed.length&&parsed.every(p=>p.from.kind==="bond"&&p.to.kind==="bond")){
+    if(parsed.length===1){
+      const t=parsed[0],[c,d]=rxKeyAtoms(t.to.id),[a,b]=rxKeyAtoms(t.from.id),far=[c,d].find(x=>x!==a&&x!==b);
+      return charges[far]>0?"allylic-cation":"pi-shift";
+    }
+    // ring pattern: the tail and head bonds together close a cycle (every atom touched twice)
+    const bondsUsed=[...new Set(parsed.flatMap(p=>[p.from.id,p.to.id]))],count={};
+    bondsUsed.forEach(k=>rxKeyAtoms(k).forEach(a=>{count[a]=(count[a]||0)+1;}));
+    const atoms=Object.keys(count);
+    return parsed.length>=3&&atoms.length===bondsUsed.length&&atoms.every(a=>count[a]===2)?"ring-pi":"pi-shift";
+  }
+  if(lpTails.length===1){
+    const t=lpTails[0],[a,b]=rxKeyAtoms(t.to.id),other=a===t.from.id?b:a;
+    if(charges[other]>0)return "lp-next-to-cation";
+    if(piTails.length>=1)return "allylic-lp";
+    return "lp-into-bond";
+  }
+  if(piTails.length===1&&parsed.length===1){
+    const t=piTails[0];
+    if(t.to.kind==="atom"){const [a,b]=rxKeyAtoms(t.from.id),other=t.to.id===a?b:a;return RX_EN[fw.byId[t.to.id].el]>RX_EN[fw.byId[other].el]?"polar-pi":"pi-to-less-EN";}
+    if(t.to.kind==="bond"){const [c,d]=rxKeyAtoms(t.to.id),[a,b]=rxKeyAtoms(t.from.id),far=[c,d].find(x=>x!==a&&x!==b);return charges[far]>0?"allylic-cation":"pi-shift";}
+  }
+  return "other";
+}
+const RX_PATTERN_NAMES={
+  "allylic-lp":"Allylic lone pair (lone pair next to a π bond)",
+  "allylic-cation":"Allylic carbocation (π bond next to C⁺)",
+  "lp-next-to-cation":"Lone pair next to a positive charge",
+  "polar-pi":"Polar π bond (π collapses onto the more electronegative atom)",
+  "ring-pi":"Conjugated π bonds in a ring",
+  "pi-shift":"π bond shifting to an adjacent bond",
+  "pi-to-less-EN":"π collapsing onto the LESS electronegative atom (legal, usually minor)",
+  "lp-into-bond":"Lone pair into a bond (no cation, no π partner)",
+  "other":"Other / mixed"
+};
+
+if(typeof module!=="undefined"&&module.exports){
+  module.exports={rxEquivalent,rxCompare,rxReasonable,rxChargeCount,RX_VALENCE,RX_EN,rxKey,rxLabelH,rxBuild,rxCloneState,rxStateSig,rxAtom,rxCharges,rxNetCharge,rxPairCount,rxParseEnd,rxArrowLegality,rxApply,rxValidate,rxEvaluateMove,rxCandidateArrows,rxMovesFrom,rxEnumerate,rxFactors,rxRank,rxHybrid,rxClassify,RX_PATTERN_NAMES};
+}
+
+/* Arrow Lab molecules, 2026-10-02. Every structure is drawn (SVG from this graph),
+ * every atom that matters carries its own label. Expected contributor counts are
+ * verified by test-content.js against the engine — not typed from memory.
+ * Coordinates live in a 400×260 box. */
+function alRing(cx,cy,r,n,ids,labels,startDeg=-90){
+  return ids.map((id,i)=>{const a=(startDeg+360*i/n)*Math.PI/180;return {id,el:"C",label:labels?labels[i]:"CH",x:Math.round(cx+r*Math.cos(a)),y:Math.round(cy+r*Math.sin(a))};});
+}
+function alRingBonds(ids,orders){return ids.map((id,i)=>({a:id,b:ids[(i+1)%ids.length],order:orders[i]}));}
+
+const ARROW_LAB_MOLECULES=[
+/* ---------- Klein pattern 1: allylic lone pair ---------- */
+{key:"acetate",name:"Acetate (carboxylate)",formula:"CH₃CO₂⁻",pattern:"allylic-lp",level:1,
+ why:"The two oxygens are equivalent. Both C–O bonds measure the same length — the hybrid is real, the drawings are not.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:124},{id:"m",el:"C",label:"CH₃",x:88,y:190},{id:"o1",el:"O",label:"O",x:178,y:38,lp:2},{id:"o2",el:"O",label:"O",x:310,y:150,lp:3,charge:-1}],bonds:[{a:"c",b:"m",order:1},{a:"c",b:"o1",order:2},{a:"c",b:"o2",order:1}]},
+ expect:{core:2,extra:0,majorTier:2}},
+{key:"enolate",name:"Acetone enolate",formula:"CH₂=C(O⁻)CH₃",pattern:"allylic-lp",level:1,
+ why:"The negative charge lives on O (major) and on the CH₂ carbon (minor). Both ends react — this is Chapter 20 in miniature.",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:80,y:170},{id:"c2",el:"C",label:"C",x:200,y:110},{id:"o",el:"O",label:"O",x:200,y:30,lp:3,charge:-1},{id:"m",el:"C",label:"CH₃",x:320,y:170}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"o",order:1},{a:"c2",b:"m",order:1}]},
+ expect:{core:2,extra:0,majorTier:1}},
+{key:"allyl-anion",name:"Allyl anion",formula:"⁻CH₂–CH=CH₂",pattern:"allylic-lp",level:1,
+ why:"Two equivalent contributors. The charge is shared by the two ends, never by the middle carbon.",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:82,y:166,lp:1,charge:-1},{id:"c2",el:"C",label:"CH",x:200,y:92},{id:"c3",el:"C",label:"CH₂",x:318,y:166}],bonds:[{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:2}]},
+ expect:{core:2,extra:0,majorTier:2}},
+{key:"acetamide",name:"Acetamide",formula:"CH₃C(=O)NH₂",pattern:"allylic-lp",level:2,
+ why:"Neutral form is major, but the N⁺/O⁻ form is why amides are planar, why the N is not basic, and why rotation about C–N is slow.",
+ graph:{nodes:[{id:"o",el:"O",label:"O",x:200,y:38,lp:2},{id:"c",el:"C",label:"C",x:200,y:122},{id:"m",el:"C",label:"CH₃",x:95,y:188},{id:"n",el:"N",label:"NH₂",x:310,y:188,lp:1}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"m",order:1},{a:"c",b:"n",order:1}]},
+ expect:{core:1,extra:2,majorTier:1}},
+{key:"methyl-vinyl-ether",name:"Methyl vinyl ether",formula:"CH₂=CH–OCH₃",pattern:"allylic-lp",level:2,
+ why:"Oxygen's lone pair pushes density onto the CH₂ carbon. The charge-separated form is minor, but it tells you which carbon is nucleophilic.",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:70,y:170},{id:"c2",el:"C",label:"CH",x:180,y:105},{id:"o",el:"O",label:"O",x:290,y:170,lp:2},{id:"m",el:"C",label:"CH₃",x:370,y:105}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"o",order:1},{a:"o",b:"m",order:1}]},
+ expect:{core:1,extra:1,majorTier:1}},
+{key:"nitromethane",name:"Nitromethane",formula:"CH₃NO₂",pattern:"allylic-lp",level:2,
+ why:"N already carries + and has an octet, so the O⁻ lone pair can only move if the N=O π bond leaves at the same time. Two equivalent forms.",
+ graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:80,y:150},{id:"n",el:"N",label:"N",x:200,y:150,charge:1},{id:"o1",el:"O",label:"O",x:290,y:70,lp:2},{id:"o2",el:"O",label:"O",x:290,y:230,lp:3,charge:-1}],bonds:[{a:"m",b:"n",order:1},{a:"n",b:"o1",order:2},{a:"n",b:"o2",order:1}]},
+ expect:{core:2,extra:0,majorTier:2}},
+{key:"carbonate",name:"Carbonate",formula:"CO₃²⁻",pattern:"allylic-lp",level:2,
+ why:"Three equivalent contributors; each C–O is 1⅓ order and each O carries −⅔ in the hybrid.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:140},{id:"o1",el:"O",label:"O",x:200,y:45,lp:2},{id:"o2",el:"O",label:"O",x:112,y:195,lp:3,charge:-1},{id:"o3",el:"O",label:"O",x:288,y:195,lp:3,charge:-1}],bonds:[{a:"c",b:"o1",order:2},{a:"c",b:"o2",order:1},{a:"c",b:"o3",order:1}]},
+ expect:{core:3,extra:0,majorTier:3}},
+{key:"guanidinium",name:"Guanidinium",formula:"C(NH₂)₃⁺",pattern:"allylic-lp",level:3,
+ why:"Three equivalent N⁺ forms with every atom holding an octet (major), plus a C⁺ form with a sextet (minor). That spread is why arginine's side chain holds a positive charge so comfortably.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:140},{id:"n1",el:"N",label:"NH₂",x:200,y:45,charge:1},{id:"n2",el:"N",label:"NH₂",x:112,y:195,lp:1},{id:"n3",el:"N",label:"NH₂",x:288,y:195,lp:1}],bonds:[{a:"c",b:"n1",order:2},{a:"c",b:"n2",order:1},{a:"c",b:"n3",order:1}]},
+ expect:{core:4,extra:0,majorTier:3}},
+{key:"phenoxide",name:"Phenoxide",formula:"C₆H₅O⁻",pattern:"allylic-lp",level:3,
+ why:"The O⁻ lone pair walks the charge to ortho and para carbons only — never meta. Five contributors in the set; the O⁻ forms are major.",
+ graph:{nodes:[...alRing(200,150,72,6,["c1","c2","c3","c4","c5","c6"],["C","CH","CH","CH","CH","CH"]),{id:"o",el:"O",label:"O",x:200,y:22,lp:3,charge:-1}],bonds:[...alRingBonds(["c1","c2","c3","c4","c5","c6"],[2,1,2,1,2,1]),{a:"c1",b:"o",order:1}]},
+ expect:{core:5,extra:0,majorTier:2}},
+{key:"aniline",name:"Aniline",formula:"C₆H₅NH₂",pattern:"allylic-lp",level:3,
+ why:"Nitrogen's lone pair feeds the ring at ortho and para. That is why aniline's N is a weak base and why the ring is activated.",
+ graph:{nodes:[...alRing(200,150,72,6,["c1","c2","c3","c4","c5","c6"],["C","CH","CH","CH","CH","CH"]),{id:"n",el:"N",label:"NH₂",x:200,y:22,lp:1}],bonds:[...alRingBonds(["c1","c2","c3","c4","c5","c6"],[2,1,2,1,2,1]),{a:"c1",b:"n",order:1}]},
+ expect:{core:2,extra:3,majorTier:2}},
+{key:"cyclopentadienyl",name:"Cyclopentadienyl anion",formula:"C₅H₅⁻",pattern:"allylic-lp",level:3,
+ why:"Five equivalent contributors — the charge is spread over all five carbons. This is the aromatic anion from Chapter 17.",
+ graph:{nodes:alRing(200,150,70,5,["c1","c2","c3","c4","c5"],["CH","CH","CH","CH","CH"]).map(n=>n.id==="c1"?{...n,lp:1,charge:-1}:n),bonds:alRingBonds(["c1","c2","c3","c4","c5"],[1,2,1,2,1])},
+ expect:{core:5,extra:0,majorTier:5}},
+{key:"nitrile-anion",name:"α-cyano carbanion",formula:"CH₃–CH⁻–C≡N",pattern:"allylic-lp",level:2,
+ why:"A lone pair next to a triple bond works like one next to a double bond. The N⁻ form is major: octets everywhere and the charge on the more electronegative atom.",
+ graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:56,y:172},{id:"ca",el:"C",label:"CH",x:145,y:112,lp:1,charge:-1},{id:"cn",el:"C",label:"C",x:255,y:112},{id:"n",el:"N",label:"N",x:350,y:112,lp:1}],bonds:[{a:"m",b:"ca",order:1},{a:"ca",b:"cn",order:1},{a:"cn",b:"n",order:3}]},
+ expect:{core:2,extra:0,majorTier:1}},
+{key:"ascorbate",name:"Ascorbate (vitamin C anion)",formula:"enediolate",pattern:"allylic-lp",level:3,
+ why:"The charge can walk O₃ → C₂ → O₁ along an unbroken conjugated path. Three contributors; the two O⁻ forms are major.",
+ graph:{nodes:[{id:"or",el:"O",label:"O",x:205,y:30,lp:2},{id:"c1",el:"C",label:"C₁",x:292,y:82},{id:"o1",el:"O",label:"O₁",x:368,y:40,lp:2},{id:"c2",el:"C",label:"C₂",x:282,y:174},{id:"o2",el:"O",label:"OH",x:350,y:232,lp:2},{id:"c3",el:"C",label:"C₃",x:170,y:174},{id:"o3",el:"O",label:"O₃",x:128,y:252,lp:3,charge:-1},{id:"c4",el:"C",label:"C",x:103,y:82},{id:"r",el:"C",label:"R",x:35,y:40}],bonds:[{a:"or",b:"c1",order:1},{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:2},{a:"c3",b:"c4",order:1},{a:"c4",b:"or",order:1},{a:"c1",b:"o1",order:2},{a:"c2",b:"o2",order:1},{a:"c3",b:"o3",order:1},{a:"c4",b:"r",order:1}]},
+ expect:{core:3,extra:0,majorTier:2}},
+/* ---------- pattern 2: allylic carbocation ---------- */
+{key:"allyl-cation",name:"Allyl cation",formula:"CH₂=CH–CH₂⁺",pattern:"allylic-cation",level:1,
+ why:"The π pair slides toward the empty p orbital. The positive charge ends up where the π bond started.",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:82,y:166},{id:"c2",el:"C",label:"CH",x:200,y:92},{id:"c3",el:"C",label:"CH₂",x:318,y:166,charge:1}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"c3",order:1}]},
+ expect:{core:2,extra:0,majorTier:2}},
+{key:"pentadienyl-cation",name:"Pentadienyl cation",formula:"CH₂=CH–CH=CH–CH₂⁺",pattern:"allylic-cation",level:2,
+ why:"Three contributors, charge on C1, C3 and C5 — the odd carbons. Even carbons never carry it.",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:40,y:170},{id:"c2",el:"C",label:"CH",x:120,y:110},{id:"c3",el:"C",label:"CH",x:200,y:170},{id:"c4",el:"C",label:"CH",x:280,y:110},{id:"c5",el:"C",label:"CH₂",x:360,y:170,charge:1}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"c3",order:1},{a:"c3",b:"c4",order:2},{a:"c4",b:"c5",order:1}]},
+ expect:{core:3,extra:0,majorTier:3}},
+{key:"benzyl-cation",name:"Benzyl cation",formula:"C₆H₅CH₂⁺",pattern:"allylic-cation",level:3,
+ why:"The ring's π bonds feed the CH₂⁺ at ortho and para positions. Five contributors, each with one C⁺ sextet — the ranking rules do not separate them.",
+ graph:{nodes:[...alRing(200,150,72,6,["c1","c2","c3","c4","c5","c6"],["C","CH","CH","CH","CH","CH"]),{id:"x",el:"C",label:"CH₂",x:200,y:22,charge:1}],bonds:[...alRingBonds(["c1","c2","c3","c4","c5","c6"],[2,1,2,1,2,1]),{a:"c1",b:"x",order:1}]},
+ expect:{core:5,extra:0,majorTier:5}},
+/* ---------- pattern 3: lone pair next to a positive charge ---------- */
+{key:"methoxymethyl-cation",name:"Methoxymethyl cation",formula:"CH₃O–CH₂⁺",pattern:"lp-next-to-cation",level:1,
+ why:"The oxonium form (O⁺ with an octet) is MORE significant than the carbocation (C⁺ with six electrons). Octets beat electronegativity.",
+ graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:70,y:170},{id:"o",el:"O",label:"O",x:200,y:110,lp:2},{id:"c",el:"C",label:"CH₂",x:330,y:170,charge:1}],bonds:[{a:"m",b:"o",order:1},{a:"o",b:"c",order:1}]},
+ expect:{core:2,extra:0,majorTier:1}},
+{key:"cyclic-iminium",name:"Amino cation → iminium",formula:"cyclic N–C⁺",pattern:"lp-next-to-cation",level:2,
+ why:"Three contributors: the N lone pair fills the C⁺ (major, all octets) and the ring π bond can also shift toward C⁺ (allylic cation, minor).",
+ graph:{nodes:[{id:"n",el:"N",label:"NH",x:200,y:34,lp:1},{id:"c1",el:"C",label:"C",x:298,y:86,charge:1},{id:"c2",el:"C",label:"CH",x:298,y:178},{id:"c3",el:"C",label:"CH",x:200,y:230},{id:"c4",el:"C",label:"CH₂",x:102,y:178},{id:"c5",el:"C",label:"CH₂",x:102,y:86}],bonds:[{a:"n",b:"c1",order:1},{a:"c1",b:"c2",order:1},{a:"c2",b:"c3",order:2},{a:"c3",b:"c4",order:1},{a:"c4",b:"c5",order:1},{a:"c5",b:"n",order:1}]},
+ expect:{core:3,extra:0,majorTier:1}},
+{key:"protonated-acetone",name:"Protonated acetone",formula:"(CH₃)₂C=OH⁺",pattern:"polar-pi",level:2,
+ why:"Move the π pair onto O⁺ and you get C⁺ — a sextet. The O⁺ form (every atom with an octet) is major, but the C⁺ form explains why protonated carbonyls are such good electrophiles.",
+ graph:{nodes:[{id:"o",el:"O",label:"OH",x:200,y:42,lp:1,charge:1},{id:"c",el:"C",label:"C",x:200,y:126},{id:"m1",el:"C",label:"CH₃",x:95,y:190},{id:"m2",el:"C",label:"CH₃",x:305,y:190}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"m1",order:1},{a:"c",b:"m2",order:1}]},
+ expect:{core:2,extra:0,majorTier:1}},
+/* ---------- pattern 4: π bond between atoms of different electronegativity ---------- */
+{key:"acetone",name:"Acetone",formula:"CH₃C(=O)CH₃",pattern:"polar-pi",level:1,
+ why:"The neutral form is major. The C⁺/O⁻ form is minor (carbon has six electrons) but it is the reason carbonyl carbons are electrophilic.",
+ graph:{nodes:[{id:"o",el:"O",label:"O",x:200,y:42,lp:2},{id:"c",el:"C",label:"C",x:200,y:126},{id:"m1",el:"C",label:"CH₃",x:95,y:190},{id:"m2",el:"C",label:"CH₃",x:305,y:190}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"m1",order:1},{a:"c",b:"m2",order:1}]},
+ expect:{core:1,extra:1,majorTier:1}},
+{key:"methanimine",name:"Methanimine",formula:"CH₂=NH",pattern:"polar-pi",level:1,
+ why:"Same idea as a carbonyl, smaller electronegativity difference. The imine carbon is electrophilic, just less so.",
+ graph:{nodes:[{id:"c",el:"C",label:"CH₂",x:120,y:150},{id:"n",el:"N",label:"NH",x:280,y:150,lp:1}],bonds:[{a:"c",b:"n",order:2}]},
+ expect:{core:1,extra:1,majorTier:1}},
+{key:"acrolein",name:"Acrolein (an enone)",formula:"CH₂=CH–CH=O",pattern:"polar-pi",level:3,
+ why:"Two charge-separated forms: C⁺ on the carbonyl carbon and C⁺ on the β carbon. That β⁺ is why enones react at the far end (conjugate addition).",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:60,y:170},{id:"c2",el:"C",label:"CH",x:160,y:110},{id:"c3",el:"C",label:"CH",x:260,y:170},{id:"o",el:"O",label:"O",x:360,y:110,lp:2}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"c3",order:1},{a:"c3",b:"o",order:2}]},
+ expect:{core:1,extra:2,majorTier:1}},
+/* ---------- pattern 5: conjugated π bonds in a ring ---------- */
+{key:"benzene",name:"Benzene",formula:"C₆H₆",pattern:"ring-pi",level:1,
+ why:"Two Kekulé forms, three arrows each. All six C–C bonds are the same length in the real molecule.",
+ graph:{nodes:alRing(200,140,72,6,["c1","c2","c3","c4","c5","c6"],["CH","CH","CH","CH","CH","CH"]),bonds:alRingBonds(["c1","c2","c3","c4","c5","c6"],[2,1,2,1,2,1])},
+ expect:{core:2,extra:0,majorTier:2}},
+{key:"pyridine",name:"Pyridine",formula:"C₅H₅N",pattern:"ring-pi",level:3,trap:"lp-in-plane",
+ why:"Two Kekulé forms, plus three minor N⁻/C⁺ forms (ortho, ortho, para) from the polar C=N bond. The N lone pair is in the plane of the ring (sp²) — it does NOT join the π system, which is why pyridine's N stays basic and its ring is electron-poor.",
+ graph:{nodes:alRing(200,140,72,6,["n","c2","c3","c4","c5","c6"],["N","CH","CH","CH","CH","CH"]).map(n=>n.id==="n"?{...n,el:"N",lp:1}:n),bonds:alRingBonds(["n","c2","c3","c4","c5","c6"],[2,1,2,1,2,1])},
+ expect:{core:2,extra:3,majorTier:2}},
+{key:"furan",name:"Furan",formula:"C₄H₄O",pattern:"allylic-lp",level:3,
+ why:"Oxygen has all single bonds, so one lone pair CAN enter the ring. Four charge-separated O⁺/C⁻ forms (minor) — they are what make furan aromatic and nucleophilic at C2/C5.",
+ graph:{nodes:alRing(200,150,70,5,["o","c2","c3","c4","c5"],["O","CH","CH","CH","CH"]).map(n=>n.id==="o"?{...n,el:"O",lp:2}:n),bonds:alRingBonds(["o","c2","c3","c4","c5"],[1,2,1,2,1])},
+ expect:{core:1,extra:4,majorTier:1}},
+/* ---------- traps: molecules with NO resonance (or a blocked lone pair) ---------- */
+{key:"homoallyl-anion",name:"3-Butenyl anion",formula:"CH₂=CH–CH₂–CH₂⁻",pattern:"none",level:2,trap:"sp3-blocker",
+ why:"The lone pair is one sp³ CH₂ away from the π bond. Not allylic — nothing can move without breaking a σ bond. No resonance.",
+ graph:{nodes:[{id:"c1",el:"C",label:"CH₂",x:50,y:170},{id:"c2",el:"C",label:"CH",x:150,y:110},{id:"c3",el:"C",label:"CH₂",x:250,y:170},{id:"c4",el:"C",label:"CH₂",x:350,y:110,lp:1,charge:-1}],bonds:[{a:"c1",b:"c2",order:2},{a:"c2",b:"c3",order:1},{a:"c3",b:"c4",order:1}]},
+ expect:{core:1,extra:0,majorTier:1}},
+{key:"tert-butyl-cation",name:"tert-Butyl cation",formula:"(CH₃)₃C⁺",pattern:"none",level:1,trap:"no-pi-no-lp",
+ why:"No π bond, no lone pair — nothing to push. Its stability comes from hyperconjugation and induction, which are NOT resonance.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:140,charge:1},{id:"m1",el:"C",label:"CH₃",x:200,y:45},{id:"m2",el:"C",label:"CH₃",x:112,y:195},{id:"m3",el:"C",label:"CH₃",x:288,y:195}],bonds:[{a:"c",b:"m1",order:1},{a:"c",b:"m2",order:1},{a:"c",b:"m3",order:1}]},
+ expect:{core:1,extra:0,majorTier:1}},
+{key:"ethoxide",name:"Ethoxide",formula:"CH₃CH₂O⁻",pattern:"none",level:1,trap:"no-pi-partner",
+ why:"A lone pair with nowhere to go: the neighbor is sp³ with four bonds already. Alkoxides are strong bases precisely because the charge is stuck on one atom.",
+ graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:80,y:170},{id:"c",el:"C",label:"CH₂",x:200,y:110},{id:"o",el:"O",label:"O",x:320,y:170,lp:3,charge:-1}],bonds:[{a:"m",b:"c",order:1},{a:"c",b:"o",order:1}]},
+ expect:{core:1,extra:0,majorTier:1}}
+];
+if(typeof module!=="undefined"&&module.exports)module.exports={ARROW_LAB_MOLECULES,alRing,alRingBonds};
+
+/* Arrow Lab, 2026-10-02 — resonance you DRAW, checked stroke by stroke.
+ * Depends on resonance-engine.js and resonance-arrow-lab-content.js, plus the app's
+ * el / S / go / render / save / VIEWS / safeStore globals.
+ *
+ * Why this exists (Gabe, 10/2): the v3.46 lab graded by exact match, after the fact,
+ * with tap controls. He passed its 8 targets in one sitting on 9/3 and never came back;
+ * resonance on the exam went badly. Here every stroke is read back to him, every verdict
+ * shows the electron arithmetic, and his stated reason is logged next to what he drew.
+ *
+ * Panels: LEFT = the structure he pushes arrows on. RIGHT = the same σ skeleton, bare,
+ * where he draws the contributor his arrows produce (extra bond lines, lone-pair dots,
+ * + / − signs). Nothing is placed by the app on the right; nothing is graded by exact
+ * match — the engine checks legality, octets, formal charges and conservation. */
+
+const AL_VB_W=400,AL_VB_H=260;
+const AL_HIT=30;            // px (viewBox units) for snapping stroke ends to atoms/bonds/lone pairs
+const AL_TAP=16;            // max stroke length that counts as a dot / tap
+const AL_SIGN=48;           // max length of a + or − stroke
+const AL_PATTERNS=[["allylic-lp","Allylic lone pair"],["allylic-cation","Allylic C⁺"],["lp-next-to-cation","Lone pair next to C⁺"],["polar-pi","Polar π bond (C=O type)"],["ring-pi","Ring of π bonds"],["unsure","Not sure"]];
+const AL_RANK_REASONS=[["octet","it has more atoms with full octets"],["charges","it has fewer formal charges"],["en","its negative charge sits on the more electronegative atom (or + on the less)"],["equiv","the contributors are equivalent by symmetry"],["unsure","these rules do not settle their relative weights"]];
+
+/* ---------- geometry ---------- */
+function alDist(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1]);}
+function alMid(fw,key){const [a,b]=key.split("-"),A=fw.byId[a],B=fw.byId[b];return [(A.x+B.x)/2,(A.y+B.y)/2];}
+function alAngleDiff(a,b){let d=Math.abs(a-b)%360;return d>180?360-d:d;}
+/* Lone-pair slots: directions around an atom not occupied by bonds, farthest from bonds first. */
+function alLpSlots(fw,id){
+  const n=fw.byId[id],bondAngles=fw.neighbors[id].map(nb=>{const m=fw.byId[nb];return Math.atan2(m.y-n.y,m.x-n.x)*180/Math.PI;});
+  const cands=[];for(let a=-90;a<270;a+=45)cands.push(a);
+  return cands.map(a=>({a,gap:Math.min(...bondAngles.map(b=>alAngleDiff(a,b)),999)})).filter(c=>c.gap>=50).sort((p,q)=>q.gap-p.gap||p.a-q.a).map(c=>c.a);
+}
+function alLpPoint(fw,id,i){const n=fw.byId[id],slots=alLpSlots(fw,id),a=(slots[i%slots.length]||-90)*Math.PI/180;return [n.x+Math.cos(a)*26,n.y+Math.sin(a)*26];}
+/* Where to put a charge badge or a numeric tag so it does not sit on a lone pair: the next free direction after the lone pairs. */
+function alAnnotPoint(fw,id,lpCount,k,r=25){const n=fw.byId[id],slots=alLpSlots(fw,id);const idx=lpCount+k;const a=(idx<slots.length?slots[idx]:(-45+90*k))*Math.PI/180;return [n.x+Math.cos(a)*r,n.y+Math.sin(a)*r];}
+function alStrokeLength(pts){let L=0;for(let i=1;i<pts.length;i++)L+=alDist(pts[i-1],pts[i]);return L;}
+function alBBox(pts){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);return {w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys),cx:(Math.max(...xs)+Math.min(...xs))/2,cy:(Math.max(...ys)+Math.min(...ys))/2};}
+function alStraightness(pts){const L=alStrokeLength(pts);return L?alDist(pts[0],pts[pts.length-1])/L:1;}
+function alNearestAtom(fw,p,max=AL_HIT){let best=null;fw.nodes.forEach(n=>{const d=alDist(p,[n.x,n.y]);if(d<=max&&(!best||d<best.d))best={id:n.id,d};});return best;}
+function alNearestBond(fw,p,max=AL_HIT){let best=null;fw.bonds.forEach(b=>{const d=alDist(p,alMid(fw,b.key));if(d<=max&&(!best||d<best.d))best={key:b.key,d};});return best;}
+function alNearestLp(fw,state,p,max=AL_HIT){let best=null;fw.nodes.forEach(n=>{for(let i=0;i<(state.lp[n.id]||0);i++){const d=alDist(p,alLpPoint(fw,n.id,i));if(d<=max&&(!best||d<best.d))best={id:n.id,i,d};}});return best;}
+/* Distance from point to segment, and the projection parameter t. */
+function alSegDist(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1;let t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;t=Math.max(0,Math.min(1,t));return {d:alDist(p,[a[0]+t*dx,a[1]+t*dy]),t};}
+
+/* Interpret one finished stroke. panel = "start" (arrows) or "product" (building the contributor). */
+function alInterpret(fw,state,pts,panel){
+  if(pts.length<1)return {kind:"none",why:"empty"};
+  const L=alStrokeLength(pts),s=pts[0],e=pts[pts.length-1],bb=alBBox(pts);
+  if(L<=AL_TAP){                                                     // dot or tap
+    const atom=alNearestAtom(fw,[bb.cx,bb.cy],36);
+    if(!atom)return {kind:"none",why:"A dot has to sit next to an atom to be a lone pair."};
+    if(atom.d<10)return {kind:"select",atom:atom.id};
+    if(panel==="product"){const n=fw.byId[atom.id];return {kind:"lp",atom:atom.id,angle:Math.atan2(bb.cy-n.y,bb.cx-n.x)*180/Math.PI};}
+    return {kind:"select",atom:atom.id};
+  }
+  if(panel==="product"){
+    // a short, nearly straight stroke: − sign, or a line along a bond (extra π line)
+    if(L<=AL_SIGN&&alStraightness(pts)>0.85){
+      const horizontal=bb.w>bb.h*1.8,vertical=bb.h>bb.w*1.8;
+      // along an existing bond? (both ends within 14 of the segment, roughly parallel)
+      let along=null;fw.bonds.forEach(b=>{const [a,c]=b.key.split("-"),A=[fw.byId[a].x,fw.byId[a].y],C=[fw.byId[c].x,fw.byId[c].y];const d1=alSegDist(s,A,C),d2=alSegDist(e,A,C);const bondLen=alDist(A,C);if(d1.d<=16&&d2.d<=16&&Math.abs(d2.t-d1.t)*bondLen>=Math.min(28,bondLen*0.35)&&(!along||d1.d+d2.d<along.d))along={key:b.key,d:d1.d+d2.d};});
+      if(along&&L>=24)return {kind:"bond",key:along.key};
+      const atom=alNearestAtom(fw,[bb.cx,bb.cy],42);
+      if(atom&&atom.d>=9&&horizontal&&L<=34)return {kind:"minus",atom:atom.id,at:[bb.cx,bb.cy]};
+      if(atom&&atom.d>=9&&vertical&&L<=34)return {kind:"plus-half",atom:atom.id,at:[bb.cx,bb.cy]};
+      if(along)return {kind:"bond",key:along.key};
+      return {kind:"none",why:"Short line read as nothing: draw it ALONG a bond for a second π line, or beside an atom for a − sign."};
+    }
+    // longer stroke along a bond also counts as a bond line
+    let along=null;fw.bonds.forEach(b=>{const [a,c]=b.key.split("-"),A=[fw.byId[a].x,fw.byId[a].y],C=[fw.byId[c].x,fw.byId[c].y];const d1=alSegDist(s,A,C),d2=alSegDist(e,A,C);if(d1.d<=16&&d2.d<=16&&(!along||d1.d+d2.d<along.d))along={key:b.key,d:d1.d+d2.d};});
+    if(along&&alStraightness(pts)>0.8)return {kind:"bond",key:along.key};
+    return {kind:"none",why:"On this panel you draw the result: a second line along a bond, dots for lone pairs, + or − beside an atom."};
+  }
+  // start panel: a curved arrow from an electron source to a destination
+  if(L<30)return {kind:"none",why:"Too short for an arrow. Start on a lone pair or a π bond and end on the bond or atom the electrons move to."};
+  const lp=alNearestLp(fw,state,s),bond=alNearestBond(fw,s),atomS=alNearestAtom(fw,s,22);
+  let from=null;
+  if(lp&&(!bond||lp.d<=bond.d))from="lp:"+lp.id;else if(bond)from="bond:"+bond.key;else if(atomS)from="atom:"+atomS.id;
+  if(!from)return {kind:"none",why:"The tail did not start on anything. Arrows start on ELECTRONS: a lone pair (the dots) or the middle of a π bond."};
+  const atomE=alNearestAtom(fw,e,24),bondE=alNearestBond(fw,e);
+  let to=null;
+  if(atomE&&(!bondE||atomE.d<=bondE.d+6))to="atom:"+atomE.id;else if(bondE)to="bond:"+bondE.key;
+  if(!to)return {kind:"none",why:"The head did not land on anything. End the arrow on the middle of a bond (to make a π bond) or on an atom (to make a lone pair)."};
+  return {kind:"arrow",from,to};
+}
+
+/* ---------- model / session ---------- */
+function alMolecule(key){return ARROW_LAB_MOLECULES.find(m=>m.key===key);}
+function alBuild(M){const {fw,state}=rxBuild(M.graph);return {fw,start:state};}
+function alSession(){return S.arrowLab||null;}
+function alSave(){try{safeStore.set("arrowLab",S.arrowLab||null);}catch(e){} }
+function alDisplayNames(fw){
+  const counts={};fw.nodes.forEach(n=>{counts[n.label]=(counts[n.label]||0)+1;});
+  const seen={};const names={};
+  fw.nodes.forEach(n=>{if(counts[n.label]>1){seen[n.label]=(seen[n.label]||0)+1;names[n.id]=n.label+"·"+seen[n.label];}else names[n.id]=n.label;});
+  return names;
+}
+function alStart(key,task,opts={}){
+  const M=alMolecule(key);if(!M)return;
+  const {fw,start}=alBuild(M);
+  const all=rxEnumerate(fw,start),ranked=rxRank(fw,all);
+  S.arrowLab={key,task,ts:Date.now(),phase:"arrows",arrows:[],ink:[],productInk:[],
+    claims:{lp:{},order:{},charge:{},chargeAt:{}},     // what he drew on the product panel
+    patternClaimed:null,rankClaimed:null,reasonClaimed:null,
+    found:[rxStateSig(start)],fromSig:rxStateSig(start),   // contributor set discovery
+    log:[],hints:0,rejected:0,msg:null,selected:null,
+    expected:{core:all.filter(c=>c.core).length,all:all.length},
+    tapMode:false,mode:opts.mode||"guided",returnTo:opts.returnTo||null,returnQuestionId:opts.returnQuestionId||null};
+  alSave();go("arrowlab");
+}
+/* Current state the arrows are drawn from (start, or a contributor he already found). */
+function alCurrentStart(R,fw,start){
+  if(R.fromSig===rxStateSig(start))return start;
+  const all=rxEnumerate(fw,start);const c=all.find(x=>x.sig===R.fromSig);return c?c.state:start;
+}
+function alLogEvent(R,code,detail){R.log.push({t:Date.now()-R.ts,code,...(detail||{})});}
+
+/* ---------- SVG rendering ---------- */
+function alSvgEl(tag,attrs,parent){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));if(parent)parent.appendChild(e);return e;}
+function alBondLines(fw,state,b,svg,cls){
+  const [a,c]=b.key.split("-"),A=fw.byId[a],C=fw.byId[c],order=state.order[b.key];
+  const dx=C.x-A.x,dy=C.y-A.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,px=-uy,py=ux;
+  // shorten so lines stop short of the labels
+  const sA=[A.x+ux*18,A.y+uy*18],sC=[C.x-ux*18,C.y-uy*18];
+  const offs=order===1?[0]:order===2?[-4,4]:[-7,0,7];
+  offs.forEach(o=>alSvgEl("line",{x1:sA[0]+px*o,y1:sA[1]+py*o,x2:sC[0]+px*o,y2:sC[1]+py*o,class:cls||"al-bond"},svg));
+}
+function alDrawStructure(svg,fw,state,opts={}){
+  const names=opts.names||alDisplayNames(fw);
+  svg.innerHTML="";
+  const defs=alSvgEl("defs",{},svg);
+  defs.innerHTML='<marker id="al-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.5 1.5 L8.5 5 L1.5 8.5" fill="none" stroke="#a5222d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="al-head-bad" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.5 1.5 L8.5 5 L1.5 8.5" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>';
+  fw.bonds.forEach(b=>alBondLines(fw,state,b,svg,opts.partial&&opts.partial[b.key]?"al-bond al-partial":"al-bond"));
+  if(opts.claimOrders)fw.bonds.forEach(b=>{const extra=(opts.claimOrders[b.key]||0);if(extra>0){const [a,c]=b.key.split("-"),A=fw.byId[a],C=fw.byId[c];const dx=C.x-A.x,dy=C.y-A.y,L=Math.hypot(dx,dy)||1,px=-dy/L,py=dx/L;for(let i=0;i<extra;i++){const o=6+6*i;alSvgEl("line",{x1:A.x+dx*.18+px*o,y1:A.y+dy*.18+py*o,x2:C.x-dx*.18+px*o,y2:C.y-dy*.18+py*o,class:"al-bond al-claim"},svg);}}});
+  const charges=rxCharges(fw,state);
+  fw.nodes.forEach(n=>{
+    const g=alSvgEl("g",{class:"al-atom"+(opts.selected===n.id?" sel":""),"data-atom":n.id},svg);
+    alSvgEl("circle",{cx:n.x,cy:n.y,r:17,class:"al-atom-bg"},g);
+    const t=alSvgEl("text",{x:n.x,y:n.y+6,"text-anchor":"middle",class:"al-label"},g);t.textContent=n.label;
+    const lpN=state.lp[n.id]||0,chargeNow=opts.showCharges===false?0:charges[n.id];
+    if(names[n.id]!==n.label){const tp=alAnnotPoint(fw,n.id,lpN,chargeNow?1:0,24);const tag=alSvgEl("text",{x:tp[0],y:tp[1]+4,"text-anchor":"middle",class:"al-tag"},g);tag.textContent=names[n.id].split("·")[1];}
+    // lone pairs (state) — drawn as dot pairs
+    for(let i=0;i<(state.lp[n.id]||0);i++){const p=alLpPoint(fw,n.id,i),ang=Math.atan2(p[1]-n.y,p[0]-n.x),qx=-Math.sin(ang)*4.5,qy=Math.cos(ang)*4.5;alSvgEl("circle",{cx:p[0]+qx,cy:p[1]+qy,r:3,class:"al-lp"},g);alSvgEl("circle",{cx:p[0]-qx,cy:p[1]-qy,r:3,class:"al-lp"},g);}
+    // claimed lone pairs (product panel)
+    if(opts.claimLp&&opts.claimLp[n.id])opts.claimLp[n.id].forEach(ang=>{const a=ang*Math.PI/180,p=[n.x+Math.cos(a)*26,n.y+Math.sin(a)*26],qx=-Math.sin(a)*4.5,qy=Math.cos(a)*4.5;alSvgEl("circle",{cx:p[0]+qx,cy:p[1]+qy,r:3,class:"al-lp al-claim"},g);alSvgEl("circle",{cx:p[0]-qx,cy:p[1]-qy,r:3,class:"al-lp al-claim"},g);});
+    const ch=chargeNow;
+    if(ch){const cp=alAnnotPoint(fw,n.id,lpN,0,25);const c=alSvgEl("g",{class:"al-charge"},g);alSvgEl("circle",{cx:cp[0],cy:cp[1],r:8},c);const ct=alSvgEl("text",{x:cp[0],y:cp[1]+4,"text-anchor":"middle"},c);ct.textContent=ch>0?(ch>1?ch+"+":"+"):(ch<-1?(-ch)+"−":"−");}
+    if(opts.claimCharge&&opts.claimCharge[n.id]){const v=opts.claimCharge[n.id];const at=(opts.claimChargeAt&&opts.claimChargeAt[n.id])||[n.x+19,n.y-19];const c=alSvgEl("g",{class:"al-charge al-claim"},g);alSvgEl("circle",{cx:at[0],cy:at[1],r:8},c);const ct=alSvgEl("text",{x:at[0],y:at[1]+4,"text-anchor":"middle"},c);ct.textContent=v>0?"+":"−";}
+    if(opts.delta&&opts.delta[n.id]){const d=alSvgEl("text",{x:n.x-22,y:n.y-16,class:"al-delta"},g);d.textContent=opts.delta[n.id];}
+    if(opts.octetMark&&opts.octetMark[n.id]){const m=alSvgEl("text",{x:n.x,y:n.y+32,"text-anchor":"middle",class:"al-octet "+opts.octetMark[n.id].cls},g);m.textContent=opts.octetMark[n.id].text;}
+  });
+  // arrows
+  (opts.arrows||[]).forEach((ar,i)=>{
+    const from=rxParseEnd(ar.from),to=rxParseEnd(ar.to);
+    const p0=from.kind==="lp"?alLpPoint(fw,from.id,Math.max(0,(state.lp[from.id]||1)-1)):from.kind==="bond"?alMid(fw,from.id):[fw.byId[from.id].x,fw.byId[from.id].y];
+    const p1=to.kind==="atom"?[fw.byId[to.id].x,fw.byId[to.id].y]:alMid(fw,to.id);
+    const mx=(p0[0]+p1[0])/2,my=(p0[1]+p1[1])/2,dx=p1[0]-p0[0],dy=p1[1]-p0[1],L=Math.hypot(dx,dy)||1,bend=Math.min(40,L*0.35);
+    const cx=mx-dy/L*bend,cy=my+dx/L*bend;
+    // stop a little short of the head target
+    const ex=p1[0]-(p1[0]-cx)/Math.hypot(p1[0]-cx,p1[1]-cy)*(to.kind==="atom"?20:8),ey=p1[1]-(p1[1]-cy)/Math.hypot(p1[0]-cx,p1[1]-cy)*(to.kind==="atom"?20:8);
+    const bad=opts.arrowStatus&&opts.arrowStatus[i]===false;
+    alSvgEl("path",{d:"M"+p0[0]+" "+p0[1]+" Q"+cx+" "+cy+" "+ex+" "+ey,class:"al-arrow"+(bad?" bad":""),"marker-end":bad?"url(#al-head-bad)":"url(#al-head)"},svg);
+    const lab=alSvgEl("text",{x:cx,y:cy,class:"al-arrow-n"},svg);lab.textContent=String(i+1);
+  });
+  // live ink
+  (opts.ink||[]).forEach(st=>{if(st.length>1)alSvgEl("polyline",{points:st.map(p=>p.join(",")).join(" "),class:"al-ink"+(st.rejected?" rejected":"")},svg);});
+}
+
+/* ---------- product-panel claims → a state the engine can check ---------- */
+function alClaimedState(fw,start,claims){
+  // The product panel starts from the σ skeleton: every bond order 1, no lone pairs.
+  const s={lp:{},order:{}};
+  fw.bonds.forEach(b=>{s.order[b.key]=1+(claims.order[b.key]||0);});
+  fw.nodes.forEach(n=>{s.lp[n.id]=(claims.lp[n.id]||[]).length;});
+  return s;
+}
+/* Rename an atom report's texts with the display name (CH·2 instead of CH) so messages are unambiguous. */
+function alNamed(fw,names,id,text){const l=fw.byId[id].label;if(names[id]===l)return text;const esc=l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return text.replace(new RegExp("^"+esc+":"),names[id]+":").replace("FC("+l+")","FC("+names[id]+")");}
+/* Compare what he drew with what his arrows produce, atom by atom, with arithmetic. */
+function alCheckProduct(fw,start,arrowsResult,claims,names){
+  const drawn=alClaimedState(fw,start,claims),rows=[],issues=[];
+  fw.nodes.forEach(n=>{
+    const want=rxAtom(fw,arrowsResult,n.id),have=rxAtom(fw,drawn,n.id),claimed=claims.charge[n.id]||0;
+    const lpOk=have.lp===want.lp,chOk=claimed===have.fc,chWant=claimed===want.fc;
+    if(!lpOk)issues.push({code:"lp-count",atom:n.id,text:names[n.id]+": you drew "+have.lp+" lone pair"+(have.lp===1?"":"s")+"; the arrows leave "+want.lp+"."});
+    if(!chOk){
+      issues.push({code:"charge-wrong",atom:n.id,text:names[n.id]+": you wrote "+(claimed>0?"+":claimed<0?"−":"no charge")+", but with "+have.lp+" lone pair"+(have.lp===1?"":"s")+" and "+(have.bondOrders+have.h)+" bond"+((have.bondOrders+have.h)===1?"":"s")+" the formal charge is "+have.fcText.split("= ").pop()+".  ("+alNamed(fw,names,n.id,have.fcText)+")"});
+    }
+    if(have.octet==="over")issues.push({code:"octet-over",atom:n.id,text:alNamed(fw,names,n.id,have.electronText)+" — more than 8."});
+    rows.push({id:n.id,name:names[n.id],want,have,claimed,lpOk,chOk,chWant});
+  });
+  fw.bonds.forEach(b=>{if(drawn.order[b.key]!==arrowsResult.order[b.key]){const [a,c]=b.key.split("-");issues.push({code:"bond-order",bond:b.key,text:names[a]+"–"+names[c]+": you drew order "+drawn.order[b.key]+"; the arrows make it "+arrowsResult.order[b.key]+"."});}});
+  const net0=rxNetCharge(fw,start),netDrawn=Object.values(claims.charge).reduce((t,v)=>t+v,0);
+  if(netDrawn!==net0)issues.push({code:"net-charge",text:"Your written charges add to "+netDrawn+"; the molecule's net charge is "+net0+". Resonance never changes net charge."});
+  const p0=rxPairCount(fw,start),p1=rxPairCount(fw,drawn);
+  if(p1!==p0)issues.push({code:"pair-count",text:"Your drawing holds "+p1+" electron pairs (bonds + lone pairs); the molecule has "+p0+". Pairs move; they are not created or lost."});
+  return {rows,issues,ok:issues.length===0,drawn};
+}
+
+/* ---------- the view ---------- */
+function alCss(){
+  if(document.getElementById("al-css"))return;
+  const st=document.createElement("style");st.id="al-css";
+  st.textContent=`
+.al-wrap{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:900px){.al-wrap.two{grid-template-columns:1fr 1fr}}
+.al-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
+.al-panel h4{margin:2px 4px 6px;font-size:.9rem}
+.al-svg{width:100%;max-width:640px;margin:0 auto;height:auto;display:block;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;border-radius:8px;background:#fcfcfa}
+.al-bond{stroke:#20302f;stroke-width:3;stroke-linecap:round}
+.al-bond.al-partial{stroke-dasharray:6 5;stroke:#5d4b87}
+.al-bond.al-claim{stroke:#1766b3}
+.al-atom-bg{fill:#fff;stroke:none}
+.al-atom.sel .al-atom-bg{stroke:#F2B705;stroke-width:3;fill:#fff8dc}
+.al-label{font:700 17px -apple-system,"Segoe UI",sans-serif;fill:#1d272c}
+.al-tag{font:600 10px -apple-system,sans-serif;fill:#6b7a80}
+.al-lp{fill:#1d272c}
+.al-lp.al-claim{fill:#1766b3}
+.al-charge circle{fill:#fff;stroke:#1d272c;stroke-width:1.6}
+.al-charge text{font:700 12px -apple-system,sans-serif;fill:#1d272c}
+.al-charge.al-claim circle{stroke:#1766b3}.al-charge.al-claim text{fill:#1766b3}
+.al-delta{font:700 12px -apple-system,sans-serif;fill:#5d4b87}
+.al-octet{font:700 11px -apple-system,sans-serif}.al-octet.over{fill:#be3548}.al-octet.short{fill:#b26a00}.al-octet.full{fill:#2f6b4c}
+.al-arrow{fill:none;stroke:#a5222d;stroke-width:2.6;stroke-linecap:round}
+.al-arrow.bad{stroke:#8a8a8a;stroke-dasharray:5 4}
+.al-arrow-n{font:700 11px -apple-system,sans-serif;fill:#a5222d}
+.al-ink{fill:none;stroke:#1766b3;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.al-ink.rejected{stroke:#be3548;opacity:.5;stroke-dasharray:3 4}
+.al-read{min-height:22px;font-size:.88rem;margin:6px 4px 0;color:#1d272c}
+.al-read b{color:#1766b3}
+.al-fb{border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.92rem;line-height:1.45}
+.al-fb.ok{background:#e8f3ec;border:1px solid #a8cbb5}
+.al-fb.bad{background:#fbeaec;border:1px solid #e3b4ba}
+.al-fb.note{background:#f3f0fa;border:1px solid #cfc6e6}
+.al-fb ul{margin:6px 0 0;padding-left:18px}
+.al-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.al-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-size:.85rem;min-height:40px}
+.al-chip[aria-pressed="true"]{background:#1d272c;color:#fff;border-color:#1d272c}
+.al-atoms{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
+.al-atomcard{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:.78rem;background:#fff}
+.al-atomcard.bad{border-color:#e3b4ba;background:#fff7f8}
+.al-atomcard b{display:block;font-size:.85rem}
+.al-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.al-lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.al-lib .card{margin:0}
+.al-lib h4{margin:4px 0 2px}
+.al-mini{width:100%;height:auto;display:block;background:#fcfcfa;border-radius:8px;border:1px solid var(--line)}
+.al-pattern-table td,.al-pattern-table th{padding:4px 8px;font-size:.82rem;text-align:left;border-bottom:1px solid var(--line)}
+`;document.head.appendChild(st);
+}
+
+function alAttachInk(svg,fw,getState,panel,onStroke){
+  let active=null,pointerId=null;
+  const toLocal=e=>{const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const m=svg.getScreenCTM();if(!m)return [0,0];const q=pt.matrixTransform(m.inverse());return [Math.round(q.x*10)/10,Math.round(q.y*10)/10];};
+  ["selectstart","dragstart","contextmenu"].forEach(ev=>svg.addEventListener(ev,e=>e.preventDefault()));
+  svg.addEventListener("pointerdown",e=>{
+    if(pointerId!==null||e.isPrimary===false||(e.pointerType==="mouse"&&e.button!==0))return;
+    e.preventDefault();pointerId=e.pointerId;active=[toLocal(e)];
+    try{svg.setPointerCapture(pointerId);}catch(_){ }
+    onStroke({type:"begin",points:active});
+  });
+  svg.addEventListener("pointermove",e=>{
+    if(pointerId===null||e.pointerId!==pointerId)return;e.preventDefault();
+    const p=toLocal(e),last=active[active.length-1];if(alDist(p,last)>=1.5)active.push(p);
+    onStroke({type:"move",points:active});
+  });
+  const end=e=>{if(pointerId===null||(e&&e.pointerId!==pointerId))return;const pts=active;pointerId=null;active=null;onStroke({type:"end",points:pts});};
+  svg.addEventListener("pointerup",end);svg.addEventListener("pointercancel",end);svg.addEventListener("lostpointercapture",end);
+}
+
+/* Library (no active session) */
+function alLibrary(v){
+  alCss();
+  const rows=(S.attempts||[]).filter(a=>a.drawing&&a.drawing.kind==="arrow-lab");
+  const head=el("div",{class:"card teal"});
+  head.innerHTML='<span class="tag coral">Chapter 2 · resonance you draw</span><h2>Arrow Lab</h2><p>Draw the curved arrows with your pen. Then draw the contributor they produce — extra bond lines, lone-pair dots, + and − signs. Every stroke is read back to you and checked at once: legal pattern, octets, formal charges, conservation. No multiple choice, no exact-match key: any correct contributor is accepted and ranked.</p><p class="muted" style="margin:6px 0 0">'+ARROW_LAB_MOLECULES.length+' structures · '+rows.length+' logged builds · the "Your patterns" box below is the record we review together.</p>';
+  v.appendChild(head);
+  v.appendChild(alPatternsCard(rows));
+  const groups=[["allylic-lp","Pattern 1 · Allylic lone pair"],["allylic-cation","Pattern 2 · Allylic carbocation"],["lp-next-to-cation","Pattern 3 · Lone pair next to C⁺"],["polar-pi","Pattern 4 · Polar π bond"],["ring-pi","Pattern 5 · π bonds in a ring"],["none","Traps · no resonance here"]];
+  groups.forEach(([pat,title])=>{
+    const Ms=ARROW_LAB_MOLECULES.filter(m=>m.pattern===pat);if(!Ms.length)return;
+    v.appendChild(el("h3",{style:"margin:16px 0 8px"},title));
+    const grid=el("div",{class:"al-lib"});
+    Ms.forEach(M=>{
+      const {fw,start}=alBuild(M);const done=rows.filter(a=>a.drawing.molecule===M.key);const clean=done.filter(a=>a.ok&&!a.h).length;
+      const c=el("div",{class:"card cream"});
+      const svg=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-mini",role:"img","aria-label":M.name});alDrawStructure(svg,fw,start);c.appendChild(svg);
+      c.appendChild(el("h4",{},M.name+" <span class='muted' style='font-weight:400'>"+M.formula+"</span>"));
+      c.appendChild(el("p",{class:"muted",style:"margin:0 0 6px"},(M.trap?"Trap · ":"Level "+M.level+" · ")+(done.length?done.length+" build"+(done.length===1?"":"s")+", "+clean+" clean":"not yet built")));
+      const row=el("div",{class:"al-tools"});
+      if(M.pattern==="none")row.appendChild(el("button",{class:"btn small",onclick:()=>alStart(M.key,"trap")},"Test it →"));
+      else{row.appendChild(el("button",{class:"btn small",onclick:()=>alStart(M.key,"next")},"Draw a contributor →"));if(M.expect.core+M.expect.extra>2)row.appendChild(el("button",{class:"btn ghost small",onclick:()=>alStart(M.key,"set")},"Whole set"));row.appendChild(el("button",{class:"btn ghost small",onclick:()=>alStart(M.key,"spot")},"Spot the error"));}
+      c.appendChild(row);grid.appendChild(c);
+    });
+    v.appendChild(grid);
+  });
+  const legacy=el("p",{class:"muted",style:"margin-top:16px"},"The older tap-based Resonance Lab (8 fixed transformations, graded by exact match) is still available: ");
+  legacy.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.legacyResLab=true;go("reslab");}},"open it"));v.appendChild(legacy);
+}
+function alPatternsCard(rows){
+  const c=el("div",{class:"card cream"});
+  if(!rows.length){c.innerHTML='<h3>Your patterns</h3><p class="muted">Nothing logged yet. Each build records every stroke the engine rejected, every rule you broke, the pattern you said you used versus the one you actually drew, and your ranking reason versus the rule that decides it. That log is the map.</p>';return c;}
+  const codes={},mism={pattern:0,rank:0,reason:0,n:0},rec={ok:0,total:0};
+  rows.forEach(a=>{const d=a.drawing;(d.errors||[]).forEach(e=>{codes[e.code]=(codes[e.code]||0)+e.count;});if(d.patternClaimed&&d.patternActual){mism.n++;if(d.patternClaimed!==d.patternActual&&d.patternClaimed!=="unsure")mism.pattern++;}if(d.rankClaimed&&d.rankActual&&d.rankClaimed!==d.rankActual)mism.rank++;if(d.reasonClaimed&&d.reasonActual&&d.reasonClaimed!==d.reasonActual&&d.reasonClaimed!=="unsure")mism.reason++;rec.ok+=d.strokesRecognized||0;rec.total+=(d.strokesRecognized||0)+(d.strokesRejected||0);});
+  const names={"tail-sigma":"tried to move a σ bond","tail-no-lp":"tail on an atom with no lone pair","lp-in-plane":"pushed an in-plane (sp²) lone pair","lp-to-atom":"lone pair aimed at an atom","head-not-adjacent":"head not on an adjacent bond","head-not-endpoint":"π collapsed onto a non-member atom","head-new-bond":"tried to create a new connection","octet-over":"left an atom with 10 electrons","charge-wrong":"written charge ≠ formal charge","lp-count":"lone-pair count off","bond-order":"bond order off","net-charge":"net charge changed","pair-count":"electron pairs created/lost","collapse-no-payoff":"collapsed π with no EN payoff","charges-on-carbon":"separated charge onto carbons","new-sextet":"made a sextet without payoff","heteroatom-sextet":"left N/O with six electrons","dominated-by-donation":"polar collapse beside an anion","unreasonable":"legal but not a contributor to draw"};
+  const sorted=Object.entries(codes).sort((a,b)=>b[1]-a[1]);
+  c.innerHTML='<h3>Your patterns <span class="muted" style="font-weight:400">· '+rows.length+' builds</span></h3>';
+  const t=el("table",{class:"al-pattern-table"});
+  t.innerHTML='<tr><th>What happened</th><th>Count</th></tr>'+(sorted.length?sorted.slice(0,8).map(([k,n])=>'<tr><td>'+(names[k]||k)+'</td><td>'+n+'</td></tr>').join(""):'<tr><td>No rule violations logged</td><td>0</td></tr>');
+  c.appendChild(t);
+  c.appendChild(el("p",{class:"muted",style:"margin:8px 0 0"},"Logic vs hand: pattern named ≠ pattern drawn "+mism.pattern+"/"+mism.n+" · ranking call wrong "+mism.rank+" · ranking reason wrong "+mism.reason+" · strokes read "+rec.ok+"/"+rec.total+"."));
+  return c;
+}
+
+/* Active session */
+function alView(v){
+  alCss();
+  const R=alSession();if(!R){alLibrary(v);return;}
+  const M=alMolecule(R.key);if(!M){S.arrowLab=null;alSave();alLibrary(v);return;}
+  const {fw,start}=alBuild(M),names=alDisplayNames(fw);
+  const from=alCurrentStart(R,fw,start);
+  const all=rxEnumerate(fw,start),ranked=rxRank(fw,all);
+  const head=el("div",{class:"card teal"});
+  const taskText={next:"Draw the arrows for ONE legal move, then draw the contributor they produce.",set:"Find every contributor in the set. Draw a move, build the product, then push from any contributor you have found.",spot:"One thing in this drawing breaks a rule. Tap the atom or bond that is wrong, then name the rule.",trap:"Decide: does this structure have any resonance contributors? Draw an arrow if you think so, or declare none."}[R.task];
+  head.innerHTML='<span class="tag coral">Arrow Lab · '+M.name+'</span><h2 style="margin:4px 0">'+M.name+' <span style="font-weight:400;opacity:.8">'+M.formula+'</span></h2><p style="margin:0">'+taskText+'</p>';
+  const back=el("button",{class:"btn ghost small",style:"margin-top:8px",onclick:()=>alAbandon()},"← Library");head.appendChild(back);
+  v.appendChild(head);
+  if(R.task==="spot"){alSpotView(v,R,M,fw,start,names,all,ranked);return;}
+  const wrap=el("div",{class:"al-wrap"+(R.phase==="product"||R.phase==="rank"||R.phase==="done"?" two":"")});
+  // LEFT: arrows on the current structure
+  const left=el("div",{class:"al-panel"});
+  left.appendChild(el("h4",{},R.phase==="arrows"||R.phase==="reason"?"1 · Push electrons here (pen = curved arrow; tail on dots or a π bond, head on a bond or atom)":"1 · Your arrows"));
+  const svgL=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-svg",role:"img","aria-label":"Structure for drawing arrows"});
+  const evalNow=()=>rxEvaluateMove(fw,from,R.arrows);
+  const paintLeft=()=>{const ev=evalNow();const octetMark={};if(ev.legal&&ev.result)fw.nodes.forEach(n=>{const A=rxAtom(fw,ev.result,n.id);if(A.octet==="over")octetMark[n.id]={text:A.electrons+" e⁻",cls:"over"};});alDrawStructure(svgL,fw,from,{names,arrows:R.arrows,arrowStatus:ev.perArrow.map(p=>p.ok),ink:R.ink,selected:R.selected,octetMark});};
+  paintLeft();left.appendChild(svgL);
+  const readL=el("div",{class:"al-read","aria-live":"polite"},R.msg&&R.msg.panel==="start"?R.msg.html:"&nbsp;");left.appendChild(readL);
+  const toolsL=el("div",{class:"al-tools"});
+  if(R.phase==="arrows")toolsL.appendChild(el("button",{class:"btn ghost small",onclick:()=>{if(R.arrows.length){R.arrows.pop();alLogEvent(R,"undo-arrow");}R.msg=null;R.ink=[];alSave();render();}},"Undo arrow"));
+  if(R.phase==="arrows")toolsL.appendChild(el("button",{class:"btn ghost small",onclick:()=>{R.arrows=[];R.ink=[];R.msg=null;alSave();render();}},"Clear"));
+  if(R.phase==="arrows")toolsL.appendChild(el("button",{class:"btn ghost small",onclick:()=>{R.hints++;alLogEvent(R,"hint");const moves=rxMovesFrom(fw,from,3);const m=moves.find(x=>!R.found.includes(x.sig))||moves[0];R.msg={panel:"start",html:m?"<b>Hint:</b> one legal move starts at "+alEndText(fw,names,from,m.arrows[0].from)+(m.arrows.length>1?" (and needs "+(m.arrows.length-1)+" more arrow"+(m.arrows.length>2?"s":"")+" to keep every octet ≤ 8)":"")+".":"<b>Hint:</b> there is no legal move here."};alSave();render();}},"Hint"));
+  if(R.phase==="arrows")toolsL.appendChild(el("button",{class:"btn small",onclick:()=>alCommitArrows(R,fw,from,names)},R.task==="trap"?"Check these arrows →":"Arrows done → why?"));
+  if(R.task==="trap"&&R.phase==="arrows")toolsL.appendChild(el("button",{class:"btn coral small",onclick:()=>alDeclareNone(R,M,fw,from,names)},"No resonance here"));
+  left.appendChild(toolsL);
+  if(R.phase==="arrows"){
+    alAttachInk(svgL,fw,()=>from,"start",evt=>{
+      if(evt.type!=="end"){R.ink=[evt.points];alDrawStructure(svgL,fw,from,{names,arrows:R.arrows,arrowStatus:evalNow().perArrow.map(p=>p.ok),ink:R.ink,selected:R.selected});return;}
+      R.ink=[];const it=alInterpret(fw,from,evt.points,"start");
+      if(it.kind==="select"){R.selected=R.selected===it.atom?null:it.atom;const A=rxAtom(fw,from,it.atom);R.msg={panel:"start",html:"<b>"+names[it.atom]+"</b>: "+alNamed(fw,names,it.atom,A.electronText)+" · "+alNamed(fw,names,it.atom,A.fcText)+" · octet "+(A.octet==="full"?"full":A.octet==="short"?"incomplete ("+A.electrons+")":A.octet)};alSave();render();return;}
+      if(it.kind!=="arrow"){R.rejected++;alLogEvent(R,"stroke-rejected",{why:it.why});R.msg={panel:"start",html:"<span style='color:#be3548'>Not read as an arrow.</span> "+it.why};const pts=evt.points;pts.rejected=true;R.ink=[pts];alSave();render();return;}
+      const legality=rxArrowLegality(fw,from,it,R.arrows);
+      R.arrows.push({from:it.from,to:it.to});
+      alLogEvent(R,legality.ok?"arrow":"arrow-illegal",{from:it.from,to:it.to,legality:legality.code});
+      let html="<b>Read as:</b> "+alEndText(fw,names,from,it.from)+" → "+alEndText(fw,names,from,it.to,"head")+". ";
+      if(!legality.ok){html+="<span style='color:#be3548'>Illegal:</span> "+legality.text+" <i>(Undo removes it.)</i>";}
+      else{
+        const ev=rxEvaluateMove(fw,from,R.arrows);
+        if(ev.legal&&ev.validity){const over=ev.validity.problems.filter(p=>p.code==="octet-over");if(over.length)html+="<span style='color:#b26a00'>If you stop here:</span> "+over.map(p=>p.text).join(" ");else html+="<span style='color:#2f6b4c'>Legal.</span> Every octet ≤ 8 with these arrows.";}
+      }
+      R.msg={panel:"start",html};alSave();render();
+    });
+  }
+  wrap.appendChild(left);
+  if(R.task==="trap"&&R.phase==="done"&&R.trapVerdict){
+    v.appendChild(wrap);
+    const tc=el("div",{class:"card cream"});
+    tc.innerHTML="<h3>Verdict</h3><div class='al-fb "+(R.trapVerdict.correct?"ok":"bad")+"'>"+R.trapVerdict.why+"</div>";
+    const row=el("div",{class:"al-tools",style:"margin-top:10px"});row.appendChild(el("button",{class:"btn ghost small",onclick:()=>alAbandon()},"Back to library"));tc.appendChild(row);
+    v.appendChild(tc);return;
+  }
+  // REASON phase: pattern chips
+  if(R.phase==="reason"){
+    const rc=el("div",{class:"card cream"});rc.innerHTML="<h3>2 · Which pattern did you just use?</h3><p class='muted' style='margin:0'>Name it before you see the result. This is the part we track: what you <i>think</i> you did versus what the arrows actually do.</p>";
+    const chips=el("div",{class:"al-chips"});AL_PATTERNS.forEach(([k,label])=>chips.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.patternClaimed===k),onclick:()=>{R.patternClaimed=k;alSave();render();}},label)));rc.appendChild(chips);
+    rc.appendChild(el("button",{class:"btn small",disabled:!R.patternClaimed,onclick:()=>{if(!R.patternClaimed)return;R.phase="product";R.msg=null;alSave();render();}},"Now draw what the arrows produce →"));
+    v.appendChild(wrap);v.appendChild(rc);return;
+  }
+  // RIGHT: build the product on a bare skeleton
+  if(R.phase==="product"||R.phase==="rank"||R.phase==="done"){
+    const right=el("div",{class:"al-panel"});
+    const ev=rxEvaluateMove(fw,from,R.arrows);
+    right.appendChild(el("h4",{},R.phase==="product"?"3 · Draw the contributor your arrows make: a 2nd line along a bond for π, dots for lone pairs, + or − beside an atom":"3 · Your contributor"));
+    const svgR=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-svg",role:"img","aria-label":"Draw the resulting contributor"});
+    const bare={lp:Object.fromEntries(fw.nodes.map(n=>[n.id,0])),order:Object.fromEntries(fw.bonds.map(b=>[b.key,1]))};
+    const paintRight=()=>alDrawStructure(svgR,fw,bare,{names,showCharges:false,claimOrders:R.claims.order,claimLp:R.claims.lp,claimCharge:R.claims.charge,claimChargeAt:R.claims.chargeAt,ink:R.productInk,selected:R.selected});
+    paintRight();right.appendChild(svgR);
+    const readR=el("div",{class:"al-read","aria-live":"polite"},R.msg&&R.msg.panel==="product"?R.msg.html:"&nbsp;");right.appendChild(readR);
+    const toolsR=el("div",{class:"al-tools"});
+    if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn ghost small",onclick:()=>{const last=R.log.filter(x=>x.code==="claim").pop();if(last){alUnclaim(R,last);alLogEvent(R,"undo-claim");}R.msg=null;R.productInk=[];alSave();render();}},"Undo"));
+    if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn ghost small",onclick:()=>{R.claims={lp:{},order:{},charge:{},chargeAt:{}};R.productInk=[];R.msg=null;alSave();render();}},"Clear"));
+    if(R.phase==="product"&&!R.prefilled)toolsR.appendChild(el("button",{class:"btn ghost small",title:"Copies lone pairs, π bonds and charges of atoms your arrows do not touch. Counts as a hint.",onclick:()=>{alPrefill(R,fw,from);R.hints++;alLogEvent(R,"prefill");alSave();render();}},"Prefill untouched atoms (hint)"));
+    if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn small",onclick:()=>alCheckProductNow(R,M,fw,start,from,names)},"Check my contributor →"));
+    right.appendChild(toolsR);
+    if(R.phase==="product"){
+      let pendingHalf=null;
+      alAttachInk(svgR,fw,()=>bare,"product",evt=>{
+        if(evt.type!=="end"){R.productInk=[evt.points];paintRight();return;}
+        R.productInk=[];const it=alInterpret(fw,bare,evt.points,"product");
+        if(it.kind==="none"){R.rejected++;alLogEvent(R,"stroke-rejected",{why:it.why,panel:"product"});R.msg={panel:"product",html:"<span style='color:#be3548'>Not read.</span> "+it.why};const pts=evt.points;pts.rejected=true;R.productInk=[pts];alSave();render();return;}
+        if(it.kind==="select"){const have=alClaimedState(fw,start,R.claims);const A=rxAtom(fw,have,it.atom);R.msg={panel:"product",html:"<b>"+names[it.atom]+"</b> as drawn: "+alNamed(fw,names,it.atom,A.electronText)+" · "+alNamed(fw,names,it.atom,A.fcText)};alSave();render();return;}
+        if(it.kind==="plus-half"){ // a vertical stroke: half of a +; pair it with a horizontal drawn just before or after
+          const lastClaim=R.log.filter(x=>x.code==="claim").pop();
+          if(lastClaim&&lastClaim.kind==="minus"&&lastClaim.atom===it.atom&&Date.now()-R.ts-lastClaim.t<4000){alUnclaim(R,lastClaim);alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
+          else if(pendingHalf&&pendingHalf.atom===it.atom&&Date.now()-pendingHalf.t<4000){pendingHalf=null;alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
+          else{pendingHalf={atom:it.atom,t:Date.now()};R.msg={panel:"product",html:"Vertical stroke by <b>"+names[it.atom]+"</b> — cross it to make a <b>+</b>."};render();return;}
+        }else if(it.kind==="minus"){
+          if(pendingHalf&&pendingHalf.atom===it.atom&&Date.now()-pendingHalf.t<4000){pendingHalf=null;alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
+          else alClaim(R,{kind:"minus",atom:it.atom,at:it.at});
+        }else alClaim(R,it);
+        // instant read-back + arithmetic for the atom touched
+        const have=alClaimedState(fw,start,R.claims);
+        let html="<b>Read as:</b> "+alClaimText(fw,names,it)+". ";
+        const atomId=it.atom||null;
+        if(atomId){const A=rxAtom(fw,have,atomId);html+=alNamed(fw,names,atomId,A.electronText)+(A.octet==="over"?" <span style='color:#be3548'>— over 8!</span>":"")+" · "+alNamed(fw,names,atomId,A.fcText)+(R.claims.charge[atomId]?(R.claims.charge[atomId]===A.fc?" <span style='color:#2f6b4c'>matches your sign</span>":" <span style='color:#be3548'>≠ the sign you wrote</span>"):"");}
+        else if(it.key){const [a,c]=it.key.split("-");[a,c].forEach(id=>{const A=rxAtom(fw,have,id);html+=" "+names[id]+": "+A.electrons+" e⁻"+(A.octet==="over"?" <span style='color:#be3548'>over 8</span>":"")+".";});}
+        R.msg={panel:"product",html};alSave();render();
+      });
+    }
+    wrap.appendChild(right);
+    v.appendChild(wrap);
+    if(R.phase==="rank")alRankCard(v,R,M,fw,start,from,names,all,ranked);
+    if(R.phase==="done")alDoneCard(v,R,M,fw,start,from,names,all,ranked);
+    return;
+  }
+  v.appendChild(wrap);
+}
+function alEndText(fw,names,state,str,role="tail"){const p=rxParseEnd(str);if(!p)return str;if(p.kind==="lp")return "lone pair on "+names[p.id];if(p.kind==="atom")return names[p.id]+(role==="head"?" (new lone pair)":"");const [a,b]=p.id.split("-");if(role==="head")return "the "+names[a]+"–"+names[b]+" bond (new π)";return (state.order[p.id]>=2?"π bond ":"σ bond ")+names[a]+"–"+names[b];}
+function alClaimText(fw,names,it){if(it.kind==="lp")return "lone pair on "+names[it.atom];if(it.kind==="bond"){const [a,b]=it.key.split("-");return "extra bond line on "+names[a]+"–"+names[b];}if(it.kind==="minus")return "− on "+names[it.atom];if(it.kind==="plus")return "+ on "+names[it.atom];return it.kind;}
+function alClaim(R,it){
+  if(it.kind==="lp"){(R.claims.lp[it.atom]=R.claims.lp[it.atom]||[]).push(it.angle);}
+  else if(it.kind==="bond"){R.claims.order[it.key]=Math.min(2,(R.claims.order[it.key]||0)+1);}
+  else if(it.kind==="minus"){R.claims.charge[it.atom]=(R.claims.charge[it.atom]||0)===-1?0:-1;if(it.at)(R.claims.chargeAt=R.claims.chargeAt||{})[it.atom]=it.at;}
+  else if(it.kind==="plus"){R.claims.charge[it.atom]=(R.claims.charge[it.atom]||0)===1?0:1;if(it.at)(R.claims.chargeAt=R.claims.chargeAt||{})[it.atom]=it.at;}
+  alLogEvent(R,"claim",{kind:it.kind,atom:it.atom,key:it.key});
+}
+function alPrefill(R,fw,from){
+  const touched=new Set();R.arrows.forEach(a=>{[a.from,a.to].forEach(s=>{const p=rxParseEnd(s);if(p.kind==="bond"){touched.add("b:"+p.id);p.id.split("-").forEach(x=>touched.add(x));}else touched.add(p.id);});});
+  fw.nodes.forEach(n=>{if(touched.has(n.id))return;const lp=from.lp[n.id]||0;if(lp){R.claims.lp[n.id]=[];for(let i=0;i<lp;i++){const p=alLpPoint(fw,n.id,i);R.claims.lp[n.id].push(Math.atan2(p[1]-n.y,p[0]-n.x)*180/Math.PI);}}const fc=rxAtom(fw,from,n.id).fc;if(fc){R.claims.charge[n.id]=fc;(R.claims.chargeAt=R.claims.chargeAt||{})[n.id]=alAnnotPoint(fw,n.id,lp,0,25);}});
+  fw.bonds.forEach(b=>{if(touched.has("b:"+b.key))return;const extra=(from.order[b.key]||1)-1;if(extra>0)R.claims.order[b.key]=extra;});
+  R.prefilled=true;
+}
+function alUnclaim(R,ev){
+  if(ev.kind==="lp"&&R.claims.lp[ev.atom])R.claims.lp[ev.atom].pop();
+  else if(ev.kind==="bond")R.claims.order[ev.key]=Math.max(0,(R.claims.order[ev.key]||0)-1);
+  else if(ev.kind==="minus"||ev.kind==="plus")R.claims.charge[ev.atom]=0;
+  const i=R.log.lastIndexOf(ev);if(i>=0)R.log.splice(i,1);
+}
+function alCommitArrows(R,fw,from,names){
+  if(!R.arrows.length){R.msg={panel:"start",html:"Draw at least one arrow first."};render();return;}
+  const ev=rxEvaluateMove(fw,from,R.arrows);
+  if(!ev.legal){const bad=ev.perArrow.findIndex(p=>!p.ok);R.msg={panel:"start",html:"<span style='color:#be3548'>Arrow "+(bad+1)+" is illegal:</span> "+ev.perArrow[bad].text};alLogEvent(R,"commit-illegal",{code:ev.perArrow[bad].code});alSave();render();return;}
+  if(!ev.validity.ok){R.msg={panel:"start",html:"<span style='color:#be3548'>Not a complete move:</span> "+ev.validity.problems.map(p=>p.text).join(" ")};alLogEvent(R,"commit-invalid",{codes:ev.validity.problems.map(p=>p.code)});alSave();render();return;}
+  if(ev.validity.unchanged){R.msg={panel:"start",html:"These arrows give back the same structure — nothing moved."};alSave();render();return;}
+  if(R.task==="trap"){alTrapResolve(R,fw,from,names,ev);return;}
+  R.phase="reason";R.msg=null;alSave();render();
+}
+function alCheckProductNow(R,M,fw,start,from,names){
+  const ev=rxEvaluateMove(fw,from,R.arrows);
+  const chk=alCheckProduct(fw,start,ev.result,R.claims,names);
+  R.productCheck={ok:chk.ok,issues:chk.issues.map(i=>({code:i.code,atom:i.atom||null,bond:i.bond||null}))};
+  alLogEvent(R,chk.ok?"product-ok":"product-issues",{codes:chk.issues.map(i=>i.code)});
+  if(!chk.ok){
+    R.productTries=(R.productTries||0)+1;
+    R.msg={panel:"product",html:"<span style='color:#be3548'>"+chk.issues.length+" thing"+(chk.issues.length===1?"":"s")+" to fix:</span><ul>"+chk.issues.map(i=>"<li>"+i.text+"</li>").join("")+"</ul>"};
+    alSave();render();return;
+  }
+  R.phase="rank";R.msg=null;alSave();render();
+}
+function alRankCard(v,R,M,fw,start,from,names,all,ranked){
+  const ev=rxEvaluateMove(fw,from,R.arrows),sig=rxStateSig(ev.result);
+  const row=ranked.rows.find(r=>r.sig===sig),fromRow=ranked.rows.find(r=>r.sig===rxStateSig(from));
+  const c=el("div",{class:"card cream"});
+  c.innerHTML="<h3>4 · Rank it</h3><p class='muted' style='margin:0 0 6px'>Compared with the structure you pushed FROM, is this contributor more significant, less, or equivalent? If octets, charge count and electronegativity do not distinguish non-equivalent forms, choose unresolved. A tie in those rules does not prove equal weight.</p>";
+  const chips=el("div",{class:"al-chips"});[["more","More significant"],["equal","Equivalent by symmetry"],["less","Less significant"],["unresolved","Unresolved by these rules"]].forEach(([k,l])=>chips.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.rankClaimed===k),onclick:()=>{R.rankClaimed=k;alSave();render();}},l)));c.appendChild(chips);
+  const chips2=el("div",{class:"al-chips"});AL_RANK_REASONS.forEach(([k,l])=>chips2.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.reasonClaimed===k),onclick:()=>{R.reasonClaimed=k;alSave();render();}},"because "+l)));c.appendChild(chips2);
+  c.appendChild(el("button",{class:"btn small",disabled:!(R.rankClaimed&&R.reasonClaimed),onclick:()=>{if(!(R.rankClaimed&&R.reasonClaimed))return;alFinish(R,M,fw,start,from,names,all,ranked);}},"Show me the verdict →"));
+  v.appendChild(c);
+}
+/* Which single rule decides the comparison between two contributors. */
+function alDecidingReason(fa,fb){
+  if(fa.octetShort.length!==fb.octetShort.length)return "octet";
+  if(fa.chargeCount!==fb.chargeCount)return "charges";
+  if(fa.likeAdjacent!==fb.likeAdjacent)return "charges";
+  if(Math.abs(fa.negEN-fb.negEN)>1e-6||Math.abs(fa.posEN-fb.posEN)>1e-6)return "en";
+  return "equiv";
+}
+function alFinish(R,M,fw,start,from,names,all,ranked){
+  const ev=rxEvaluateMove(fw,from,R.arrows),sig=rxStateSig(ev.result);
+  const inSet=all.find(c=>c.sig===sig),reasonable=rxReasonable(fw,from,R.arrows,ev.result);
+  const fa=rxFactors(fw,ev.result),fb=rxFactors(fw,from),cmp=rxCompare(fa,fb);
+  const equivalent=cmp===0&&rxEquivalent(fw,ev.result,from),rankActual=cmp<0?"more":cmp>0?"less":equivalent?"equal":"unresolved",reasonActual=cmp===0&&!equivalent?"unsure":alDecidingReason(fa,fb);
+  const patternActual=rxClassify(fw,from,R.arrows);
+  if(inSet&&!R.found.includes(sig))R.found.push(sig);
+  R.result={sig,inSet:!!inSet,reasonable:reasonable.ok,reasonableCode:reasonable.code,rankActual,reasonActual,patternActual};
+  // log as an attempt (flows to history, cloud and the adaptive engine)
+  const errCounts={};
+  R.log.forEach(e=>{
+    if(e.code==="arrow-illegal"&&e.legality)errCounts[e.legality]=(errCounts[e.legality]||0)+1;
+    if(e.code==="commit-invalid"||e.code==="product-issues")(e.codes||[]).forEach(c=>{errCounts[c]=(errCounts[c]||0)+1;});
+  });
+  if(!reasonable.ok)errCounts[reasonable.code]=(errCounts[reasonable.code]||0)+1;
+  const clean=Object.keys(errCounts).length===0&&R.rejected===0&&R.hints===0;
+  const ok=!!inSet&&R.productCheck&&R.productCheck.ok&&R.rankClaimed===rankActual&&R.reasonClaimed===reasonActual&&R.patternClaimed===patternActual;
+  const ev2={id:"AL-"+M.key+"-"+R.task,questionRevision:'2026-10-03.2',ts:Date.now(),ok:ok?1:0,g:0,d:Math.min(900,Math.round((Date.now()-R.ts)/1000)),m:"arrowlab",t:"resonance",h:R.hints,a:(R.patternClaimed||"")+"/"+(R.rankClaimed||"")+"/"+(R.reasonClaimed||""),
+    drawing:{kind:"arrow-lab",version:1,molecule:M.key,task:R.task,fromSig:R.fromSig,arrows:R.arrows.map(x=>({...x})),product:{lp:Object.fromEntries(Object.entries(R.claims.lp).map(([k,v])=>[k,v.length])),order:{...R.claims.order},charge:{...R.claims.charge}},
+      inSet:!!inSet,reasonable:reasonable.ok,patternClaimed:R.patternClaimed,patternActual,rankClaimed:R.rankClaimed,rankActual,reasonClaimed:R.reasonClaimed,reasonActual,
+      errors:Object.entries(errCounts).map(([code,count])=>({code,count})),strokesRejected:R.rejected,strokesRecognized:R.log.filter(e=>e.code==="arrow"||e.code==="arrow-illegal"||e.code==="claim").length,productTries:R.productTries||0,hints:R.hints,clean}};
+  if(!ok){const first=Object.keys(errCounts)[0];ev2.x=first||(R.rankClaimed!==rankActual?"rank-"+rankActual:R.reasonClaimed!==reasonActual?'rank-reason':R.patternClaimed!==patternActual?'resonance-pattern':"not-in-set");}
+  S.attempts.push(ev2);if(S.attempts.length>5000)S.attempts=S.attempts.slice(-5000);
+  R.phase="done";alSave();save();render();
+}
+function alDoneCard(v,R,M,fw,start,from,names,all,ranked){
+  const res=R.result;if(!res)return;
+  const ev=rxEvaluateMove(fw,from,R.arrows);
+  const row=ranked.rows.find(r=>r.sig===res.sig);
+  const c=el("div",{class:"card cream"});
+  const patOk=R.patternClaimed===res.patternActual,rankOk=R.rankClaimed===res.rankActual,reasonOk=R.reasonClaimed===res.reasonActual||(res.reasonActual==="equiv"&&R.reasonClaimed==="equiv");
+  let html="<h3>Verdict</h3>";
+  html+="<div class='al-fb "+(res.inSet?"ok":"note")+"'><b>Contributor:</b> "+(res.inSet?"valid and in the set — ranked <b>"+row.label+"</b>. "+(row.why?row.why.charAt(0).toUpperCase()+row.why.slice(1)+".":""):"legal electron pushing, but "+(res.reasonable?"it adds a second pair of charges to an already-charged species, so it is not one of the contributors we draw.":alReasonText(res.reasonableCode)))+"</div>";
+  html+="<div class='al-fb "+(patOk?"ok":"bad")+"'><b>Pattern:</b> you said <i>"+(AL_PATTERNS.find(p=>p[0]===R.patternClaimed)||["","?"])[1]+"</i>; the arrows are <i>"+RX_PATTERN_NAMES[res.patternActual]+"</i>."+(patOk?"":" Naming the pattern correctly is how you know which arrows to look for next time.")+"</div>";
+  html+="<div class='al-fb "+(rankOk&&reasonOk?"ok":"bad")+"'><b>Ranking vs the structure you pushed from:</b> <b>"+({more:"more significant by these rules",less:"less significant by these rules",equal:"equivalent in this framework",unresolved:"relative weights unresolved by these rules"})[res.rankActual]+"</b>. Basis: <b>"+({octet:"octets",charges:"number of formal charges",en:"electronegativity placement",equiv:"framework symmetry",unsure:"tied rule scores without equivalence; no equal weights inferred"})[res.reasonActual]+"</b>."+(rankOk?"":" You said "+R.rankClaimed+".")+(reasonOk?"":" You gave <i>"+(AL_RANK_REASONS.find(r=>r[0]===R.reasonClaimed)||["","?"])[1]+"</i>.")+"</div>";
+  // the arithmetic for every atom that changed
+  const changed=fw.nodes.filter(n=>rxAtom(fw,from,n.id).fc!==rxAtom(fw,ev.result,n.id).fc||from.lp[n.id]!==ev.result.lp[n.id]);
+  if(changed.length)html+="<div class='al-atoms'>"+changed.map(n=>{const A=rxAtom(fw,ev.result,n.id);return "<div class='al-atomcard'><b>"+names[n.id]+"</b>"+alNamed(fw,names,n.id,A.electronText)+"<br>"+alNamed(fw,names,n.id,A.fcText)+"</div>";}).join("")+"</div>";
+  c.innerHTML=html;
+  // hybrid when the set is complete
+  if(R.task==="set"){
+    const core=all.filter(x=>x.core).map(x=>x.sig),foundCore=core.filter(s=>R.found.includes(s)).length;
+    c.appendChild(el("p",{style:"margin:10px 0 4px"},"<b>Set progress:</b> "+foundCore+" of "+core.length+" core contributors found"+(all.length>core.length?" (plus "+all.filter(x=>!x.core&&R.found.includes(x.sig)).length+"/"+(all.length-core.length)+" charge-separated minor forms)":"")+"."));
+    if(foundCore===core.length){const H=rxHybrid(fw,ranked);const hs=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-mini",role:"img","aria-label":"Resonance hybrid"});alDrawStructure(hs,fw,start,{names,showCharges:false,delta:H.delta,partial:H.partial});c.appendChild(el("h4",{style:"margin:10px 0 4px"},"Qualitative hybrid of this contributor set"));c.appendChild(hs);c.appendChild(el("p",{class:"muted"},"Includes the enumerated minor contributors, even if you have not drawn every extra form yet. Dashed bonds mark varying bond order; δ marks varying formal-charge sites, not calculated charge magnitudes. An unchanged formal charge remains + or −. No equal weights or numerical bond orders are assumed."));}
+    else{
+      const pick=el("div",{class:"al-chips"});
+      R.found.forEach(sig=>{const r=ranked.rows.find(x=>x.sig===sig);const ch=Object.entries(rxCharges(fw,r.state)).filter(([k,v])=>v).map(([k,v])=>names[k]+(v>0?"⁺":"⁻")).join(" ")||"neutral";pick.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.fromSig===sig),onclick:()=>{alContinueFrom(R,sig);}},"Push from: "+ch));});
+      c.appendChild(el("p",{style:"margin:8px 0 2px"},"Next move — choose which contributor to push from:"));c.appendChild(pick);
+    }
+  }
+  const row2=el("div",{class:"al-tools",style:"margin-top:10px"});
+  if(R.task!=="set"||R.found.length<all.length)row2.appendChild(el("button",{class:"btn small",onclick:()=>{if(R.task==="set")alContinueFrom(R,R.fromSig);else alStart(M.key,R.task);}},R.task==="set"?"Another move →":"Try another move on "+M.name+" →"));
+  row2.appendChild(el("button",{class:"btn ghost small",onclick:()=>alAbandon()},"Back to library"));
+  if(R.returnTo==="drill"&&S.drill)row2.appendChild(el("button",{class:"btn gold small",onclick:()=>{S.arrowLab=null;alSave();go("drill");}},"Back to the question →"));
+  c.appendChild(row2);
+  v.appendChild(c);
+  c.appendChild(el("p",{class:"muted",style:"margin-top:8px"},"<b>Why this one matters:</b> "+M.why));
+}
+function alReasonText(code){return ({"collapse-no-payoff":"it collapses a π bond onto an atom that is not more electronegative, with nothing forcing it — no chemist draws that form.","charges-on-carbon":"it separates charge with both new charges on carbon, so there is no electronegativity payoff.","new-sextet":"it creates a new incomplete octet without the polar-π payoff.","heteroatom-sextet":"it leaves a nitrogen or oxygen with six electrons — never significant.","dominated-by-donation":"it leaves C⁺ right beside a lone pair that would simply fill it; the real contributor comes from pushing that lone pair in.","too-much-separation":"it creates two new pairs of charges at once."})[code]||"it is not a contributor chemists draw.";}
+function alContinueFrom(R,sig){R.fromSig=sig;R.phase="arrows";R.arrows=[];R.ink=[];R.productInk=[];R.claims={lp:{},order:{},charge:{},chargeAt:{}};R.patternClaimed=null;R.rankClaimed=null;R.reasonClaimed=null;R.msg=null;R.result=null;R.productCheck=null;R.productTries=0;R.prefilled=false;R.ts=Date.now();R.log=[];R.hints=0;R.rejected=0;alSave();render();}
+function alAbandon(){S.arrowLab=null;alSave();go("arrowlab");}
+
+/* Trap task: declare "no resonance" or try arrows */
+function alDeclareNone(R,M,fw,from,names){
+  const moves=rxMovesFrom(fw,from,3);const correct=moves.length===0;
+  const ev2={id:"AL-"+M.key+"-trap",ts:Date.now(),ok:correct?1:0,g:0,d:Math.min(900,Math.round((Date.now()-R.ts)/1000)),m:"arrowlab",t:"resonance",h:R.hints,a:"none",drawing:{kind:"arrow-lab",version:1,molecule:M.key,task:"trap",declared:"none",correct,errors:[],strokesRejected:R.rejected,strokesRecognized:R.log.filter(e=>e.code==="arrow"||e.code==="arrow-illegal").length,hints:R.hints,clean:correct&&R.rejected===0&&R.hints===0}};
+  if(!correct)ev2.x="missed-resonance";
+  S.attempts.push(ev2);
+  R.phase="done";R.trapVerdict={declared:"none",correct,why:correct?"Right. "+M.why:"There IS a legal move here: it starts at "+alEndText(fw,names,from,moves[0].arrows[0].from)+"."};
+  alSave();save();render();
+}
+function alTrapResolve(R,fw,from,names,ev){
+  const M=alMolecule(R.key);const reasonable=rxReasonable(fw,from,R.arrows,ev.result);
+  const correct=false; // a trap molecule has no reasonable move; reaching here means the move is legal+valid but unreasonable
+  const ev2={id:"AL-"+M.key+"-trap",ts:Date.now(),ok:0,g:0,d:Math.min(900,Math.round((Date.now()-R.ts)/1000)),m:"arrowlab",t:"resonance",h:R.hints,a:"arrows",x:reasonable.code,drawing:{kind:"arrow-lab",version:1,molecule:M.key,task:"trap",declared:"arrows",arrows:R.arrows.map(x=>({...x})),correct,errors:[{code:reasonable.code,count:1}],strokesRejected:R.rejected,strokesRecognized:R.log.filter(e=>e.code==="arrow"||e.code==="arrow-illegal").length,hints:R.hints,clean:false}};
+  S.attempts.push(ev2);
+  R.phase="done";R.trapVerdict={declared:"arrows",correct,why:"Those arrows are legal electron pushing, but "+alReasonText(reasonable.code)+" "+M.why};
+  alSave();save();render();
+}
+
+/* Spot-the-error task: a corrupted drawing he must diagnose */
+function alSpotCases(M,fw,start,all){
+  // deterministic set of corruptions built from a real contributor
+  const cases=[];
+  const moves=rxMovesFrom(fw,start,3);
+  if(moves.length){const m=moves[0];
+    // (a) product with a charge dropped
+    const charges=rxCharges(fw,m.state);const charged=Object.keys(charges).filter(k=>charges[k]);
+    if(charged.length)cases.push({kind:"charge-missing",state:m.state,arrows:m.arrows,hide:charged[0],rule:"charge-wrong",where:charged[0],text:"A formal charge is missing on "+charged[0]+"."});
+    // (b) product with an extra lone pair (octet over)
+    const over=fw.nodes.find(n=>rxAtom(fw,m.state,n.id).electrons===8&&RX_SECOND_ROW.has(n.el));
+    if(over){const s=rxCloneState(m.state);s.lp[over.id]+=1;cases.push({kind:"octet-over",state:s,arrows:m.arrows,rule:"octet-over",where:over.id,text:over.id+" would hold 10 electrons."});}
+  }
+  // (c) an arrow from a σ bond
+  const sigma=fw.bonds.find(b=>start.order[b.key]===1);
+  if(sigma){const [a,b]=sigma.key.split("-");cases.push({kind:"sigma-arrow",state:start,arrows:[{from:"bond:"+sigma.key,to:"atom:"+a}],rule:"tail-sigma",where:sigma.key,text:"The arrow starts on a σ bond."});}
+  // (d) lone pair aimed at a non-adjacent bond
+  const donor=fw.nodes.find(n=>start.lp[n.id]>0&&fw.bonds.filter(b=>b.a===n.id||b.b===n.id).every(b=>start.order[b.key]===1));
+  if(donor){const far=fw.bonds.find(b=>b.a!==donor.id&&b.b!==donor.id);if(far)cases.push({kind:"far-head",state:start,arrows:[{from:"lp:"+donor.id,to:"bond:"+far.key}],rule:"head-not-adjacent",where:far.key,text:"The head lands on a bond that does not touch the donor atom."});}
+  return cases;
+}
+const AL_SPOT_RULES=[["tail-sigma","σ bond electrons were moved"],["head-not-adjacent","arrow head not adjacent to its tail"],["octet-over","an atom has more than 8 electrons"],["charge-wrong","a formal charge is wrong or missing"],["none","nothing is wrong"]];
+function alSpotView(v,R,M,fw,start,names,all,ranked){
+  const cases=alSpotCases(M,fw,start,all);if(!cases.length){v.appendChild(el("p",{},"No spot-the-error case for this molecule."));return;}
+  if(R.spotIndex==null){R.spotIndex=Math.floor(Math.random()*cases.length);R.spotPicked=null;R.spotRule=null;alSave();}
+  const c=cases[R.spotIndex];
+  const panel=el("div",{class:"al-panel"});panel.appendChild(el("h4",{},"Tap the atom or bond where the rule breaks"));
+  const svg=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-svg",role:"img"});
+  const hideCharge=c.kind==="charge-missing"?c.hide:null;
+  // draw: structure as given with its arrows; for charge-missing, suppress one charge
+  alDrawStructure(svg,fw,c.state,{names,arrows:c.arrows,selected:R.spotPicked,showCharges:!hideCharge});
+  if(hideCharge){const charges=rxCharges(fw,c.state);fw.nodes.forEach(n=>{if(n.id!==hideCharge&&charges[n.id]){const g=alSvgEl("g",{class:"al-charge"},svg);alSvgEl("circle",{cx:n.x+19,cy:n.y-19,r:8},g);const t=alSvgEl("text",{x:n.x+19,y:n.y-15,"text-anchor":"middle"},g);t.textContent=charges[n.id]>0?"+":"−";}});}
+  panel.appendChild(svg);
+  svg.addEventListener("pointerdown",e=>{const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(svg.getScreenCTM().inverse());const p=[q.x,q.y];const atom=alNearestAtom(fw,p,26),bond=alNearestBond(fw,p,26);R.spotPicked=atom&&(!bond||atom.d<=bond.d)?atom.id:bond?bond.key:null;alSave();render();});
+  panel.appendChild(el("div",{class:"al-read"},R.spotPicked?"Picked: <b>"+(names[R.spotPicked]||R.spotPicked.split("-").map(x=>names[x]).join("–"))+"</b>":"Nothing picked yet."));
+  v.appendChild(panel);
+  const rc=el("div",{class:"card cream"});rc.innerHTML="<h3>Which rule is broken?</h3>";
+  const chips=el("div",{class:"al-chips"});AL_SPOT_RULES.forEach(([k,l])=>chips.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.spotRule===k),onclick:()=>{R.spotRule=k;alSave();render();}},l)));rc.appendChild(chips);
+  if(!R.spotDone)rc.appendChild(el("button",{class:"btn small",disabled:!(R.spotRule&&R.spotPicked),onclick:()=>{
+    const whereOk=R.spotPicked===c.where,ruleOk=R.spotRule===c.rule;const ok=whereOk&&ruleOk;
+    const ev2={id:"AL-"+M.key+"-spot",ts:Date.now(),ok:ok?1:0,g:0,d:Math.min(900,Math.round((Date.now()-R.ts)/1000)),m:"arrowlab",t:"resonance",h:0,a:R.spotRule+"@"+R.spotPicked,drawing:{kind:"arrow-lab",version:1,molecule:M.key,task:"spot",caseKind:c.kind,ruleActual:c.rule,ruleClaimed:R.spotRule,whereOk,ruleOk,errors:ok?[]:[{code:"spot-"+c.rule,count:1}],clean:ok}};
+    if(!ok)ev2.x="spot-"+c.rule;S.attempts.push(ev2);R.spotDone={whereOk,ruleOk};alSave();save();render();}},"Check →"));
+  if(R.spotDone){const d=R.spotDone;rc.appendChild(el("div",{class:"al-fb "+(d.whereOk&&d.ruleOk?"ok":"bad")},(d.whereOk?"Right place. ":"Wrong place — it is at <b>"+(names[c.where]||c.where.split("-").map(x=>names[x]).join("–"))+"</b>. ")+(d.ruleOk?"Right rule. ":"Rule: <b>"+AL_SPOT_RULES.find(r=>r[0]===c.rule)[1]+"</b>. ")+c.text));
+    const row=el("div",{class:"al-tools"});row.appendChild(el("button",{class:"btn small",onclick:()=>{R.spotIndex=null;R.spotDone=null;R.spotPicked=null;R.spotRule=null;R.ts=Date.now();alSave();render();}},"Another case →"));row.appendChild(el("button",{class:"btn ghost small",onclick:()=>alAbandon()},"Library"));rc.appendChild(row);}
+  v.appendChild(rc);
+}
+
+/* ---------- registration ---------- */
+VIEWS.arrowlab=alView;
+(function(){
+  if(typeof S!=="undefined"){try{S.arrowLab=safeStore.get("arrowLab",null);}catch(e){S.arrowLab=null;}}
+  // Every old entry point to the Resonance Lab now lands on the Arrow Lab unless a legacy
+  // session is active or he explicitly asked for the old lab.
+  const legacy=VIEWS.reslab;
+  VIEWS.reslab=function(v){
+    if((S.resLab&&S.resLab.target)||S.legacyResLab){S.legacyResLab=false;return legacy(v);}
+    alView(v);
+  };
+  if(typeof NAV_GROUP!=="undefined")NAV_GROUP.arrowlab=NAV_GROUP.reslab||NAV_GROUP.arrowlab;
+})();
+
+/* END ARROW LAB */
+
+/* Exam-transfer repair bank, 2026-10-03. Bounded, versioned original exercises.
+ * Structured answers are machine-checked; scratch drawings/prose are NOT graded.
+ * Never infer a percentile, exam score, or whole-chapter mastery from these tasks. */
+const ET_REVISION='2026-10-03.1';
+const ET_TRACKS=[
+  {id:'naming',title:'Choose the parent before naming',topic:'alkanes',reason:'Separate longest path, equal-length parent choice, numbering, and name assembly.',steps:['Trace terminal-to-terminal paths. The longest continuous path can turn into what looks like a branch.','If longest chains tie, choose the one leaving more substituents. Then compare locants at the first difference.','For a ring with tied locant sets, give the alphabetically earlier substituent the lower locant. Ignore di-/tri- for alphabetizing.'],lab:null},
+  {id:'acidbase',title:'Separate proton movement from equilibrium',topic:'acidbase1',reason:'First do the requested H⁺ operation. Then compare the acids on the two sides.',steps:['Conjugate acid: add one H⁺; net charge increases by 1. Conjugate base: remove one H⁺; charge decreases by 1.','For B⁻ + HA ⇌ HB + A⁻, compare HA with HB—not the two bases.','ΔpKa = pKa(product acid) − pKa(reactant acid). Positive: products favored. Negative: reactants favored. Use the values supplied in the question.'],lab:null},
+  {id:'resonance',title:'Audit electrons, then build the hybrid',topic:'resonance',reason:'Check the changed bonds and charge sites rather than moving a charge by itself.',steps:['Keep atoms, attached H atoms, the sigma framework, and net charge fixed. Move electron pairs.','For each changed atom: formal charge = valence electrons − nonbonding electrons − bond-order sum. No second-row atom may exceed eight electrons.','For the specified contributor set, mark partial bonds where bond order changes and δ signs at the sites that carry formal charge. A central atom need not carry the charge.'],lab:'allyl-anion'}
+];
+function etField(label,answer,code,note,accept){return {label,answer:String(answer),numeric:typeof answer==='number',kind:typeof answer==='number'?'num':'text',code,note,accept:(accept||[answer]).map(String)};}
+function etFigure(graph,title='Bond-line structure'){
+  const pts=Object.values(graph.nodes),xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x=Math.min(...xs)-28,y=Math.min(...ys)-32,w=Math.max(...xs)-x+28,h=Math.max(...ys)-y+32;
+  return '<svg class="et-figure" role="img" aria-label="'+title+'" viewBox="'+[x,y,w,h].join(' ')+'"><title>'+title+'</title>'+graph.edges.map(([a,b])=>'<path d="M'+graph.nodes[a].join(' ')+' L'+graph.nodes[b].join(' ')+'" fill="none" stroke="currentColor" stroke-width="2.5"/>').join('')+'</svg>';
+}
+function etTree(n,branches=[]){return ch4NMTree(n,branches);}
+function etTie(n,iso=false){
+  const g=etTree(n),p=g.nodes.p4;
+  // Both alternatives have n carbons. Going through the fork leaves two
+  // substituents rather than one. No additional graph is invented by its name.
+  Object.assign(g.nodes,{a:[p[0],p[1]-58],b:[p[0]+50,p[1]-88],c:[p[0],p[1]-116],d:[p[0]+(iso?-50:50),p[1]-146]});
+  g.edges.push(['p4','a'],['a','c'],[iso?'c':'a','b'],['c','d']);return g;
+}
+function etRing(n,ethyl=1,methyls=[2,3]){
+  const g=ch4NMRing(n);
+  [[ethyl,2],...methyls.map(p=>[p,1])].forEach(([p,len],j)=>{
+    const a=-Math.PI/2+(p-1)*2*Math.PI/n,origin=g.nodes['r'+p];
+    ch4NMArm(g,'r'+p,'branch'+j,Array.from({length:len},(_,i)=>[origin[0]+(55+i*45)*Math.cos(a)+(i?18:0),origin[1]+(55+i*45)*Math.sin(a)]));
+  });return g;
+}
+const ET_NAMING_CASES=[
+  {g:etTree(8,[{at:3,length:1},{at:5,length:2}]),name:'5-ethyl-3-methyloctane',parent:8,rule:'length',why:'Eight is the longest path. Locants 3,5 beat 4,6. Alphabetize ethyl before methyl.'},
+  {g:etTie(9),name:'3-methyl-4-propylnonane',parent:9,rule:'substituents',why:'The path through the fork and the horizontal path both contain nine carbons. Through the fork leaves methyl plus propyl, not one sec-butyl branch. Locants are 3,4.'},
+  {g:etRing(6),name:'1-ethyl-2,3-dimethylcyclohexane',parent:6,rule:'alphabet',why:'The two best locant lists are both 1,2,3. Ethyl precedes methyl, so ethyl receives 1.'},
+  {g:etTree(7,[{at:3,length:4}]),name:'5-ethylnonane',parent:9,rule:'length',why:'Trace from the end of the four-carbon arm through its attachment to the far end of the drawn chain: nine carbons. The remaining two-carbon arm is ethyl at C5.'},
+  {g:etTie(10,true),name:'2-methyl-4-propyldecane',parent:10,rule:'substituents',why:'A ten-carbon path through the fork leaves methyl and propyl. Number from the fork tip for locants 2,4.'},
+  {g:etRing(7,1,[3]),name:'1-ethyl-3-methylcycloheptane',parent:7,rule:'alphabet',why:'Both directions can give 1,3. Assign 1 to ethyl, which alphabetizes before methyl.'},
+  {g:etTree(8,[{at:3,length:4}]),name:'5-ethyldecane',parent:10,rule:'length',why:'The longest path turns from the four-carbon arm into the five-carbon right segment: ten total. Number to place ethyl at 5 rather than 6.'},
+  {g:etTie(11),name:'3-methyl-4-propylundecane',parent:11,rule:'substituents',why:'The tied eleven-carbon paths differ in how many substituents they leave. The path through the fork leaves two: methyl at 3 and propyl at 4.'},
+  {g:etRing(7),name:'1-ethyl-2,3-dimethylcycloheptane',parent:7,rule:'alphabet',why:'The best locant set is 1,2,3 from either end of the substituted segment; ethyl receives 1 by alphabetical tie-break.'}
+];
+function etItem(skill,n,phase,prompt,fields,why,extra={}){
+  return {id:'ET-20261003-'+skill+'-'+String(n).padStart(2,'0'),type:'blanks',template:fields.map((f,i)=>'<div>'+f.label+': {{'+i+'}}</div>').join(''),topic:ET_TRACKS.find(t=>t.id===skill).topic,transferSkill:skill,transferPhase:phase,correctedAt:ET_REVISION,source:'Original bounded repair exercise; checked against its graph/arithmetic. Not an instructor assessment.',adaptiveEligible:false,readinessEligible:false,eligibleForUnseenTransfer:false,prompt,fields,why,...extra};
+}
+const ET_QUESTIONS=ET_NAMING_CASES.map((c,i)=>etItem('naming',i+1,i<3?'guided':'check',etFigure(c.g)+'<p>'+(i<3?'Find the preferred parent, then write the full name.':'Write the complete name. Decide the parent and numbering yourself; show your working on paper or in the scratchpad.')+'</p>',[
+  ...(i<3?[etField('Carbons in the preferred parent',c.parent,'parent-path','Trace the whole path, including a turn through a branch if it makes the longest preferred parent.')]:[]),
+  etField('Complete name',c.name,'name-assembly',c.why)
+],c.why,{graph:c.g,expectedParent:c.parent,parentRule:c.rule}));
+function etSpecies(label){return '<div class="et-species" role="img" aria-label="'+label.replace(/<[^>]*>/g,'')+'">'+label+'</div>';}
+const ET_AB_CASES=[
+  ['CH₃–CH₂–OH','conjugate base','O',1,0,0,-1],
+  ['CH₃–NH₂','conjugate acid','N',2,0,3,1],
+  ['CH₃–CH₂–NH₃⁺','conjugate base','N',3,1,2,0],
+  ['CH₃–CH₂–CH₂–NH₂','conjugate acid','N',2,0,3,1],
+  ['CH₃–OH₂⁺','conjugate base','O',2,1,1,0],
+  ['CH₃–NH–CH₃','conjugate acid','N',1,0,2,1],
+  ['CH₃–CH₂–O⁻','conjugate acid','O',0,-1,1,0],
+  ['CH₃–CH₂–CH₂–OH','conjugate base','O',1,0,0,-1],
+  ['CH₃–NH₂','conjugate base','N',2,0,1,-1]
+];
+ET_AB_CASES.forEach(([label,op,atom,h,charge,newH,newCharge],i)=>{
+  const delta=op==='conjugate acid'?1:-1;
+  ET_QUESTIONS.push(etItem('acidbase',i+1,i<3?'guided':'check',etSpecies(label)+'<p>Construct the <b>'+op+'</b> by changing H⁺ at '+atom+'. Keep every carbon bond fixed. Draw the product, then enter its '+atom+'-bound H count and charge.</p>',[
+    etField('H atoms bonded to '+atom+' in the product',newH,'proton-operation','A '+op+' has '+(delta===1?'one MORE':'one FEWER')+' H at '+atom+'.'),
+    etField('Net charge of the product',newCharge,'charge-bookkeeping','H⁺ changes charge by '+(delta===1?'+1':'−1')+'. Start at '+charge+'.',[String(newCharge),...(newCharge>0?['+'+newCharge]:[])])
+  ],'Start with '+h+' H on '+atom+' and charge '+charge+'. '+(delta===1?'Add':'Remove')+' one H⁺: '+newH+' H on '+atom+', charge '+newCharge+'. This constructs the requested conjugate; it does not by itself claim that a particular reagent will produce it.',{operation:{h,charge,delta,newH,newCharge}}));
+});
+const ET_EQ_CASES=[
+  ['CH₃CO₂H + PhO⁻ ⇌ CH₃CO₂⁻ + PhOH',4.8,10],
+  ['PhO⁻ + H₂O ⇌ PhOH + HO⁻',15.7,9.9],
+  ['EtO⁻ + PhOH ⇌ EtOH + PhO⁻',10,16],
+  ['NH₂⁻ + HC≡CH ⇌ NH₃ + ⁻C≡CH',25,38],
+  ['HO⁻ + NH₃ ⇌ H₂O + NH₂⁻',38,15.7],
+  ['CH₃CO₂⁻ + EtOH ⇌ CH₃CO₂H + EtO⁻',16,4.8]
+];
+ET_EQ_CASES.forEach(([rx,left,right],i)=>{
+  const delta=+(right-left).toFixed(1),side=delta>0?'products':'reactants';
+  ET_QUESTIONS.push(etItem('acidbase',10+i,i===0?'guided':'check',etSpecies(rx)+'<p>Use these supplied values: reactant acid pKa = <b>'+left+'</b>; product acid pKa = <b>'+right+'</b>. Ph = phenyl; Et = ethyl.</p><p>Which side is favored? Compute ΔpKa as product acid minus reactant acid.</p>',[
+    etField('ΔpKa',delta,'equilibrium-subtraction','Subtract '+right+' − '+left+' (product acid minus reactant acid).',[String(delta),...(delta>0?['+'+delta]:[])]),
+    etField('Favored side',side,'equilibrium-direction','The side with the weaker acid (higher pKa) is favored.',side==='products'?['products','product','right']:['reactants','reactant','left'])
+  ],'ΔpKa = '+delta+', so K ≈ 10^('+delta+'). '+(delta>0?'Products':'Reactants')+' are favored. “Reactants favored” in a base + water comparison means little net protonation of that base by water—not that water consumes it completely.',{equilibrium:{left,right,delta,side}}));
+});
+// Electron-bookkeeping exercises have explicit H counts and mapped sites;
+// they do not pretend that a typed audit grades a complete freehand structure.
+const ET_RES_CASES=[
+  ['CH₂(A)=CH(B)–CH₂(C)⁺','Move the A=B π pair to B–C.','A',1,'A–B loses its π pair; B–C gains it. A now has three bonds and no lone pair, so A carries +1.'],
+  ['⁻CH₂(A)–CH(B)=CH₂(C)','Use the lone pair on A to make A=B, while moving the B=C π pair onto C.','C',-1,'A becomes neutral as its lone pair forms A=B. C gains a lone pair and carries −1.'],
+  ['CH₃–C(B)(=O(A))–CH₂(C)⁻','Use the lone pair on C to make B=C; simultaneously move B=O(A) π electrons onto O(A).','A',-1,'A is oxygen: it becomes singly bonded with three lone pairs, FC = 6 − 6 − 1 = −1. The carbonyl carbon keeps an octet.'],
+  ['CH₃–CH(A)=CH(B)–CH₂(C)⁺','Move the A=B π pair to B–C.','A',1,'A loses one bond order and becomes the carbocation. The attached CH₃ and all H atoms remain fixed.'],
+  ['CH₃–CH(A)⁻–CH(B)=CH₂(C)','Form A=B from the lone pair at A; move B=C π electrons onto C.','C',-1,'The lone pair and negative formal charge end on C, not B. Sigma bonds and H counts stay fixed.'],
+  ['CH₃CH₂–C(B)(=O(A))–CH₂(C)⁻','Form B=C from the lone pair on C while moving B=O(A) π electrons onto O(A).','A',-1,'The new form has O(A)⁻, B=C, and no carbon charge. Moving both pairs avoids a ten-electron carbon.'],
+  ['CH₂(A)=CH(B)–CH(C)⁺–CH₃','Move the A=B π pair to B–C.','A',1,'A becomes CH₂⁺; the B=C bond is now double. Nothing moves into the saturated CH₃.'],
+  ['CH₂(A)=CH(B)–CH(C)⁻–CH₃','Form B=C from the lone pair on C; move A=B π electrons onto A.','A',-1,'A receives a lone pair and −1. C loses its lone pair into a π bond and becomes neutral.'],
+  ['CH₃–CH(A)⁻–C(B)(=O(C))–CH₃','Form A=B from the lone pair on A; move B=O(C) π electrons onto O(C).','C',-1,'O(C) receives the π pair and becomes O⁻. This is the same enolate pattern with the labels and orientation changed.']
+];
+ET_RES_CASES.forEach(([mol,move,site,charge,why],i)=>ET_QUESTIONS.push(etItem('resonance',i+1,i<3?'guided':'check',etSpecies(mol)+'<p>'+move+' Draw the resulting contributor before checking.</p>',[
+  etField('Site carrying the formal charge after the move',site,'charge-site','Follow the electrons and recount bonds; do not place charge automatically on the middle atom.'),
+  etField('Formal charge at that site',charge,'formal-charge','The net charge must remain '+charge+'.',[String(charge),...(charge>0?['+'+charge]:[])])
+],why,{chargeMove:{site,charge}})));
+ET_QUESTIONS.push(etItem('resonance',10,'guided',etSpecies('CH₂(A)=CH(B)–CH₂(C)⁺ ↔ ⁺CH₂(A)–CH(B)=CH₂(C)')+'<p>For this two-contributor set, draw the hybrid. At which labeled atoms do you put δ⁺? List letters separated by commas.</p>',[etField('δ⁺ sites','A,C','hybrid-sites','Only A and C carry positive formal charge in these contributors. B does not.',['A,C','C,A'])],'Draw partial double bonds on both A–B and B–C, with δ⁺ at A and C. The hybrid is one structure, not two contributors inside brackets.'));
+ET_QUESTIONS.push(etItem('resonance',11,'check',etSpecies('⁻CH₂(A)–CH(B)=CH₂(C) ↔ CH₂(A)=CH(B)–CH₂(C)⁻')+'<p>For these contributors, draw the hybrid. Which sites carry δ⁻? Which bonds have partial double-bond character?</p>',[etField('δ⁻ sites','A,C','hybrid-sites','Charge occurs at the ends, A and C.',['A,C','C,A']),etField('Partial double bonds','AB,BC','hybrid-bonds','Both bonds alternate between single and double.',['AB,BC','BC,AB','A-B,B-C','B-C,A-B'])],'δ⁻ belongs at A and C; add dashed π lines beside both A–B and B–C. No resonance-derived positive site appears in this set.'));
+ET_QUESTIONS.push(etItem('resonance',12,'check',etSpecies('CH₂(A)=CH(B)–CH(C)=CH(D)–CH₂(E)⁺')+'<p>The positive charge can be delocalized along this five-carbon conjugated chain without introducing additional charges. Draw the contributors and list every site that carries δ⁺ in their hybrid.</p>',[etField('δ⁺ sites','A,C,E','hybrid-sites','Move adjacent π pairs toward the carbocation. The charge reaches alternate sites.',['A,C,E','A,E,C','C,A,E','C,E,A','E,A,C','E,C,A'])],'The three contributors put +1 at E, C, and A. The hybrid has δ⁺ at A,C,E—not B or D—and partial π character along the conjugated chain.'));
+
+/* Resonance -> IR transfer, prompted by the supplied in-class wavenumber sheet.
+ * Original exercises, not a reconstruction of an instructor key. The class
+ * photographs are private group-work evidence and are NOT embedded in the app.
+ * Sources: William Reusch (MSU), Infrared Spectroscopy / Carbonyl Reactivity;
+ * George E. McManis, Applied Spectroscopy 24 (1970), 10.1366/000370270774372489.
+ */
+ET_TRACKS.push({id:'resonance-ir',title:'Turn resonance into an IR prediction',topic:'resonance',reason:'Name the bond being measured. Follow electron donation to bond character, stiffness, and wavenumber—not “more resonance” by itself.',steps:['Circle the exact bond in the prompt: C=O, C–O, or C–H. A statement about one is not automatically true of another.','Draw a valid contributor with charges and unchanged atoms. Identify which bond loses π character and which gains it. Do not count contributors as equal fractions.','For comparable bonds: higher force constant k means higher wavenumber. The harmonic model is ν̃ = (1/2πc)√(k/μ). Peak position is not peak intensity or “more light passes through.”'],lab:'acetamide'});
+// The newest class difficulty gets the first route, followed by its application.
+ET_TRACKS.sort((a,b)=>['resonance','resonance-ir','naming','acidbase'].indexOf(a.id)-['resonance','resonance-ir','naming','acidbase'].indexOf(b.id));
+function etIRField(label,answer,code,note,extra=[]){return etField(label,answer,code,note,[answer,...extra]);}
+function etIRQuestion(n,phase,prompt,fields,why,kind){ET_QUESTIONS.push(etItem('resonance-ir',n,phase,prompt,fields,why,{irKind:kind,source:'Original resonance-to-IR repair; course worksheet supplied 2026-10-03; Reusch/MSU IR and carbonyl reactivity; McManis 1970 vinyl esters. Qualitative comparisons, not exact predicted spectra.'}));}
+const etIRHigher=['higher','increase','increases'],etIRLower=['lower','decrease','decreases'];
+etIRQuestion(1,'guided',etSpecies('CH₃–C(=O)–NH₂ ↔ CH₃–C(–O⁻)=NH₂⁺')+'<p>Draw the two electron-pair arrows connecting these contributors. Focus on the <b>C=O</b> bond in the neutral drawing. Compared with a localized carbonyl, does donation add more single or double character to that bond, and push its stretching wavenumber higher or lower?</p>',[
+ etIRField('Added character at the original C=O','single','target-bond','C=O becomes C–O in the donated contributor.',['single bond','single-bond']),
+ etIRField('Effect on C=O wavenumber','lower','ir-direction','Less double character means a less stiff carbonyl stretch.',etIRLower)
+],'N lone pair → C–N; simultaneously C=O π pair → O. N becomes +1 and O −1. C–N gains π character; the original C=O loses some. It is the C=O stretch being asked about.','bond');
+etIRQuestion(2,'guided',etSpecies('CH₃–C(=Oₐ)–OᵦH ↔ CH₃–C(–Oₐ⁻)=OᵦH⁺')+'<p>Now focus on <b>C–Oᵦ</b>, the bond to the OH oxygen—not C=Oₐ. Compared with the C–O bond of a simple primary alcohol, does this acid C–O bond have more or less double character? Would its C–O stretching band be higher or lower?</p>',[
+ etIRField('Double character relative to the alcohol C–O','more','target-bond','The OH oxygen can donate toward the adjacent carbonyl.',['greater']),
+ etIRField('C–O wavenumber relative to the alcohol','higher','ir-direction','This bond gains double character; do not apply the carbonyl-lowering conclusion to it.',etIRHigher)
+],'The acid’s C–O(H) bond gains partial double-bond character and has a higher effective stiffness. This is consistent with the supplied sheet’s approximately 1250 versus 1050 cm⁻¹. Do not swap C–O and C=O. The neutral-acid contributors are not equally weighted.','bond');
+etIRQuestion(3,'guided','<p>Two hypothetical stretches have the same reduced mass. Bond B has four times bond A’s force constant. Using ν̃ ∝ √(k/μ), what is ν̃(B)/ν̃(A)? Is this calculation about peak position or intensity?</p>',[
+ etField('Wavenumber ratio B/A',2,'hooke-square-root','Take √4, not 4.'),
+ etIRField('Position or intensity?','position','position-vs-intensity','Wavenumber locates a band; intensity is a different property.',['peak position'])
+],'√(4k/μ) / √(k/μ) = 2. A stiffer spring needs higher-frequency light. This does not predict how much light is transmitted.','physics');
+etIRQuestion(4,'check',etSpecies('CH₃CH₂–C(=O)–NH–CH₃')+'<p>Draw the contributor made by donating the N lone pair toward the carbonyl. Enter the resulting O and N charges, then the direction of the C=O stretching shift due to that donation.</p>',[
+ etField('Formal charge on O in the donated contributor',-1,'formal-charge','The former carbonyl oxygen gains the π pair.'),
+ etField('Formal charge on N in the donated contributor',1,'formal-charge','N uses its lone pair to make a fourth bond.'),
+ etIRField('C=O shift: higher or lower?','lower','ir-direction','Donation decreases the original carbonyl’s double character.',etIRLower)
+],'N donation forms C=N⁺ while C=O becomes C–O⁻. The carbonyl has more single-bond character and a lower stretching wavenumber.','bond');
+etIRQuestion(5,'check',etSpecies('A: CH₂=CH–C(=O)–CH₃<br>B: CH₂=CH–CH₂–C(=O)–CH₃')+'<p>Which structure has the alkene directly conjugated with the carbonyl? Which is expected to have the lower C=O stretching wavenumber, other comparable effects held fixed? Draw the contributor supporting your choice.</p>',[
+ etIRField('Conjugated structure','A','conjugation-path','An sp³ CH₂ breaks the continuous p-orbital path in B.'),
+ etIRField('Lower C=O wavenumber','A','ir-direction','Conjugation reduces effective C=O double character in A.')
+],'A has C=C–C=O. B has a saturated CH₂ between the π systems. Merely having another double bond somewhere does not establish conjugation.','connectivity');
+etIRQuestion(6,'check','<p>For the same bond type, keep force constant k fixed and make reduced mass μ four times larger. What happens to the wavenumber: enter the new/old ratio. Does “higher wavenumber” mean a higher or lower vibrational energy gap?</p>',[
+ etField('New/old wavenumber',0.5,'hooke-square-root','√(1/4) = 1/2; decimal entry is accepted.'),
+ etIRField('Energy gap at higher wavenumber','higher','energy-direction','E = hcν̃, so larger ν̃ corresponds to larger transition energy.',etIRHigher)
+],'With fixed k, quadrupling μ halves the wavenumber. Separately, a higher-wavenumber photon has greater energy—not necessarily greater transmitted intensity.','physics');
+etIRQuestion(7,'check',etSpecies('A: CH₃CH₂–C(=O)–OH<br>B: CH₃CH₂CH₂–OH')+'<p>Compare the <b>C–O bond to the OH oxygen</b> in A and B. Which has greater partial double-bond character? Which C–O absorption should appear at higher wavenumber in this course comparison?</p>',[
+ etIRField('More partial double character','A','target-bond','In A, the OH oxygen is directly attached to a carbonyl carbon.'),
+ etIRField('Higher C–O wavenumber','A','ir-direction','The measured C–O bond is strengthened by donation.')
+],'A’s OH oxygen donates toward C=O. Its C–O(H) bond gains π character. The acid C–O band is higher than the primary-alcohol example; that does not make the acid’s C=O bond stronger through the same donation.','bond');
+etIRQuestion(8,'check',etSpecies('A: CH₃CH₂–C(=O)–O–CH₂CH₃<br>B: CH₂=CH–C(=O)–O–CH₂CH₃<br>C: CH₃CH₂–C(=O)–O–CH=CH₂')+'<p>These are an ordinary ester, an ester conjugated on the acyl side, and a vinyl ester. Which is expected to have the <b>highest C=O</b> stretching wavenumber? Which the lowest? Draw the relevant donor paths before answering.</p>',[
+ etIRField('Highest C=O wavenumber','C','competing-donation','In C the alkoxy O can donate toward the vinyl group, reducing its donation toward C=O.'),
+ etIRField('Lowest C=O wavenumber','B','conjugation-path','B’s alkene is directly conjugated on the carbonyl-carbon side.')
+],'Expected order: C > A > B. Vinyl-side conjugation competes for alkoxy-O donation into C=O; direct acyl-side conjugation lowers C=O frequency. “More resonance means lower frequency” is not a sufficient rule.','connectivity');
+etIRQuestion(9,'check','<p>Compare C–H stretching for carbon that is sp, sp², or sp³ hybridized (similar surroundings). List the carbon hybridizations from highest to lowest wavenumber, using commas. Is the key trend increasing or decreasing C–H stiffness with increasing s character?</p>',[
+ etIRField('Highest to lowest','sp,sp2,sp3','hybridization-stiffness','Typical order is sp C–H near 3300, sp² above 3000, sp³ below 3000 cm⁻¹.',['sp,sp²,sp³']),
+ etIRField('Stiffness with more s character','increasing','bond-stiffness','More s character generally gives a shorter, stiffer C–H bond.',['increase','increases','higher'])
+],'sp has 50% s character, sp² about 33%, sp³ 25%. The useful chain is hybridization → C–H stiffness → wavenumber; “electron density” alone leaves the causal link unspecified.','physics');
+etIRQuestion(10,'check',etSpecies('A: Ph–C(=O)–OCH₃<br>B: Ph–C(=O)–NH₂')+'<p>Compare the C=O stretches of these otherwise analogous ester and amide structures. Which generally has the lower wavenumber? In that structure, which atom supplies the adjacent lone-pair donation?</p>',[
+ etIRField('Lower C=O wavenumber','B','donor-strength','Amide N donates strongly into the carbonyl.'),
+ etIRField('Lone-pair donor atom','N','donor-strength','Name the donor, not the oxygen that receives the carbonyl π pair.',['nitrogen'])
+],'B: the amide N is a strong resonance donor. The net effect is lower C=O stiffness/frequency than in the analogous ester. Both also share the phenyl group; it alone cannot distinguish them.','bond');
+etIRQuestion(11,'check',etSpecies('A: H₂N–CH=CH–C(=O)–CH₃<br>B: H₂N–CH₂–CH=CH–C(=O)–CH₃')+'<p>Which structure allows the N lone pair to donate through the alkene all the way to the carbonyl? Draw the charge-separated contributor for that structure, then enter the N and O formal charges. Do not move H atoms.</p>',[
+ etIRField('Continuous N-to-carbonyl donor path','A','conjugation-path','B’s sp³ CH₂ interrupts the N-to-π connection.'),
+ etField('N charge in the donated contributor',1,'formal-charge','N makes a double bond without losing either H.'),
+ etField('O charge in the donated contributor',-1,'formal-charge','The carbonyl π pair ends on O.')
+],'A can give H₂N⁺=CH–CH=C(–O⁻)–CH₃ using three simultaneous arrows. B still has an enone, but its N lone pair is not directly conjugated with it. This is an extended donor-to-carbonyl path, not just a count of drawn contributors.','connectivity');
+etIRQuestion(12,'check','<p>You can draw three resonance contributors for one molecule. A classmate claims each must contribute exactly one third, so every pictured double bond has bond order 1.67. Is that conclusion justified from the count alone? A separate question asks where an IR band occurs: is that position or intensity?</p>',[
+ etIRField('Is equal weighting justified?','no','contributor-weight','Only symmetry-equivalent contributors necessarily have equal weights; number alone does not determine weights.',['not justified']),
+ etIRField('Where the band occurs','position','position-vs-intensity','Band location is wavenumber, not transmission depth.',['peak position'])
+],'No. Contributor weights depend on relative importance. Do not turn three drawings into 33/33/33 percentages without symmetry or additional evidence. A wavenumber question concerns position.','physics');
+function etIRWorked(){return '<h3>One donation changes two different bonds</h3>'+etSpecies('CH₃–C(=Oₐ)–OᵦH ↔ CH₃–C(–Oₐ⁻)=OᵦH⁺')+'<p><b>Draw both arrows:</b> Oᵦ lone pair → C–Oᵦ bond; at the same time, C=Oₐ π pair → Oₐ. Atoms and H atoms stay put. The donated form is charge-separated; it is not equally weighted with the neutral form.</p><table><thead><tr><th>Bond in the original</th><th>Donation adds</th><th>Qualitative shift</th></tr></thead><tbody><tr><td>C=Oₐ</td><td>Single character</td><td>Less stiff → lower C=O wavenumber</td></tr><tr><td>C–Oᵦ(H)</td><td>Double character</td><td>Stiffer → higher C–O wavenumber than a comparable alcohol</td></tr></tbody></table><p><b>The worksheet’s Q8 is the second row.</b> Approximately 1250 is higher than 1050 cm⁻¹. “Shorter/stronger, therefore lower wavenumber” reverses the final step.</p><h3>Follow the connection, not the number of drawings</h3>'+etSpecies('N:–C=C–C=O → donation can reach O<br>N:–CH₂–C=C–C=O → CH₂ blocks N donation')+'<p>The second molecule still has a conjugated C=C–C=O segment. It is the N connection that is broken. For the first, draw N⁺=C–C=C–O⁻, preserving all H atoms.</p><h3>A trap from the three-esters comparison</h3><p>An alkene on the carbonyl-carbon side (C=C–C=O) lowers the C=O stretching frequency. A vinyl group on the alkoxy side (C=O–O–C=C) competes for that oxygen’s lone-pair donation; the carbonyl can retain more double character and stretch at higher wavenumber. Locate the donor and the exact target bond.</p><h3>Explain it in one causal sentence</h3><p>“The lone pair on ___ can donate along ___. This gives the measured ___ bond more ___ character, making it ___ stiff, so its IR wavenumber is ___.”</p><p><b>Do not write:</b> “more resonance lets more light pass.” Peak position and intensity are different questions. Hooke’s model uses square roots: ν̃ ∝ √(k/μ), not k/μ itself.</p><p class="muted">Teaching references: <a href="https://www2.chemistry.msu.edu/faculty/reusch/virttxtjml/special2.htm">Reusch: carbonyl donation and IR</a>; <a href="https://www2.chemistry.msu.edu/faculty/reusch/VirtTxtJml/Spectrpy/InfraRed/irspec1.htm">Reusch: vibrational spectroscopy</a>; <a href="https://journals.sagepub.com/doi/10.1366/000370270774372489">McManis: vinyl ester spectra</a>. Values vary with environment; these are qualitative course comparisons.</p>';}
+
+/* Instruction -> independent transfer -> delayed retrieval. Uses the existing
+ * immutable attempt ledger, saved drills and cloud merge; no new grade metric. */
+QUESTIONS.push(...ET_QUESTIONS);
+const etNorm=s=>String(s).toLowerCase().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/^[+]/,'');
+function etGrade(q,values){return q.fields.map((f,i)=>{const value=etNorm(values[i]??''),numeric=f.numeric&&/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)&&Math.abs(Number(value)-Number(f.answer))<1e-9;return {field:f.label,code:f.code,answer:String(values[i]??''),expected:f.answer,ok:!!numeric||f.accept.some(a=>etNorm(a)===value),note:f.note};});}
+function etRows(skill){return (S.attempts||[]).filter(a=>a.transfer?.version===ET_REVISION&&(!skill||a.transfer.skill===skill));}
+function etRounds(skill){
+  const groups=new Map();etRows(skill).forEach(a=>{if(!groups.has(a.u))groups.set(a.u,[]);groups.get(a.u).push(a);});
+  return [...groups.values()].map(rows=>({rows,ts:Math.max(...rows.map(a=>a.ts)),phase:rows[0].transfer.phase,complete:new Set(rows.map(a=>a.id)).size===3,clean:rows.length===3&&rows.every(a=>a.ok&&!a.g&&!a.dk&&!a.rf&&(a.transfer.phase==='guided'||!a.h)&&!a.sr&&!a.transfer.help)})).sort((a,b)=>a.ts-b.ts);
+}
+function etStatus(skill,now=Date.now()){
+  const rounds=etRounds(skill),last=rounds.filter(r=>r.complete&&(r.phase!=='review'||!r.clean)).at(-1),lastMiss=rounds.filter(r=>r.complete&&!r.clean).at(-1)?.ts||0,checks=rounds.filter(r=>r.complete&&r.ts>lastMiss&&['check','delayed'].includes(r.phase)&&r.clean);
+  if(!last)return {phase:'guided',label:'Learn the method',due:0,checks};
+  if(!last.clean)return {phase:'guided',label:'Repair the missed step',due:0,checks};
+  if(last.phase==='guided')return {phase:'check',label:'Try different problems without help',due:0,checks};
+  const delay=checks.length===1?86400000:checks.length===2?3*86400000:7*86400000,due=last.ts+delay;
+  return {phase:'delayed',label:due<=now?'Delayed check due':'Next check '+new Date(due).toLocaleDateString(undefined,{month:'short',day:'numeric'}),due,checks};
+}
+function etNext(now=Date.now()){
+  const list=ET_TRACKS.map(t=>({t,s:etStatus(t.id,now)}));
+  // Due retention first, then unfinished instruction/check. No invented deadline.
+  return list.filter(x=>x.s.phase==='delayed'&&x.s.due<=now).sort((a,b)=>a.s.due-b.s.due)[0]||list.find(x=>x.s.phase!=='delayed')||list.sort((a,b)=>a.s.due-b.s.due)[0];
+}
+function etSeen(){return new Set([...(S.attempts||[]).map(a=>a.id),...(S.practiceSelections||[]).flatMap(p=>p.plannedIds||[])]);}
+function etPick(skill,phase){
+  const seen=etSeen(),pool=ET_QUESTIONS.filter(q=>q.transferSkill===skill&&q.transferPhase===(phase==='guided'?'guided':'check'));
+  const latest=id=>(S.attempts||[]).filter(a=>a.id===id).at(-1)?.ts||0;
+  const sorted=pool.slice().sort((a,b)=>Number(seen.has(a.id))-Number(seen.has(b.id))||latest(a.id)-latest(b.id)||a.id.localeCompare(b.id));
+  const slots=skill==='naming'?[q=>q.parentRule==='length',q=>q.parentRule==='substituents',q=>q.parentRule==='alphabet']:skill==='acidbase'?[q=>q.operation,q=>q.equilibrium,q=>q.operation]:skill==='resonance-ir'?[q=>q.irKind==='bond',q=>q.irKind==='connectivity',q=>q.irKind==='physics']:[q=>q.chargeMove,q=>!q.chargeMove,q=>q.chargeMove];
+  const picked=[];slots.forEach(test=>{const q=sorted.find(q=>!picked.includes(q)&&test(q))||sorted.find(q=>!picked.includes(q));if(q)picked.push(q);});return picked;
+}
+function etStart(skill,phase){
+  const track=ET_TRACKS.find(t=>t.id===skill);if(!track)return;
+  const status=etStatus(skill);
+  if(phase!=='guided'&&status.phase==='delayed'&&status.due>Date.now())phase='review';
+  if(phase==='delayed'&&status.phase!=='delayed')phase='check';
+  const queue=etPick(skill,phase),seen=etSeen();if(queue.length!==3)throw Error('Transfer route needs three tasks');
+  parkCurrentDrill();
+  const runId=makeRunId('transfer-'+phase),fresh=Object.fromEntries(queue.map(q=>[q.id,!seen.has(q.id)]));
+  S.drill={queue,i:0,right:0,wrong:0,answered:false,log:[],runId,topic:track.topic,cold:phase!=='guided',scopeName:track.title+' · '+phase,sketchDrafts:{},transferCoach:{version:ET_REVISION,skill,phase,fresh,help:false,drafts:{},startedAt:Date.now()}};
+  S.practiceSelections.push({runId,ts:Date.now(),rotationKey:'transfer-'+skill,plannedIds:queue.map(q=>q.id),purpose:'presentation-not-performance'});
+  snapshotDrill(0);save();go('drill');
+}
+function etOpen(skill){courseNavigationSaveWork();S.transferLesson=skill;S.transferLessonStep=0;go('transferLesson');}
+function etBtn(label,fn,secondary=false,attrs={}){return el('button',{type:'button',class:'btn'+(secondary?' ghost':''),onclick:fn,...attrs},label);}
+function etWorked(skill){
+  if(skill==='resonance-ir')return etIRWorked();
+  if(skill==='naming'){
+    const g=etTie(8),best=['d','c','a','p4','p5','p6','p7','p8'],wrong=Array.from({length:8},(_,i)=>'p'+(i+1));
+    const mark=(path,color)=>path.slice(1).map((id,i)=>'<path d="M'+g.nodes[path[i]].join(' ')+' L'+g.nodes[id].join(' ')+'" stroke="'+color+'" stroke-width="7" opacity=".45" fill="none"/>').join('');
+    let figure=etFigure(g,'Worked example: compare two eight-carbon parent chains').replace('</svg>',mark(wrong,'#cb6b42')+mark(best,'#16856c')+best.map((id,i)=>'<text x="'+(g.nodes[id][0]+9)+'" y="'+(g.nodes[id][1]+18)+'" font-size="15" fill="#075d49">'+(i+1)+'</text>').join('')+'</svg>');
+    return figure+'<p><b>Orange:</b> eight parent carbons, one sec-butyl substituent. <b>Green:</b> also eight carbons, but two substituents (methyl and propyl). Choose green.</p><p>Numbering from the fork gives methyl at 3 and propyl at 4. Reversing gives 5 and 6. The complete name is <b>3-methyl-4-propyloctane</b>.</p><p><b>Why the tempting answer loses:</b> choosing the longest horizontal line is not enough when another longest path leaves more substituents.</p>';
+  }
+  if(skill==='acidbase')return etSpecies('CH₃CH₂NH₂ + H⁺ → CH₃CH₂NH₃⁺')+'<p>Conjugate <b>acid</b>: N goes from two H atoms to three; charge goes from 0 to +1. For its conjugate <b>base</b>, the same starting amine loses H⁺ instead: CH₃CH₂NH⁻, charge −1. Do not swap these operations.</p>'+etSpecies('PhO⁻ + H₂O ⇌ PhOH + HO⁻')+'<p>Using pKa(H₂O) = 15.7 and pKa(PhOH) = 9.9: ΔpKa = 9.9 − 15.7 = −5.8. K ≪ 1, so <b>reactants</b> are favored. Water does not quantitatively consume phenoxide.</p><p>Now compare a different reaction: PhO⁻ + propanoic acid (4.9) ⇌ PhOH (9.9) + propanoate. ΔpKa = +5.0, so <b>products</b> are favored. They are two different equilibria.</p>';
+  return etSpecies('⁻CH₂(A)–CH(B)=CH₂(C) ↔ CH₂(A)=CH(B)–CH₂(C)⁻')+'<ol><li>Start the first curved arrow at the lone pair on A and end at the A–B bond.</li><li>At the same time, start the second arrow at the B=C π bond and end on C. This prevents overfilling B.</li><li>C ends with three bonds and a lone pair: FC = 4 − 2 − 3 = −1. No H atom moved.</li></ol><p>The hybrid has <b>δ− at A and C</b>, not B. Draw one sigma framework with partial π lines on A–B and B–C. It is not two full structures inside brackets.</p><p>A π pair becoming a lone pair does not disappear. Count electrons again at <em>both</em> ends and include the other simultaneous arrow.</p>';
+}
+function etLessonPanels(t){
+  const method={title:'The decision sequence',body:'<ol>'+t.steps.map(s=>'<li>'+s+'</li>').join('')+'</ol>'},worked=etWorked(t.id);
+  if(t.id==='resonance-ir'){
+    const host=document.createElement('div');host.innerHTML=worked;const panels=[method];
+    [...host.children].forEach(node=>{if(node.tagName==='H3')panels.push({title:node.textContent,body:''});else panels.at(-1).body+=node.outerHTML;});return panels;
+  }
+  if(t.id==='acidbase'){
+    const host=document.createElement('div');host.innerHTML=worked;const nodes=[...host.children];
+    return [method,{title:'First: construct the conjugate',body:nodes.slice(0,2).map(n=>n.outerHTML).join('')},{title:'Second: test water separately',body:nodes.slice(2,4).map(n=>n.outerHTML).join('')},{title:'Third: test the desired reaction',body:nodes.slice(4).map(n=>n.outerHTML).join('')}];
+  }
+  if(t.id==='resonance'){
+    const split=worked.indexOf('<p>The hybrid');return [method,{title:'Move the electron pairs',body:worked.slice(0,split)},{title:'Combine the contributors',body:worked.slice(split)}];
+  }
+  return [method,{title:'Compare the two parent paths',body:worked}];
+}
+function etRenderLesson(v){
+  const t=ET_TRACKS.find(t=>t.id===S.transferLesson)||etNext().t;
+  const panels=etLessonPanels(t),step=Math.max(0,Math.min(S.transferLessonStep||0,panels.length-1)),panel=panels[step];
+  v.appendChild(etBtn('← Training desk',()=>go('transferCoach'),true));
+  const card=el('article',{class:'card et-card','data-transfer-lesson':t.id});
+  card.innerHTML='<span class="tag teal">SHORT LESSON · STEP '+(step+1)+' OF '+panels.length+'</span><h1>'+t.title+'</h1><p>'+t.reason+'</p><progress class="et-progress" max="'+panels.length+'" value="'+(step+1)+'" aria-label="Lesson step"></progress><section class="et-panel" data-transfer-panel="'+step+'"><h2 tabindex="-1" id="et-step-heading">'+panel.title+'</h2>'+panel.body+'</section>';
+  // These two contrasts are clearer as stacked cards than a narrow mobile table.
+  card.querySelectorAll('.et-panel table').forEach(table=>{
+    const comparison=el('div',{class:'et-bond-comparison'});
+    table.querySelectorAll('tbody tr').forEach(row=>{const cells=[...row.cells],c=el('section',{class:'why'});c.appendChild(el('h3',{},cells[0].textContent));c.appendChild(el('p',{},'Donation adds '+cells[1].textContent.toLowerCase()+'. '+cells[2].textContent+'.'));comparison.appendChild(c);});table.replaceWith(comparison);
+  });
+  const nav=el('div',{class:'et-step-nav',role:'navigation','aria-label':'Lesson steps'}),move=n=>{S.transferLessonStep=n;render();document.getElementById('et-step-heading')?.focus();};
+  nav.appendChild(etBtn('← Previous step',()=>move(step-1),true,{disabled:step===0,'data-transfer-previous':'true'}));
+  if(step<panels.length-1)nav.appendChild(etBtn('Next · '+panels[step+1].title,()=>move(step+1),false,{'data-transfer-step-next':'true'}));
+  else nav.appendChild(el('span',{class:'muted'},'Example complete. Now make the decisions yourself.'));
+  card.appendChild(nav);
+  const actions=el('div',{class:'et-lesson-actions'});actions.appendChild(etBtn('Your turn · 3 coached problems',()=>etStart(t.id,'guided'),step<panels.length-1,{'data-transfer-guided':t.id}));
+  const skip=el('details');skip.appendChild(el('summary',{},'Already know the method?'));skip.appendChild(etBtn('Check me without help',()=>etStart(t.id,'check'),true));actions.appendChild(skip);card.appendChild(actions);v.appendChild(card);
+  if(t.lab){const c=el('section',{class:'card et-card'});c.innerHTML='<h2>Draw the arrows and product</h2><p>Typed answers check your decisions. The drawing lab checks the actual arrow moves and product separately.</p>';c.appendChild(etBtn('Open the arrow-and-product drawing lab',()=>{courseNavigationSaveWork();alStart(t.lab,'set');},true));v.appendChild(c);}
+}
+function etHomeCard(v,compact=false){
+  if(typeof PROFILE!=='undefined'&&!PROFILE)return;
+  const {t,s}=etNext(),pending=S.pausedDrill?.transferCoach,wait=s.phase==='delayed'&&s.due>Date.now(),card=el('section',{class:'card teal et-card','data-transfer-home':'true'});
+  card.innerHTML='<span class="tag teal">EXAM TRANSFER TRAINING</span><h'+(compact?'2':'1')+'>'+(pending?'Continue your saved training':wait?'Let this settle. Keep the next chapter moving.':t.title)+'</h'+(compact?'2':'1')+'><p>'+(pending?esc(S.pausedDrill.scopeName):wait?'The next scheduled retrieval check is '+new Date(s.due).toLocaleString()+'. Earlier reviews remain available; they do not count as delayed checks.':t.reason)+'</p><p><b>'+(pending?'Resume exactly where you stopped':s.label)+'</b> · correctness first; timing stays descriptive.</p>';
+  card.appendChild(etBtn(pending?'Resume saved training':wait?'Open Chapter 5 lessons':s.phase==='guided'?'Start the short lesson':'Start 3 independent problems',()=>pending?resumeDrill():wait?courseNavigationGo('ch5'):s.phase==='guided'?etOpen(t.id):etStart(t.id,s.phase),false,{'data-transfer-next':'true'}));
+  if(compact)card.appendChild(etBtn('See the repair tracks',()=>{courseNavigationSaveWork();go('transferCoach');},true));
+  card.appendChild(el('p',{class:'muted'},'No rank or grade prediction. Guided answers, repeats, fresh attempts and delayed checks are different evidence.'));v.appendChild(card);
+}
+function etRenderDesk(v){
+  etHomeCard(v);
+  ET_TRACKS.forEach(t=>{
+    const s=etStatus(t.id),rows=etRows(t.id),fresh=rows.filter(a=>a.transfer.fresh&&a.transfer.phase!=='guided'&&a.ok&&!a.g&&!a.h&&!a.transfer.help).length,card=el('section',{class:'card et-card'});
+    card.innerHTML='<h2>'+t.title+'</h2><p>'+t.reason+'</p><p>'+s.label+' · '+rows.length+' answers logged · '+fresh+' first-presentation independent answers correct. Structured task evidence only; not mastery.</p>';
+    const misses=rows.slice(-9).flatMap(a=>a.transfer.fields.filter(f=>!f.ok).map(f=>f.code)),unique=[...new Set(misses)];
+    if(unique.length)card.appendChild(el('p',{class:'muted'},'Recent repair targets: '+unique.join(' · ')));
+    card.appendChild(etBtn('Lesson and worked example',()=>etOpen(t.id),true));card.appendChild(etBtn('Independent practice',()=>etStart(t.id,'check'),true));v.appendChild(card);
+  });
+  const d=el('details',{class:'card'});d.innerHTML='<summary>How this route changes with your answers</summary><p>A miss or help request routes back to instruction. A clean three-task check schedules retrieval after 24 hours, then 3 days, then 7 days. These are starting intervals to test, not an optimal schedule proven for you. A repeat is labeled; it never becomes a new first-presentation success.</p><p>Only entered answers are auto-graded. Scratchpad ink and explanations are saved for review, not scored by text matching. Check scores stay out of the legacy readiness percentage. Passing this bounded bank is not a guarantee of exam performance.</p><a href="https://ies.ed.gov/ncee/wwc/PracticeGuide/1" target="_blank" rel="noopener">Why examples, retrieval and spacing are combined</a>';v.appendChild(d);
+  v.appendChild(etBtn('All course chapters',()=>courseNavigationGo('overview'),true));
+}
+function etSubmit(q,D,values,help,reasoning){
+  if(D.answered||values.some(x=>!String(x).trim()))return false;
+  const fields=etGrade(q,values),ok=fields.every(f=>f.ok),meta=D.transferCoach,now=Date.now();
+  D.answered=true;const ev=logAttempt(q,ok,!!help,D,false,values.join(' | '));
+  ev.transfer={version:ET_REVISION,skill:meta.skill,phase:meta.phase,fresh:!!meta.fresh[q.id],help:!!help||meta.help,fields,reasoning,reasoningReviewed:false};
+  if(meta.phase==='guided'||help||meta.help){ev.h=Math.max(1,ev.h||0);delete ev.c;}
+  ev.transfer.delayed=meta.phase==='delayed';
+  if(D.sketchDrafts?.[q.id]){ev.drawing={kind:'ungraded-transfer-scratch',...JSON.parse(JSON.stringify(D.sketchDrafts[q.id]))};delete ev.drawing.inkHistory;}
+  if(ok)D.right++;else D.wrong++;
+  D.log.push({id:q.id,ok,ts:now,ans:values.slice(),transfer:ev.transfer});
+  rebuildQstatsFromAttempts();snapshotDrill(D.i+1);save();return true;
+}
+function etRenderTask(v,D){
+  const q=D.queue[D.i],meta=D.transferCoach,guided=meta.phase==='guided';
+  if(!q){etRenderResult(v,D);return;}
+  if(D._shownQ!==q.id+':'+D.i){D._shownQ=q.id+':'+D.i;D._shownAt=Date.now();D._hiddenMs=0;D._clockPausedAt=document.hidden?Date.now():0;}
+  v.appendChild(etBtn('Save & return to training desk',()=>{courseNavigationSaveWork();go('transferCoach');},true));
+  const card=el('section',{class:'card et-card','data-transfer-task':q.id});
+  card.innerHTML='<span class="tag teal">'+(guided?'COACHED PRACTICE':meta.phase==='delayed'?'DELAYED RETRIEVAL':meta.phase==='review'?'EARLY RETRIEVAL PRACTICE':'INDEPENDENT CHECK')+' · '+(D.i+1)+' / 3</span><h2>'+ET_TRACKS.find(t=>t.id===meta.skill).title+'</h2><p class="muted">'+(meta.fresh[q.id]?'First presentation in this app route; outside exposure is unknown.':'Previously presented · retrieval practice, not a fresh item.')+'</p>'+q.prompt;
+  if(guided)card.appendChild(el('p',{class:'why'},ET_TRACKS.find(t=>t.id===meta.skill).steps.join(' ')));
+  const draft=meta.drafts[q.id]||(meta.drafts[q.id]={values:q.fields.map(()=>''),reasoning:'',help:false});
+  const keep=()=>{snapshotDrill(D.i);save();};
+  const inputs=q.fields.map((f,i)=>{
+    const label=el('label',{class:'et-field'},f.label),input=el('input',{type:'text',class:'answerbox wide','aria-label':f.label,autocomplete:'off',spellcheck:'false'});input.value=draft.values[i];input.disabled=D.answered;
+    input.addEventListener('input',()=>{draft.values[i]=input.value;keep();});label.appendChild(input);card.appendChild(label);return input;
+  });
+  const reason=el('textarea',{class:'answerbox wide',rows:2,'aria-label':'My reasoning (saved for review, not auto-graded)',placeholder:'Optional: what led you to this answer?'});reason.value=draft.reasoning;reason.disabled=D.answered;reason.addEventListener('input',()=>{draft.reasoning=reason.value;keep();});card.appendChild(reason);
+  const lab=el('label',{class:'et-help'}),help=el('input',{type:'checkbox','data-transfer-help':'true'});help.checked=draft.help;help.disabled=D.answered;help.addEventListener('change',()=>{draft.help=help.checked;keep();});lab.appendChild(help);lab.appendChild(document.createTextNode('I used notes/help or guessed. Keep this as supported evidence.'));card.appendChild(lab);
+  const scratch=el('details',{class:'et-scratch'});scratch.appendChild(el('summary',{},'Draw / work it out · saved but not automatically graded'));
+  scratch.addEventListener('toggle',()=>{if(scratch.open&&!scratch.dataset.built){scratch.dataset.built='true';renderCourseSketch(scratch,q,D,D.answered);}});card.appendChild(scratch);
+  const note=el('p',{role:'status','aria-live':'polite'});card.appendChild(note);
+  if(!D.answered){
+    card.appendChild(etBtn(guided?'Check my steps':'Save answer & continue',()=>{
+      if(inputs.some(i=>!i.value.trim())){note.textContent='Enter each answer before continuing. A best attempt is useful.';return;}
+      etSubmit(q,D,inputs.map(i=>i.value.trim()),help.checked,reason.value);
+      if(!guided){D.i++;D.answered=false;snapshotDrill(D.i);save();}render();
+    },false,{'data-transfer-submit':'true'}));
+    if(!guided)card.appendChild(etBtn('I need instruction on this',()=>{meta.help=true;draft.help=true;keep();const explanation=el('div',{class:'why'});explanation.innerHTML='<b>Supported now, not a cold result.</b><p>'+q.why+'</p>';card.appendChild(explanation);help.checked=true;},true));
+  }else{
+    const row=D.log.at(-1);row.transfer.fields.forEach(f=>{const p=el('p',{class:'why'});p.textContent=(f.ok?'✓ ':'Revisit: ')+f.field+(f.ok?'':'. '+f.note+' Correct entry: '+f.expected);card.appendChild(p);});
+    card.appendChild(el('p',{},q.why));card.appendChild(etBtn('Next problem',()=>{D.i++;D.answered=false;snapshotDrill(D.i);save();render();}));
+  }
+  if(!guided)card.appendChild(el('p',{class:'muted'},'Feedback waits until all three answers are saved, so one answer does not teach the next.'));
+  v.appendChild(card);
+}
+function etRenderResult(v,D){
+  const meta=D.transferCoach,card=el('section',{class:'card et-card','data-transfer-result':'true'}),rows=D.log,clean=rows.length===3&&rows.every(r=>r.ok&&!r.transfer.help)&&meta.phase!=='guided',state=etStatus(meta.skill);
+  card.innerHTML='<span class="tag teal">'+(meta.phase==='guided'?'GUIDED WORK':'CHECK')+' COMPLETE</span><h1>'+D.right+' / 3 structured answers correct</h1><p>'+(meta.phase==='guided'?'This was instruction, not independent evidence. Next, remove the prompts and try different examples.':clean?'Keep this as a small piece of evidence. A delayed check is scheduled; full paper drawings still need independent review.':'The missed/helped steps below stay in repair. Start from the exact decision, not the whole chapter.')+'</p>';
+  rows.forEach(r=>{const q=ET_QUESTIONS.find(q=>q.id===r.id),d=el('details');d.innerHTML='<summary>'+q.id+' · '+(r.ok?'correct':'repair')+'</summary><p>'+q.why+'</p>';r.transfer.fields.forEach(f=>d.appendChild(el('p',{},f.field+': you entered '+f.answer+'; expected '+f.expected+(f.ok?' ✓':' — '+f.note))));card.appendChild(d);});
+  card.appendChild(etBtn(state.phase==='check'?'Try different problems without help':state.phase==='guided'?'Repair with the worked example':'See my next training step',()=>state.phase==='check'?etStart(meta.skill,'check'):state.phase==='guided'?etOpen(meta.skill):go('transferCoach')));
+  card.appendChild(el('p',{class:'muted'},'No rank, mastery badge or predicted exam score is awarded.'));v.appendChild(card);
+}
+// Extend, never replace, the existing saved-work contract.
+const ET_PREV_SNAPSHOT=snapshotDrill;
+snapshotDrill=function(idx){ET_PREV_SNAPSHOT(idx);if(S.drill?.transferCoach&&S.pausedDrill){S.pausedDrill.transferCoach=JSON.parse(JSON.stringify(S.drill.transferCoach));S.pausedDrill.sketchDrafts=S.drill.sketchDrafts||{};safeStore.set('pausedDrill',S.pausedDrill);}};
+const ET_PREV_RESUME=resumeDrill;
+resumeDrill=function(){const meta=S.pausedDrill?.transferCoach;if(meta){const p=S.pausedDrill,queue=p.ids.map(id=>QUESTIONS.find(q=>q.id===id));if(queue.some(q=>!q))return;S.drill={...p,queue,transferCoach:JSON.parse(JSON.stringify(meta)),answered:false,sketchDrafts:p.sketchDrafts||{}};go('drill');return;}ET_PREV_RESUME();};
+const ET_PREV_DRILL=VIEWS.drill;VIEWS.drill=v=>S.drill?.transferCoach?etRenderTask(v,S.drill):ET_PREV_DRILL(v);
+const ET_PREV_HOME=VIEWS.home;VIEWS.home=v=>{ET_PREV_HOME(v);if(typeof PROFILE!=='undefined'&&!PROFILE)return;const host=el('div');etHomeCard(host,true);v.prepend(host);};
+VIEWS.transferCoach=etRenderDesk;VIEWS.transferLesson=etRenderLesson;NAV_GROUP.transferCoach='home';NAV_GROUP.transferLesson='home';
+const etStyle=el('style');etStyle.textContent='.et-card{max-width:100%;overflow-wrap:anywhere}.et-card h1{font-size:1.7rem}.et-card p,.et-card li{line-height:1.65}.et-card li{margin:8px 0}.et-card .btn{margin:7px 7px 0 0;white-space:normal}.et-figure{display:block;width:100%;max-width:660px;max-height:280px;margin:22px auto;color:#243c47;overflow:visible}.et-species{font-size:clamp(17px,2.4vw,24px);font-family:ui-monospace,monospace;padding:20px 12px;background:#f1f6f4;border-radius:10px;line-height:2;overflow-wrap:anywhere}.et-field{display:block;margin:14px 0;font-weight:650}.et-field input{display:block;width:100%;max-width:620px;margin-top:7px}.et-help{display:flex;align-items:start;gap:9px;margin:14px 0;font-size:.85rem}.et-help input{flex:none;margin-top:5px}.et-scratch{margin:15px 0}.et-card details{margin:16px 0}.et-card summary{cursor:pointer;min-height:35px}.et-progress{width:100%;height:6px;accent-color:#16856c;margin:4px 0 16px}.et-step-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #d9e2df;padding-top:12px}.et-step-nav .btn{flex:1}.et-step-nav .btn:disabled{opacity:.4;cursor:default}.et-lesson-actions{margin-top:20px;border-top:1px solid #d9e2df;padding-top:12px}.et-panel h2:focus{outline:2px solid #16856c;outline-offset:5px}.et-panel table{width:100%;border-collapse:collapse;font-size:.9rem}.et-panel th,.et-panel td{padding:9px 6px;border-bottom:1px solid #d9e2df;text-align:left;vertical-align:top}@media(max-width:500px){.et-card .btn{width:100%;margin-right:0}.et-card h1{font-size:1.4rem}.et-step-nav{flex-wrap:wrap}.et-step-nav .btn{flex:1 1 130px}.et-panel table{font-size:.8rem}}';document.head.appendChild(etStyle);
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
