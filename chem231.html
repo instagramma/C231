@@ -6,7 +6,9 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.110 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.111 (LOCAL ONLY)
+  v3.111 (2026-10-08): CHAPTER STARTING + READINESS CHECKS. Distinct fixed
+  samples, sealed answers, saved drafts, separate manual review and topic gaps.
   v3.110 (2026-10-07): LEARN, CHECK, CONTINUE. Brief checks after selected main
   ideas, correct-to-continue, optional skip-rest after correct. Separate first
   responses, retries, rereads and skips; resource engagement is not mastery.
@@ -1727,7 +1729,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.110 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.111 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -15014,6 +15016,7 @@ function leBuildExport(){
       worksheetWork:'Current device only.',lessonExposure:'Current device only; latest 400 visits; may be disabled.',
       paperPracticeSessions:'Current device only; learner-recorded checkpoints and wall-clock time, not attention, automatic grades, or inferred focus.',
       studyChallengeNotes:'Current device only; latest 200 optional extra-demand explanations, not graded. Joined by runId and question.',
+      chapterChecks:'Current device/profile only; starting and final chapter samples with sealed first submissions, revisions, confidence, coverage limits and separately self-reviewed drawings. Not an exam prediction or a mastery award.',
       lessonChecks:'Current device/profile only; immediate checks after teaching. First responses, supported retries and skips stay separate; no readiness credit.',
       resourceEngagement:'Current device/profile only; resource clicks are not viewing. Optional player measurements describe observed playback, never understanding.',
       fieldSelection:'Explicit learning-data field allowlist. Account credentials and separate sensitive data sources are not read.',
@@ -15024,6 +15027,7 @@ function leBuildExport(){
     worksheets,lessonExposure:{tier:'exposure',enabled:safeStore.get('lessonTimeEnabled',true),events:lessons},
     paperPracticeSessions:leClone(safeStore.get('paperPracticeSessions',[])),
     studyChallengeNotes:safeStore.get('studyChallengeNotes',[]).map(r=>lePick(r,['runId','question','chapter','text','updatedAt','review','qa'])),
+    chapterChecks:typeof ccExport==='function'?ccExport():null,
     lessonChecks:typeof lcExport==='function'?lcExport():null,
     resourceEngagement:typeof leEngagementExport==='function'?leEngagementExport():null,
     retentionAndMissingness:{attemptCap:5000,writtenNoteCap:120,lessonVisitCap:400,olderMissingFields:'Not captured or unknown; never fill with zero, confident, independent, or no study.'}};
@@ -15914,6 +15918,386 @@ window.addEventListener('pagehide',()=>[...leEngPlayers].forEach(entry=>leEngVid
 document.addEventListener('visibilitychange',()=>leEngPlayers.forEach(entry=>{leEngVideoSample(entry);entry.previous=null;leEngVideoSave(entry);}));
 window.addEventListener('blur',()=>leEngPlayers.forEach(entry=>{leEngVideoSample(entry);entry.previous=null;leEngVideoSave(entry);}));
 window.addEventListener('focus',()=>leEngPlayers.forEach(entry=>{entry.previous=null;}));
+
+/* Chapter starting/final checks: fixed plans and device-local records only.
+ * No DOM, bank mutation, S.drill mutation, ordinary attempt credit or mastery.
+ * Existing bank items are samples, not equivalent forms or proven unseen work. */
+const CC_VERSION=1,CC_BLUEPRINT_VERSION='2026-10-08.1',CC_RUN_CAP=30;
+const CC_AUTO_TYPES=['mc','text','num','multiSelect','blanks','multi'];
+function ccClone(value){return value===undefined?null:JSON.parse(JSON.stringify(value));}
+function ccPick(value,keys){const out={};keys.forEach(key=>{if(value&&Object.prototype.hasOwnProperty.call(value,key))out[key]=ccClone(value[key]);});return out;}
+function ccFingerprint(value){
+  if(typeof leFingerprint==='function')return leFingerprint(value);
+  const stable=v=>v&&typeof v==='object'?(Array.isArray(v)?'['+v.map(stable).join(',')+']':'{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stable(v[k])).join(',')+'}'):JSON.stringify(v);
+  const text=stable(value);let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619);}return 'cc-fnv1a32:'+((hash>>>0).toString(16));
+}
+function ccQuestionFingerprint(q){return ccFingerprint(ccPick(q,['id','type','prompt','template','choices','choiceLabels','answer','accept','tolerance','fields','model','rubric','production','arrowBoard','resonanceBoard','correctedAt']));}
+function ccQuestion(id){return QUESTIONS.find(q=>q.id===id)||null;}
+function ccFamilies(q){return typeof adaptiveLearningFamilies==='function'?adaptiveLearningFamilies(q):['id:'+q.id,...(q.transferFamily?['transfer:'+q.transferFamily]:[]),...(q.sourceModelIds||[]).map(id=>'source:'+id)];}
+function ccLevel(q){return typeof adaptiveLearningDifficulty==='function'?adaptiveLearningDifficulty(q):Math.max(0,Math.min(3,Number(q.diff)||2));}
+function ccEligible(q){return !!q&&!q.preview&&q.readinessEligible!==false&&(typeof adaptiveLearningEligible!=='function'||adaptiveLearningEligible(q));}
+function ccAutoSupported(q){
+  if(!q||!CC_AUTO_TYPES.includes(q.type)||q.requiresDrawing||q.arrowBoard||q.resonanceBoard||q.production||q.drawFirst||(q.bondLineFirst||[]).length||q.customGrade||q.checker)return false;
+  if(q.type==='mc')return Array.isArray(q.choices)&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.choices.length;
+  if(q.type==='multiSelect')return Array.isArray(q.choices)&&Array.isArray(q.answer)&&q.answer.length>0&&new Set(q.answer).size===q.answer.length&&q.answer.every(i=>Number.isInteger(i)&&i>=0&&i<q.choices.length);
+  if(q.type==='num')return Number.isFinite(Number(q.answer))&&q.answer!==null&&q.answer!=='';
+  if(q.type==='text')return (q.accept||[q.answer]).some(a=>typeof a==='string'||typeof a==='number');
+  return Array.isArray(q.fields)&&q.fields.length>0&&q.fields.every(f=>f&&(['string','number'].includes(typeof f.answer)||(Array.isArray(f.accept)&&f.accept.length))&&(!f.kind||['num','text','select','order'].includes(f.kind))&&(!(q.type==='multi'||f.kind==='num')||Number.isFinite(Number(f.answer))));
+}
+function ccBlueprint(chapter){
+  const ch=CHAPTERS.find(c=>c.id===chapter);if(!ch)return {version:CC_BLUEPRINT_VERSION,chapter,label:'Unavailable chapter',domains:[],available:false};
+  const units=(CHAPTER_LEARNING_UNITS[chapter]||[]).filter(u=>!u.preview);
+  const domains=units.length?units.map(u=>({id:u.id,label:u.title,topics:[u.topic],unitIds:[u.id],poolIds:[...new Set(['guidedIds','practiceIds','coldIds','proofIds'].flatMap(key=>u[key]||[]).concat(QUESTIONS.filter(q=>q.adaptiveSkill===u.id).map(q=>q.id)))]})):ch.topics.map(topic=>({id:topic,label:TOPICS[topic]?.name||topic,topics:[topic],unitIds:[]}));
+  return {version:CC_BLUEPRINT_VERSION,chapter,label:ch.name,available:true,domains,scope:'Current core chapter lessons, or current chapter topics where no lesson map exists.',targetPerDomain:2};
+}
+function ccStore(){const value=safeStore.get('chapterChecks',{version:CC_VERSION,runs:[]});return {version:CC_VERSION,runs:Array.isArray(value?.runs)?ccClone(value.runs):[]};}
+function ccCompleted(run){return run?.status==='completed'||run?.status==='complete'||!!run?.completedAt;}
+function ccBaseline(chapter,runs=ccStore().runs){return runs.filter(r=>r.chapter===chapter&&r.phase==='starting'&&ccCompleted(r)).sort((a,b)=>(a.completedAt||a.startedAt)-(b.completedAt||b.startedAt))[0]||null;}
+function ccSave(store){
+  const rows=[...new Map((store.runs||[]).filter(r=>r&&r.id).map(r=>[r.id,ccClone(r)])).values()].sort((a,b)=>(a.startedAt||0)-(b.startedAt||0));
+  const protectedIds=new Set([...new Set(rows.map(r=>r.chapter))].map(ch=>ccBaseline(ch,rows)?.id).filter(Boolean));
+  const protectedRows=rows.filter(r=>protectedIds.has(r.id)),recent=rows.filter(r=>!protectedIds.has(r.id)).slice(-Math.max(0,CC_RUN_CAP-protectedRows.length));
+  const next={version:CC_VERSION,runs:[...protectedRows,...recent].sort((a,b)=>(a.startedAt||0)-(b.startedAt||0))};safeStore.set('chapterChecks',next);return ccClone(next);
+}
+function ccRun(id){return ccStore().runs.find(r=>r.id===id)||null;}
+function ccExposure(){
+  const ids=new Set(),families=new Set(),lessons=new Set(),state=typeof S==='undefined'?{}:S;
+  const mark=id=>{if(!id)return;ids.add(id);const q=ccQuestion(id);if(q)ccFamilies(q).forEach(f=>families.add(f));};
+  (state.attempts||[]).forEach(a=>mark(a.id));
+  Object.entries(state.qstats||{}).forEach(([id,v])=>{if((v.r||0)+(v.w||0)+(v.gr||0)+(v.gw||0)+(v.dk||0)>0)mark(id);});
+  Object.keys(state.questionFlags||{}).forEach(mark);
+  ccStore().runs.forEach(run=>Object.keys(run.responses||{}).forEach(mark));
+  Object.entries(state.flightPrep||{}).forEach(([id,v])=>{if(v?.learnedAt)lessons.add(id);});
+  safeStore.get('lessonVisits',[]).forEach(row=>{const key=String(row.key||'');Object.values(CHAPTER_LEARNING_UNITS).flat().forEach(u=>{if(key.includes(':'+u.id+':')||key.endsWith(':'+u.id))lessons.add(u.id);});});
+  return {ids,families,lessons};
+}
+function ccPlan(chapter,phase='starting'){
+  phase=phase==='final'?'final':'starting';const blueprint=ccBlueprint(chapter),exposure=ccExposure(),baseline=phase==='final'?ccBaseline(chapter):null;
+  const items=[],gaps=[],usedIds=new Set(),usedFamilies=new Set(),baselineIds=new Set((baseline?.items||[]).map(i=>i.id)),baselineFamilies=new Set();
+  (baseline?.items||[]).forEach(item=>{const q=ccQuestion(item.id);if(q)ccFamilies(q).forEach(f=>baselineFamilies.add(f));});
+  const priorPlans=ccStore().runs.filter(r=>r.chapter===chapter),plannedCounts={};priorPlans.forEach(r=>(r.items||[]).forEach(i=>{plannedCounts[i.id]=(plannedCounts[i.id]||0)+1;}));
+  const addGap=(domain,kind,missing,note)=>gaps.push({domain,label:blueprint.domains.find(d=>d.id===domain)?.label||domain,kind,missing,note,message:note});
+  const poolFor=domain=>QUESTIONS.filter(q=>ccEligible(q)&&domain.topics.includes(q.topic)&&(!domain.poolIds||domain.poolIds.includes(q.id)));
+  const rank=(pool,target)=>pool.slice().sort((a,b)=>{
+    const score=q=>{
+      const fam=ccFamilies(q),usedFamily=fam.some(f=>usedFamilies.has(f)),baseFamily=fam.some(f=>baselineFamilies.has(f)),seen=exposure.ids.has(q.id),familySeen=fam.some(f=>exposure.families.has(f));
+      return (usedFamily?10000:0)+(baseFamily?5000:0)+(seen?1000:familySeen?700:0)+(q.familiarRepresentation||q.eligibleForUnseenTransfer===false||q.sourceKind==='learner-homework-redraw'?400:0)+Math.abs(ccLevel(q)-target)*50+(plannedCounts[q.id]||0)*5;
+    };return score(a)-score(b)||String(a.id).localeCompare(String(b.id));
+  });
+  const add=(q,domain,manualReview,target)=>{
+    const fam=ccFamilies(q),seenBefore=exposure.ids.has(q.id),seenFamilyBefore=fam.some(f=>exposure.families.has(f)),baselineFamilyOverlap=fam.some(f=>baselineFamilies.has(f)),withinFormFamilyOverlap=fam.some(f=>usedFamilies.has(f)),familiarContent=!!q.familiarRepresentation||q.eligibleForUnseenTransfer===false||q.sourceKind==='learner-homework-redraw';
+    const review=seenBefore||seenFamilyBefore||baselineFamilyOverlap||withinFormFamilyOverlap||familiarContent;
+    const item={id:q.id,domain:domain.id,domainLabel:domain.label,manualReview,type:q.type,difficulty:ccLevel(q),targetDifficulty:target,questionRevision:q.correctedAt||null,itemFingerprint:ccQuestionFingerprint(q),families:fam,seenBefore,seenFamilyBefore,baselineFamilyOverlap,withinFormFamilyOverlap,familiarContent,lessonExposure:domain.unitIds.some(id=>exposure.lessons.has(id)),review,selectionReason:review?'Review or familiar material; not fresh evidence.':'No prior item/family exposure found in retained records; outside familiarity is unknown.'};
+    items.push(item);usedIds.add(q.id);fam.forEach(f=>usedFamilies.add(f));
+    if(baselineFamilyOverlap||withinFormFamilyOverlap)addGap(domain.id,'family-overlap',0,'A different item reuses a recorded family; treat this as review, not a distinct transfer check.');
+    if(ccLevel(q)!==target)addGap(domain.id,'difficulty-match',0,'The authored target difficulty is unavailable for this slot; forms are not calibrated equivalents.');
+  };
+  blueprint.domains.forEach(domain=>{
+    const all=poolFor(domain),auto=all.filter(ccAutoSupported),available=auto.filter(q=>!usedIds.has(q.id)&&!baselineIds.has(q.id));
+    // Reserve at least one exact alternative for the final form in tiny banks.
+    const target=auto.length>=2?Math.min(2,Math.floor(auto.length/2),available.length):Math.min(2,available.length);
+    for(let slot=0;slot<target;slot++){
+      const desired=slot===0?1:2,pick=rank(available.filter(q=>!usedIds.has(q.id)),desired)[0];if(pick)add(pick,domain,false,desired);
+    }
+    const count=items.filter(i=>i.domain===domain.id&&!i.manualReview).length;
+    if(count<2)addGap(domain.id,'automatic-coverage',2-count,'Only '+count+' of 2 planned automatic questions can be supplied while keeping an alternative for the other form. This domain is incompletely sampled.');
+    if(all.some(q=>q.production||q.arrowBoard||q.resonanceBoard||q.drawFirst||(q.bondLineFirst||[]).length))addGap(domain.id,'construction-not-automatically-checked',0,'Required drawing or construction is not automatically assessed by this check. A correct short answer does not establish that skill.');
+  });
+  // Add a small, separately reviewed production sample. Do not replace missing
+  // automatic questions or award automatic correctness for paper/self-review.
+  let manualCount=0;
+  const manualDomains=blueprint.domains.slice().sort((a,b)=>Number(poolFor(a).some(ccAutoSupported))-Number(poolFor(b).some(ccAutoSupported)));
+  manualDomains.forEach(domain=>{
+    const authored=poolFor(domain).filter(q=>(q.type==='written'||q.type==='ch4production')&&q.prompt);
+    const pool=authored.filter(q=>!usedIds.has(q.id)&&!baselineIds.has(q.id));
+    const pick=manualCount<3?rank(pool,2)[0]:null;
+    if(pick){add(pick,domain,true,2);manualCount++;}
+    else if(authored.length)addGap(domain.id,'manual-coverage',1,'This drawing or written skill is not included in the limited paper sample. It remains unassessed, even when the automatic answers are correct.');
+  });
+  const limits=['A chapter sample, not a calibrated exam or a grade prediction.','Different question IDs and incomplete family tags do not prove unfamiliarity. Outside exposure is unknown.','Authored difficulty labels do not establish equivalent starting and final forms.','Drawing and written explanations require separate review; they do not raise the automatic score.'];
+  if(phase==='final'&&!baseline)limits.push('No completed starting check is linked; there is no measured starting-to-final comparison.');
+  if(gaps.length)limits.push('The listed coverage and form differences prevent a whole-chapter readiness claim.');
+  return {chapter,phase,blueprintVersion:blueprint.version,blueprint:ccClone(blueprint),items,gaps,seenCount:items.filter(i=>i.seenBefore).length,reviewCount:items.filter(i=>i.review).length,lessonExposureCount:items.filter(i=>i.lessonExposure).length,baselineRunId:baseline?.id||null,available:items.some(i=>!i.manualReview),limits};
+}
+function ccStart(chapter,phase='starting'){
+  phase=phase==='final'?'final':'starting';const pending=ccStore().runs.findLast(r=>r.chapter===chapter&&r.phase===phase&&!ccCompleted(r));if(pending)return pending;
+  const plan=ccPlan(chapter,phase);if(!plan.available)return {available:false,chapter,phase,items:[],gaps:plan.gaps,limits:plan.limits,reason:'No supported automatic questions are available for this chapter check.'};
+  const now=Date.now(),id=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?'chapter-check-'+crypto.randomUUID():'chapter-check-'+now+'-'+Math.random().toString(36).slice(2);
+  const run={id,version:CC_VERSION,chapter,phase,status:'in-progress',startedAt:now,completedAt:null,updatedAt:now,baselineRunId:plan.baselineRunId,plan,items:ccClone(plan.items),responses:{},currentIndex:0,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};return ccSaveRun(run);
+}
+function ccText(value,field=false){const text=String(value??'').toLowerCase();return field?text.replace(/²/g,'2').replace(/³/g,'3').replace(/°/g,'').replace(/[\s.]/g,''):text.replace(/[\s−]/g,'-').replace(/-+/g,'-').replace(/[^a-z0-9+\-]/g,'');}
+function ccNumber(value){if(value===null||value===undefined||String(value).trim()==='')return null;const n=Number(String(value).trim().replace(/−/g,'-'));return Number.isFinite(n)?n:null;}
+function ccGrade(q,value){
+  if(!ccAutoSupported(q))return {graded:false,correct:null,feedback:q?.type==='written'?'Written work needs separate review; it has no automatic grade.':'This response format is not automatically checked here.'};
+  let correct=false,fields;
+  if(q.type==='mc'){const n=ccNumber(value);correct=Number.isInteger(n)&&n===q.answer;}
+  else if(q.type==='num'){const n=ccNumber(value);correct=n!==null&&Math.abs(n-Number(q.answer))<=Number(q.tolerance||0);}
+  else if(q.type==='text')correct=(q.accept||[q.answer]).some(a=>ccText(value)===ccText(a))&&String(value??'').trim()!=='';
+  else if(q.type==='multiSelect'){
+    const got=Array.isArray(value)?value.map(ccNumber):[];correct=got.length===q.answer.length&&new Set(got).size===got.length&&got.every(n=>Number.isInteger(n)&&q.answer.includes(n));
+  }else{
+    const values=Array.isArray(value)?value:[];
+    fields=q.fields.map((field,index)=>{
+      const answer=values[index],number=ccNumber(answer),numeric=q.type==='multi'||field.kind==='num';
+      const ok=numeric?number!==null&&Math.abs(number-Number(field.answer))<=Number(field.tolerance||0):String(answer??'').trim()!==''&&(field.accept||[field.answer]).some(a=>ccText(answer,true)===ccText(a,true));
+      return {index,label:field.label||'Part '+(index+1),correct:ok,expected:ccClone(field.answer),submitted:ccClone(answer)};
+    });correct=values.length===q.fields.length&&fields.every(f=>f.correct);
+  }
+  return {graded:true,correct,feedback:q.why||'Compare your response with the saved answer key.',...(fields?{fields}:{}),expected:ccClone(q.type==='multiSelect'?q.answer:q.answer)};
+}
+function ccResponsePresent(response){if(!response)return false;if(response.skipped)return true;return Array.isArray(response.value)?response.value.some(v=>v!==null&&String(v).trim()!==''):response.value!==null&&response.value!==undefined&&String(response.value).trim()!=='';}
+function ccSaveRun(run){
+  if(!run?.id)return null;const store=ccStore(),index=store.runs.findIndex(r=>r.id===run.id),old=index>=0?store.runs[index]:null;let next=ccClone(run);
+  if(old&&ccCompleted(old)){
+    // Answers and original grades stay immutable after submission. Self-review
+    // annotations can be added without rewriting the automatically checked work.
+    next=ccClone(old);
+    (old.items||[]).filter(item=>item.manualReview).forEach(item=>{
+      const proposed=run.responses?.[item.id];if(!proposed||!Object.prototype.hasOwnProperty.call(proposed,'manualRating'))return;
+      const rating=['meets','needs-work','unreviewed'].includes(proposed.manualRating)?proposed.manualRating:'unreviewed';
+      const response=next.responses[item.id]||(next.responses[item.id]={});response.manualRating=rating;response.reviewMode='self-review';
+      if(proposed.reviewedAt)response.reviewedAt=proposed.reviewedAt;
+    });
+    if(run.reviewedAt)next.reviewedAt=run.reviewedAt;
+    if(JSON.stringify(next)===JSON.stringify(old))return old;
+  }else if(ccCompleted(next)){
+    next.status='completed';next.completedAt=next.completedAt||Date.now();next.grades={};
+    next.items.forEach(item=>{
+      const q=ccQuestion(item.id),response=next.responses[item.id]||{};
+      if(!q||ccQuestionFingerprint(q)!==item.itemFingerprint){next.grades[item.id]={graded:false,correct:null,contentChanged:true,feedback:'This bank item changed or is unavailable; its answer is not assigned a new grade.'};return;}
+      const grade=ccGrade(q,response.value);if(grade.graded&&(response.skipped||!ccResponsePresent(response)))grade.correct=false;next.grades[item.id]=grade;
+    });
+  }
+  next.updatedAt=Date.now();if(index<0)store.runs.push(next);else store.runs[index]=next;ccSave(store);return ccRun(next.id);
+}
+function ccSummary(run){
+  if(!run)return null;const complete=ccCompleted(run),domains=(run.plan?.blueprint?.domains||ccBlueprint(run.chapter).domains).map(d=>({id:d.id,label:d.label,total:0,correct:complete?0:null,answered:0,skipped:0,ungraded:0,manualTotal:0,manualSubmitted:0,manualReviewed:0}));
+  const auto={correct:complete?0:null,total:0,planned:0,answered:0,skipped:0,ungraded:0},manual={total:0,submitted:0,reviewed:0,meets:0,needsWork:0};
+  (run.items||[]).forEach(item=>{
+    const response=run.responses?.[item.id]||{},domain=domains.find(d=>d.id===item.domain),grade=complete?run.grades?.[item.id]:null;
+    if(item.manualReview){
+      manual.total++;if(domain)domain.manualTotal++;
+      const ink=response.sketch?.strokes?.length||response.sketch?.paper||response.onPaper||response.paper||String(response.text||response.value||response.reasoning||'').trim();
+      if(ink&&!response.skipped){manual.submitted++;if(domain)domain.manualSubmitted++;}
+      if(complete&&['meets','needs-work'].includes(response.manualRating)){manual.reviewed++;if(domain)domain.manualReviewed++;if(response.manualRating==='meets')manual.meets++;else manual.needsWork++;}return;
+    }
+    auto.total++;auto.planned++;if(domain)domain.total++;
+    if(ccResponsePresent(response)&&!response.skipped){auto.answered++;if(domain)domain.answered++;}
+    if(response.skipped){auto.skipped++;if(domain)domain.skipped++;}
+    if(complete&&grade?.graded&&grade.correct&&!response.skipped){auto.correct++;if(domain)domain.correct++;}
+    if(complete&&!grade?.graded){auto.ungraded++;auto.total--;if(domain){domain.ungraded++;domain.total--;}}
+  });
+  const confidence={sure:0,unsure:0,guess:0,notRecorded:0};Object.values(run.responses||{}).forEach(r=>{if(['sure','unsure','guess'].includes(r.confidence))confidence[r.confidence]++;else confidence.notRecorded++;});
+  const baseline=run.baselineRunId?ccRun(run.baselineRunId):null;
+  return {runId:run.id,chapter:run.chapter,phase:run.phase,complete,auto,manual,domains,confidence,correct:auto.correct,total:auto.total,percent:complete&&auto.total&&!auto.ungraded?Math.round(100*auto.correct/auto.total):null,baselineRunId:baseline?.id||null,comparisonAvailable:!!baseline&&complete&&baseline.plan?.blueprintVersion===run.plan?.blueprintVersion,gaps:ccClone(run.plan?.gaps||[]),seenCount:run.plan?.seenCount||0,reviewCount:run.plan?.reviewCount||0,limits:ccClone(run.plan?.limits||[])};
+}
+function ccExportSketch(sketch){return ccPick(sketch,['strokes','strokeStyles','text','paper','width','height','version']);}
+function ccExport(){
+  const runs=ccStore().runs.map(run=>{
+    const row=ccPick(run,['id','version','chapter','phase','status','startedAt','completedAt','updatedAt','baselineRunId','currentIndex','qa','reviewedAt','helpUsed']);
+    row.plan=ccPick(run.plan,['chapter','phase','blueprintVersion','blueprint','gaps','seenCount','reviewCount','lessonExposureCount','baselineRunId','available','limits']);
+    row.items=(run.items||[]).map(i=>ccPick(i,['id','domain','domainLabel','manualReview','type','difficulty','targetDifficulty','questionRevision','itemFingerprint','families','seenBefore','seenFamilyBefore','baselineFamilyOverlap','withinFormFamilyOverlap','familiarContent','lessonExposure','review','selectionReason']));
+    row.responses=Object.fromEntries(Object.entries(run.responses||{}).map(([id,r])=>{
+      const response=ccPick(r,['value','confidence','reasoning','skipped','firstValue','firstCommittedAt','firstConfidence','edited','text','onPaper','paper','submittedAt','committedAt','updatedAt','manualRating','reviewMode','reviewedAt','externalHelp']);
+      if(r.commits)response.commits=r.commits.map(c=>ccPick(c,['ts','value','skipped']));if(r.sketch)response.sketch=ccExportSketch(r.sketch);return [id,response];
+    }));
+    if(ccCompleted(run))row.grades=Object.fromEntries(Object.entries(run.grades||{}).map(([id,g])=>[id,ccPick(g,['graded','correct','feedback','expected','fields','contentChanged'])]));
+    row.summary=ccSummary(run);return row;
+  });
+  return {version:CC_VERSION,blueprintVersion:CC_BLUEPRINT_VERSION,storage:'Current device and profile only; no automatic attempt or mastery credit.',cap:CC_RUN_CAP,retention:'First completed starting check per chapter plus recent runs; at most 30 total.',runs,limits:['Uncompleted checks export submitted work without answer keys or correctness.','Self-reviewed drawings remain separate from automatically checked answers.','Prior app exposure is incomplete and does not establish outside freshness.']};
+}
+
+/* Chapter entry/exit checks. Sealed answers until Finish; distinct from
+ * supported lesson gates, practice attempts, and the paper pacing protocol. */
+function ccLabel(phase){return phase==='starting'?'Starting check':'Readiness check';}
+function ccLatest(chapter,phase,status='completed'){
+  return ccStore().runs.filter(r=>r.chapter===chapter&&r.phase===phase&&r.status===status).sort((a,b)=>b.startedAt-a.startedAt)[0]||null;
+}
+function ccPending(chapter){return ccStore().runs.filter(r=>r.chapter===chapter&&r.status==='in-progress').sort((a,b)=>b.startedAt-a.startedAt)[0]||null;}
+function ccOpen(chapter,phase){courseNavigationSaveWork();smSetChapter(chapter);S.ccPhase=phase;go(phase==='final'?'modeReadiness':'chapterCheck');}
+function ccOpenRun(id){const run=ccRun(id);if(!run)return;courseNavigationSaveWork();smSetChapter(run.chapter);S.ccRunId=id;go(run.status==='completed'?'chapterCheckResults':'chapterCheckRun');}
+function ccItemQuestion(item){return QUESTIONS.find(q=>q.id===item.id);}
+function ccHasValue(value){return Array.isArray(value)?value.some(ccHasValue):value!==null&&value!==undefined&&String(value).trim()!=='';}
+function ccResponse(run,id){return run.responses[id]||(run.responses[id]={value:null,confidence:null,reasoning:'',skipped:false});}
+function ccPersistResponse(run,response){if(run.status!=='in-progress')return;response.updatedAt=Date.now();ccSaveRun(run);}
+function ccCommit(run,skip=false){
+  if(run.status!=='in-progress')return;
+  const item=run.items[run.currentIndex];if(!item)return;const r=ccResponse(run,item.id);
+  r.skipped=skip;if(skip)r.value=null;
+  const value=JSON.parse(JSON.stringify(r.value??null));
+  if(!r.firstCommittedAt){r.firstCommittedAt=Date.now();r.firstValue=value;r.firstConfidence=r.confidence||null;}
+  r.commits=r.commits||[];
+  if(!r.commits.length||JSON.stringify(r.commits.at(-1).value)!==JSON.stringify(value)||r.commits.at(-1).skipped!==skip)
+    r.commits.push({ts:Date.now(),value,skipped:skip});
+  r.edited=r.commits.length>1;run.currentIndex++;ccSaveRun(run);render();window.scrollTo(0,0);
+}
+function ccFinishRun(id){
+  const run=ccRun(id);if(!run||run.status!=='in-progress')return;
+  run.items.forEach(item=>{if(!run.responses[item.id])run.responses[item.id]={value:null,skipped:true};});
+  run.status='completed';run.completedAt=Date.now();ccSaveRun(run);S.ccRunId=id;go('chapterCheckResults');
+}
+function ccStatusText(run){
+  if(!run)return 'Not taken yet';const s=ccSummary(run);
+  return s.auto.correct+'/'+s.auto.total+' scored · '+s.manual.total+' manual-review task'+(s.manual.total===1?'':'s');
+}
+function ccStartPanel(host,chapter,phase){
+  const plan=ccPlan(chapter,phase),pending=ccLatest(chapter,phase,'in-progress'),prior=ccLatest(chapter,phase);
+  const auto=plan.items.filter(i=>!i.manualReview).length,manual=plan.items.length-auto;
+  const card=el('section',{class:'card cc-panel','data-cc-panel':phase});
+  card.innerHTML='<h2>'+ccLabel(phase)+'</h2><p>'+(phase==='starting'?'Find what to learn first. It is okay not to know an answer.':'Check what you can do after studying. Compare with your starting point.')+'</p>'+
+    '<p class="muted">'+auto+' scored questions'+(manual?' + '+manual+' drawing / written tasks':'')+' · no hints · answers after you finish</p>';
+  if(prior)card.appendChild(el('p',{},'Last result: '+ccStatusText(prior)));
+  if(pending){card.appendChild(smButton('Resume '+ccLabel(phase).toLowerCase(),()=>ccOpenRun(pending.id),{class:'btn','data-cc-resume':pending.id}));}
+  else if(plan.items.length){card.appendChild(smButton(prior?'Take another '+ccLabel(phase).toLowerCase():'Start '+ccLabel(phase).toLowerCase(),()=>{const run=ccStart(chapter,phase);if(run?.id)ccOpenRun(run.id);},{class:'btn','data-cc-start':phase}));}
+  else card.appendChild(el('p',{},'This chapter does not have a usable check bank yet. No score is estimated.'));
+  if(prior)card.appendChild(smButton('See last results',()=>ccOpenRun(prior.id),{'data-cc-results':prior.id}));
+  card.appendChild(el('p',{class:'cc-caveat'},'Saved on this device/profile; included in Learning evidence downloads. Drawing and written work needs human review. This sample is not an exam grade prediction.'));
+  if(phase==='starting'&&!prior)card.appendChild(el('p',{class:'cc-caveat'},'Already studied this chapter? This records your starting point now—not what you knew before.'));
+  if(phase==='final')card.appendChild(el('p',{class:'cc-caveat'},'Different question IDs from your starting check. Previously seen items are labeled; new in the app does not guarantee unfamiliar work.'));
+  if(plan.gaps?.length){
+    const areas=new Set(plan.gaps.filter(g=>/coverage|construction/.test(g.kind||'')).map(g=>g.domain));
+    card.appendChild(el('p',{class:'cc-warning'},areas.size?'Partial coverage: '+areas.size+' skill areas still need extra checking.':'Some questions are familiar or differ in difficulty. This is a sample, not a full readiness verdict.'));
+    const limits=el('details');limits.appendChild(el('summary',{},'See coverage limits'));
+    const notes=el('ul');plan.gaps.forEach(g=>{const domain=ccBlueprint(chapter).domains.find(d=>d.id===g.domain);notes.appendChild(el('li',{},esc(typeof g==='string'?g:(domain?.label||g.domain)+': '+(g.note||g.message||g.label))));});limits.appendChild(notes);card.appendChild(limits);
+  }
+  const more=el('details');more.appendChild(el('summary',{},'What this checks'));
+  const list=el('ul');ccBlueprint(chapter).domains.forEach(d=>list.appendChild(el('li',{},esc(d.label))));more.appendChild(list);
+  more.appendChild(el('p',{class:'muted'},'The two checks sample the same areas and authored difficulty levels. They are not statistically equivalent tests. Pausing is allowed; any help you use must be reported. No mastery credit is awarded automatically.'));
+  card.appendChild(more);host.appendChild(card);
+}
+VIEWS.chapterCheck=v=>{
+  const chapter=smChapter();const header=el('header',{class:'sm-heading'});header.innerHTML='<p class="sm-eyebrow">'+esc(chapter.name)+'</p><h1>Before you learn</h1>';smSelectChapter(header);v.appendChild(header);
+  ccStartPanel(v,chapter.id,'starting');v.appendChild(smButton('Skip for now · go to Learn',()=>smGo('learn')));
+};
+const CC_PREVIOUS_READINESS=VIEWS.modeReadiness;
+VIEWS.modeReadiness=v=>{
+  const head=el('header',{class:'sm-heading'});head.innerHTML='<p class="sm-eyebrow">AFTER LEARNING & PRACTICE</p><h1>Readiness check</h1>';smSelectChapter(head);v.appendChild(head);
+  ccStartPanel(v,smChapter().id,'final');
+  const paper=el('section',{class:'cc-paper'});paper.innerHTML='<h2>Then check full problems on paper</h2><p>A chapter score alone does not test every linked step or exam pacing. Use fresh paper work: untimed first, then a different matched set timed.</p>';
+  const old=el('div');CC_PREVIOUS_READINESS(old);old.querySelector('.sm-heading')?.remove();paper.appendChild(old);v.appendChild(paper);
+};
+function ccQuestionNavigation(host,run){
+  const details=el('details',{class:'cc-jump'});details.appendChild(el('summary',{},'Review my answers before finishing'));
+  const row=el('div',{class:'cc-number-list'});run.items.forEach((item,i)=>{
+    const r=run.responses[item.id],done=!!r?.firstCommittedAt;
+    row.appendChild(smButton(String(i+1)+(r?.skipped?' · skipped':done?' · saved':''),()=>{run.currentIndex=i;ccSaveRun(run);render();},{'aria-label':'Question '+(i+1)+(r?.skipped?', skipped':done?', saved':''),'aria-current':i===run.currentIndex?'step':'false'}));
+  });details.appendChild(row);host.appendChild(details);
+}
+function ccRenderAnswer(host,q,run,item,r){
+  const keep=()=>ccPersistResponse(run,r);
+  if(q.type==='mc'){
+    const choices=el('div',{class:'cc-choices',role:'group','aria-label':'Your answer'});
+    (q.choices||[]).forEach((choice,i)=>{const b=smButton(choice,()=>{r.value=i;r.skipped=false;keep();choices.querySelectorAll('button').forEach((n,j)=>n.setAttribute('aria-pressed',String(i===j)));},{class:'cc-choice','data-cc-response':String(i),'aria-pressed':String(r.value===i)});choices.appendChild(b);});host.appendChild(choices);
+  }else if(q.type==='multiSelect'){
+    (q.choices||[]).forEach((choice,i)=>{const label=el('label',{class:'cc-check-label'}),box=el('input',{type:'checkbox','data-cc-response':i});box.checked=(r.value||[]).includes(i);box.onchange=()=>{const values=new Set(r.value||[]);box.checked?values.add(i):values.delete(i);r.value=[...values];keep();};label.append(box,el('span',{},choice));host.appendChild(label);});
+  }else if(['blanks','multi'].includes(q.type)){
+    if(q.template)host.appendChild(el('p',{},q.template.replace(/\{\{\d+\}\}/g,'_____')));
+    (q.fields||[]).forEach((field,i)=>{const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},esc(field.label||'Part '+(i+1))));const input=field.kind==='select'?el('select'):el('input',{type:'text'});input.setAttribute('data-cc-response',i);input.setAttribute('aria-label',field.label||'Part '+(i+1));if(field.kind==='select'){input.appendChild(el('option',{value:''},'Choose…'));field.choices.forEach(c=>input.appendChild(el('option',{value:String(c)},esc(String(c)))));}input.value=r.value?.[i]??'';input.oninput=()=>{if(!Array.isArray(r.value))r.value=[];r.value[i]=input.value;keep();};label.appendChild(input);host.appendChild(label);});
+  }else if(item.manualReview){
+    const D={sketchDrafts:{[q.id]:r.sketch||(r.sketch={strokes:[],text:''})},answered:false,persist:()=>keep()};
+    renderCourseSketch(host,{...q,requiresDrawing:true},D,false);
+    const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'Written answer (optional if shown in your drawing or on paper)'));
+    const input=el('textarea',{'aria-label':'Written answer','data-cc-response':'written',rows:3});input.value=r.value||'';input.oninput=()=>{r.value=input.value;keep();};label.appendChild(input);host.appendChild(label);
+  }else{
+    const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'Your answer'));
+    const input=el('input',{type:'text',inputmode:q.type==='num'?'decimal':'text','aria-label':'Your answer','data-cc-response':'text',autocomplete:'off',spellcheck:'false'});input.value=r.value??'';input.oninput=()=>{r.value=input.value;r.skipped=false;keep();};label.appendChild(input);host.appendChild(label);
+  }
+}
+VIEWS.chapterCheckRun=v=>{
+  const run=ccRun(S.ccRunId);if(!run){ccOpen(smChapter().id,'starting');return;}
+  if(run.status==='completed'){go('chapterCheckResults');return;}
+  const head=el('header',{class:'sm-heading'});head.innerHTML='<p class="sm-eyebrow">'+esc(CHAPTERS.find(c=>c.id===run.chapter)?.name||run.chapter)+'</p><h1>'+ccLabel(run.phase)+'</h1><p>No hints or feedback until you finish. You can go back and change an answer.</p>';v.appendChild(head);
+  const pause=()=>{ccSaveRun(run);ccOpen(run.chapter,run.phase);};v.appendChild(smButton('Save & leave',pause,{'data-cc-pause':true}));
+  if(run.currentIndex>=run.items.length){
+    const box=el('section',{class:'card cc-panel'});const skipped=run.items.filter(i=>run.responses[i.id]?.skipped||!run.responses[i.id]?.firstCommittedAt).length;
+    box.innerHTML='<h2>Ready to finish?</h2><p>'+run.items.length+' tasks · '+skipped+' skipped or unanswered. Skipped scored questions count as incorrect; manual work stays separate.</p>';
+    const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'Did you use notes, hints, or outside help?'));
+    const select=el('select',{'aria-label':'Help used during this check'});[['','Not reported'],['none','No help'],['some','I used help']].forEach(([val,text])=>select.appendChild(el('option',{value:val},text)));select.value=run.helpUsed||'';select.onchange=()=>{run.helpUsed=select.value||null;ccSaveRun(run);};label.appendChild(select);box.appendChild(label);
+    ccQuestionNavigation(box,run);box.appendChild(smButton('Finish & see results',()=>ccFinishRun(run.id),{class:'btn','data-cc-finish':true}));v.appendChild(box);return;
+  }
+  const item=run.items[run.currentIndex],q=ccItemQuestion(item),r=ccResponse(run,item.id);
+  const card=el('section',{class:'card cc-question','data-cc-question':item.id});
+  card.appendChild(el('p',{class:'cc-position'},'Question '+(run.currentIndex+1)+' of '+run.items.length+(item.manualReview?' · human review needed':'')));
+  if(!q){card.appendChild(el('p',{},'This saved question is no longer in the bank. It will remain unassessed.'));card.appendChild(smButton('Skip unavailable question',()=>ccCommit(run,true),{'data-cc-skip':true}));v.appendChild(card);return;}
+  const body=el('div',{class:'cc-workspace'}),given=el('div',{class:'cc-given qprompt'},q.prompt),answer=el('div',{class:'cc-answer'});body.append(given,answer);card.appendChild(body);
+  ccRenderAnswer(answer,q,run,item,r);
+  const confidence=el('label',{class:'cc-field cc-confidence'});confidence.appendChild(el('span',{},'Confidence · optional'));const select=el('select',{'aria-label':'Confidence'});[['','Choose if useful'],['sure','Sure'],['unsure','Unsure'],['guess','Guessing']].forEach(([value,text])=>select.appendChild(el('option',{value},text)));select.value=r.confidence||'';select.onchange=()=>{r.confidence=select.value||null;ccPersistResponse(run,r);};confidence.appendChild(select);answer.appendChild(confidence);
+  const details=el('details');details.appendChild(el('summary',{},'Add my reasoning · optional'));const note=el('textarea',{'aria-label':'My reasoning',rows:3});note.value=r.reasoning||'';note.oninput=()=>{r.reasoning=note.value;ccPersistResponse(run,r);};details.appendChild(note);answer.appendChild(details);
+  const actions=el('div',{class:'cc-actions'});if(run.currentIndex>0)actions.appendChild(smButton('Back',()=>{run.currentIndex--;ccSaveRun(run);render();}));
+  const error=el('p',{role:'status',class:'cc-warning'});
+  actions.appendChild(smButton('Save answer & next',()=>{if(!item.manualReview&&!ccHasValue(r.value)){error.textContent='Choose or enter an answer, or use “I don’t know yet.”';return;}ccCommit(run,false);},{class:'btn','data-cc-next':true}));
+  actions.appendChild(smButton('I don’t know yet · skip',()=>ccCommit(run,true),{'data-cc-skip':true}));card.append(actions,error);ccQuestionNavigation(card,run);v.appendChild(card);
+};
+function ccAnswerText(q,r){
+  if(!r||r.skipped)return 'Skipped';if(q.type==='mc')return (q.choiceLabels||q.choices)?.[r.value]??'No answer';
+  if(q.type==='multiSelect')return (r.value||[]).map(i=>(q.choiceLabels||q.choices)[i]).join(', ');
+  return Array.isArray(r.value)?r.value.join(' · '):String(r.value??'');
+}
+function ccKeyText(q){if(q.type==='mc')return (q.choiceLabels||q.choices)?.[q.answer]??'';if(q.type==='multiSelect')return q.answer.map(i=>(q.choiceLabels||q.choices)[i]).join(', ');if(q.fields)return q.fields.map(f=>f.label+': '+f.answer).join(' · ');return String(q.answer??'');}
+function ccResultTable(run,baseline){
+  const grid=el('div',{class:'cc-domain-list'});
+  (run.plan.blueprint?.domains||ccBlueprint(run.chapter).domains).forEach(domain=>{
+    const tally=r=>{const items=r.items.filter(i=>i.domain===domain.id&&!i.manualReview&&r.grades?.[i.id]?.graded);return {n:items.length,correct:items.filter(i=>!r.responses[i.id]?.skipped&&r.grades?.[i.id]?.correct).length};};
+    const now=tally(run),before=baseline?tally(baseline):null,cell=el('section',{class:'cc-domain'});cell.appendChild(el('h3',{},esc(domain.label)));
+    cell.appendChild(el('p',{},(before?'Starting '+before.correct+'/'+before.n+' → ':'')+(run.phase==='final'?'Final ':'')+now.correct+'/'+now.n+(now.n?' scored':' · not sampled')));
+    cell.appendChild(el('p',{class:'muted'},!now.n?'Unassessed':now.correct<now.n?'Review this area next':'Correct in this sample—not proof of mastery'));
+    if(!now.n||now.correct<now.n)cell.appendChild(smButton('Learn this area',()=>{const unit=(CHAPTER_LEARNING_UNITS[run.chapter]||[]).find(u=>domain.id===u.id||domain.topics.includes(u.topic));smSetChapter(run.chapter);if(unit)openLearningUnit(run.chapter,unit.id);else {S.learnCh=run.chapter;S.learnTopic=domain.topics[0];go('allLearn');}}));grid.appendChild(cell);
+  });return grid;
+}
+VIEWS.chapterCheckResults=v=>{
+  const run=ccRun(S.ccRunId);if(!run||run.status!=='completed'){go('chapterCheckRun');return;}
+  const summary=ccSummary(run),baseline=run.baselineRunId?ccRun(run.baselineRunId):null;
+  const head=el('section',{class:'card cc-panel','data-cc-results-summary':true});head.innerHTML='<p class="sm-eyebrow">'+esc(CHAPTERS.find(c=>c.id===run.chapter)?.name||run.chapter)+'</p><h1>'+ccLabel(run.phase)+' results</h1><h2>'+summary.auto.correct+' / '+summary.auto.total+' scored answers correct</h2><p>'+summary.manual.total+' drawing / written tasks are separate from that score · '+summary.manual.reviewed+' self-reviewed.</p><p class="muted">'+(run.helpUsed==='none'?'No help reported.':run.helpUsed==='some'?'Help was used: treat this as supported work.':'Help use was not reported; independence is unknown.')+' Different questions can vary in difficulty. This is a learning snapshot, not a predicted exam grade.</p>';
+  if(summary.auto.ungraded)head.appendChild(el('p',{class:'cc-warning'},summary.auto.ungraded+' questions could not be scored because their content changed or is unavailable.'));
+  if(summary.confidence.guess)head.appendChild(el('p',{class:'cc-caveat'},summary.confidence.guess+' answers were marked as guesses. Correct guesses still need another check.'));
+  if(run.plan.gaps?.length)head.appendChild(el('p',{class:'cc-warning'},'The check has coverage limits. Untested skills and unreviewed drawings remain unassessed, even with a high score.'));
+  if(run.phase==='final'&&!baseline)head.appendChild(el('p',{},'No completed starting check is available. This is your current snapshot; improvement cannot be calculated.'));
+  const seen=run.items.filter(i=>i.review||i.seenBefore||i.seenFamilyBefore).length;head.appendChild(el('p',{class:'muted'},seen+' tasks use familiar material or a known related item. In-app history cannot establish unfamiliarity outside the app.'));
+  head.appendChild(smButton('Go to Learn',()=>smGo('learn'),{class:'btn'}));head.appendChild(smButton('Back to chapter checks',()=>ccOpen(run.chapter,run.phase)));v.appendChild(head);
+  v.appendChild(ccResultTable(run,baseline));
+  const review=el('section',{class:'card cc-panel'});review.innerHTML='<h2>Review each answer</h2><p>Your submitted answers stay unchanged. Drawing ratings below are your self-review, not an automatic grade.</p>';
+  run.items.forEach((item,index)=>{
+    const q=ccItemQuestion(item),r=run.responses[item.id]||{},detail=el('details',{'data-cc-review':item.id});if(!q)return;
+    const grade=run.grades?.[item.id]||{},status=item.manualReview?'Human review':grade.contentChanged?'Unassessed · question changed':r.skipped?'Skipped':grade.correct?'Correct':'Needs review';detail.appendChild(el('summary',{},(index+1)+' · '+status+' · '+esc(TOPICS[q.topic]?.name||q.topic)));
+    if(grade.contentChanged)detail.appendChild(el('p',{class:'cc-warning'},'This question changed after you started. The version below is for review only; it was not used to score your saved answer.'));
+    detail.appendChild(el('div',{class:'qprompt'},q.prompt));detail.appendChild(el('p',{},'<b>Your answer:</b> '+esc(ccAnswerText(q,r))));
+    if(r.reasoning){const note=el('p');note.textContent='Your reasoning: '+r.reasoning;detail.appendChild(note);}
+    if(item.manualReview){
+      if(r.sketch)renderCourseSketch(detail,q,{sketchDrafts:{}},true,r.sketch);
+      if(q.production){
+        const model=el('section',{class:'cc-production-model'});model.appendChild(el('h3',{},'One correct construction'));
+        const modelDraft=ch4ProductionModel(q);
+        renderCh4Production(model,q,{ch4Drafts:{[q.id]:modelDraft},ch4Evidence:{},answered:true,persist:()=>{}},()=>{},true);
+        detail.appendChild(model);
+      }else detail.appendChild(el('div',{class:'why'},q.model||esc(ccKeyText(q))));
+      if(q.rubric)detail.appendChild(el('ul',{},q.rubric.map(t=>'<li>'+esc(t)+'</li>').join('')));
+      const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'My review against the model'));const select=el('select',{'aria-label':'Self-review question '+(index+1)});[['unreviewed','Not reviewed'],['needs-work','Needs work'],['meets','Meets the listed criteria']].forEach(([value,text])=>select.appendChild(el('option',{value},text)));select.value=r.manualRating||'unreviewed';select.onchange=()=>{r.manualRating=select.value;r.reviewMode='self-review';r.reviewedAt=Date.now();run.responses[item.id]=r;ccSaveRun(run);};label.appendChild(select);detail.appendChild(label);
+    }else detail.appendChild(el('p',{},'<b>Answer:</b> '+ccKeyText(q)));
+    if(q.why)detail.appendChild(el('div',{class:'why'},q.why));review.appendChild(detail);
+  });v.appendChild(review);
+};
+// Final stays in the existing mode; starting is a small entry, not a fifth mode.
+STUDY_MODES.readiness.verb='Check what you can do';
+STUDY_MODES.readiness.description='Final chapter check, then fresh paper work: untimed first, then timed.';
+const CC_PREVIOUS_LEARN=VIEWS.modeLearn;
+VIEWS.modeLearn=v=>{CC_PREVIOUS_LEARN(v);const b=el('section',{class:'cc-start-strip'});b.appendChild(el('span',{},'Before you learn · '+(ccLatest(smChapter().id,'starting')?'starting result saved':'find your starting point')));b.appendChild(smButton('Starting check',()=>ccOpen(smChapter().id,'starting'),{'data-cc-starting':true}));v.insertBefore(b,v.children[1]||null);};
+const CC_PREVIOUS_HOME=VIEWS.home;
+VIEWS.home=v=>{
+  CC_PREVIOUS_HOME(v);const host=v.querySelector('.sm-next');if(!host)return;const pending=ccPending(smChapter().id),baseline=ccLatest(smChapter().id,'starting');
+  const b=smButton(pending?'Resume chapter check':'Starting check',()=>pending?ccOpenRun(pending.id):ccOpen(smChapter().id,'starting'),{'data-cc-starting':true});host.appendChild(b);
+  if(pending)host.querySelector('span').textContent='Your chapter check is saved. Other practice is saved separately.';
+  else if(!baseline&&!S.pausedDrill)host.querySelector('span').textContent='Find your starting point, or go straight to Learn.';
+};
+const CC_PREVIOUS_ACTIVITY=smActivity;
+smActivity=function(){
+  if(['chapterCheck','chapterCheckRun','chapterCheckResults'].includes(S.view)){const run=S.view==='chapterCheck'?null:ccRun(S.ccRunId),phase=run?.phase||'starting';return {mode:phase==='starting'?'learn':'readiness',chapter:run?.chapter||smChapter().id,detail:ccLabel(phase)+(S.view==='chapterCheckRun'?' · answers held until finish':'')};}
+  return CC_PREVIOUS_ACTIVITY();
+};
+const ccStyle=el('style',{id:'chapter-check-style'});ccStyle.textContent=`
+ .cc-panel{padding:20px!important}.cc-panel h1{font-size:1.6rem}.cc-panel h2{font-size:1.15rem}.cc-panel p,.cc-panel li{font-size:.9rem;line-height:1.5}.cc-caveat{font-size:.8rem!important;color:#526b71}.cc-warning{color:#865817;font-weight:600}.cc-start-strip{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px;padding:10px 14px;background:#edf5f2;border-radius:12px;font-size:.86rem}.cc-start-strip .btn{margin:0}.sm-next{flex-wrap:wrap}.sm-next>span{flex:1 1 230px}.sm-next .btn{flex:0 1 auto}.cc-question{padding:20px!important}.cc-position{font-size:.82rem;color:#536c73;font-weight:700}.cc-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}.cc-given,.cc-answer{min-width:0}.cc-given .course-structure,.cc-given figure{max-width:100%;margin-inline:0!important}.cc-given img,.cc-given svg{max-width:100%}.cc-given svg{height:auto;max-height:340px}.cc-choices{display:grid;gap:9px}.cc-choice{text-align:left;white-space:normal;border:1px solid #b7cbce;background:white;color:#173e47;padding:12px;border-radius:10px;font:inherit;min-height:48px;cursor:pointer}.cc-choice[aria-pressed=true]{border:2px solid #156e74;background:#e2f2f0;box-shadow:inset 4px 0 #156e74}.cc-choice:focus-visible{outline:3px solid #cc9200;outline-offset:3px}.cc-field{display:flex;flex-direction:column;gap:6px;margin:12px 0;font-size:.9rem}.cc-field input,.cc-field select,.cc-field textarea,.cc-answer textarea{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;border:1px solid #adbec6;border-radius:9px;padding:11px;background:white;color:#173e47}.cc-confidence{max-width:270px}.cc-check-label{display:flex;align-items:center;gap:10px;min-height:44px}.cc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.cc-actions .btn{margin:0}.cc-jump{margin-top:16px}.cc-number-list{display:flex;gap:5px;flex-wrap:wrap}.cc-number-list .btn{font-size:.8rem;margin:0}.cc-domain-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}.cc-domain{padding:14px;border:1px solid #c9d8d9;border-radius:12px;background:#fff}.cc-domain h3{font-size:1rem;margin:0 0 8px}.cc-domain p{font-size:.85rem}.cc-paper>h2{font-size:1.15rem}.cc-panel details{padding:12px 0;border-top:1px solid #d8e3e4}.cc-panel summary,.cc-jump summary{min-height:35px;cursor:pointer;font-weight:650}.cc-panel [data-cc-review] .qprompt{margin-top:15px}.cc-question .course-sketch{margin-top:0}.cc-panel .course-sketch{max-width:700px}.cc-panel .qprompt{overflow-wrap:anywhere}
+ @media(max-width:700px){.cc-workspace,.cc-domain-list{grid-template-columns:1fr}.cc-workspace{gap:16px}.cc-question,.cc-panel{padding:14px!important}.cc-question .qprompt{font-size:1rem}.cc-given svg{max-height:250px}.cc-actions .btn{font-size:.85rem;padding:10px;min-height:44px}.sm-next{flex-direction:row}.sm-next>span{flex-basis:100%}.sm-next .btn{font-size:.82rem;padding:9px}.cc-panel h1{font-size:1.4rem}}
+ @media(min-width:350px) and (max-width:600px){.sm-next .btn{width:auto!important;flex:1 1 130px;font-size:.8rem;padding:9px 7px}}
+`;document.head.appendChild(ccStyle);
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
