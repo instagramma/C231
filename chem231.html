@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.109 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.110 (LOCAL ONLY)
+  v3.110 (2026-10-07): LEARN, CHECK, CONTINUE. Brief checks after selected main
+  ideas, correct-to-continue, optional skip-rest after correct. Separate first
+  responses, retries, rereads and skips; resource engagement is not mastery.
   v3.109 (2026-10-07): VISIBLE STUDY MODES. Learn / Practice / Challenge / Readiness.
   Optional warm-ups, original linked worksheet problems, untimed then timed paper checks.
   v3.108 (2026-10-07): EXAM 2 PREP HOME. Chapter 5 first; Chapter 4 review below.
@@ -1724,7 +1727,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.109 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.110 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -14603,7 +14606,15 @@ function focusActiveSlice(from,to,lastActivity,foreground){
   return foreground?Math.max(0,Math.min(to,lastActivity+FOCUS_IDLE_MS)-Math.max(from,lastActivity)):0;
 }
 function focusVisitTick(now=Date.now()){
-  if(focusVisit)focusVisit.activeMs+=focusActiveSlice(focusLastTick,now,focusLastActivity,focusForeground&&!document.hidden);
+  // Flush check timing before activity/focus listeners replace the shared state.
+  if(typeof lcTick==='function')lcTick(now);
+  if(focusVisit){
+    // This is the PREVIOUS interval's state. visibilitychange flushes it before
+    // updating focusForeground; document.hidden already reflects the new state.
+    const foreground=focusForeground;
+    focusVisit.activeMs+=focusActiveSlice(focusLastTick,now,focusLastActivity,foreground);
+    if(foreground)focusVisit.foregroundMs=(focusVisit.foregroundMs||0)+Math.max(0,now-focusLastTick);
+  }
   focusLastTick=now;
 }
 function focusVisitSave(end=false){
@@ -14617,7 +14628,7 @@ function focusVisitStart(key){
   focusVisitSave(true);focusVisit=null;
   if(!key||!PROFILE||!safeStore.get('lessonTimeEnabled',true))return;
   const now=Date.now();focusLastTick=now;focusLastActivity=now;
-  focusVisit={id:'lesson-'+now+'-'+Math.random().toString(36).slice(2,8),key,startedAt:now,activeMs:0,next:0,back:0,tier:'exposure',version:1};
+  focusVisit={id:'lesson-'+now+'-'+Math.random().toString(36).slice(2,8),key,startedAt:now,activeMs:0,foregroundMs:0,next:0,back:0,tier:'exposure',version:2,actor:typeof leActor==='function'?leActor():null};
   focusVisitSave();
 }
 function focusVisitAction(action){if(focusVisit&&['next','back'].includes(action)){focusVisit[action]++;focusVisitSave();}}
@@ -14709,7 +14720,7 @@ VIEWS.prepPlan=v=>{
   const timing=focusDetails('Lesson time · this device only');
   const enabled=el('input',{type:'checkbox','aria-label':'Record lesson viewing time'});enabled.checked=safeStore.get('lessonTimeEnabled',true);enabled.addEventListener('change',()=>{focusVisitSave(true);focusVisit=null;safeStore.set('lessonTimeEnabled',enabled.checked);});
   const label=el('label');label.appendChild(enabled);label.appendChild(document.createTextNode(' Record lesson viewing time'));timing.appendChild(label);
-  timing.appendChild(el('p',{},'Records foreground time and Next/Back clicks on supported lessons. Pauses when hidden, unfocused, or idle for 45 seconds. This cannot tell whether you read or understood. No forced waiting.'));
+  timing.appendChild(el('p',{},'Records visible, focused time and selected Next/Back clicks. Also records a separate interaction-limited estimate that stops after 45 idle seconds. Both pause when hidden or unfocused. Neither proves reading or understanding. No forced waiting.'));
   timing.appendChild(el('p',{},'Stored only on this device; not synced to the learning profile or Claude. The latest 400 lesson visits are kept.'));
   const visits=safeStore.get('lessonVisits',[]);timing.appendChild(el('p',{},visits.length+' lesson visits recorded here.'));
   timing.appendChild(etBtn('Download lesson-time log',()=>{focusVisitSave();const blob=new Blob([JSON.stringify({kind:'lesson-exposure-only',version:1,events:safeStore.get('lessonVisits',[])},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='chem231-lesson-exposure.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);},true));c.appendChild(timing);v.appendChild(c);
@@ -14855,7 +14866,7 @@ const wsStyle=el('style');wsStyle.textContent=`
  * attempt payload. Worksheet work and lesson exposure stay device-local.
  * No new cloud reads, credentials, health fields, or inferred mental causes.
  */
-const LE_EVIDENCE_VERSION='2026-10-07.1';
+const LE_EVIDENCE_VERSION='2026-10-07.2';
 const LE_SCHEMA='chem231-learning-evidence';
 function leClone(value){return value===undefined?null:JSON.parse(JSON.stringify(value));}
 function lePick(value,keys){const out={};keys.forEach(k=>{if(value&&Object.prototype.hasOwnProperty.call(value,k))out[k]=leClone(value[k]);});return out;}
@@ -14996,13 +15007,15 @@ function leSummary(attempts,worksheets,lessons){
 function leBuildExport(){
   const attempts=(S.attempts||[]).map(leAttemptExport).sort((a,b)=>(a.ts||0)-(b.ts||0));
   const worksheets=leWorksheetExport();
-  const lessons=safeStore.get('lessonVisits',[]).map(a=>lePick(a,['id','key','startedAt','endedAt','updatedAt','activeMs','next','back','tier','version']));
+  const lessons=safeStore.get('lessonVisits',[]).map(a=>lePick(a,['id','key','startedAt','endedAt','updatedAt','activeMs','foregroundMs','next','back','tier','version','actor']));
   return {kind:LE_SCHEMA,schemaVersion:1,moduleVersion:LE_EVIDENCE_VERSION,exportedAt:new Date().toISOString(),actor:leActor(),course:'CHEM231',
     purpose:'Learning evidence for review by Gabe, Claude, or Codex; not a grade prediction or a model of a brain.',
     scope:{attempts:'Current profile retained attempts; metadata on new supported submissions only.',
       worksheetWork:'Current device only.',lessonExposure:'Current device only; latest 400 visits; may be disabled.',
       paperPracticeSessions:'Current device only; learner-recorded checkpoints and wall-clock time, not attention, automatic grades, or inferred focus.',
       studyChallengeNotes:'Current device only; latest 200 optional extra-demand explanations, not graded. Joined by runId and question.',
+      lessonChecks:'Current device/profile only; immediate checks after teaching. First responses, supported retries and skips stay separate; no readiness credit.',
+      resourceEngagement:'Current device/profile only; resource clicks are not viewing. Optional player measurements describe observed playback, never understanding.',
       fieldSelection:'Explicit learning-data field allowlist. Account credentials and separate sensitive data sources are not read.',
       crossAssistantDelivery:'Download must be supplied to the shared Signals/exports folder or the reviewing assistant. No automatic delivery.'},
     summary:leSummary(attempts,worksheets,lessons),attempts,
@@ -15011,6 +15024,8 @@ function leBuildExport(){
     worksheets,lessonExposure:{tier:'exposure',enabled:safeStore.get('lessonTimeEnabled',true),events:lessons},
     paperPracticeSessions:leClone(safeStore.get('paperPracticeSessions',[])),
     studyChallengeNotes:safeStore.get('studyChallengeNotes',[]).map(r=>lePick(r,['runId','question','chapter','text','updatedAt','review','qa'])),
+    lessonChecks:typeof lcExport==='function'?lcExport():null,
+    resourceEngagement:typeof leEngagementExport==='function'?leEngagementExport():null,
     retentionAndMissingness:{attemptCap:5000,writtenNoteCap:120,lessonVisitCap:400,olderMissingFields:'Not captured or unknown; never fill with zero, confident, independent, or no study.'}};
 }
 function leDownload(){
@@ -15026,6 +15041,8 @@ VIEWS.learningEvidence=function(v){
   head.appendChild(el('button',{class:'btn',type:'button','data-le-export':'true',onclick:leDownload},'Download learning evidence'));
   if(out.actor.qa||out.actor.role!=='owner')head.appendChild(el('p',{},'This is a QA or auditor profile. It must not count as Gabe’s performance.'));
   head.appendChild(el('p',{class:'muted'},'Send the downloaded file to Claude or Codex, or put it in Learning Profile / Signals / exports. Nothing is sent automatically.'));v.appendChild(head);
+  if(typeof lcPanel==='function')lcPanel(v);
+  if(typeof leEngagementPanel==='function')leEngagementPanel(v);
   const counts=el('section',{class:'card'});counts.appendChild(el('h2',{},'What is saved'));
   [['Correct answers',s.correct,s.retainedAttempts],['With recorded app help',s.withRecordedHelp,s.retainedAttempts],
     ['With repeated drawing checks',s.withRepeatedChecks,s.retainedAttempts],
@@ -15331,6 +15348,572 @@ smStyle.textContent=`
  @media(max-width:340px){#nav>button{padding-inline:2px}#nav .nav-label{font-size:.64rem}}
  @media(prefers-reduced-motion:reduce){.sm-mode{transition:none}.sm-mode:hover{transform:none}}
 `;document.head.appendChild(smStyle);
+
+/* Short, assisted main-idea checks for selected lesson steps · 2026-10-07.
+ * Key = focusRuleSteps lesson key; numeric property = zero-based rule step.
+ * teach is shown BEFORE the check. It fills gaps where an existing step is a
+ * procedural command rather than the rule itself. Full rules stay available.
+ * These are recognition/application checks immediately after teaching, not
+ * cold assessment, independent drawing, whole-lesson mastery, or exam readiness.
+ * Repeating a check after feedback is feedback-exposed practice, not fresh work.
+ * Sources: the mapped CH4_LESSONS and course-aligned CH5_CORE_LESSONS below.
+ */
+const LESSON_CHECKS={
+  'ch5:ch5-intro':{
+    1:{id:'LC5-intro-connectivity',conceptId:'same-formula-different-connections',
+      teach:'Same formula, different atom-to-atom connections: constitutional isomers. Turning the page does not change a connection.',
+      prompt:'Two molecules have the same formula, but their atoms connect differently. What are they?',
+      choices:[{id:'a',text:'The same molecule in a new view'},{id:'b',text:'Constitutional isomers'},{id:'c',text:'Always enantiomers'}],answer:'b',
+      feedback:'Constitutional isomers share a formula but have different connections. Enantiomers have the same connections.'}
+  },
+  'ch5:ch5-chirality':{
+    2:{id:'LC5-chirality-whole-groups',conceptId:'compare-complete-attached-groups',
+      teach:'Two groups can both start with carbon and still be different. Follow each group until you find a difference—or confirm they match.',
+      prompt:'Two groups attached to a candidate stereocenter both start with carbon. What should you do next?',
+      choices:[{id:'a',text:'Treat them as identical immediately'},{id:'b',text:'Use whichever looks larger on the page'},{id:'c',text:'Follow both groups until they differ or match completely'}],answer:'c',
+      feedback:'Compare the complete groups. A first-atom tie is not proof that the groups are identical.'}
+  },
+  'ch5:ch5-rs':{
+    0:{id:'LC5-rs-first-atom',conceptId:'cip-direct-atom-priority',
+      teach:'Start CIP ranking with the directly attached atoms. Higher atomic number wins. For isotopes of one element, higher mass wins.',
+      prompt:'The directly attached atoms are H, C, O, and Br. Which gets priority 1?',
+      choices:[{id:'a',text:'Br'},{id:'b',text:'O'},{id:'c',text:'C'}],answer:'a',
+      feedback:'Br has the highest atomic number of these four atoms, so it gets priority 1.'},
+    2:{id:'LC5-rs-four-toward',conceptId:'rs-lowest-priority-orientation',
+      teach:'With group 4 away, clockwise 1→2→3 means R. With group 4 toward you, reverse that result.',
+      prompt:'Group 4 points toward you. The 1→2→3 path looks clockwise. What is the configuration?',
+      choices:[{id:'a',text:'R'},{id:'b',text:'S'},{id:'c',text:'Clockwise always means R'}],answer:'b',
+      feedback:'Reverse the apparent R because group 4 points toward you. The configuration is S.'}
+  },
+  'ch5:ch5-fischer':{
+    1:{id:'LC5-fischer-horizontal-four',conceptId:'fischer-depth-and-rs',
+      teach:'In a Fischer projection, horizontal bonds come toward you and vertical bonds go away. A horizontal group 4 means reverse the apparent R/S result.',
+      prompt:'In a Fischer projection, priority 4 is on a horizontal bond. How do you read the apparent 1→2→3 result?',
+      choices:[{id:'a',text:'Keep it unchanged'},{id:'b',text:'Call it R every time'},{id:'c',text:'Reverse it'}],answer:'c',
+      feedback:'Horizontal means toward you. Reverse the apparent clockwise/counterclockwise assignment.'},
+    2:{id:'LC5-fischer-page-rotation',conceptId:'fischer-allowed-rotation',
+      teach:'Turning a Fischer projection 180° on the page preserves its configuration. Turning it 90° and reading it as a new Fischer does not.',
+      prompt:'Which page rotation keeps a Fischer projection’s configuration when you read it again as a Fischer?',
+      choices:[{id:'a',text:'180°'},{id:'b',text:'90°'},{id:'c',text:'Every page rotation'}],answer:'a',
+      feedback:'Use 180°. A 90° reinterpretation exchanges toward/away positions and changes the configuration.'}
+  },
+  'ch5:ch5-relationships':{
+    2:{id:'LC5-relationships-mirror-test',conceptId:'whole-molecule-superimposability',
+      teach:'An enantiomer is a mirror image that cannot line up exactly with the original. A symmetry check can reveal that a mirror image is actually the same compound.',
+      prompt:'A molecule and its mirror image can line up exactly in 3-D. How are they related?',
+      choices:[{id:'a',text:'Enantiomers'},{id:'b',text:'The same compound'},{id:'c',text:'Constitutional isomers'}],answer:'b',
+      feedback:'They are the same compound. Enantiomers must be mirror images that cannot be superimposed.'}
+  },
+  'ch5:ch5-symmetry':{
+    0:{id:'LC5-symmetry-ring-paths',conceptId:'ring-stereocenter-path-comparison',
+      teach:'The two directions around a ring count as two attached paths. Follow both paths; being in a ring does not automatically make them identical.',
+      prompt:'To compare the two ring paths attached to a candidate stereocenter, what should you do?',
+      choices:[{id:'a',text:'Assume every ring gives two identical paths'},{id:'b',text:'Count only the first atom of each path'},{id:'c',text:'Follow both paths until they differ or prove identical'}],answer:'c',
+      feedback:'Trace both ring paths. A later branch or different atom can make them different groups.'},
+    2:{id:'LC5-symmetry-meso',conceptId:'meso-versus-racemate',
+      teach:'Meso means one achiral compound that has stereocenters. A racemate is a 50:50 mixture of two enantiomers.',
+      prompt:'Which describes a meso compound?',
+      choices:[{id:'a',text:'One achiral compound with stereocenters'},{id:'b',text:'A 50:50 mixture of enantiomers'},{id:'c',text:'Any molecule with two stereocenters'}],answer:'a',
+      feedback:'Meso is one achiral compound, not a mixture. Two stereocenters alone do not guarantee meso or chirality.'}
+  },
+  'ch5:ch5-ez':{
+    0:{id:'LC5-ez-eligibility',conceptId:'ez-distinct-groups-at-both-ends',
+      teach:'E/Z needs two different groups on each double-bond carbon. If either carbon has two matching groups, stop: no E/Z.',
+      prompt:'One carbon of a C=C bond has H and H attached. Can this double bond have an E/Z label?',
+      choices:[{id:'a',text:'Yes, always E'},{id:'b',text:'No'},{id:'c',text:'Yes, always Z'}],answer:'b',
+      feedback:'No. That end has two identical groups, so E/Z is not defined.'},
+    2:{id:'LC5-ez-winners',conceptId:'ez-compare-local-priority-winners',
+      teach:'Pick the higher-priority group at each end of C=C. Winners on the same side give Z; winners on opposite sides give E.',
+      prompt:'The higher-priority group at each end of C=C is on the same side. Which label fits?',
+      choices:[{id:'a',text:'E'},{id:'b',text:'Either E or Z'},{id:'c',text:'Z'}],answer:'c',
+      feedback:'Same side for the two higher-priority groups means Z. Compare the winners, not just similar-looking groups.'}
+  },
+  'ch5:ch5-representations':{
+    0:{id:'LC5-representations-front-carbon',conceptId:'newman-viewing-direction',
+      teach:'The Newman dot is the front carbon; the circle is the back carbon. Looking from C2 toward C3 puts C2 in front.',
+      prompt:'You look from C2 toward C3. Which carbon is the center dot in the Newman view?',
+      choices:[{id:'a',text:'C2'},{id:'b',text:'C3'},{id:'c',text:'Whichever carbon is drawn higher'}],answer:'a',
+      feedback:'C2 is nearer your eye, so it is the dot. C3 is the rear circle.'},
+    2:{id:'LC5-representations-chair-flip',conceptId:'chair-flip-preserves-face',
+      teach:'A ring flip changes axial to equatorial and equatorial to axial. Each group stays on its carbon and keeps its up/down face.',
+      prompt:'A group is axial up before a ring flip. Where is it afterward?',
+      choices:[{id:'a',text:'Axial down'},{id:'b',text:'Equatorial up'},{id:'c',text:'Equatorial down'}],answer:'b',
+      feedback:'Equatorial up. The site changes, but the face and carbon do not.'}
+  },
+  'ch5:ch5-optical':{
+    0:{id:'LC5-optical-percent-ee',conceptId:'ee-from-composition',
+      teach:'For a mixture containing only two enantiomers, ee is the larger percentage minus the smaller percentage—not the percentage of the major enantiomer.',
+      prompt:'A sample is 80% R and 20% S. What is its enantiomeric excess (ee)?',
+      choices:[{id:'a',text:'80% ee'},{id:'b',text:'20% ee'},{id:'c',text:'60% ee'}],answer:'c',
+      feedback:'80 − 20 = 60% ee, favoring R. The sample is 80% R, but its excess is only 60%.'},
+    2:{id:'LC5-optical-rs-not-sign',conceptId:'configuration-does-not-predict-rotation',
+      teach:'R/S names the 3-D arrangement. (+)/(−) is the measured direction of optical rotation. R does not automatically mean (+).',
+      prompt:'You know a pure enantiomer is R. Can you tell whether its optical rotation is (+) or (−) from R alone?',
+      choices:[{id:'a',text:'No; the rotation must be measured or supplied'},{id:'b',text:'Yes; R always means (+)'},{id:'c',text:'Yes; R always means (−)'}],answer:'a',
+      feedback:'No. Configuration and the measured rotation sign are separate pieces of information.'}
+  },
+  'ch4:ch4-carbon-map':{
+    1:{id:'LC4-carbon-map-parent-path',conceptId:'parent-is-one-continuous-path',
+      teach:'A parent chain is one continuous path. You cannot visit a carbon twice to collect extra branches.',
+      prompt:'Can a proposed parent chain pass through the same junction carbon twice?',
+      choices:[{id:'a',text:'Yes, if that makes the chain longer'},{id:'b',text:'No; each carbon on the path is counted once'},{id:'c',text:'Yes, if the drawing has enough corners'}],answer:'b',
+      feedback:'No. Try another continuous path instead; doubling back through a carbon does not make a valid longer parent.'}
+  },
+  'ch4:ch4-name-draw':{
+    1:{id:'LC4-name-draw-first-difference',conceptId:'lowest-locants-first-difference',
+      teach:'Compare numbering lists from left to right. At the first difference, the lower number wins. Do not choose by adding all the numbers.',
+      prompt:'Two numbering directions give 2,3,6 and 2,4,5. Which list wins?',
+      choices:[{id:'a',text:'2,3,6'},{id:'b',text:'2,4,5'},{id:'c',text:'They tie because both sums are 11'}],answer:'a',
+      feedback:'2,3,6 wins: the first numbers tie, then 3 is lower than 4. The sums do not decide.'}
+  },
+  'ch4:ch4-isomers':{
+    1:{id:'LC4-isomers-connections',conceptId:'constitutional-isomer-connectivity',
+      teach:'Constitutional isomers share a formula but connect atoms differently. Rotating the paper alone does not make a new isomer.',
+      prompt:'You rotate a drawing without changing any bond connections. Have you created a new constitutional isomer?',
+      choices:[{id:'a',text:'Yes, if branches now point left instead of right'},{id:'b',text:'Yes, if the page is upside down'},{id:'c',text:'No'}],answer:'c',
+      feedback:'No. A new constitutional isomer needs different atom-to-atom connections, not a new page angle.'}
+  },
+  'ch4:ch4-newman-view':{
+    0:{id:'LC4-newman-view-front',conceptId:'newman-viewing-direction',
+      teach:'Read the viewing direction first. Looking from C3 toward C2 puts C3 in front: C3 is the dot and C2 is the circle.',
+      prompt:'The viewing direction is C3 → C2. Which carbon is the front dot?',
+      choices:[{id:'a',text:'C2'},{id:'b',text:'C3'},{id:'c',text:'Always the lower-numbered carbon'}],answer:'b',
+      feedback:'C3 is in front. The viewing direction—not the smaller carbon number—decides.'}
+  },
+  'ch4:ch4-conformer-energy':{
+    2:{id:'LC4-conformer-energy-anti',conceptId:'butane-staggered-energy',
+      teach:'Both anti and gauche butane are staggered. Anti puts the methyl groups farther apart and is lower in energy than gauche.',
+      prompt:'Which staggered butane conformation is lower in energy?',
+      choices:[{id:'a',text:'Anti: methyl groups 180° apart'},{id:'b',text:'Gauche: methyl groups 60° apart'},{id:'c',text:'They must tie because both are staggered'}],answer:'a',
+      feedback:'Anti is lower. Being staggered avoids eclipsing, but the distance between methyl groups still matters.'}
+  },
+  'ch4:ch4-chair-basics':{
+    2:{id:'LC4-chair-basics-opposite-face',conceptId:'axial-equatorial-versus-up-down',
+      teach:'At one chair carbon, axial and equatorial point to opposite faces. Axial up means equatorial down at that same carbon.',
+      prompt:'At a particular chair carbon, the axial bond points down. Which way does its equatorial bond point?',
+      choices:[{id:'a',text:'Down'},{id:'b',text:'It has no up/down face'},{id:'c',text:'Up'}],answer:'c',
+      feedback:'Up. At the same carbon, axial and equatorial are opposite in face; equatorial does not mean “always down.”'}
+  },
+  'ch4:ch4-chair-flip':{
+    2:{id:'LC4-chair-flip-invariants',conceptId:'chair-flip-preserves-carbon-and-face',
+      teach:'In a ring flip, a group stays on its carbon and keeps its up/down face. Only its axial/equatorial site switches.',
+      prompt:'A group is equatorial down at C2. After a ring flip, where is that same group?',
+      choices:[{id:'a',text:'Axial up at C2'},{id:'b',text:'Axial down at C2'},{id:'c',text:'Axial down at a different carbon'}],answer:'b',
+      feedback:'Axial down at C2. The site changes; the carbon and down face stay fixed.'}
+  },
+  'ch4:ch4-chair-stability':{
+    2:{id:'LC4-chair-stability-penalty',conceptId:'compare-total-axial-penalties',
+      teach:'For two valid chairs of the same compound, compare their total axial penalties. The lower penalty means the lower-energy chair.',
+      prompt:'Two valid chairs have total axial penalties of 8 and 23 kJ/mol. Which is more stable?',
+      choices:[{id:'a',text:'The 8 kJ/mol chair'},{id:'b',text:'The 23 kJ/mol chair'},{id:'c',text:'The one drawn higher on the page'}],answer:'a',
+      feedback:'The 8 kJ/mol chair has less axial strain, so it is lower in energy and more stable.'}
+  },
+  'ch4:ch4-cis-trans-faces':{
+    1:{id:'LC4-cis-trans-faces-same',conceptId:'cis-trans-from-faces',
+      teach:'Same ring face means cis: up/up or down/down. Opposite faces mean trans: up/down. Axial/equatorial alone does not decide.',
+      prompt:'Two substituents on different ring carbons both point down. Are they cis or trans?',
+      choices:[{id:'a',text:'Trans'},{id:'b',text:'Only cis if both are equatorial'},{id:'c',text:'Cis'}],answer:'c',
+      feedback:'Cis. Both are on the same face, even if one is axial and the other equatorial.'}
+  },
+  'ch4:ch4-combustion-stability':{
+    1:{id:'LC4-combustion-signed-enthalpy',conceptId:'heat-released-versus-signed-enthalpy',
+      teach:'For same-formula isomers making the same products under the same conditions, less heat released means a more stable starting isomer. “Less released” is a less negative ΔH.',
+      prompt:'Comparable isomers give the same products: A has ΔH = −5400 and B has ΔH = −5380 kJ/mol. Which starts more stable?',
+      choices:[{id:'a',text:'A: it releases more heat'},{id:'b',text:'B: it releases less heat'},{id:'c',text:'They must tie because both values are negative'}],answer:'b',
+      feedback:'B releases 20 kJ/mol less heat to reach the same products. It starts 20 kJ/mol lower in energy.'},
+    2:{id:'LC4-combustion-per-ch2',conceptId:'ring-strain-normalized-comparison',
+      teach:'Different-sized cycloalkanes contain different numbers of CH₂ units. Compare heat released per CH₂ before using it to discuss ring strain.',
+      prompt:'Why divide combustion heat by the number of CH₂ units when comparing different-sized cycloalkanes?',
+      choices:[{id:'a',text:'To compare on the same amount-of-structure basis'},{id:'b',text:'To make every ring equally strained'},{id:'c',text:'To calculate how fast each ring burns'}],answer:'a',
+      feedback:'Normalization makes the comparison fair. Raw total heat also grows with the number of CH₂ units; it is not a reaction-rate measurement.'}
+  },
+  'ch4:ch4-ring-strain-study':{
+    0:{id:'LC4-ring-strain-eclipsing',conceptId:'distinguish-types-of-strain',
+      teach:'Angle strain concerns bond angles. Torsional strain concerns eclipsing. Steric strain concerns nonbonded crowding; more than one can occur together.',
+      prompt:'Which strain term specifically refers to eclipsing bonds?',
+      choices:[{id:'a',text:'Angle strain'},{id:'b',text:'Ring size alone'},{id:'c',text:'Torsional strain'}],answer:'c',
+      feedback:'Eclipsing is the torsional-strain issue. Check bond angles and nonbonded crowding separately.'}
+  },
+  'ch4:ch4-chair-paper-check':{
+    3:{id:'LC4-chair-paper-total-penalty',conceptId:'total-penalty-not-per-contact',
+      teach:'A stated total axial penalty already includes that group’s axial contacts. Do not double it just because there are two 1,3-diaxial contacts.',
+      prompt:'A table gives a group’s TOTAL axial penalty as 7.6 kJ/mol. What do you add for one axial copy of that group?',
+      choices:[{id:'a',text:'15.2 kJ/mol'},{id:'b',text:'7.6 kJ/mol'},{id:'c',text:'3.8 kJ/mol'}],answer:'b',
+      feedback:'Add 7.6 kJ/mol once. Double a value only if the problem gives a per-contact cost and two such contacts apply.'}
+  },
+  'ch4:ch4-quiz-parent-attachment':{
+    1:{id:'LC4-parent-length-tie',conceptId:'parent-tie-substituent-count',
+      teach:'Choose the longest parent first. Only when longest lengths tie, choose the candidate that leaves more separate substituents.',
+      prompt:'Two possible parents are equally longest. One leaves two substituents; the other leaves three. Which do you choose?',
+      choices:[{id:'a',text:'The one with three substituents'},{id:'b',text:'The one with two substituents'},{id:'c',text:'Whichever is horizontal on the page'}],answer:'a',
+      feedback:'For this true longest-length tie, choose the candidate with three substituents. This rule never lets a shorter chain beat a longer one.'}
+  },
+  'ch4:ch4-quiz-bicyclo':{
+    1:{id:'LC4-bicyclo-internal-counts',conceptId:'bicyclo-bridge-internal-atoms',
+      teach:'In bicyclo brackets, count the internal atoms on each bridge—not the two bridgeheads. Put the three counts in descending order.',
+      prompt:'When writing the three bicyclo bridge counts, do you include the shared bridgehead atoms in each count?',
+      choices:[{id:'a',text:'Yes, both bridgeheads each time'},{id:'b',text:'Yes, just the starting bridgehead'},{id:'c',text:'No; count only internal atoms'}],answer:'c',
+      feedback:'Count only internal atoms in the brackets. Add the two bridgeheads once to get the total parent carbon count.'}
+  },
+  'ch4:ch4-quiz-shape-tracking':{
+    3:{id:'LC4-shape-track-one-group',conceptId:'real-flip-versus-view-change',
+      teach:'Turning a model changes your view, not its axial/equatorial sites. A real ring flip switches each group’s site while keeping its carbon and face.',
+      prompt:'You turn a chair model to look from another side without changing its conformation. Does an axial group become equatorial?',
+      choices:[{id:'a',text:'Yes, whenever it looks sideways'},{id:'b',text:'No; that needs a real ring flip'},{id:'c',text:'Yes, if you turn it 90°'}],answer:'b',
+      feedback:'No. A new viewing angle is not a ring flip. Track the same group on the same carbon.'}
+  },
+  'ch4:ch4-quiz-double-newman':{
+    3:{id:'LC4-double-newman-carbon-count',conceptId:'double-newman-preserves-ring-carbons',
+      teach:'Two Newman views show four separate carbons: two dots and two circles. The two remaining ring carbons connect those views into one six-carbon ring.',
+      prompt:'Two Newman views show four carbons of cyclohexane. How many other ring carbons must connect the views?',
+      choices:[{id:'a',text:'Two'},{id:'b',text:'Zero'},{id:'c',text:'Four'}],answer:'a',
+      feedback:'Two more carbons complete the six-carbon ring. Overlapping dot/circle drawings do not merge atoms.'}
+  }
+};
+
+/* Brief checks after selected teaching steps. Immediate, supported recognition
+ * is NOT cold retrieval, whole-lesson mastery, or exam-readiness evidence.
+ * Device-local, profile-scoped, no cloud writes and no changes to S.attempts. */
+const LC_VERSION='2026-10-07.1',LC_EVENT_CAP=1000,LC_PROGRESS_CAP=200;
+const lcRuntime=new Map();
+let lcClock=null,lcLastTick=Date.now();
+function lcEnabled(){return !!PROFILE&&safeStore.get('lessonChecksEnabled',true);}
+function lcEvents(){return safeStore.get('lessonCheckEvents',[]);}
+function lcStamp(){return typeof crypto.randomUUID==='function'?crypto.randomUUID():'lc-'+Date.now()+'-'+Math.random().toString(36).slice(2);}
+function lcFingerprint(spec){return leFingerprint({version:LC_VERSION,...spec});}
+function lcSave(progress){
+  lcRuntime.set(progress.key,progress);
+  if(!lcEnabled())return;
+  const rows=safeStore.get('lessonCheckProgress',{});rows[progress.key]=progress;
+  safeStore.set('lessonCheckProgress',Object.fromEntries(Object.entries(rows).sort((a,b)=>a[1].updatedAt-b[1].updatedAt).slice(-LC_PROGRESS_CAP)));
+}
+function lcRecord(kind,progress,extra={}){
+  if(!lcEnabled())return;
+  const event={id:lcStamp(),kind,ts:Date.now(),version:LC_VERSION,actor:leActor(),
+    runId:progress.runId,key:progress.key,lessonKey:progress.lessonKey,step:progress.step,
+    checkId:progress.checkId,conceptId:progress.conceptId,itemFingerprint:progress.fingerprint,
+    context:'immediate-after-instruction',cold:false,...extra};
+  safeStore.set('lessonCheckEvents',[...lcEvents(),event].slice(-LC_EVENT_CAP));
+}
+function lcProgress(key,index,spec){
+  const id=key+':'+index,fp=lcFingerprint(spec);
+  let p=lcRuntime.get(id)||(lcEnabled()?safeStore.get('lessonCheckProgress',{})[id]:null);
+  if(!p||p.fingerprint!==fp||p.closed){
+    p={key:id,lessonKey:key,step:index,checkId:spec.id,conceptId:spec.conceptId,fingerprint:fp,
+      runId:lcStamp(),phase:'info',openedAt:null,updatedAt:Date.now(),answerCount:0,passed:false,
+      activeMs:0,lastAnswerActiveMs:0,rereads:0,fullRuleViewed:false,confusionReported:false,
+      feedbackSeen:false,selected:null,confidence:null,choiceOrder:spec.choices.map(c=>c.id)};
+    for(let i=p.choiceOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p.choiceOrder[i],p.choiceOrder[j]]=[p.choiceOrder[j],p.choiceOrder[i]];}
+    lcSave(p);
+  }
+  return p;
+}
+function lcTick(now=Date.now()){
+  if(lcClock&&lcClock.phase==='check'&&!lcClock.passed&&!lcClock.closed){
+    lcClock.activeMs+=focusActiveSlice(lcLastTick,now,focusLastActivity,focusForeground);
+  }
+  lcLastTick=now;
+}
+function lcStop(){lcTick();if(lcClock)lcSave(lcClock);lcClock=null;}
+['blur','pagehide'].forEach(type=>window.addEventListener(type,lcStop));
+document.addEventListener('visibilitychange',()=>{lcTick();if(lcClock)lcSave(lcClock);});
+setInterval(()=>{lcTick();if(lcClock)lcSave(lcClock);},5000);
+function lcOpenCheck(p){
+  if(!p.openedAt){
+    focusVisitSave();p.openedAt=Date.now();lcRecord('check-opened',p,{instructionShown:true,
+      instructionVisitId:focusVisit?.id||null,instructionForegroundMs:focusVisit?.foregroundMs??null,instructionActiveMs:focusVisit?.activeMs??null});
+  }
+  p.phase='check';p.updatedAt=Date.now();lcSave(p);
+}
+function lcSubmit(p,spec){
+  if(p.passed||!spec.choices.some(c=>c.id===p.selected))return false;
+  lcTick();const correct=p.selected===spec.answer,first=p.answerCount===0;
+  const previous=lcEvents().filter(e=>e.kind==='answer'&&e.checkId===spec.id&&e.itemFingerprint===p.fingerprint);
+  const feedbackBefore=p.feedbackSeen;
+  const supportKinds=[...(p.rereads?['reread']:[]),...(p.fullRuleViewed?['full-rule']:[]),...(feedbackBefore?['answer-feedback']:[])];
+  p.answerCount++;p.passed=correct;p.lastCorrect=correct;p.updatedAt=Date.now();
+  lcRecord('answer',p,{choiceId:p.selected,choiceText:spec.choices.find(c=>c.id===p.selected).text,
+    correct,attemptNumber:p.answerCount,firstInRun:first,firstRetainedForItem:previous.length===0,
+    confidence:p.confidence||null,confidenceStatus:p.confidence?'reported':'not-answered',
+    rereads:p.rereads,fullRuleViewed:p.fullRuleViewed,feedbackSeenBefore:feedbackBefore,
+    supportKinds,firstWithoutReopenedHelp:first&&supportKinds.length===0,
+    supportedRetry:!first||feedbackBefore,foregroundResponseMs:Math.max(0,p.activeMs-p.lastAnswerActiveMs),
+    timingCaveat:'Idle-limited foreground estimate, not attention; silent reading may be undercounted.'});
+  p.lastAnswerActiveMs=p.activeMs;p.feedbackSeen=true;if(!correct)p.confidence=null;lcSave(p);return true;
+}
+function lcFinish(p,kind,extra={}){
+  if(!p.passed)return false;
+  lcTick();lcRecord(kind,p,{afterCorrect:true,attempts:p.answerCount,...extra});
+  p.closed=true;p.updatedAt=Date.now();lcSave(p);lcClock=null;return true;
+}
+function lcNextLesson(key){
+  const chapter=key.split(':')[0],id=key.slice(chapter.length+1);
+  const lessons=(CHAPTER_LEARNING_UNITS[chapter]||[]).filter(u=>!u.preview),i=lessons.findIndex(u=>u.id===id),next=lessons[i+1];
+  if(i>=0&&next)openLearningUnit(chapter,next.id);
+  else{smSetChapter(chapter);smGo('learn');}
+}
+function lcFocus(panel){panel.querySelector('h2')?.focus();}
+const LC_ORIGINAL_RULE_STEPS=focusRuleSteps;
+focusRuleSteps=function(host,u,key,example){
+  const checks=LESSON_CHECKS[key];
+  if(!checks)return LC_ORIGINAL_RULE_STEPS(host,u,key,example);
+  const steps=u.steps?.length?u.steps:[u.explain],positions=safeStore.get('lessonStepPositions',{});
+  let index=Math.max(0,Math.min(Number(positions[key])||0,steps.length-1));
+  const panel=el('section',{'data-focus-steps':key});host.appendChild(panel);
+  const advance=()=>{if(index===steps.length-1){example();return;}index++;draw();lcFocus(panel);};
+  const draw=()=>{
+    lcStop();panel.innerHTML='';
+    const spec=checks[index],p=spec?lcProgress(key,index,spec):null,isCheck=p?.phase==='check';
+    panel.dataset.lessonPhase=isCheck?'check':'info';
+    panel.dataset.focusLesson=key+':rule:'+index+(isCheck?':check':'');
+    const saved=safeStore.get('lessonStepPositions',{});saved[key]=index;
+    safeStore.set('lessonStepPositions',Object.fromEntries(Object.entries(saved).slice(-200)));
+    panel.appendChild(el('h2',{tabindex:'-1','data-focus-step-heading':'true'},isCheck?'One quick check':'Step '+(index+1)+' of '+steps.length));
+    if(isCheck){
+      lcClock=p;lcLastTick=Date.now();
+      const form=el('form',{'data-lc-check':spec.id});
+      const fieldset=el('fieldset',{class:'lc-options'});fieldset.appendChild(el('legend',{},esc(spec.prompt)));
+      p.choiceOrder.forEach(id=>{
+        const choice=spec.choices.find(c=>c.id===id),label=el('label',{class:'lc-choice'});
+        const input=el('input',{type:'radio',name:'lesson-choice',value:id,'data-lc-choice':id});
+        input.checked=p.selected===id;input.disabled=p.passed;
+        input.addEventListener('change',()=>{p.selected=id;p.updatedAt=Date.now();lcSave(p);});
+        label.appendChild(input);label.appendChild(document.createTextNode(choice.text));fieldset.appendChild(label);
+      });form.appendChild(fieldset);
+      if(!p.passed){
+        const confidence=el('label',{class:'lc-confidence'});confidence.appendChild(document.createTextNode('How sure? · optional '));
+        const select=el('select',{'aria-label':'Lesson check confidence','data-lc-confidence':true});
+        [['','Not answered'],['sure','Sure'],['unsure','Unsure'],['guess','Guess']].forEach(([value,text])=>select.appendChild(el('option',{value},text)));
+        select.value=p.confidence||'';select.addEventListener('change',()=>{p.confidence=select.value||null;lcSave(p);});confidence.appendChild(select);form.appendChild(confidence);
+        form.appendChild(el('button',{type:'submit',class:'btn','data-lc-submit':true},p.answerCount?'Check again':'Check answer'));
+      }
+      const message=el('div',{role:'status','aria-live':'polite','data-lc-feedback':true});
+      if(p.answerCount){message.appendChild(el('p',{},p.passed?'Correct. '+esc(spec.feedback):'Not yet. '+esc(spec.feedback)));if(!p.passed)message.appendChild(el('p',{},'Choose again, or read the step once more.'));}
+      form.appendChild(message);
+      form.addEventListener('submit',e=>{e.preventDefault();if(!p.selected){message.textContent='Choose one answer first.';return;}if(lcSubmit(p,spec)){draw();lcFocus(panel);}});panel.appendChild(form);
+      const nav=el('div',{class:'focus-actions'});
+      if(p.passed){
+        nav.appendChild(etBtn(index===steps.length-1?'See one example →':'Next step →',()=>{if(lcFinish(p,'continue')){focusVisitAction('next');advance();}},false,{'data-lc-continue':true}));
+        nav.appendChild(etBtn('I’ve got this — skip the rest of this lesson',()=>{
+          if(lcFinish(p,'skip-rest',{skippedRuleSteps:Math.max(0,steps.length-index-1),skippedParts:['remaining-rule-steps','worked-example','practice-launch'],meaning:'Learner choice after one correct check; remaining content unassessed.'}))lcNextLesson(key);
+        },true,{'data-lc-skip':true}));
+        panel.appendChild(el('p',{class:'muted lc-note'},'This checks one idea—not the whole lesson.'));
+      }else nav.appendChild(etBtn('Read the step again',()=>{lcTick();p.rereads++;lcRecord('reread',p,{afterAttempts:p.answerCount});p.phase='info';lcSave(p);draw();lcFocus(panel);},true,{'data-lc-reread':true}));
+      panel.appendChild(nav);
+    }else{
+      panel.appendChild(el('p',{class:'focus-instruction','data-focus-instruction':true},esc(steps[index])));
+      if(spec?.teach)panel.appendChild(el('p',{class:'lc-teach'},esc(spec.teach)));
+      const nav=el('div',{class:'focus-actions'});
+      nav.appendChild(etBtn('Back',()=>{focusVisitAction('back');index--;draw();lcFocus(panel);},true,{disabled:index===0}));
+      nav.appendChild(etBtn(spec?'Next · quick check →':index===steps.length-1?'See one example →':'Next step →',()=>{
+        focusVisitAction('next');if(p){lcOpenCheck(p);draw();lcFocus(panel);}else advance();
+      },false,{'data-focus-step-next':true}));panel.appendChild(nav);
+      const full=el('div');full.appendChild(el('p',{},esc(u.explain)));full.appendChild(el('ol',{},steps.map(s=>'<li>'+esc(s)+'</li>').join('')));
+      const details=focusDetails('Full rule & all steps',full);details.addEventListener('toggle',()=>{if(details.open&&p){p.fullRuleViewed=true;lcRecord('full-rule-opened',p);lcSave(p);}});panel.appendChild(details);
+    }
+    if(p&&!p.passed){
+      const report=etBtn(p.confusionReported?'Saved: this explanation needs work':'This explanation is confusing',()=>{
+        if(p.confusionReported)return;p.confusionReported=true;lcRecord('confusion-reported',p,{tier:'self-report',phase:p.phase,afterAttempts:p.answerCount});lcSave(p);draw();
+      },true,{'data-lc-confusing':true,disabled:p.confusionReported});panel.appendChild(report);
+    }
+    focusVisitStart(panel.dataset.focusLesson);
+  };draw();
+};
+function lcExport(){
+  lcTick();if(lcClock)lcSave(lcClock);
+  const rows=lcEvents().map(e=>lePick(e,['id','kind','ts','version','actor','runId','key','lessonKey','step','checkId','conceptId','itemFingerprint','context','cold','instructionShown','instructionVisitId','instructionForegroundMs','instructionActiveMs','choiceId','choiceText','correct','attemptNumber','firstInRun','firstRetainedForItem','confidence','confidenceStatus','rereads','fullRuleViewed','feedbackSeenBefore','supportKinds','firstWithoutReopenedHelp','supportedRetry','foregroundResponseMs','timingCaveat','afterCorrect','attempts','skippedRuleSteps','skippedParts','meaning','afterAttempts','tier','phase']));
+  const answers=rows.filter(e=>e.kind==='answer'),first=answers.filter(e=>e.firstInRun),correctRuns=new Set(answers.filter(e=>e.correct).map(e=>e.runId));
+  return {version:LC_VERSION,enabled:lcEnabled(),storage:'device-local, current profile; no automatic Claude/Codex delivery',cap:LC_EVENT_CAP,events:rows,
+    summary:{firstResponses:{correct:first.filter(e=>e.correct).length,n:first.length},retryResponses:{correct:answers.filter(e=>!e.firstInRun&&e.correct).length,n:answers.filter(e=>!e.firstInRun).length},runsWithCorrectAnswer:correctRuns.size,
+      firstWithReopenedHelp:first.filter(e=>e.supportKinds?.length>0).length,
+      skipRestChoices:rows.filter(e=>e.kind==='skip-rest').length,rereads:rows.filter(e=>e.kind==='reread').length,confusionReports:rows.filter(e=>e.kind==='confusion-reported').length,
+      checksOpened:rows.filter(e=>e.kind==='check-opened').length},
+    limits:['Immediate recognition after instruction, not independent recall or exam readiness.','First in a saved run is not first lifetime encounter. Retention cap can remove earlier events.','Wrong answers show feedback; later tries are supported, not fresh evidence.','Skipped lesson parts remain unassessed.','No automatic scoring of reading or attention.']};
+}
+function lcPanel(host){
+  const data=lcExport(),s=data.summary,c=el('section',{class:'card','data-lc-summary':true});
+  c.appendChild(el('h2',{},'Lesson checks'));
+  c.appendChild(el('p',{},'First response per visit: '+s.firstResponses.correct+' / '+s.firstResponses.n+' correct. After a retry: '+s.retryResponses.correct+' / '+s.retryResponses.n+' correct responses.'));
+  if(s.firstWithReopenedHelp)c.appendChild(el('p',{},s.firstWithReopenedHelp+' first responses followed reopened help. All checks follow teaching—not cold recall.'));
+  c.appendChild(el('p',{},'Skipped after a correct answer: '+s.skipRestChoices+'. Explanations marked confusing: '+s.confusionReports+'.'));
+  const details=focusDetails('What is tracked & controls');
+  details.appendChild(el('p',{},'Answers, optional confidence, retries, rereads, confusing steps, and skips. Latest '+LC_EVENT_CAP+' events, on this device and profile only. These checks follow teaching; they do not raise readiness scores.'));
+  const label=el('label'),input=el('input',{type:'checkbox','aria-label':'Record lesson check results'});input.checked=lcEnabled();
+  input.addEventListener('change',()=>{lcStop();safeStore.set('lessonChecksEnabled',input.checked);lcRuntime.clear();render();});label.appendChild(input);label.appendChild(document.createTextNode(' Record lesson check results'));details.appendChild(label);
+  const clear=etBtn('Clear lesson-check records',()=>{if(!confirm('Clear lesson-check records on this device? Ordinary practice answers stay saved.'))return;lcClock=null;lcRuntime.clear();safeStore.set('lessonCheckEvents',[]);safeStore.set('lessonCheckProgress',{});render();},true,{'data-lc-clear':true});details.appendChild(clear);c.appendChild(details);host.appendChild(c);
+}
+const LC_PREVIOUS_RENDER=render;
+render=function(){lcStop();LC_PREVIOUS_RENDER();};
+window.addEventListener('focus',()=>{const panel=document.querySelector('[data-focus-steps][data-lesson-phase="check"]');if(panel){const p=[...lcRuntime.values()].find(p=>p.lessonKey===panel.dataset.focusSteps&&p.phase==='check'&&!p.closed&&!p.passed);if(p){lcClock=p;lcLastTick=Date.now();}}});
+const lcStyle=el('style');lcStyle.textContent='.lc-options{border:0;padding:0;min-width:0;margin:16px 0}.lc-options legend{font-size:1.08rem;font-weight:650;margin-bottom:12px;line-height:1.5}.lc-choice{display:flex;gap:10px;align-items:center;border:1px solid #bacacf;border-radius:10px;padding:12px;margin:10px 0;min-height:44px;cursor:pointer;line-height:1.5}.lc-choice:has(input:checked){background:#e7f3f3;border-color:#176c72}.lc-choice input{flex:none;width:18px;height:18px}.lc-choice:focus-within{outline:3px solid #d99b18;outline-offset:2px}.lc-confidence{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0}.lc-confidence select{min-height:44px;max-width:100%;font:inherit}.lc-teach{border-left:3px solid #176c72;padding:8px 14px;line-height:1.6;max-width:60ch}.lc-note{font-size:.9rem}[data-lc-feedback] p{line-height:1.6}[data-lc-confusing]{font-size:.88rem;white-space:normal!important}[data-lc-skip]{white-space:normal!important}@media(max-width:500px){[data-focus-steps] .focus-actions{flex-direction:column}[data-focus-steps] .btn{max-width:100%;white-space:normal}.lc-options legend{font-size:1rem}}';document.head.appendChild(lcStyle);
+
+/* Resource exposure, 2026-10-07. Device-local and optional; never mastery.
+ * Integration: load after the lesson modules. leEngagementExport() joins the
+ * learning-evidence download; leEngagementPanel(host) adds its privacy controls.
+ * Official player contract: https://developers.google.com/youtube/iframe_api_reference
+ * Only explicitly loaded, assigned Ch5 videos use the player API. Ordinary
+ * external links remain usable and cannot report viewing time back to this app.
+ */
+const LE_ENGAGEMENT_VERSION='2026-10-07.1';
+const LE_ENG_CLICK_CAP=500,LE_ENG_VIDEO_CAP=100;
+const leEngPlayers=new Set();
+let leEngApiPromise=null,leEngPlayerSequence=0;
+function leEngActor(){return typeof leActor==='function'?leActor():{profile:typeof PROFILE==='string'?PROFILE:null,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};}
+function leEngAllowed(){return !!leEngActor().profile&&safeStore.get('resourceMetricsEnabled',true)!==false;}
+function leEngList(key){const rows=safeStore.get(key,[]);return Array.isArray(rows)?rows:[];}
+function leEngId(prefix){return prefix+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);}
+function leEngPick(row,keys){const out={};keys.forEach(k=>{if(Object.prototype.hasOwnProperty.call(row||{},k))out[k]=JSON.parse(JSON.stringify(row[k]));});return out;}
+function leEngUrl(raw){
+  try{
+    const u=new URL(raw);if(u.protocol!=='https:'||u.username||u.password)return null;
+    if(['www.youtube.com','youtube.com','youtu.be'].includes(u.hostname)){
+      const id=u.hostname==='youtu.be'?u.pathname.slice(1):u.pathname==='/watch'?u.searchParams.get('v'):null;
+      return /^[\w-]{11}$/.test(id||'')?'https://www.youtube.com/watch?v='+id:null;
+    }
+    u.search='';u.hash='';return u.href;
+  }catch(_){return null;}
+}
+function leEngCatalog(){
+  const map=new Map(),add=(raw,label,videoId=null)=>{const url=leEngUrl(raw);if(url)map.set(url,{url,label:String(label||'Course resource').slice(0,160),videoId});};
+  if(typeof CH5_COURSE!=='undefined'){
+    add(CH5_COURSE.slides,'Chapter 5 slides');
+    (CH5_COURSE.groups||[]).forEach(g=>{add(CH5_COURSE.canvas+'/pages/'+g.slug,g.title+' instructions');(g.videos||[]).forEach(([label,id])=>{if(/^[\w-]{11}$/.test(id))add('https://www.youtube.com/watch?v='+id,label,id);});});
+  }
+  const units=[];
+  if(typeof CH5_LESSONS!=='undefined')units.push(...CH5_LESSONS);
+  if(typeof CH4_LESSONS!=='undefined')units.push(...CH4_LESSONS);
+  units.forEach(u=>(u.sourceUrls||[u.source]).filter(x=>typeof x==='string').forEach(url=>add(url,(u.title||'Lesson')+' reference')));
+  // Exact published course URLs, not a domain-wide browser-history allowlist.
+  add('https://docs.google.com/spreadsheets/d/1jwWTZWfLK17B4Uf-AiADdKV9QEB8cANrf-UP20bAGnc/edit','Course schedule');
+  add('https://smccd.instructure.com/courses/73887/discussion_topics/1365021','Current-week announcement');
+  add('https://smccd.instructure.com/courses/73887/modules','Course modules');
+  return map;
+}
+function leEngContext(){
+  const root=document.getElementById('view'),step=root?.querySelector('[data-focus-lesson]'),ch5=root?.querySelector('[data-ch5-lesson]'),ch4=root?.querySelector('[data-learn-unit]'),repair=root?.querySelector('[data-transfer-lesson]');
+  return {view:typeof S!=='undefined'?String(S.view||'').slice(0,80):null,lessonKey:step?.dataset.focusLesson||(ch5?'ch5:'+ch5.dataset.ch5Lesson:ch4?'ch4:'+ch4.dataset.learnUnit:repair?'repair:'+repair.dataset.transferLesson:null)};
+}
+function leEngRecordClick(anchor,activation='click'){
+  if(!leEngAllowed()||!anchor||!document.getElementById('view')?.contains(anchor))return null;
+  const resource=leEngCatalog().get(leEngUrl(anchor.href));if(!resource)return null;
+  const row={id:leEngId('resource'),version:LE_ENGAGEMENT_VERSION,ts:Date.now(),actor:leEngActor(),kind:'resource-link-activation',activation,...resource,context:leEngContext(),tier:'exposure',meaning:'Link activated; destination load, reading and video playback are not observed.'};
+  safeStore.set('resourceClickEvents',leEngList('resourceClickEvents').concat(row).slice(-LE_ENG_CLICK_CAP));return row;
+}
+document.addEventListener('click',event=>{if(event.button===0)leEngRecordClick(event.target?.closest?.('a[href]'));},true);
+document.addEventListener('auxclick',event=>{if(event.button===1)leEngRecordClick(event.target?.closest?.('a[href]'),'middle-click');},true);
+
+/* Conservatively accept short, continuous position progress while the API says
+ * PLAYING. A seek jump, buffering, pause, hidden page, long polling gap or rate
+ * change earns no time for that interval. This remains an estimate: a small seek
+ * inside the tolerance cannot be distinguished perfectly from normal playback.
+ * We do not equate final playhead position or ENDED with full viewing.
+ */
+function leEngPlaybackSlice(previous,current){
+  if(!previous||!current||previous.state!==1||current.state!==1||!previous.foreground||!current.foreground)return {ms:0,discontinuity:false};
+  const wall=(current.at-previous.at)/1000,delta=current.position-previous.position,rate=previous.rate;
+  if(!Number.isFinite(wall)||wall<=0||wall>2.5||!Number.isFinite(delta)||!Number.isFinite(rate)||rate<=0||current.rate!==rate)return {ms:0,discontinuity:false};
+  const expected=wall*rate,tolerance=Math.max(.35,expected*.35);
+  if(delta<0||Math.abs(delta-expected)>tolerance)return {ms:0,discontinuity:true};
+  return {ms:Math.max(0,Math.min(wall,delta/rate)*1000),discontinuity:false};
+}
+function leEngReadPlayer(entry,at=Date.now()){
+  try{
+    const currentUrl=leEngUrl(entry.player?.getVideoUrl?.());
+    // Recommended/next videos are outside the assigned-ID allowlist.
+    if(currentUrl!=='https://www.youtube.com/watch?v='+entry.videoId)return null;
+    const position=entry.player.getCurrentTime(),rate=entry.player.getPlaybackRate(),state=entry.player.getPlayerState();
+    if(!Number.isFinite(position)||!Number.isFinite(rate))return null;
+    return {at,position,rate,state,foreground:!document.hidden&&document.hasFocus()};
+  }catch(_){return null;}
+}
+function leEngVideoSave(entry){
+  if(!leEngAllowed()||!entry.row||entry.closed)return;
+  entry.row.updatedAt=Date.now();const rows=leEngList('videoExposureSessions'),index=rows.findIndex(r=>r.id===entry.row.id);
+  const row=JSON.parse(JSON.stringify(entry.row));if(index<0)rows.push(row);else rows[index]=row;
+  safeStore.set('videoExposureSessions',rows.slice(-LE_ENG_VIDEO_CAP));
+}
+function leEngVideoSample(entry,at=Date.now()){
+  if(entry.closed)return;
+  const current=leEngReadPlayer(entry,at);
+  if(!leEngAllowed()||!entry.row){entry.previous=null;return;}
+  if(current){const slice=leEngPlaybackSlice(entry.previous,current);entry.row.foregroundPlaybackMs+=slice.ms;if(slice.discontinuity)entry.row.discontinuities++;const duration=entry.player.getDuration?.();if(Number.isFinite(duration)&&duration>0)entry.row.durationSeconds=duration;}
+  entry.previous=current;
+  if(at-entry.lastSave>=5000){leEngVideoSave(entry);entry.lastSave=at;}
+}
+function leEngVideoClose(entry,reason='navigation'){
+  if(entry.closed)return;
+  leEngVideoSample(entry);if(entry.row){entry.row.closedAt=Date.now();entry.row.closeReason=reason;leEngVideoSave(entry);}
+  entry.closed=true;clearInterval(entry.timer);clearTimeout(entry.readyTimeout);try{entry.player?.destroy?.();}catch(_){}
+  if(entry.button?.isConnected){entry.button.disabled=false;entry.button.textContent='Load video';}
+  leEngPlayers.delete(entry);
+}
+function leEngLoadApi(){
+  if(window.YT?.Player)return Promise.resolve(window.YT);
+  if(leEngApiPromise)return leEngApiPromise;
+  leEngApiPromise=new Promise((resolve,reject)=>{
+    const previous=window.onYouTubeIframeAPIReady,script=document.createElement('script');let settled=false;
+    const finish=(error)=>{if(settled)return;settled=true;clearTimeout(timeout);if(error){script.remove();reject(error);}else resolve(window.YT);};
+    const timeout=setTimeout(()=>finish(new Error('The video player did not load.')),12000);
+    window.onYouTubeIframeAPIReady=()=>{if(typeof previous==='function'){try{previous();}catch(_){}}if(window.YT?.Player)finish();};
+    script.src='https://www.youtube.com/iframe_api';script.onerror=()=>finish(new Error('The video player could not connect.'));document.head.appendChild(script);
+  }).catch(error=>{leEngApiPromise=null;throw error;});
+  return leEngApiPromise;
+}
+async function leEngLoadVideo(anchor,host,status,button){
+  if(!leEngActor().profile)return;
+  const resource=leEngCatalog().get(leEngUrl(anchor.href));if(!resource?.videoId||anchor.dataset.ch5AssignedVideo!==resource.videoId)return;
+  if(!/^https?:$/.test(location.protocol)){status.textContent='Use the live app to load this player, or open the original video link.';return;}
+  button.disabled=true;status.textContent='Loading YouTube. Press Play when it is ready.';
+  const entry={videoId:resource.videoId,host,button,player:null,previous:null,row:null,lastSave:Date.now(),closed:false};leEngPlayers.add(entry);
+  if(leEngAllowed()){
+    entry.row={id:leEngId('video'),version:LE_ENGAGEMENT_VERSION,actor:leEngActor(),videoId:resource.videoId,label:resource.label,context:leEngContext(),startedAt:Date.now(),foregroundPlaybackMs:0,playEvents:0,pauseEvents:0,endEvents:0,discontinuities:0,durationSeconds:null,status:'loading',tier:'exposure',measure:'estimated-foreground-continuous-playback',coverage:'Unique viewed segments and complete viewing are not measured.'};leEngVideoSave(entry);
+  }
+  try{
+    const YT=await leEngLoadApi();if(entry.closed||!host.isConnected)return;
+    const iframe=document.createElement('iframe');iframe.id='le-assigned-player-'+(++leEngPlayerSequence);iframe.title=resource.label;iframe.width='100%';iframe.height='240';iframe.style.cssText='display:block;width:100%;min-height:200px;border:0';iframe.setAttribute('allowfullscreen','');iframe.setAttribute('allow','encrypted-media; picture-in-picture');iframe.referrerPolicy='strict-origin-when-cross-origin';
+    const url=new URL('https://www.youtube-nocookie.com/embed/'+resource.videoId);url.searchParams.set('enablejsapi','1');url.searchParams.set('autoplay','0');url.searchParams.set('playsinline','1');url.searchParams.set('origin',location.origin);iframe.src=url.href;host.appendChild(iframe);
+    const fail=()=>{if(entry.closed)return;status.textContent='This player is unavailable. Use the original video link; outside viewing is not timed.';if(entry.row){entry.row.status='unavailable';leEngVideoSave(entry);}leEngVideoClose(entry,'player-unavailable');button.disabled=false;button.textContent='Try loading again';};
+    entry.readyTimeout=setTimeout(fail,15000);
+    entry.player=new YT.Player(iframe,{events:{
+      onReady:()=>{if(entry.closed)return;clearTimeout(entry.readyTimeout);status.textContent=leEngAllowed()?'Press Play. Only observed playback here is timed—not outside YouTube viewing.':'Press Play. Resource tracking is off.';if(entry.row){entry.row.status='ready';leEngVideoSave(entry);}entry.timer=setInterval(()=>leEngVideoSample(entry),1000);},
+      onStateChange:event=>{if(entry.closed)return;leEngVideoSample(entry);if(!leEngAllowed()||!entry.row)return;const sample=leEngReadPlayer(entry);if(!sample)return;entry.row.status=({1:'playing',2:'paused',0:'ended',3:'buffering',5:'cued'})[event.data]||'unstarted';if(event.data===1)entry.row.playEvents++;if(event.data===2)entry.row.pauseEvents++;if(event.data===0)entry.row.endEvents++;entry.previous=sample;leEngVideoSave(entry);},
+      onPlaybackRateChange:()=>{entry.previous=null;},onError:fail
+    }});
+  }catch(_){if(entry.closed)return;status.textContent='YouTube did not load. The original video link still works; outside viewing is not timed.';if(entry.row){entry.row.status='unavailable';leEngVideoSave(entry);}leEngVideoClose(entry,'api-unavailable');button.disabled=false;button.textContent='Try loading again';}
+}
+function leEngagementMount(root=document.getElementById('view')){
+  [...leEngPlayers].forEach(entry=>{if(!entry.host.isConnected)leEngVideoClose(entry);});
+  if(!root||!leEngActor().profile)return;
+  const catalog=leEngCatalog();root.querySelectorAll('a[data-ch5-assigned-video]').forEach(anchor=>{
+    const resource=catalog.get(leEngUrl(anchor.href));if(!resource?.videoId||resource.videoId!==anchor.dataset.ch5AssignedVideo||anchor.dataset.lePlayerOffered)return;
+    anchor.dataset.lePlayerOffered='true';const details=el('details',{'data-le-video-option':resource.videoId,style:'margin:8px 0 16px'});details.appendChild(el('summary',{},'Watch here · optional'));
+    details.appendChild(el('p',{class:'muted'},'Loading connects to YouTube. This app can estimate playback here if resource tracking is on. It cannot tell whether you paid attention. The original link still works.'));
+    const host=el('div',{'data-le-player-host':resource.videoId}),status=el('p',{role:'status',class:'muted'}),button=el('button',{class:'btn ghost',type:'button','data-le-video-load':resource.videoId},'Load video');button.addEventListener('click',()=>leEngLoadVideo(anchor,host,status,button));details.appendChild(button);details.appendChild(status);details.appendChild(host);anchor.after(details);
+  });
+}
+function leEngagementExport(){
+  if(!leEngActor().profile)return {enabled:false,events:[],videoSessions:[],scope:'Signed out; no resource evidence is read.'};
+  leEngPlayers.forEach(entry=>{leEngVideoSample(entry);leEngVideoSave(entry);});
+  return {version:LE_ENGAGEMENT_VERSION,enabled:safeStore.get('resourceMetricsEnabled',true)!==false,storage:'current-profile device-local; no cloud sync',tier:'exposure',caps:{clicks:LE_ENG_CLICK_CAP,videoSessions:LE_ENG_VIDEO_CAP},
+    events:leEngList('resourceClickEvents').map(r=>leEngPick(r,['id','version','ts','actor','kind','activation','url','label','videoId','context','tier','meaning'])),
+    videoSessions:leEngList('videoExposureSessions').map(r=>leEngPick(r,['id','version','actor','videoId','label','context','startedAt','updatedAt','closedAt','closeReason','foregroundPlaybackMs','playEvents','pauseEvents','endEvents','discontinuities','durationSeconds','status','tier','measure','coverage'])),
+    limitations:['Clicks are not verified destination visits or watching.','Only explicitly loaded assigned Chapter 5 players report playback; external tabs and older embeds are not measured.','Playback time estimates accepted short continuous foreground intervals. Seeks, long polling gaps and background time are excluded; small seeks may be indistinguishable from playback.','Video end events do not prove full viewing. Unique watched segments, attention, reading and understanding are not measured.','Disabled and unrecorded activity is missing evidence, not zero studying.']};
+}
+function leEngagementPanel(host){
+  if(!leEngActor().profile)return;
+  const box=el('details',{'data-le-resource-settings':'true'});box.appendChild(el('summary',{},'Resource clicks & video time · this device'));
+  const label=el('label'),enabled=el('input',{type:'checkbox','aria-label':'Record course resource clicks and in-app video playback'});enabled.checked=safeStore.get('resourceMetricsEnabled',true)!==false;label.appendChild(enabled);label.appendChild(document.createTextNode(' Record resource use'));box.appendChild(label);
+  const description=el('p',{},'Keeps the latest 500 supported course-link clicks and 100 video sessions. Only videos loaded with “Watch here” are timed. This does not show reading or understanding. Stored here, not sent to Claude or Codex.');box.appendChild(description);
+  const counts=el('p',{role:'status'}),update=()=>{counts.textContent=leEngList('resourceClickEvents').length+' clicks · '+leEngList('videoExposureSessions').length+' video sessions retained. Included in the learning-evidence download.';};update();box.appendChild(counts);
+  enabled.addEventListener('change',()=>{leEngPlayers.forEach(entry=>{leEngVideoSample(entry);leEngVideoSave(entry);entry.previous=null;entry.row=null;});safeStore.set('resourceMetricsEnabled',enabled.checked);counts.textContent=enabled.checked?'Recording on. Reload an open video to begin a new timed session.':'Recording off. Existing records stay until you delete them.';});
+  const clear=el('button',{class:'btn ghost',type:'button','data-le-resource-delete':'true'},'Delete resource history');clear.addEventListener('click',()=>{if(!confirm('Delete this profile’s resource clicks and video sessions on this device? Lesson answers and practice scores will stay.'))return;[...leEngPlayers].forEach(entry=>leEngVideoClose(entry,'history-deleted'));safeStore.set('resourceClickEvents',[]);safeStore.set('videoExposureSessions',[]);update();});box.appendChild(clear);host.appendChild(box);return box;
+}
+const LE_ENG_PREVIOUS_RENDER=render;
+render=function(){[...leEngPlayers].forEach(entry=>leEngVideoClose(entry,'navigation'));LE_ENG_PREVIOUS_RENDER.apply(this,arguments);leEngagementMount();};
+window.addEventListener('pagehide',()=>[...leEngPlayers].forEach(entry=>leEngVideoClose(entry,'pagehide')));
+document.addEventListener('visibilitychange',()=>leEngPlayers.forEach(entry=>{leEngVideoSample(entry);entry.previous=null;leEngVideoSave(entry);}));
+window.addEventListener('blur',()=>leEngPlayers.forEach(entry=>{leEngVideoSample(entry);entry.previous=null;leEngVideoSave(entry);}));
+window.addEventListener('focus',()=>leEngPlayers.forEach(entry=>{entry.previous=null;}));
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
