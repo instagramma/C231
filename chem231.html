@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.113 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.115 (LOCAL ONLY)
+  v3.115 (2026-10-12): VISUAL OPTICAL ACTIVITY + SPECIFIC ROTATION.
+  Original multi-representation selection problems and separate warm-ups.
+  v3.114 (2026-10-12): CHAIR PAIRS + IUPAC NAMES.
+  Linked relationship/two-name problems, optional warm-ups, part-level feedback.
   v3.113 (2026-10-11): VISUAL MESO + STEREOISOMER PRACTICE.
   Original ring, chain and Fischer problems; open-count select-all grading.
   v3.112 (2026-10-11): OPTIONAL EXPLANATION VIDEOS + MY PROGRESS.
@@ -1735,7 +1739,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.113 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.115 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -7402,12 +7406,13 @@ VIEWS.drill = (v) => {
     c.appendChild(gRow);
     reviewCtl=addReviewFlag(c,q,D);
   }
-  const finish = (ok, revealHtml, wrText, submitted) => {
+  const finish = (ok, revealHtml, wrText, submitted, fieldCheck) => {
     if(D.answered) return;   // v3.29.1: re-entry guard — a double-fire used to tally byTopic twice while D.right counted once, so the results card could show 100% AND flag a failing topic
     D.answered=true;
     const isDK = !!(dkk&&dkk.checked) || D._wrDK===true; // v3.5: 🤷 checkbox — unlearned; implies guess semantics + learn-first tag
     const guessed = isDK || !!(gk&&gk.checked) || D._wrGuessed===true;
     const attempt=logAttempt(q,ok,guessed,D,isDK,submitted); // v3.25: immutable event drives every derived qstat
+    if(q.chairPairAudit&&fieldCheck&&typeof ch5CPRecord==='function')ch5CPRecord(attempt,q,fieldCheck);
     const namingDiagnostic=!ok&&typeof ch4NamingResponseDiagnostic==='function'?ch4NamingResponseDiagnostic(q,submitted):null;
     if(namingDiagnostic){attempt.feedbackCode=namingDiagnostic.code;attempt.feedbackNote=namingDiagnostic.note;}
     const reviewFlag=!!(reviewCtl&&reviewCtl.active()), reviewNote=reviewFlag?reviewCtl.note():"";
@@ -7423,6 +7428,7 @@ VIEWS.drill = (v) => {
     // Keep the exact explanation on its own immutable attempt. Blank is valid;
     // the spatial/answer grader never uses this text to award correctness.
     if(['ch4','ch5'].includes(q.courseRoute)||[4,5].includes(q.chapter)){attempt.reasoning=wrText||rat;attempt.reasoningKind=wrText?'written':'rationale';if(rInp)rInp.readOnly=true;}
+    if(q.chairPairAudit&&attempt.evidence)attempt.evidence.reasoningReview={status:rat?'awaiting-review':'not-provided',reviewer:null};
     const reasonSignal=reasoningSignalText(wrText||rat); if(reasonSignal)attempt.rs=reasonSignal;
     // v3.15: keep a per-round record so "go back and see what I answered" is possible
     (D.log=D.log||[]).push({id:q.id, idx:D.i, ok:!!ok, g:!!guessed, dk:!!isDK, rf:reviewFlag, rn:reviewNote, h:attempt.h||0, hs:attempt.hs||[], hf:attempt.hf||"", ans:(submitted!==undefined&&submitted!==null)?String(submitted).slice(0,160):"", note:(['ch4','ch5'].includes(q.courseRoute)||[4,5].includes(q.chapter))?(wrText||rat||""):(wrText||rat||"").slice(0,400),sr:attempt.sr||0,drawing:attempt.drawing||null});
@@ -7437,6 +7443,7 @@ VIEWS.drill = (v) => {
     const verdict='<p class="'+(ok?"feedback-right":"feedback-wrong")+'">'+(ok?(isDK?"✓ Right — but marked 🤷 don't-know, so it counts as UNLEARNED and stays in rotation. Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" next.":guessed?"✓ Right — but flagged as a guess, so it stays in rotation":reviewFlag?"✓ Right — saved in your 🚩 review queue, so it is practice rather than clean proof.":attempt.h?"✓ Right with "+attempt.h+" hint"+(attempt.h===1?"":"s")+" — guided practice, not clean proof.":"✓ Right without hints"):(isDK?"🤷 Don't know yet — honest data, not a failure. Stays in rotation; hit the 📖 Learn primer for "+(TOPICS[q.topic]?.name||q.topic)+" after this round, then re-drill.":"✗ Not quite"+(revealHtml?" — answer: "+revealHtml:"")))+'</p>';
     fb.innerHTML=verdict+(D.cold?'<p class="muted" style="font-size:.85em">Cold run — explanations wait for the end. Keep moving.</p>':'<div class="why">'+q.why+'</div>')+(branch?'<details class="cq-details" data-adaptive-next><summary>Next practice step'+(branch.retained?' · planned question retained':branch.picks.length?' · adjusted to your answer':'')+'</summary><p>'+esc(branch.label)+(branch.picks.length?' · '+branch.picks.length+' future slot'+(branch.picks.length===1?'':'s')+' adjusted':branch.retained?'':' · no unused sibling available')+'.</p></details>':'');
     if(namingDiagnostic){const note=el('p',{'data-answer-diagnostic':namingDiagnostic.code,class:'why'},esc(namingDiagnostic.note));fb.insertBefore(note,fb.firstChild.nextSibling);}
+    if(q.chairPairAudit&&fieldCheck&&!D.cold){const parts=el('div');parts.innerHTML=ch5CPFeedback(q,fieldCheck.values,fieldCheck.checks);fb.insertBefore(parts,fb.firstChild.nextSibling);}
     if(attempt.sr){const verdict=fb.querySelector('p');if(verdict)verdict.textContent=ok?'Self-reviewed: you marked all rubric points complete. Not an automatic drawing grade.':'Self-reviewed: you identified a missing rubric point. Keep your drawing for comparison.';}
     if(isDK&&D.adaptive)fb.appendChild(el("button",{class:"btn teal",style:"margin-top:10px",onclick:()=>{snapshotDrill(D.i+1);S.drill=null;go("learn");}},"📖 Pause and open Learn primer"));
     fb.appendChild(el("button",{class:"btn coral",style:"margin-top:10px",onclick:()=>{D.i++;D.answered=false;D._hintState=null;render();}},"Next →"));
@@ -7503,6 +7510,7 @@ VIEWS.drill = (v) => {
       }else{
         ctl=el("input",{class:"answerbox",type:"text",inputmode:f.kind==="num"?"numeric":"text",placeholder:f.kind==="num"?"#":"answer",style:"width:"+(f.width||90)+"px;margin:0 4px","aria-label":f.label});
       }
+      if(q.chairPairAudit)ctl.style.maxWidth='calc(100% - 8px)';
       controls[i]=ctl; line.appendChild(displayCtl||ctl); last=rx.lastIndex;
     }
     const tail=el("span");tail.innerHTML=q.template.slice(last);line.appendChild(tail);
@@ -7511,11 +7519,12 @@ VIEWS.drill = (v) => {
       const vals=q.fields.map((f,i)=>(controls[i]?.dataset?.rankValue||controls[i]?.value||"").trim());
       if(vals.some(v=>v===""))return;
       const norm=s=>String(s).toLowerCase().replace(/²/g,"2").replace(/³/g,"3").replace(/°/g,"").replace(/[\s.]/g,"");
-      const ok=q.fields.every((f,i)=>f.kind==="num"?Math.abs(Number(vals[i])-Number(f.answer))<=(f.tolerance||0):(f.accept||[f.answer]).some(a=>norm(a)===norm(vals[i])));
+      const checks=q.fields.map((f,i)=>f.kind==="num"?Math.abs(Number(vals[i])-Number(f.answer))<=(f.tolerance||0):(f.accept||[f.answer]).some(a=>norm(a)===norm(vals[i])));
+      const ok=checks.every(Boolean);
       const correct=q.fields.map(f=>f.label+": "+f.answer).join(" · ");
       const submitted=q.fields.map((f,i)=>f.label+": "+vals[i]).join(" · ");
       controls.forEach(x=>{x.disabled=true;if(x._setDisabled)x._setDisabled(true);});sub.disabled=true;
-      finish(ok,"<b class='mono'>"+correct+"</b>",undefined,submitted);
+      finish(ok,q.chairPairAudit?'':"<b class='mono'>"+correct+"</b>",undefined,submitted,q.chairPairAudit?{values:vals,checks}:null);
     }},"Check all blanks");
     c.appendChild(line);c.appendChild(sub);
   } else if (q.type==="multiSelect"){
@@ -7549,7 +7558,7 @@ VIEWS.drill = (v) => {
         if(D.answered)return;
         const ok=o.i===q.answer;
         e.currentTarget.classList.add(ok?"picked-right":"picked-wrong");
-        if(!ok){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
+        if(!ok&&!(D.cold&&q.opticalVisualBank)){ [...ch.children].forEach((b,bi)=>{ if(order[bi].i===q.answer)b.classList.add("reveal-right"); }); }
         finish(ok,"",undefined,(q.choiceLabels||q.choices)[o.i]); // v3.18: image choices log a readable label
       }},o.txt));
     });
@@ -12668,6 +12677,12 @@ function renderCh5Lesson(v,u){
     if(['ch5-symmetry','ch5-relationships'].includes(u.id)&&typeof smStartVisualStereo==='function'){
       body.appendChild(ch5Button('Try a short visual problem set →',()=>smStartVisualStereo(u.id==='ch5-symmetry'?'meso':'pairs'),true,{'data-ch5-visual-set':u.id}));
     }
+    if(['ch5-optical','ch5-symmetry'].includes(u.id)&&typeof smStartOpticalVisual==='function'){
+      body.appendChild(ch5Button('Try optical activity & rotation →',()=>smStartOpticalVisual(),true,{'data-ch5-optical-set':u.id}));
+    }
+    if(['ch5-relationships','ch5-representations'].includes(u.id)&&typeof smStartChairPairs==='function'){
+      body.appendChild(ch5Button('Try chair pairs & names →',()=>smStartChairPairs(),true,{'data-ch5-chair-set':u.id}));
+    }
   }
   card.appendChild(body);
   const sources=(u.sourceUrls||[u.source]).filter(Boolean);
@@ -12946,6 +12961,310 @@ for(const q of CH5_VISUAL_STEREO_QUESTIONS){
   if(!lesson)throw new Error('Visual stereochemistry lesson missing: '+q.adaptiveSkill);
   const n=Number(q.id.slice(-2)),field=q.diff===1||n%2?'practiceIds':'coldIds';
   if(!lesson[field].includes(q.id))lesson[field].push(q.id);
+}
+
+/* Chair relationship + naming practice, 2026-10-12.
+ * Original, numbered drawings. Same linked response format as Gabe's homework.
+ * No old keys/attempts change. A finite family-aware bank is not an unseen exam.
+ */
+const CH5_CP_SOURCE='https://organicchemistrydata.org/reusch/virtualtext/stereoisomers-3/';
+const CH5_CP_RELATIONS=['Identical compounds','Enantiomers','Diastereomers','Constitutional isomers'];
+function ch5CPSpec(second=3,faces=['up','down'],group='Cl',view={}){
+  return {second,faces,group,mirror:false,flip:false,rotate:0,...view};
+}
+function ch5CPDiagram(spec,caption){
+  // Ideal chair: z alternates; a ring flip reverses heights, not group faces.
+  // View the flipped chair from the opposite side (a proper 180-degree turn
+  // about z), avoiding a flattened projection. Its front path is then 4-5-6.
+  const a=Math.sqrt(3)/2,xy=[[-a,-.5],[0,-1],[a,-.5],[a,.5],[0,1],[-a,.5]];
+  const z=xy.map((_,i)=>(i%2?1:-1)*(spec.flip?-1:1));
+  const viewXY=xy.map(([x,y])=>spec.flip?[-x,-y]:[x,y]);
+  const raw=viewXY.map(([x,y],i)=>[255+145*x-40*y,155-60*y-30*z[i]]);
+  const transform=([x,y])=>{if(spec.mirror)x=510-x;if(spec.rotate===180){x=510-x;y=330-y;}return [x,y];};
+  const line=(p,q,width=3,attrs='')=>{const [x1,y1]=transform(p),[x2,y2]=transform(q);return '<line '+attrs+' x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="currentColor" stroke-width="'+width+'" stroke-linecap="round"/>';};
+  const text=(p,label,size=26)=>{const [x,y]=transform(p);return '<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-size="'+size+'">'+ch5FEscape(label)+'</text>';};
+  let body=raw.map((p,i)=>line(p,raw[(i+1)%6],(spec.flip?i===3||i===4:i<2)?8:3,'data-ring-bond="'+(i+1)+'"')).join('');
+  const bonds=[];
+  [0,spec.second-1].forEach((site,j)=>{
+    const [x,y]=raw[site],axialFace=z[site]>0?'up':'down';
+    // A shorter C2-up stem keeps its label below the back ring edge.
+    const axialLength=site===1?35:57;
+    const dirs={axial:[0,-z[site]*axialLength],equatorial:[viewXY[site][0]*66-viewXY[site][1]*18,-viewXY[site][1]*26+z[site]*26]};
+    for(const [position,[dx,dy]] of Object.entries(dirs)){
+      const face=position==='axial'?axialFace:(axialFace==='up'?'down':'up');
+      const label=spec.faces[j]===face?spec.group:'H',length=Math.hypot(dx,dy);
+      body+=line([x,y],[x+dx,y+dy],3,'data-site="'+(site+1)+'" data-position="'+position+'" data-face="'+face+'" data-group="'+label+'"');
+      body+=text([x+dx*(1+17/length),y+dy*(1+17/length)],label);
+      bonds.push('C'+(site+1)+' '+label+' '+position+' '+face);
+    }
+  });
+  raw.forEach((p,i)=>{const [x,y]=transform(p);body+='<circle cx="'+x+'" cy="'+y+'" r="11" fill="white"/>'+text(p,String(i+1),20);});
+  const description='Numbered cyclohexane chair. Front ring path '+(spec.flip?'4-5-6':'1-2-3')+'. '+bonds.join('; ')+'.'+(spec.mirror?' Drawing reflected left to right.':'')+(spec.rotate?' Whole drawing rotated 180 degrees on the page.':'');
+  return '<figure class="ch5-cp-figure"><figcaption>'+ch5FEscape(caption)+'</figcaption><svg class="ch5-cp-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 510 330" role="img" aria-label="'+ch5FEscape(description)+'"><title>'+ch5FEscape(description)+'</title>'+body+'</svg></figure>';
+}
+function ch5CPNames(spec,configuration){
+  const suffix='-1,'+spec.second+'-di'+(spec.group==='Cl'?'chloro':'bromo')+'cyclohexane';
+  const configs=configuration[0]===configuration[1]?[configuration]:[configuration,configuration.split('').reverse().join('')];
+  // Either equivalent numbering of identical groups is valid for the meso form.
+  return configs.map(rs=>'(1'+rs[0]+','+spec.second+rs[1]+')'+suffix);
+}
+function ch5CPQuestion(n,extra){
+  return {id:'CH5-CP'+String(n).padStart(2,'0'),chapter:5,courseRoute:'ch5',topic:'stereoRelations',adaptiveSkill:'ch5-relationships',
+    source:'Original chair-pair practice requested Oct 12, 2026; same linked format as homework, not an instructor item. '+CH5_CP_SOURCE,
+    sourceUrl:CH5_CP_SOURCE,sourceKind:'original-practice',scopeStatus:'course-objectives',eligibleForUnseenTransfer:true,chairPairBank:true,...extra};
+}
+function ch5CPPair(n,a,b,relation,configs,why,family){
+  const names=[ch5CPNames(a,configs[0]),ch5CPNames(b,configs[1])];
+  return ch5CPQuestion(n,{type:'blanks',diff:2,difficulty:2,formatRole:'direct-answer',transferFamily:'ch5-chair-'+family,
+    prompt:'Establish the relationship between <b>A and B</b>. Then give the full IUPAC name of each, including <b>R/S and the carbon numbers (locants)</b>.'+
+      '<div class="ch5-cp-grid">'+ch5CPDiagram(a,'A')+ch5CPDiagram(b,'B')+'</div><p class="muted ch5-cp-note">Numbers identify the ring carbons. Bold ring bonds mark the front edge, not substituent wedges. Equivalent valid numbering is accepted. Written reasoning is optional.</p>',
+    template:'<span class="ch5-cp-field-label">Relationship</span>{{0}}<br><span class="ch5-cp-field-label">Full name of A</span>{{1}}<br><span class="ch5-cp-field-label">Full name of B</span>{{2}}',
+    fields:[{kind:'select',label:'Relationship',choices:CH5_CP_RELATIONS.slice(),answer:relation},
+      ...names.map((accept,i)=>({kind:'text',label:'Full name of '+String.fromCharCode(65+i),answer:accept[0],accept,width:410}))],
+    hints:['Check connections first. Then compare the configurations of corresponding atoms; a ring flip alone does not change R/S.',
+      'At each halogen-bearing carbon: halogen first, H last. Of the two ring routes, the one that reaches the other halogen-bearing carbon sooner ranks higher.'],
+    why:why+'<details><summary>More: naming and chair checks</summary><p>Use <b>cyclohexane</b> for this ring. Rank Cl or Br first and H fourth. Rank the two ring paths at their first difference. Axial down is not the same as pointing away from you: orient H away before reading 1 → 2 → 3.</p><p>A ring flip swaps axial/equatorial but preserves up/down and R/S. For these identical 1,2- or 1,3-substituents, cis is meso; trans gives an RR/SS enantiomer pair. In a meso name, reversing the equivalent numbering may exchange the R/S locants without changing the compound.</p></details>',
+    chairPairAudit:{specs:[a,b],configurations:configs,relationship:relation}
+  });
+}
+const cp13=ch5CPSpec(),cp12=ch5CPSpec(2);
+const CH5_CHAIR_PAIR_QUESTIONS=[
+  ch5CPQuestion(1,{type:'mc',diff:1,difficulty:1,formatRole:'foundation',transferFamily:'ch5-chair-parent',prompt:'What parent name belongs to this structure?'+ch5CPDiagram(cp13,'One structure'),choices:['Hexane','Cyclohexane','Cyclopentane','Heptane'],answer:1,why:'Six connected ring carbons give cyclohexane. Hexane is an open chain.'}),
+  ch5CPQuestion(2,{type:'mc',diff:1,difficulty:1,formatRole:'foundation',transferFamily:'ch5-chair-cip-path',prompt:'At <b>C1</b>, which ring path has higher CIP priority?'+ch5CPDiagram(cp13,'Compare the two ring routes'),choices:['C1 → C2 → C3','C1 → C6 → C5','They are tied because both start with carbon'],answer:0,why:'Both routes begin with CH₂. At the next comparison, the route through C2 reaches chlorine-bearing C3: [Cl, C, H] outranks [C, H, H]. Cl itself is priority 1 and H is priority 4.'}),
+  ch5CPQuestion(3,{type:'mc',diff:1,difficulty:1,formatRole:'foundation',transferFamily:'ch5-chair-faces',prompt:'Are these chlorine groups cis or trans?'+ch5CPDiagram(ch5CPSpec(2,['up','up']),'Read the faces'),choices:['Cis','Trans'],answer:0,why:'Both chlorines are up, so they are cis. Here one is axial and one equatorial. Axial/equatorial alone does not decide cis/trans.'}),
+  ch5CPQuestion(4,{type:'mc',diff:1,difficulty:1,formatRole:'foundation',transferFamily:'ch5-chair-flip-rule',prompt:'A ring flip exchanges axial and equatorial positions. What happens to the R/S configuration at each stereocenter?',choices:['It stays the same','Both centers invert','Only the axial center inverts'],answer:0,why:'A chair flip changes conformation, not configuration. Each substituent keeps its up/down face and each stereocenter retains R/S.'}),
+  ch5CPPair(5,cp13,ch5CPSpec(3,['up','down'],'Cl',{mirror:true}),'Enantiomers',['SS','RR'],'Both connections match, but both stereocenters invert. This trans pair is chiral: A is (1S,3S), B is (1R,3R).','mirror-13'),
+  ch5CPPair(6,ch5CPSpec(2,['down','up'],'Br'),ch5CPSpec(2,['down','up'],'Br',{mirror:true}),'Enantiomers',['RR','SS'],'These trans-1,2 compounds have opposite configurations at both corresponding centers. A is (1R,2R); B is (1S,2S).','mirror-12'),
+  ch5CPPair(7,cp13,ch5CPSpec(3,['up','down'],'Cl',{flip:true}),'Identical compounds',['SS','SS'],'B is a ring-flipped conformation of A. The chlorines stay up at C1 and down at C3; both names keep (1S,3S). A chair flip does not create an enantiomer.','ring-flip'),
+  ch5CPPair(8,ch5CPSpec(3,['up','up']),ch5CPSpec(3,['up','up'],'Cl',{mirror:true}),'Identical compounds',['SR','RS'],'Both drawings represent the same meso cis compound. Mirror drawings do not always mean different enantiomers: this molecule is achiral. The equivalent numbering allows either (1S,3R) or (1R,3S).','meso-mirror'),
+  ch5CPPair(9,cp13,ch5CPSpec(3,['up','up']),'Diastereomers',['SS','SR'],'A is trans and B is cis. Their connections match, but only C3 changes configuration with the shown numbering. They are diastereomers; B is meso.','cis-trans'),
+  ch5CPPair(10,ch5CPSpec(3,['down','up'],'Br'),ch5CPSpec(3,['down','up'],'Br',{rotate:180}),'Identical compounds',['RR','RR'],'B is the complete drawing turned 180° on the page. Match the carbon labels: no bond or configuration has changed. Both names retain (1R,3R).','page-rotation'),
+  ch5CPPair(11,ch5CPSpec(2,['up','up']),ch5CPSpec(2,['up','up'],'Cl',{mirror:true}),'Identical compounds',['SR','RS'],'This cis-1,2 compound is meso. Its mirror drawings represent one compound even though individual chair conformations can look asymmetric. Either equivalent numbering of its identical substituents is accepted.','meso-mirror'),
+  ch5CPPair(12,ch5CPSpec(2,['down','down'],'Br'),ch5CPSpec(2,['down','up'],'Br'),'Diastereomers',['RS','RR'],'Only the second center changes: A is cis and meso; B is trans and chiral. They have the same connections but are not mirror-image compounds.','cis-trans'),
+  ch5CPPair(13,cp12,cp13,'Constitutional isomers',['SS','SS'],'A has chlorines at C1 and C2; B has chlorines at C1 and C3. Their formulas match, but the attachment positions differ. Compare connectivity before R/S.','connectivity'),
+  ch5CPPair(14,ch5CPSpec(2,['up','down'],'Cl',{flip:true}),ch5CPSpec(2,['up','down'],'Cl',{flip:true,mirror:true}),'Enantiomers',['SS','RR'],'These flipped-chair views still show a trans enantiomer pair. A is (1S,2S) and B is (1R,2R); the chair silhouette does not determine R/S.','mirror-12')
+];
+for(const q of CH5_CHAIR_PAIR_QUESTIONS){
+  if(!QUESTIONS.some(old=>old.id===q.id))QUESTIONS.push(q);
+  if(!CH5_QUESTIONS.some(old=>old.id===q.id))CH5_QUESTIONS.push(q);
+  const lesson=CH5_LESSONS.find(u=>u.id===q.adaptiveSkill),field=q.diff===1||Number(q.id.slice(-2))%2?'practiceIds':'coldIds';
+  if(!lesson[field].includes(q.id))lesson[field].push(q.id);
+}
+function ch5CPFeedback(q,values,checks){
+  return '<div class="ch5-cp-feedback"><b>'+checks.filter(Boolean).length+' of 3 parts correct.</b><ul>'+q.fields.map((f,i)=>{
+    let note='';
+    if(!checks[i])note=i===0?q.why.split('<details>')[0]:!String(values[i]).toLowerCase().includes('cyclo')?'This is a ring: include cyclohexane. Then check the R/S descriptors and their carbon numbers.':'Check the R/S descriptors and their carbon numbers. Axial down does not mean away from the viewer.';
+    return '<li><b>'+(checks[i]?'✓ ':'✗ ')+ch5FEscape(f.label)+'</b>'+(!checks[i]?': '+ch5FEscape(f.answer)+'<br>'+note:'')+'</li>';
+  }).join('')+'</ul></div>';
+}
+function ch5CPRecord(attempt,q,result){
+  if(!attempt.evidence)return;
+  attempt.evidence.submittedResponse=result.values.slice();
+  attempt.evidence.fieldResponses=q.fields.map((f,index)=>({index,label:f.label,code:index===0?'chair-relationship':'chair-name-'+(index===1?'a':'b'),submitted:result.values[index],correct:result.checks[index],expected:f.answer,historyStatus:'not-captured'}));
+  const failed=attempt.evidence.fieldResponses.find(f=>!f.correct);
+  attempt.evidence.firstFailedRubricField=failed?{index:failed.index,label:failed.label,code:failed.code}:null;
+  attempt.evidence.errorInterpretation='First failed answer part, not the first mental error or its cause. Naming and relationship are assessed separately; free-text reasoning requires human review.';
+}
+const ch5CPStyle=document.createElement('style');ch5CPStyle.id='ch5-chair-pairs-style';
+ch5CPStyle.textContent='.ch5-cp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}.ch5-cp-figure{margin:6px 0;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:0}.ch5-cp-figure figcaption{font-weight:800}.ch5-cp-diagram{display:block;width:100%;height:auto;max-height:240px;color:var(--text,#193d45)}.ch5-cp-note{font-size:.8rem;line-height:1.35}.ch5-cp-field-label{display:inline-block;min-width:120px;font-size:.9rem}.ch5-cp-feedback li{margin:8px 0;overflow-wrap:anywhere} .ch5-cp-feedback{font-size:.92rem}@media(max-width:600px){.ch5-cp-grid{grid-template-columns:1fr}.ch5-cp-diagram{max-height:210px}.ch5-cp-field-label{display:block;line-height:1.5;margin-top:8px}}';
+document.head.appendChild(ch5CPStyle);
+
+/* Optical activity from structures · original homework-shaped practice.
+ * Requested 2026-10-12. Load after ch5-visual-stereo-bank.js and ch5-chair-pairs.js.
+ * Finite, family-aware bank; no old IDs, attempts, or answer keys are changed.
+ */
+const CH5_OPTICAL_VISUAL_SOURCES={
+  optical:'https://openstax.org/books/organic-chemistry/pages/5-3-optical-activity',
+  meso:'https://openstax.org/books/organic-chemistry/pages/5-7-meso-compounds',
+  racemic:'https://openstax.org/books/organic-chemistry/pages/5-8-racemic-mixtures-and-the-resolution-of-enantiomers',
+  conformers:'https://www.chm.bris.ac.uk/org/adavis/stereochime/page15.htm'
+};
+function ch5OVTetra(labels){return {kind:'tetra',labels,positions:{UL:'plain',UR:'plain',DL:'wedge',DR:'hash'}};}
+function ch5OVBondline(){
+  return {kind:'bondline-tetra',center:'c0',
+    atoms:[{id:'c0',element:'C',hydrogens:0,point:[185,135]},
+      {id:'methyl',element:'C',hydrogens:3,point:[158,82]},
+      {id:'leftCH2',element:'C',hydrogens:2,point:[133,165]},{id:'leftO',element:'O',hydrogens:1,point:[82,136],label:'HO'},
+      {id:'frontCH2',element:'C',hydrogens:2,point:[232,76]},{id:'frontO',element:'O',hydrogens:1,point:[293,76],label:'OH'},
+      {id:'chain1',element:'C',hydrogens:2,point:[235,165]},{id:'chain2',element:'C',hydrogens:2,point:[276,141]},
+      {id:'chain3',element:'C',hydrogens:2,point:[317,165]},{id:'chain4',element:'C',hydrogens:3,point:[358,141]}],
+    bonds:[{from:'c0',to:'methyl',type:'hash'},{from:'c0',to:'leftCH2',type:'plain'},{from:'leftCH2',to:'leftO',type:'plain'},
+      {from:'c0',to:'frontCH2',type:'wedge'},{from:'frontCH2',to:'frontO',type:'plain'},
+      {from:'c0',to:'chain1',type:'plain'},{from:'chain1',to:'chain2',type:'plain'},{from:'chain2',to:'chain3',type:'plain'},{from:'chain3',to:'chain4',type:'plain'}]};
+}
+function ch5OVFischer(group='OH',sides=['left','left'],top='CH₃',bottom='CH₃'){
+  return {kind:'fischer',top,bottom,left:sides.map(s=>s==='left'?group:'H'),right:sides.map(s=>s==='right'?group:'H')};
+}
+function ch5OVNewman(group='Br',chiral=false){
+  return {kind:'newman',frontAngles:[-90,30,150],rearAngles:[90,210,330],front:['CH₃','H',group],rear:chiral?['CH₃',group,'H']:['CH₃','H',group],
+    view:'Front carbon toward the viewer; looking along its bond to the rear carbon',connectivity:'CH₃–CH('+group+')–CH('+group+')–CH₃'};
+}
+function ch5OVDouble(cis=false){
+  return {kind:'double-newman',group:'CH₃',
+    carbonOrder:{rightFront:1,rightRear:2,lowerBridge:3,leftRear:4,leftFront:5,upperBridge:6},
+    ringEdges:[[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]],projectionBonds:[[1,2],[5,4]],
+    projectedCarbons:{1:[300,125],2:[300,125],3:[210,173],4:[120,125],5:[120,125],6:[210,77]},
+    substituents:[{carbon:1,front:true,angle:-30,group:'CH₃'},{carbon:1,front:true,angle:90,group:'H'},
+      {carbon:2,front:false,angle:30,group:cis?'H':'CH₃'},{carbon:2,front:false,angle:-90,group:cis?'CH₃':'H'},
+      {carbon:5,front:true,angle:210,group:'H'},{carbon:5,front:true,angle:90,group:'H'},
+      {carbon:4,front:false,angle:150,group:'H'},{carbon:4,front:false,angle:-90,group:'H'}],
+    view:'Looking C1→C2 on the right and C5→C4 on the left. Upper connecting vertex is C6 (CH₂); lower is C3 (CH₂). Angles are measured clockwise on screen from the right.'};
+}
+function ch5OVChair(second=2,faces=['up','up'],flip=false){return {kind:'chair',...ch5CPSpec(second,faces,'CH₃',{flip})};}
+function ch5OVDescription(spec){
+  if(spec.kind==='tetra')return 'Wedge–dash structure. '+Object.entries(spec.labels).map(([p,g])=>p+' '+g+' on a '+spec.positions[p]+' bond').join('; ')+'.';
+  if(spec.kind==='bondline-tetra')return 'Bond-line structure. Central carbon connects by a hashed bond to an unlabeled methyl endpoint; by a solid wedge to a CH₂ vertex then OH; by an ordinary bond to another CH₂ vertex then OH; and by an ordinary bond to an unbranched four-carbon chain. Unlabeled corners and endpoints are carbons.';
+  if(spec.kind==='fischer')return 'Fischer projection. Top '+spec.top+'; bottom '+spec.bottom+'. '+spec.left.map((g,i)=>'Crossing '+(i+1)+': left '+g+', right '+spec.right[i]).join('; ')+'. Horizontal bonds toward you, vertical bonds away.';
+  if(spec.kind==='newman')return 'Newman projection. Front groups at '+spec.frontAngles.map((a,i)=>a+' degrees: '+spec.front[i]).join('; ')+'. Rear groups at '+spec.rearAngles.map((a,i)=>a+' degrees: '+spec.rear[i]).join('; ')+'. Angles clockwise from right. '+spec.view+'.';
+  if(spec.kind==='double-newman')return 'Double Newman projection of one six-membered ring. '+spec.view+' '+spec.substituents.map(s=>'C'+s.carbon+' '+s.group+' at '+s.angle+' degrees').join('; ')+'.';
+  return 'Cyclohexane chair; numbered carbons and substituent bonds shown.';
+}
+function ch5OVDiagram(spec){
+  if(spec.kind==='chair')return ch5CPDiagram(spec,'Chair').replace('class="ch5-cp-diagram"','class="ch5-cp-diagram ch5-ov-diagram" data-ov-kind="chair"');
+  let body='',width=340,height=250;
+  const line=(a,b,attrs='')=>'<line '+attrs+' x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>';
+  const label=(p,s,size=20)=>ch5FText(p[0],p[1]+6,s,size);
+  const radial=(center,angle,r)=>[center[0]+r*Math.cos(angle*Math.PI/180),center[1]+r*Math.sin(angle*Math.PI/180)];
+  if(spec.kind==='tetra'){
+    width=420;const origin=[210,124],ends={UL:[133,78],UR:[287,78],DL:[141,183],DR:[279,183]},texts={UL:[91,63],UR:[329,63],DL:[107,212],DR:[313,212]};
+    body=Object.keys(ends).map(p=>ch5FBond(origin,ends[p],spec.positions[p])+label(texts[p],spec.labels[p],19)).join('');
+  }else if(spec.kind==='bondline-tetra'){
+    width=420;const atoms=Object.fromEntries(spec.atoms.map(a=>[a.id,a]));
+    spec.bonds.forEach(b=>{
+      const a=atoms[b.from],z=atoms[b.to];let end=z.point;
+      if(z.element!=='C'){const dx=end[0]-a.point[0],dy=end[1]-a.point[1],length=Math.hypot(dx,dy);end=[end[0]-18*dx/length,end[1]-18*dy/length];}
+      body+='<g data-atom-from="'+b.from+'" data-atom-to="'+b.to+'" data-bond-kind="'+b.type+'">'+ch5FBond(a.point,end,b.type)+'</g>';
+    });
+    spec.atoms.filter(a=>a.label).forEach(a=>{body+=label(a.point,a.label,22);});
+  }else if(spec.kind==='fischer'){
+    const n=spec.left.length,ys=n===3?[73,125,177]:[88,158];
+    body=line([170,43],[170,213])+label([170,23],spec.top)+label([170,235],spec.bottom);
+    ys.forEach((y,i)=>{body+=line([112,y],[228,y])+label([85,y],spec.left[i])+label([255,y],spec.right[i]);});
+  }else if(spec.kind==='newman'){
+    const c=[170,125];
+    spec.rearAngles.forEach((a,i)=>{body+=line(radial(c,a,28),radial(c,a,66),'data-ov-depth="rear" data-group="'+ch5FEscape(spec.rear[i])+'" data-angle="'+a+'"');});
+    body+='<circle cx="170" cy="125" r="28" fill="none" stroke="currentColor" stroke-width="2.8"/>';
+    spec.frontAngles.forEach((a,i)=>{body+=line(c,radial(c,a,66),'data-ov-depth="front" data-group="'+ch5FEscape(spec.front[i])+'" data-angle="'+a+'"');});
+    spec.rearAngles.forEach((a,i)=>{body+=label(radial(c,a,91),spec.rear[i]);});
+    spec.frontAngles.forEach((a,i)=>{body+=label(radial(c,a,91),spec.front[i]);});
+    body+='<circle cx="170" cy="125" r="3" fill="currentColor"/>';
+  }else if(spec.kind==='double-newman'){
+    width=420;const c=spec.projectedCarbons;
+    // Rear bonds begin at the circle surface. Both connecting vertices are CH₂.
+    body+=line(radial(c[2],150,26),c[3],'data-ring-edge="2-3"')+line(c[3],radial(c[4],30,26),'data-ring-edge="3-4"');
+    spec.substituents.filter(s=>!s.front).forEach(s=>{body+=line(radial(c[s.carbon],s.angle,26),radial(c[s.carbon],s.angle,57),'data-newman-carbon="'+s.carbon+'" data-ov-depth="rear" data-angle="'+s.angle+'" data-group="'+s.group+'"');});
+    body+='<circle cx="120" cy="125" r="26" fill="none" stroke="currentColor" stroke-width="2.8"/><circle cx="300" cy="125" r="26" fill="none" stroke="currentColor" stroke-width="2.8"/>';
+    body+=line(c[5],c[6],'data-ring-edge="5-6"')+line(c[6],c[1],'data-ring-edge="6-1"');
+    spec.substituents.filter(s=>s.front).forEach(s=>{body+=line(c[s.carbon],radial(c[s.carbon],s.angle,57),'data-newman-carbon="'+s.carbon+'" data-ov-depth="front" data-angle="'+s.angle+'" data-group="'+s.group+'"');});
+    spec.substituents.forEach(s=>{body+=label(radial(c[s.carbon],s.angle,79),s.group,19);});
+    body+='<circle cx="120" cy="125" r="3" fill="currentColor"/><circle cx="300" cy="125" r="3" fill="currentColor"/>';
+  }
+  const description=ch5OVDescription(spec);
+  return '<svg class="ch5-ov-diagram" data-ov-kind="'+spec.kind+'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+ch5FEscape(description)+'"><title>'+ch5FEscape(description)+'</title>'+body+'</svg>';
+}
+function ch5OVGrid(specs){
+  return '<div class="ch5-ov-grid'+(specs.length===1?' ch5-ov-single':'')+'">'+specs.map((s,i)=>'<div class="ch5-ov-card" data-structure-letter="'+String.fromCharCode(65+i)+'">'+(specs.length>1?'<b class="ch5-ov-letter">'+String.fromCharCode(65+i)+'</b>':'')+ch5OVDiagram(s)+'</div>').join('')+'</div>';
+}
+function ch5OVModel(spec,classification,reason){return {spec,classification,active:classification==='chiral',reason};}
+const ch5OVModels={
+  repeatedAlcohol:ch5OVModel(ch5OVTetra({UL:'CH₂OH',UR:'CH₂CH₂CH₃',DL:'CH₂OH',DR:'CH₃'}),'achiral','Two groups on the apparent center are identical –CH₂OH groups. Different bond directions do not make those groups different. There are no other stereogenic elements.'),
+  repeatedBondline:ch5OVModel(ch5OVBondline(),'achiral','Trace each branch from the central carbon: both the left branch and the wedge branch are –CH₂OH. They are identical groups despite their different directions. The remaining groups are methyl and an unbranched four-carbon chain; no stereogenic element is present.'),
+  repeatedMethyl:ch5OVModel(ch5OVTetra({UL:'CH₃',UR:'CH₂CH₃',DL:'Cl',DR:'CH₃'}),'achiral','The carbon has two identical methyl groups. A wedge and a dash show depth; they do not guarantee chirality.'),
+  bromoTetra:ch5OVModel(ch5OVTetra({UL:'CH₃',UR:'CH₂CH₃',DL:'Br',DR:'H'}),'chiral','The tetrahedral carbon has four different groups: Br, H, methyl and ethyl. This configurationally stable stereoisomer is chiral.'),
+  alcoholTetra:ch5OVModel(ch5OVTetra({UL:'CH₃',UR:'CH₂CH₃',DL:'OH',DR:'H'}),'chiral','The OH-bearing carbon has four different groups. Its handedness does not determine the sign or size of its rotation.'),
+  mesoFischerOH:ch5OVModel(ch5OVFischer(),'meso','The ends match and both OH groups occupy the same side of the Fischer drawing. Internal symmetry makes this one meso compound, not a racemate.'),
+  mesoFischerCl:ch5OVModel(ch5OVFischer('Cl',['right','right']),'meso','Equal methyl ends and the same-side chlorine arrangement make the whole two-center compound internally symmetric and meso.'),
+  mesoFischerBr:ch5OVModel(ch5OVFischer('Br'),'meso','Both methyl ends match. This same-side Fischer arrangement is the meso form, so its two stereocenters do not make the whole compound chiral.'),
+  chiralFischerOH:ch5OVModel(ch5OVFischer('OH',['left','right']),'chiral','With these equal ends, opposite-side OH groups in this Fischer projection give the RR/SS chiral pair, not the meso form.'),
+  unequalFischerOH:ch5OVModel(ch5OVFischer('OH',['left','left'],'CH₃','CH₂CH₃'),'chiral','The chain ends differ: methyl versus ethyl. The symmetry of a matching-end meso molecule is absent; this stereoisomer is chiral.'),
+  mesoFischerThree:ch5OVModel(ch5OVFischer('OH',['right','left','right'],'COOH','COOH'),'meso','Identical COOH ends and matching upper/lower halves give internal symmetry. The compound is meso. Do not count every Fischer crossing as an ordinary chiral center; the middle crossing has mirror-related arms.'),
+  mesoNewmanBr:ch5OVModel(ch5OVNewman('Br'),'meso','Every front group has an identical rear group directly opposite it: methyl/methyl, Br/Br and H/H. This conformation has an inversion center; it is the meso compound.'),
+  mesoNewmanCl:ch5OVModel(ch5OVNewman('Cl'),'meso','Identical front/rear groups are opposite each other through the center. That inversion symmetry makes the whole compound achiral and meso.'),
+  mesoNewmanOH:ch5OVModel(ch5OVNewman('OH'),'meso','The opposite methyl, OH and H pairs produce an inversion center. This is one meso compound with zero optical rotation.'),
+  chiralNewmanBr:ch5OVModel(ch5OVNewman('Br',true),'chiral','The two centers have the same configuration (RR or SS), not the meso RS arrangement. Rotating the carbon–carbon bond does not change either configuration.'),
+  chiralNewmanCl:ch5OVModel(ch5OVNewman('Cl',true),'chiral','The two centers have the same configuration (RR or SS). This is a chiral stereoisomer, but its specific rotation requires a measurement or a matched enantiomer reference.'),
+  transDouble:ch5OVModel(ch5OVDouble(),'chiral','The circles are two views along bonds in one cyclohexane ring. Both methyl groups are equatorial, on opposite ring faces: trans-1,2. Its RR/SS enantiomers do not interconvert in a chair flip.'),
+  cisDouble:ch5OVModel(ch5OVDouble(true),'meso','One methyl is axial and the other equatorial; here they are on the same ring face (cis-1,2). At room temperature, its mirror-related chair conformers rapidly interconvert and the net rotation is zero.'),
+  cisChair12:ch5OVModel(ch5OVChair(),'meso','Both methyl groups are up: cis-1,2. One is axial and one equatorial. Its mirror-related chairs interconvert rapidly at room temperature, so the compound is optically inactive.'),
+  cisChair12Flip:ch5OVModel(ch5OVChair(2,['up','up'],true),'meso','Both methyl groups remain up in this flipped cis-1,2 chair. Axial/equatorial exchange does not create a stable enantiomer; the room-temperature conformer ensemble is optically inactive.'),
+  cisChair13:ch5OVModel(ch5OVChair(3,['up','up']),'meso','The identical 1,3 methyl groups are cis. This meso compound has internal symmetry and no net optical rotation.'),
+  transChair13:ch5OVModel(ch5OVChair(3,['up','down']),'chiral','The methyl groups are on opposite faces: trans-1,3. Its two same-configuration centers give an RR/SS enantiomer pair, and a chair flip does not exchange the enantiomers.'),
+  transChair12Flip:ch5OVModel(ch5OVChair(2,['up','down'],true),'chiral','The methyl groups remain on opposite faces in this flipped trans-1,2 chair. Both stereocenters retain their configurations during a ring flip, so an enantiopure sample remains optically active.')
+};
+function ch5OVQuestion(n,role,extra){
+  return {id:'CH5-OV'+String(n).padStart(2,'0'),chapter:5,courseRoute:'ch5',topic:'stereoOptical',adaptiveSkill:'ch5-optical',type:'mc',diff:role==='warm-up'?1:2,difficulty:role==='warm-up'?1:2,formatRole:'direct-answer',
+    source:'Original visual optical-activity practice requested Oct 12, 2026. Homework-style format, not a copied assessment. Rules: '+Object.values(CH5_OPTICAL_VISUAL_SOURCES).join(' ; '),
+    sourceKind:'original-practice',sourceUrl:CH5_OPTICAL_VISUAL_SOURCES.optical,scopeStatus:'course-objectives',eligibleForUnseenTransfer:true,
+    opticalVisualBank:true,opticalVisualRole:role,...extra};
+}
+function ch5OVRotation(n,model,expected,family,reference){
+  const measured=!!reference;
+  return ch5OVQuestion(n,'rotation',{
+    prompt:(measured?'The <b>pure mirror-image enantiomer</b> of the structure below has a measured specific rotation of <b>+28.4</b>. Predict the specific rotation of the pure stereoisomer shown, measured in the <b>same solvent, at the same temperature and wavelength</b>.':'Predict the specific rotation of this <b>pure compound at room temperature</b>. No measured rotation is supplied.')+
+      ch5OVGrid([model.spec])+'<p class="ch5-ov-note muted">Specific rotation values use °·mL·g⁻¹·dm⁻¹. Written reasoning is optional.</p>',
+    choices:measured?['−28.4','Zero','+28.4','Cannot predict from the supplied information']:['−20','Zero','Cannot predict its exact value from the structure alone','+20'],
+    answer:expected==='opposite-reference'?0:expected==='zero'?1:2,transferFamily:'ch5-ov-'+family,
+    hints:['Check whether the whole compound is chiral. Do not assume a wedge guarantees a chiral center.','For a chiral compound, R/S does not give the sign or magnitude. A supplied pure-enantiomer measurement can provide the opposite sign under matched conditions.'],
+    why:(expected==='zero'?'<b>Zero.</b> '+model.reason:expected==='not-inferable'?'<b>The exact value cannot be predicted from this structure alone.</b> '+model.reason+' Neither +20 nor −20 is supplied by a chemical structure.':'<b>−28.4.</b> Pure enantiomers have equal-magnitude, opposite-sign specific rotations under identical conditions. The +28.4 measurement is explicitly for this structure’s mirror-image enantiomer.')+
+      '<details><summary>More: structure versus measurement</summary><p>Achiral or meso compounds have zero net optical rotation under ordinary achiral measurement conditions. A chiral structure does not encode its measured (+)/(−) sign or numerical rotation. A racemate is a 50:50 mixture of two enantiomers; it also gives zero, but it is not the same thing as one meso compound.</p></details>',
+    opticalVisualAudit:{kind:'rotation',structures:[model],expectedRotation:expected,sample:'pure-single-configurational-stereoisomer',...(reference?{reference}:{})}
+  });
+}
+function ch5OVActivity(n,modelNames,family){
+  const structures=modelNames.map(name=>({...ch5OVModels[name],modelId:name}));
+  const active=structures.map((m,i)=>m.active?i:-1).filter(i=>i>=0);
+  if(active.length!==1)throw new Error('Optical board must have exactly one active choice: '+n);
+  const answer=active[0],letter=String.fromCharCode(65+answer);
+  return ch5OVQuestion(n,'activity',{
+    prompt:'Which compound is expected to be <b>optically active at room temperature</b>? Choose one.'+
+      '<p class="ch5-ov-given">Each sample contains only the drawn configurational stereoisomer—not a racemic mixture. Conformations may interconvert normally at room temperature.</p>'+ch5OVGrid(structures.map(m=>m.spec))+
+      '<p class="ch5-ov-note muted">Wedges point toward you; hashed wedges point away. Fischer horizontal bonds point toward you. Bold chair edges mark the front of the ring. Written reasoning is optional.</p>',
+    choices:['A','B','C','D'],answer,transferFamily:'ch5-ov-'+family,
+    hints:['Check the whole molecule, not just the number of stereocenters. Are any attached groups identical? Is the whole structure meso?',
+      'A chair flip preserves each carbon’s R/S configuration. Some meso compounds nevertheless have mirror-related chair shapes that rapidly interconvert; consider the room-temperature molecule, not only one frozen shape.'],
+    why:'<b>'+letter+' is expected to be active.</b> '+structures[answer].reason+
+      '<details><summary>More: why each option is in or out</summary><ul>'+structures.map((m,i)=>'<li><b>'+String.fromCharCode(65+i)+' — '+(m.active?'active':'inactive')+'.</b> '+m.reason+'</li>').join('')+'</ul><p>A meso compound is one achiral compound. A racemate is a mixture of two chiral enantiomers. Neither gives net optical rotation, but for different reasons.</p></details>',
+    opticalVisualAudit:{kind:'activity',structures,requestedActivity:'active',sample:'pure-single-configurational-stereoisomer',temperature:'room',allowsConformationalEquilibration:true}
+  });
+}
+const CH5_OPTICAL_VISUAL_QUESTIONS=[
+  ch5OVQuestion(1,'warm-up',{prompt:'Is the central carbon a chiral center?'+ch5OVGrid([ch5OVModels.repeatedAlcohol.spec]),choices:['Yes, because it has a wedge','No: two attached groups are identical –CH₂OH groups','Yes, because the two –CH₂OH bonds point different ways','No: oxygen-containing molecules cannot be chiral'],answer:1,transferFamily:'ch5-ov-repeated-groups',why:ch5OVModels.repeatedAlcohol.reason,opticalVisualAudit:{kind:'warmup',decision:'four-different-groups',structures:[ch5OVModels.repeatedAlcohol]}}),
+  ch5OVQuestion(2,'warm-up',{prompt:'A pure compound is <b>R</b>. With no rotation measurement given, can you assign a (+) or (−) sign?',choices:['R must be (+)','R must be (−)','No: R/S does not determine (+)/(−)'],answer:2,transferFamily:'ch5-ov-sign-not-configuration',why:'R/S describes the arrangement of groups. (+)/(−) describes a measured direction of light rotation. There is no universal R = (+) or S = (−) rule.',opticalVisualAudit:{kind:'warmup',decision:'configuration-not-rotation-sign',structures:[]}}),
+  ch5OVQuestion(3,'warm-up',{prompt:'What does <b>meso</b> describe?',choices:['One achiral compound that contains stereocenters','A 50:50 mixture of two enantiomers','Every compound with two stereocenters','A compound that must rotate light clockwise'],answer:0,transferFamily:'ch5-ov-meso-versus-racemate',why:'Meso describes one achiral compound with stereocenters. A 50:50 enantiomer mixture is a racemate. Both are optically inactive, but they are not the same situation.',opticalVisualAudit:{kind:'warmup',decision:'meso-not-racemate',structures:[]}}),
+  ch5OVQuestion(4,'warm-up',{prompt:'At <b>C1</b>, the axial H points down. Which face does the CH₃ on that same carbon point toward?'+ch5OVGrid([ch5OVModels.cisChair12.spec]),choices:['Down','Up'],answer:1,transferFamily:'ch5-ov-cis12-dynamics',why:'Up. On one ring carbon, the axial and equatorial bonds point to opposite ring faces. At C1, H is axial down, so CH₃ is equatorial up.',opticalVisualAudit:{kind:'warmup',decision:'opposite-faces-on-one-carbon',structures:[ch5OVModels.cisChair12]}}),
+  ch5OVRotation(5,ch5OVModels.repeatedBondline,'zero','repeated-groups'),
+  ch5OVRotation(6,ch5OVModels.bromoTetra,'not-inferable','sign-not-configuration'),
+  ch5OVRotation(7,ch5OVModels.mesoFischerOH,'zero','meso-fischer'),
+  ch5OVRotation(8,ch5OVModels.chiralNewmanCl,'not-inferable','newman-configuration'),
+  ch5OVRotation(9,ch5OVModels.cisChair12,'zero','cis12-dynamics'),
+  ch5OVRotation(10,ch5OVModels.alcoholTetra,'opposite-reference','matched-enantiomer-reference',{value:28.4,relation:'enantiomer',conditionsMatched:true}),
+  ch5OVActivity(11,['transDouble','mesoFischerThree','mesoNewmanBr','cisChair12'],'mixed-double-newman'),
+  ch5OVActivity(12,['repeatedBondline','cisChair12Flip','transDouble','mesoFischerCl'],'mixed-double-newman'),
+  ch5OVActivity(13,['mesoFischerCl','chiralFischerOH','mesoNewmanOH','cisChair13'],'mixed-fischer'),
+  ch5OVActivity(14,['mesoNewmanBr','repeatedMethyl','mesoFischerThree','chiralNewmanBr'],'mixed-newman'),
+  ch5OVActivity(15,['bromoTetra','mesoNewmanCl','cisChair12','mesoFischerOH'],'mixed-tetra'),
+  ch5OVActivity(16,['cisChair13','mesoFischerBr','transChair13','repeatedBondline'],'mixed-chair'),
+  ch5OVActivity(17,['cisDouble','unequalFischerOH','mesoNewmanBr','cisChair12Flip'],'mixed-fischer'),
+  ch5OVActivity(18,['mesoFischerOH','repeatedMethyl','mesoNewmanCl','transChair12Flip'],'mixed-chair')
+];
+const CH5_OPTICAL_VISUAL_GROUPS={
+  warmup:CH5_OPTICAL_VISUAL_QUESTIONS.filter(q=>q.opticalVisualRole==='warm-up').map(q=>q.id),
+  rotation:CH5_OPTICAL_VISUAL_QUESTIONS.filter(q=>q.opticalVisualRole==='rotation').map(q=>q.id),
+  activity:CH5_OPTICAL_VISUAL_QUESTIONS.filter(q=>q.opticalVisualRole==='activity').map(q=>q.id),
+  all:CH5_OPTICAL_VISUAL_QUESTIONS.map(q=>q.id)
+};
+for(const q of CH5_OPTICAL_VISUAL_QUESTIONS){
+  if(!QUESTIONS.some(old=>old.id===q.id))QUESTIONS.push(q);
+  if(!CH5_QUESTIONS.some(old=>old.id===q.id))CH5_QUESTIONS.push(q);
+  const lesson=CH5_LESSONS.find(u=>u.id==='ch5-optical');
+  if(!lesson)throw new Error('Optical activity lesson missing');
+  const field=q.diff===1||Number(q.id.slice(-2))%2?'practiceIds':'coldIds';
+  if(!lesson[field].includes(q.id))lesson[field].push(q.id);
+}
+if(typeof document!=='undefined'&&!document.getElementById('ch5-optical-visual-style')){
+  const style=document.createElement('style');style.id='ch5-optical-visual-style';
+  style.textContent='.ch5-ov-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.ch5-ov-card{border:1px solid var(--border,#ccdadd);border-radius:12px;padding:7px;min-width:0}.ch5-ov-letter{display:block;font-size:1rem}.ch5-ov-diagram{display:block;width:100%;height:auto;max-height:185px;color:var(--text,#193d45)}.ch5-ov-card .ch5-cp-figure{border:0;margin:0;padding:0}.ch5-ov-card .ch5-cp-figure figcaption{font-size:.8rem;font-weight:400}.ch5-ov-single{grid-template-columns:1fr;max-width:480px;margin-left:auto;margin-right:auto}.ch5-ov-single .ch5-ov-diagram{max-height:240px}.ch5-ov-given{font-size:.88rem;line-height:1.4;margin:8px 0}.ch5-ov-note{font-size:.78rem;line-height:1.35;margin:5px 0}@media(max-width:600px){.ch5-ov-grid:not(.ch5-ov-single){grid-template-columns:1fr}.ch5-ov-diagram{max-height:176px}.ch5-ov-single .ch5-ov-diagram{max-height:210px}}';
+  document.head.appendChild(style);
 }
 
 /* BEGIN ARROW LAB (resonance you draw), 2026-10-02 */
@@ -15444,7 +15763,7 @@ VIEWS.modeLearn=v=>{
   if(!lessons.length)smChapter().topics.forEach(topic=>list.appendChild(smButton(esc(TOPICS[topic]?.name||topic)+' →',()=>{courseNavigationSaveWork();S.learnCh=smChapter().id;S.learnUnit=null;S.learnTopic=topic;go('allLearn');})));
   v.appendChild(list);
 };
-function smWarmupPool(){return adaptiveLearningPool({chapter:smChapter().id}).filter(q=>!q.preview&&q.diff<=2&&['mc','text','num'].includes(q.type)&&!q.requiresDrawing);}
+function smWarmupPool(){return adaptiveLearningPool({chapter:smChapter().id}).filter(q=>!q.preview&&q.diff<=2&&['mc','text','num'].includes(q.type)&&!q.requiresDrawing&&(!q.opticalVisualBank||q.opticalVisualRole==='warm-up'));}
 function smStartWarmup(topic){
   const pool=smWarmupPool().filter(q=>!topic||q.topic===topic);
   if(startAdaptiveLearning({chapter:smChapter().id,poolIds:pool.map(q=>q.id),total:3,label:'Optional warm-up · '+smChapter().name,rotationKey:'warmup-'+smChapter().id+'-'+(topic||'all')}))smTagRun('practice','warmup');
@@ -15467,6 +15786,37 @@ function smVisualStereoCard(){
   card.appendChild(smButton('Start visual practice',()=>smStartVisualStereo(select.value),{class:'btn','data-start-visual-stereo':true}));
   return card;
 }
+function smStartChairPairs(kind='practice'){
+  const warmup=kind==='warmup',pool=CH5_CHAIR_PAIR_QUESTIONS.filter(q=>warmup?q.diff===1:q.diff>1);
+  if(startAdaptiveLearning({chapter:'ch5',poolIds:pool.map(q=>q.id),total:warmup?3:4,rotationKey:'ch5-chair-pairs-'+kind,label: warmup?'Chair warm-up · one skill at a time':'Chapter 5 · Chair pairs & names'}))smTagRun('practice',warmup?'warmup':'chair-pairs','ch5');
+}
+function smChairPairCard(){
+  const card=el('section',{class:'card sm-panel','data-chair-pair-practice':true});
+  card.innerHTML='<h2>Chair pairs &amp; names</h2><p>Compare two chairs, then name each one. Relationship + two IUPAC names stay together, like your homework.</p><p class="muted">10 original linked problems · 4 optional warm-ups. Includes ring flips, mirror images, meso pairs and cis/trans comparisons. Related versions rotate; repeats are still possible.</p>';
+  card.appendChild(smButton('Start chair pairs · up to 4 problems',()=>smStartChairPairs(),{class:'btn','data-start-chair-pairs':true}));
+  const warm=el('details');warm.appendChild(el('summary',{},'Warm up first · optional'));
+  warm.appendChild(el('p',{},'Check the ring name, a CIP ring path, or the difference between face and bond position.'));
+  warm.appendChild(smButton('Start chair warm-up',()=>smStartChairPairs('warmup'),{'data-chair-pair-warmup':true}));card.appendChild(warm);return card;
+}
+function smStartOpticalVisual(kind='mixed'){
+  const warmup=kind==='warmup';
+  const pool=CH5_OPTICAL_VISUAL_QUESTIONS.filter(q=>warmup?q.opticalVisualRole==='warm-up':q.opticalVisualRole!=='warm-up'&&(kind==='mixed'||q.opticalVisualRole===kind));
+  const total=warmup?3:4;
+  const slots=kind==='mixed'?Array.from({length:total},(_,i)=>({label:i%2?'optical activity':'specific rotation',poolIds:pool.filter(q=>q.opticalVisualRole===(i%2?'activity':'rotation')).map(q=>q.id)})):undefined;
+  if(startAdaptiveLearning({chapter:'ch5',poolIds:pool.map(q=>q.id),total,slots,rotationKey:'ch5-optical-visual-'+kind,label:warmup?'Optical activity warm-up · one decision':'Chapter 5 · Optical activity & rotation'}))smTagRun('practice',warmup?'warmup':'optical-visual','ch5');
+}
+function smOpticalVisualCard(){
+  const card=el('section',{class:'card sm-panel','data-optical-visual-practice':true});
+  card.innerHTML='<h2>Optical activity &amp; rotation</h2><p>Which structure rotates light? When can you predict zero—and when is the value unknown? Compare wedge–dash, Fischer, Newman and chair drawings.</p><p class="muted">14 original homework-style problems · 4 optional warm-ups. Answer the question directly; written reasoning is optional. Related examples rotate, but repeats are possible.</p>';
+  const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'What would you like to practice?'));
+  const select=el('select',{'aria-label':'Optical activity practice'});
+  [['mixed','Mix both · up to 4 problems'],['rotation','Predict specific rotation · up to 4 problems'],['activity','Choose the active compound · up to 4 problems']].forEach(([value,text])=>select.appendChild(el('option',{value},text)));
+  label.appendChild(select);card.appendChild(label);
+  card.appendChild(smButton('Start optical activity practice',()=>smStartOpticalVisual(select.value),{class:'btn','data-start-optical-visual':true}));
+  const warm=el('details');warm.appendChild(el('summary',{},'Warm up first · optional'));
+  warm.appendChild(el('p',{},'Check identical groups, what meso means, R/S versus rotation sign, and ring faces.'));
+  warm.appendChild(smButton('Start optical warm-up',()=>smStartOpticalVisual('warmup'),{'data-optical-visual-warmup':true}));card.appendChild(warm);return card;
+}
 function smWorksheetCard(sheet){
   const c=el('section',{class:'card sm-panel','data-ws-sheet':sheet.id});c.appendChild(el('h2',{},esc(sheet.title)));
   const last=S.worksheetState.lastQuestion,continueItem=last?.sheet===sheet.id?sheet.items.find(i=>i.id===last.item):null;
@@ -15484,6 +15834,8 @@ VIEWS.modePractice=v=>{
   if(pool.length){const select=el('select',{'aria-label':'Warm-up skill'});select.appendChild(el('option',{value:''},'Mix of foundation skills'));topics.forEach(t=>select.appendChild(el('option',{value:t},esc(TOPICS[t]?.name||t))));warm.appendChild(select);warm.appendChild(smButton('Start warm-up',()=>smStartWarmup(select.value),{'data-study-warmup':true}));}
   else warm.appendChild(el('p',{},'Use a Learn lesson for a small first attempt. No short-question bank is available here yet.'));
   v.appendChild(warm);
+  if(smChapter().id==='ch5'&&typeof CH5_OPTICAL_VISUAL_QUESTIONS!=='undefined')v.appendChild(smOpticalVisualCard());
+  if(smChapter().id==='ch5'&&typeof CH5_CHAIR_PAIR_QUESTIONS!=='undefined')v.appendChild(smChairPairCard());
   if(smChapter().id==='ch5'&&typeof CH5_VISUAL_STEREO_QUESTIONS!=='undefined')v.appendChild(smVisualStereoCard());
   const h=el('header',{class:'sm-section-title'});h.innerHTML='<h2>Regular problems</h2><p>Class worksheet wording and linked parts stay together. No extra explanation is required unless the original problem asks for it.</p>';v.appendChild(h);
   const sheets=WS_SHEETS.filter(s=>s.chapter===smChapter().id),grid=el('div',{class:'sm-grid sm-sheets'});sheets.forEach(s=>grid.appendChild(smWorksheetCard(s)));v.appendChild(grid);
