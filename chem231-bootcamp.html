@@ -6,7 +6,9 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.112 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.113 (LOCAL ONLY)
+  v3.113 (2026-10-11): VISUAL MESO + STEREOISOMER PRACTICE.
+  Original ring, chain and Fischer problems; open-count select-all grading.
   v3.112 (2026-10-11): OPTIONAL EXPLANATION VIDEOS + MY PROGRESS.
   Topic-matched external videos in Learn; Khan or signed-in YouTube Premium.
   No embedded playback. Read-only chapter/topic practice bars, with sample
@@ -1733,7 +1735,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.112 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.113 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -7518,24 +7520,26 @@ VIEWS.drill = (v) => {
     c.appendChild(line);c.appendChild(sub);
   } else if (q.type==="multiSelect"){
     const inputs=[];
-    const need=q.selectN||q.answer.length;
+    const need=q.selectAll?null:(q.selectN||q.answer.length);
     const ch=el("div",{class:"choices"});
     q.choices.forEach((txt,i)=>{
       const box=el("input",{type:"checkbox",id:"pick-"+i});inputs.push(box);
       const lab=el("label",{for:"pick-"+i,class:"choice",style:"display:flex;gap:10px;align-items:center;cursor:pointer"});
       lab.appendChild(box);lab.insertAdjacentHTML("beforeend","<span>"+txt+"</span>");ch.appendChild(lab);
     });
-    const note=el("p",{class:"muted",style:"margin:6px 0"},"Select exactly "+need+".");
+    const note=el("p",{class:"muted",style:"margin:6px 0"},q.selectAll?"Select every structure that fits. Leave all boxes empty if none fit.":"Select exactly "+need+".");
     const sub=el("button",{class:"btn",onclick:()=>{
       if(D.answered)return;
       const got=inputs.map((x,i)=>x.checked?i:null).filter(i=>i!==null);
-      if(got.length!==need){note.innerHTML='<b style="color:var(--coral)">Select exactly '+need+' before checking.</b>';return;}
+      if(!q.selectAll&&got.length!==need){note.innerHTML='<b style="color:var(--coral)">Select exactly '+need+' before checking.</b>';return;}
       const want=[...q.answer].sort((a,b)=>a-b),have=[...got].sort((a,b)=>a-b);
-      const ok=want.every((x,i)=>x===have[i]);
+      const ok=want.length===have.length&&want.every((x,i)=>x===have[i]);
       const labels=(q.choiceLabels||q.choices);
       inputs.forEach(x=>x.disabled=true);sub.disabled=true;
-      finish(ok,"<b class='mono'>"+want.map(i=>labels[i]).join(", ")+"</b>",undefined,have.map(i=>labels[i]).join(", "));
-    }},"Check "+need+" selections");
+      const missed=want.filter(i=>!have.includes(i)),extra=have.filter(i=>!want.includes(i));
+      const detail=q.selectAll&&!D.cold&&!ok?"<p>"+(missed.length?"Missed: <b>"+missed.map(i=>labels[i]).join(", ")+"</b>. ":"")+(extra.length?"Selected but does not fit: <b>"+extra.map(i=>labels[i]).join(", ")+"</b>.":"")+"</p>":"";
+      finish(ok,"<b class='mono'>"+(want.map(i=>labels[i]).join(", ")||"None")+"</b>"+detail,undefined,have.map(i=>labels[i]).join(", ")||"None selected");
+    }},q.selectAll?"Check selections":"Check "+need+" selections");
     c.appendChild(ch);c.appendChild(note);c.appendChild(sub);
   } else if (q.type==="mc"){
     const ch=el("div",{class:"choices"});
@@ -12661,6 +12665,9 @@ function renderCh5Lesson(v,u){
     body.innerHTML='<h2>Read it → draw it → check it</h2><p>Try '+u.practiceIds.length+' tasks with optional hints. Then use '+u.coldIds.length+' different tasks without hints. Use paper or the expandable drawing canvas; extra written notes are optional.</p>';
     const row=ch5Actions();row.appendChild(ch5Button('Practice · '+u.practiceIds.length+' tasks',()=>startCh5Lesson(u.id),false,{'data-ch5-practice':u.id}));row.appendChild(ch5Button('No-hint check · '+u.coldIds.length+' tasks',()=>startCh5Lesson(u.id,'check'),true,{'data-ch5-check':u.id}));body.appendChild(row);
     body.appendChild(el('p',{class:'muted'},'A repeat is retrieval practice, not a fresh test. Drawings use honest self-review against the model and rubric.'));
+    if(['ch5-symmetry','ch5-relationships'].includes(u.id)&&typeof smStartVisualStereo==='function'){
+      body.appendChild(ch5Button('Try a short visual problem set →',()=>smStartVisualStereo(u.id==='ch5-symmetry'?'meso':'pairs'),true,{'data-ch5-visual-set':u.id}));
+    }
   }
   card.appendChild(body);
   const sources=(u.sourceUrls||[u.source]).filter(Boolean);
@@ -12732,6 +12739,214 @@ ch5Style.textContent=`
 document.head.appendChild(ch5Style);
 const ch5Linked=new URLSearchParams(location.search);
 if(ch5Linked.get('chapter')==='ch5'||ch5Unit(ch5Linked.get('lesson'))){S.view='allLearn';S.learnCh='ch5';S.learnUnit=ch5Unit(ch5Linked.get('lesson'))?.id||null;S.learnTopic=null;S.ch5LessonStep=0;}
+
+/* Visual stereochemistry practice · 2026-10-11.
+ * Original structures and questions in the homework's visual response format.
+ * Load after ch5-prep-ui.js. No learner records, keys or existing IDs are changed.
+ * Chemistry references support the rules, not a copied homework answer key.
+ */
+const CH5_VISUAL_STEREO_SOURCES={
+  meso:'https://openstax.org/books/organic-chemistry/pages/5-7-meso-compounds',
+  relationships:'https://openstax.org/books/organic-chemistry/pages/5-6-diastereomers',
+  fischer:'https://openstax.org/books/organic-chemistry/pages/25-2-representing-carbohydrate-stereochemistry-fischer-projections'
+};
+const CH5_VS_RELATIONS=['Identical compounds','Enantiomers','Diastereomers','Constitutional isomers'];
+const CH5_VS_CLASSES=['Meso','Chiral','Achiral, but not meso'];
+function ch5VSId(n){return 'CH5-VS'+String(n).padStart(2,'0');}
+function ch5VSRing(sites=[2,3],groups=['CH₃','CH₃'],depths=['wedge','wedge'],rotate=0){return {kind:'ring',size:5,sites,groups,depths,rotate};}
+function ch5VSChain(size=5,groups=['Cl','Cl'],depths=['wedge','wedge'],sites=[1,size-2],rotate=0){return {kind:'chain',size,sites,groups,depths,rotate};}
+function ch5VSFischer(group='Cl',sides=['left','left'],top='CH₃',bottom='CH₃',rotate=0){return {kind:'fischer',left:sides.map(s=>s==='left'?group:'H'),right:sides.map(s=>s==='right'?group:'H'),top,bottom,rotate};}
+function ch5VSRotate(spec,rotate){return {...spec,rotate};}
+function ch5VSDescription(spec){
+  if(spec.kind==='fischer')return 'Fischer projection: top '+spec.top+', bottom '+spec.bottom+'; upper crossing left '+spec.left[0]+', right '+spec.right[0]+'; lower crossing left '+spec.left[1]+', right '+spec.right[1]+'. Whole drawing rotated '+(spec.rotate||0)+' degrees.';
+  const atoms=spec.kind==='ring'?'Five-membered ring; vertices indexed from the top clockwise before page rotation':'Bond-line chain of '+spec.size+' carbons, indexed from left to right before page rotation';
+  return atoms+'. '+spec.sites.map((c,i)=>'At position '+(c+1)+': '+spec.groups[i]+' on a '+(spec.depths[i]==='wedge'?'solid wedge toward you':'hashed wedge away from you')).join('; ')+'. Unshown hydrogens are implicit. Whole drawing rotated '+(spec.rotate||0)+' degrees.';
+}
+function ch5VSDiagram(spec){
+  const angle=(spec.rotate||0)*Math.PI/180,cos=Math.cos(angle),sin=Math.sin(angle);
+  const point=p=>[160+(p[0]-160)*cos-(p[1]-118)*sin,118+(p[0]-160)*sin+(p[1]-118)*cos];
+  const line=(a,b,kind='plain')=>ch5FBond(point(a),point(b),kind);
+  const text=(p,label)=>{const [x,y]=point(p);return ch5FText(x,y+6,label,19);};
+  let body='';
+  if(spec.kind==='ring'){
+    const vertices=Array.from({length:spec.size},(_,i)=>{const a=(-90+360*i/spec.size)*Math.PI/180;return [160+60*Math.cos(a),111+60*Math.sin(a)];});
+    body=vertices.map((p,i)=>line(p,vertices[(i+1)%spec.size])).join('');
+    spec.sites.forEach((site,i)=>{const p=vertices[site],dx=(p[0]-160)/60,dy=(p[1]-111)/60;body+=line(p,[p[0]+31*dx,p[1]+31*dy],spec.depths[i])+text([p[0]+52*dx,p[1]+52*dy],spec.groups[i]);});
+  }else if(spec.kind==='chain'){
+    const vertices=Array.from({length:spec.size},(_,i)=>[36+i*248/(spec.size-1),i%2?109:81]);
+    body=vertices.slice(0,-1).map((p,i)=>line(p,vertices[i+1])).join('');
+    spec.sites.forEach((site,i)=>{const p=vertices[site],dy=site%2?1:-1;body+=line(p,[p[0],p[1]+48*dy],spec.depths[i])+text([p[0],p[1]+68*dy],spec.groups[i]);});
+  }else{
+    body=line([160,45],[160,191])+line([102,88],[218,88])+line([102,148],[218,148]);
+    body+=text([160,26],spec.top)+text([160,216],spec.bottom);
+    for(let i=0;i<2;i++)body+=text([77,88+i*60],spec.left[i])+text([243,88+i*60],spec.right[i]);
+  }
+  return '<svg class="ch5-vs-diagram" data-vs-kind="'+spec.kind+'" data-vs-rotation="'+(spec.rotate||0)+'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 236" role="img" aria-label="'+ch5FEscape(ch5VSDescription(spec))+'" style="display:block;width:100%;height:auto;max-height:224px;color:var(--text,#193d45)"><title>'+ch5FEscape(ch5VSDescription(spec))+'</title>'+body+'</svg>';
+}
+function ch5VSGrid(specs){
+  const minimum=specs.length===6?180:210;
+  return '<div class="ch5-vs-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,'+minimum+'px),1fr));gap:10px;margin:12px 0">'+specs.map((s,i)=>'<figure class="ch5-vs-card" data-structure-letter="'+String.fromCharCode(65+i)+'" style="margin:0;border:1px solid var(--border,#ccdadd);border-radius:12px;padding:8px;min-width:0"><figcaption style="font-weight:800;font-size:1rem">'+String.fromCharCode(65+i)+'</figcaption>'+ch5VSDiagram(s)+'</figure>').join('')+'</div><p class="muted" style="font-size:.82rem;margin:4px 0">Solid wedge: toward you. Hashed wedge: away. In a Fischer cross, horizontal bonds point toward you.</p>';
+}
+function ch5VSQuestion(n,topic,type,diff,prompt,extra){
+  const lesson=topic==='stereoSymmetry'?'ch5-symmetry':'ch5-relationships';
+  return {id:ch5VSId(n),chapter:5,courseRoute:'ch5',topic,type,diff,difficulty:diff,adaptiveSkill:lesson,prompt,
+    source:'Original visual practice requested Oct 11, 2026. Homework-style format; not copied homework or an instructor assessment. References: '+CH5_VISUAL_STEREO_SOURCES.meso+' ; '+CH5_VISUAL_STEREO_SOURCES.relationships,
+    sourceKind:'original-practice',sourceUrl:CH5_VISUAL_STEREO_SOURCES[topic==='stereoSymmetry'?'meso':'relationships'],scopeStatus:'course-objectives',eligibleForUnseenTransfer:true,
+    visualStereoBank:true,visualPracticeRole:diff===1?'warm-up':'direct-answer',...extra};
+}
+function ch5VSClass(n,spec,key,why,family){
+  return ch5VSQuestion(n,'stereoSymmetry','mc',1,'Classify this single compound.'+ch5VSGrid([spec]),{
+    choices:CH5_VS_CLASSES.slice(),answer:CH5_VS_CLASSES.indexOf(key),transferFamily:family,
+    hints:['First check for stereocenters. Then check whether the whole molecule and its mirror image can match.'],why,
+    visualStereoAudit:{kind:'classification',structures:[{spec,classification:key}]}
+  });
+}
+function ch5VSSelect(n,structures,diff=2){
+  const specs=structures.map(s=>s.spec),answer=structures.map((s,i)=>s.classification==='Meso'?i:null).filter(i=>i!==null);
+  return ch5VSQuestion(n,'stereoSymmetry','multiSelect',diff,'Which structures represent <b>meso compounds</b>? Select all that apply.'+ch5VSGrid(specs),{
+    selectAll:true,choices:specs.map((_,i)=>String.fromCharCode(65+i)),answer,
+    // Sister boards share a family; changing letters/halogens is not fresh
+    // transfer. Distinct representation families remain usable in mixed runs.
+    transferFamily:'ch5-visual-meso-'+({5:'rings',6:'separated-chain',7:'fischer',8:'mixed',9:'rings',10:'mixed',11:'rings',12:'rotated-mixed',13:'mixed',14:'mixed'}[n]),
+    hints:['Meso needs stereocenters and an achiral whole molecule. A plain achiral molecule without stereocenters is not meso.','Compare matching groups, ring paths or chain ends. Do not use “two wedges” or “one R and one S” as a universal rule.'],
+    why:'<b>Meso: '+answer.map(i=>String.fromCharCode(65+i)).join(', ')+'.</b><ul>'+structures.map((s,i)=>'<li><b>'+String.fromCharCode(65+i)+' — '+s.classification+'.</b> '+s.reason+'</li>').join('')+'</ul>',
+    visualStereoAudit:{kind:'selectAll',structures:structures.map(({spec,classification})=>({spec,classification}))}
+  });
+}
+function ch5VSPair(n,a,b,relationship,why,family,diff=2){
+  return ch5VSQuestion(n,'stereoRelations','mc',diff,'How are structures <b>A and B</b> related?'+ch5VSGrid([a,b]),{
+    choices:CH5_VS_RELATIONS.slice(),answer:CH5_VS_RELATIONS.indexOf(relationship),transferFamily:family,
+    hints:['Match the connections first. A changed page orientation does not change the compound.','With the same connections, compare corresponding centers and check whether symmetry makes the drawings identical.'],why,
+    visualStereoAudit:{kind:'pair',structures:[{spec:a},{spec:b}],relationship}
+  });
+}
+const ch5VSM=(spec,reason)=>({spec,classification:'Meso',reason});
+const ch5VSC=(spec,reason)=>({spec,classification:'Chiral',reason});
+const ch5VSN=(spec,reason)=>({spec,classification:'Achiral, but not meso',reason});
+const CH5_VISUAL_STEREO_QUESTIONS=[
+  ch5VSClass(1,ch5VSRing(),'Meso','The two methyl-bearing carbons are stereocenters. The identical methyl groups are on the same face; the whole compound is achiral through its internal symmetry. That combination makes it meso.','ch5-vs-ring12-methyl'),
+  ch5VSClass(2,ch5VSRing([2],['CH₂CH₃'],['hash']),'Achiral, but not meso','The substituted carbon has two equivalent paths around the otherwise unsubstituted ring. It is not a stereocenter. A wedge or dash does not create one. The compound is achiral, but it is not meso.','ch5-vs-mono-ring'),
+  ch5VSClass(3,ch5VSRing([2,3],['CH₃','CH₃'],['wedge','hash']),'Chiral','The adjacent methyl groups are on opposite faces. This trans compound has two stereocenters and cannot match its mirror image. It is chiral, not meso.','ch5-vs-ring12-methyl'),
+  ch5VSClass(4,ch5VSFischer('OH',['left','left'],'CH₃','CH₂CH₃'),'Chiral','The two ends differ: CH₃ versus CH₂CH₃. There is no matching-end symmetry to make this two-center compound meso. Opposite R/S labels alone would not establish meso.','ch5-vs-fischer-pentanediol'),
+
+  ch5VSSelect(5,[
+    ch5VSM(ch5VSRing(),'The identical adjacent methyl groups are cis; symmetry exchanges the two centers.'),
+    ch5VSC(ch5VSRing([2,3],['CH₃','CH₃'],['wedge','hash']),'The trans arrangement is a chiral stereoisomer, despite having identical substituents.'),
+    ch5VSM(ch5VSRing([1,3],['OH','OH'],['hash','hash']),'The identical 1,3 hydroxyl groups are cis and the complete structure has reflection symmetry.'),
+    ch5VSC(ch5VSRing([1,3],['OH','OH'],['wedge','hash']),'The two OH groups are trans; its mirror image is a different stereoisomer.'),
+    ch5VSN(ch5VSRing([2],['Br'],['wedge']),'The two ring paths match. No stereocenter is present.'),
+    ch5VSC(ch5VSRing([2,3],['Cl','OH'],['wedge','wedge']),'Cl and OH do not match, so the apparent ring symmetry does not exchange identical groups.')
+  ]),
+  ch5VSSelect(6,[
+    ch5VSM(ch5VSChain(5,['OH','OH']),'Both OH-bearing centers have matching ends and are related by reflection.'),
+    ch5VSC(ch5VSChain(5,['OH','OH'],['wedge','hash']),'Changing only one center removes the meso relationship.'),
+    ch5VSM(ch5VSChain(7,['Cl','Cl']),'The equal halves exchange across a plane through the middle carbon.'),
+    ch5VSM(ch5VSChain(7,['Cl','Cl'],['hash','hash']),'Both groups point away, but the matching halves still make the compound meso.'),
+    ch5VSC(ch5VSChain(6,['Cl','Cl'],['wedge','wedge'],[1,3]),'The ends around the marked region are unequal; a visual pair of wedges is not enough.'),
+    ch5VSC(ch5VSChain(5,['Br','Cl']),'The two halogens differ, so reversing the chain does not match the groups.')
+  ]),
+  ch5VSSelect(7,[
+    ch5VSM(ch5VSFischer('Br'),'Equal CH₃ ends and this arrangement give the meso form.'),
+    ch5VSC(ch5VSFischer('Br',['left','right']),'The two-center arrangement is chiral, even though the ends match.'),
+    ch5VSM(ch5VSFischer('Cl',['right','right']),'A 180° page turn gives the equivalent left/left drawing with equal ends.'),
+    ch5VSC(ch5VSFischer('Cl',['left','left'],'CH₃','CH₂CH₃'),'The methyl and ethyl ends are different.'),
+    ch5VSM(ch5VSFischer('OH'),'The two stereocenters sit in an achiral, internally symmetric compound.'),
+    ch5VSC(ch5VSFischer('OH',['right','left'],'CH₃','CH₂CH₃'),'This unequal-ended chain has no meso form.')
+  ]),
+  ch5VSSelect(8,[
+    ch5VSM(ch5VSRing([2,3],['Cl','Cl'],['hash','hash']),'Same-face, identical groups permit the ring reflection relationship.'),
+    ch5VSC(ch5VSFischer('OH',['left','left'],'CH₃','CH₂CH₃'),'Unlike ends prevent the matching symmetry.'),
+    ch5VSC(ch5VSChain(5,['Cl','Cl'],['wedge','hash']),'These equal-ended chains are chiral in the shown opposite-depth arrangement.'),
+    ch5VSN(ch5VSRing([1],['OH'],['hash']),'The substituted carbon has two equivalent ring paths, so no stereocenter.'),
+    ch5VSM(ch5VSChain(7,['Br','Br'],['hash','hash']),'The equal halves and matching depth directions give a meso compound.'),
+    ch5VSC(ch5VSFischer('OH',['right','left']),'Matching ends alone do not make every stereoisomer meso.')
+  ]),
+  ch5VSSelect(9,[
+    ch5VSM(ch5VSRing([1,3],['CH₃','CH₃'],['wedge','wedge'],180),'Turning the whole page did not change this cis, symmetric ring compound.'),
+    ch5VSM(ch5VSRing([2,3],['Br','Br'],['wedge','wedge']),'The identical adjacent bromines are on the same face.'),
+    ch5VSC(ch5VSRing([1,3],['Cl','Cl'],['hash','wedge']),'The chlorine groups are on opposite faces.'),
+    ch5VSC(ch5VSRing([2,3],['Br','Cl'],['hash','hash']),'Different halogens break the relevant ring symmetry.'),
+    ch5VSN(ch5VSRing([3],['CH₃'],['wedge']),'One methyl substituent leaves two matching ring paths and no stereocenter.'),
+    ch5VSC(ch5VSRing([2,3],['OH','OH'],['wedge','hash']),'This trans diol is chiral, not the meso cis diol.')
+  ]),
+  ch5VSSelect(10,[
+    ch5VSC(ch5VSFischer('Br',['left','right']),'This is one of the two chiral forms with these equal ends.'),
+    ch5VSM(ch5VSChain(5,['Cl','Cl'],['wedge','wedge'],[1,3],180),'The page rotation preserves the symmetric, meso configuration.'),
+    ch5VSN(ch5VSRing([2],['Cl'],['hash']),'An ordinary achiral monosubstituted ring is not meso.'),
+    ch5VSM(ch5VSRing([1,3],['Br','Br'],['hash','hash']),'The same-face identical substituents have the needed reflection relationship.'),
+    ch5VSC(ch5VSChain(6,['OH','OH'],['hash','hash'],[1,3]),'One end is longer than the other; there is no matching-end symmetry.'),
+    ch5VSM(ch5VSFischer('OH',['right','right'],'CH₂CH₃','CH₂CH₃'),'Both ends are ethyl; this arrangement has internal symmetry.')
+  ]),
+  ch5VSSelect(11,[
+    ch5VSM(ch5VSRing([2,3],['CH₂CH₃','CH₂CH₃'],['wedge','wedge']),'Identical ethyl groups on the same face give the same symmetry test as identical methyls.'),
+    ch5VSC(ch5VSRing([2,3],['CH₂CH₃','CH₂CH₃'],['wedge','hash']),'Opposite-face ethyl groups give a chiral trans stereoisomer.'),
+    ch5VSM(ch5VSRing([2,3],['CH₂CH₃','CH₂CH₃'],['hash','hash'],180),'Reversing both centers and rotating this meso drawing does not make a new enantiomer.'),
+    ch5VSC(ch5VSRing([2,3],['CH₃','CH₂CH₃'],['wedge','wedge']),'Methyl and ethyl are different, so that exchange is not a molecular symmetry.'),
+    ch5VSC(ch5VSFischer('Cl',['left','right'],'CH₂CH₃','CH₂CH₃'),'Equal ethyl ends do not rescue this chiral configuration.'),
+    ch5VSM(ch5VSChain(7,['OH','OH'],['wedge','wedge']),'Reflection exchanges the matching halves, including both stereocenters.')
+  ],3),
+  ch5VSSelect(12,[
+    ch5VSC(ch5VSChain(5,['OH','OH'],['hash','wedge'],[1,3],180),'Page rotation preserves the chiral arrangement; it does not turn it meso.'),
+    ch5VSC(ch5VSFischer('Cl',['right','right'],'CH₃','CH₂CH₃',180),'The ends remain different after the whole Fischer drawing is turned.'),
+    ch5VSM(ch5VSFischer('Br',['left','left'],'CH₂CH₃','CH₂CH₃',180),'The equal ends and meso arrangement are preserved by the 180° rotation.'),
+    ch5VSN(ch5VSRing([1],['CH₂CH₃'],['wedge'],180),'No tetrahedral stereocenter: the two ring paths still match.'),
+    ch5VSC(ch5VSRing([1,3],['CH₃','CH₃'],['wedge','hash'],180),'This remains a trans, chiral ring compound.'),
+    ch5VSM(ch5VSRing([2,3],['OH','OH'],['hash','hash'],180),'The identical OH groups remain cis, giving the meso compound.')
+  ],3),
+  ch5VSSelect(13,[
+    ch5VSC(ch5VSRing([2,3],['Br','OH'],['wedge','wedge']),'Different substituents prevent matching halves.'),
+    ch5VSC(ch5VSFischer('OH',['left','left'],'CH₃','CH₂CH₃'),'One methyl and one ethyl end prevent the meso symmetry.'),
+    ch5VSC(ch5VSChain(5,['Br','Br'],['wedge','hash']),'Only one center is inverted relative to the symmetric meso arrangement.'),
+    ch5VSN(ch5VSRing([2],['OH'],['wedge']),'Achiral, but it has no stereocenters.'),
+    ch5VSM(ch5VSFischer('Cl',['left','left'],'CH₂CH₃','CH₂CH₃'),'The matching ethyl ends and this configuration yield an achiral compound with centers.'),
+    ch5VSC(ch5VSRing([1,3],['CH₃','CH₃'],['hash','wedge']),'The trans compound is chiral; identical groups alone are not enough.')
+  ],3),
+  ch5VSSelect(14,[
+    ch5VSM(ch5VSChain(7,['OH','OH'],['hash','hash']),'Both centers are exchanged by the reflection of the equal chain halves.'),
+    ch5VSC(ch5VSRing([2,3],['CH₃','OH'],['hash','hash']),'Different attached groups remove the meso symmetry.'),
+    ch5VSC(ch5VSFischer('Br',['left','right'],'CH₂CH₃','CH₂CH₃'),'This configuration is chiral despite matching ends.'),
+    ch5VSM(ch5VSRing([1,3],['CH₂CH₃','CH₂CH₃'],['wedge','wedge']),'Equal ethyl groups on the same face give an internally symmetric compound.'),
+    ch5VSM(ch5VSFischer('Cl',['right','right'],'CH₃','CH₃',180),'The whole-page rotation retains the meso configuration.'),
+    ch5VSN(ch5VSRing([1],['Br'],['hash']),'The ring has no stereocenters, so meso is not the correct label.')
+  ]),
+
+  ch5VSPair(15,ch5VSRing(),ch5VSRing([2,3],['CH₃','CH₃'],['hash','hash']),'Identical compounds','Both drawings represent the meso cis compound. All shown centers reverse, but internal symmetry makes these mirror drawings superimposable. “Both centers changed” is not enough to call them enantiomers.','ch5-vs-ring12-methyl',3),
+  ch5VSPair(16,ch5VSRing([2,3],['CH₃','CH₃'],['wedge','hash']),ch5VSRing([2,3],['CH₃','CH₃'],['hash','wedge']),'Enantiomers','The connections match and both centers invert. The trans compound is chiral, so these mirror images cannot be superimposed.','ch5-vs-ring12-methyl'),
+  ch5VSPair(17,ch5VSRing([1,3],['OH','OH']),ch5VSRing([1,3],['OH','OH'],['wedge','hash']),'Diastereomers','The connections match, but one center changes while the other stays fixed. A is the meso cis compound; B is a chiral trans stereoisomer. A meso compound can be a diastereomer of a chiral compound.','ch5-vs-ring13-diol'),
+  ch5VSPair(18,ch5VSRing([2,3],['Cl','Br']),ch5VSRing([2,3],['Cl','Br'],['hash','hash']),'Enantiomers','Both centers invert. Cl and Br are different, so the identical-group meso exception does not apply. These are nonsuperimposable mirror images.','ch5-vs-ring12-chlorobromo'),
+  ch5VSPair(19,ch5VSRing([1,3],['CH₂CH₃','CH₂CH₃']),ch5VSRing([1,3],['CH₂CH₃','CH₂CH₃'],['wedge','wedge'],180),'Identical compounds','B is just a 180° turn of the complete drawing. Every substituent keeps its connection and wedge type. A page rotation does not change configuration.','ch5-vs-ring13-ethyl'),
+  ch5VSPair(20,ch5VSChain(5,['Cl','Cl']),ch5VSChain(5,['Cl','Cl'],['hash','hash']),'Identical compounds','These are mirror drawings of meso-2,4-dichloropentane. A three-dimensional rotation and the equal-end symmetry superimpose them. They are not two different enantiomers.','ch5-vs-chain-pentane-dichloro',3),
+  ch5VSPair(21,ch5VSChain(5,['OH','OH'],['wedge','hash']),ch5VSChain(5,['OH','OH'],['hash','wedge']),'Enantiomers','Both corresponding centers invert, and this opposite-depth arrangement is chiral. The mirror pair does not superimpose.','ch5-vs-chain-pentane-diol'),
+  ch5VSPair(22,ch5VSChain(5,['Br','Br']),ch5VSChain(5,['Br','Br'],['wedge','hash']),'Diastereomers','The same five-carbon chain is present in both. One center changes, so the drawings are not identical or mirror images. A is meso; B is chiral. “Meso” describes one compound; “diastereomers” describes the pair.','ch5-vs-chain-pentane-dibromo'),
+  ch5VSPair(23,ch5VSChain(6,['Cl','Cl'],['wedge','wedge'],[1,3]),ch5VSChain(6,['Cl','Cl'],['hash','hash'],[1,3]),'Enantiomers','Both centers invert, and the six-carbon chain has unequal ends around these substituted positions. It lacks the meso symmetry of the corresponding 2,4-disubstituted pentane.','ch5-vs-chain-hexane-dichloro',3),
+  ch5VSPair(24,ch5VSFischer('OH'),ch5VSFischer('OH',['right','right']),'Identical compounds','A 180° turn of A gives B: the two equal CH₃ ends exchange and both OH groups change screen sides. These are two drawings of the same meso diol.','ch5-vs-fischer-butanediol'),
+  ch5VSPair(25,ch5VSFischer('Br',['left','right']),ch5VSFischer('Br',['right','left']),'Enantiomers','Both corresponding Fischer crossings invert. This opposite-side arrangement gives the chiral pair, not the meso form. The equal CH₃ ends do not make all configurations identical.','ch5-vs-fischer-dibromobutane'),
+  ch5VSPair(26,ch5VSFischer('OH',['left','left'],'CH₃','CH₂CH₃'),ch5VSFischer('OH',['left','right'],'CH₃','CH₂CH₃'),'Diastereomers','The upper center is unchanged and the lower center is inverted. Both drawings have the same unequal-ended chain, so they are diastereomers. Neither is meso.','ch5-vs-fischer-pentanediol'),
+  ch5VSPair(27,ch5VSFischer('Cl',['left','left'],'CH₃','CH₂CH₃'),ch5VSFischer('Cl',['left','left'],'CH₃','CH₂CH₃',180),'Identical compounds','The second Fischer projection is the entire first drawing turned 180°. Match CH₃ with CH₃ and ethyl with ethyl before comparing centers. A permitted page rotation does not invert the configurations.','ch5-vs-fischer-dichloropentane',3),
+  ch5VSPair(28,ch5VSRing([2,3],['CH₃','CH₃']),ch5VSRing([1,3],['CH₃','CH₃']),'Constitutional isomers','A has adjacent methyl-bearing ring carbons; B has one ring carbon between them along the shorter path. Both have the same formula, but different connections. Stop at connectivity before comparing stereochemistry.','ch5-vs-ring-methyl-connectivity')
+];
+
+const CH5_VISUAL_STEREO_GROUPS={
+  warmup:CH5_VISUAL_STEREO_QUESTIONS.filter(q=>q.diff===1).map(q=>q.id),
+  meso:CH5_VISUAL_STEREO_QUESTIONS.filter(q=>q.type==='multiSelect').map(q=>q.id),
+  relationships:CH5_VISUAL_STEREO_QUESTIONS.filter(q=>q.topic==='stereoRelations').map(q=>q.id),
+  all:CH5_VISUAL_STEREO_QUESTIONS.map(q=>q.id)
+};
+// Keep the six-structure boards to two rows on a normal desktop question pane.
+// Phones retain one readable column without stretching every SVG into a poster.
+if(typeof document!=='undefined'&&!document.getElementById('ch5-vs-layout')){
+  const style=document.createElement('style');style.id='ch5-vs-layout';
+  style.textContent='@media(max-width:600px){.ch5-vs-grid{grid-template-columns:1fr!important}.ch5-vs-grid .ch5-vs-diagram{max-height:176px!important}}';
+  document.head.appendChild(style);
+}
+for(const q of CH5_VISUAL_STEREO_QUESTIONS){
+  if(!CH5_QUESTIONS.some(old=>old.id===q.id))CH5_QUESTIONS.push(q);
+  if(!QUESTIONS.some(old=>old.id===q.id))QUESTIONS.push(q);
+  const lesson=CH5_LESSONS.find(u=>u.id===q.adaptiveSkill);
+  if(!lesson)throw new Error('Visual stereochemistry lesson missing: '+q.adaptiveSkill);
+  const n=Number(q.id.slice(-2)),field=q.diff===1||n%2?'practiceIds':'coldIds';
+  if(!lesson[field].includes(q.id))lesson[field].push(q.id);
+}
 
 /* BEGIN ARROW LAB (resonance you draw), 2026-10-02 */
 /* Resonance engine, 2026-10-02. Pure, deterministic electron bookkeeping for the
@@ -14887,7 +15102,7 @@ function leFingerprint(value){
 function leActor(){return {profile:typeof PROFILE==='string'?PROFILE:null,role:typeof P!=='undefined'?P.role:null,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};}
 function leQuestionMetadata(q){
   return {id:q.id,revision:q.correctedAt||null,responseFormat:q.type||'unspecified',topic:q.topic||null,source:q.source||null,
-    itemFingerprint:leFingerprint(lePick(q,['id','type','prompt','template','choices','choiceLabels','fields','production','arrowBoard','resonanceBoard'])),
+    itemFingerprint:leFingerprint(lePick(q,['id','type','prompt','template','choices','choiceLabels','selectAll','fields','production','arrowBoard','resonanceBoard'])),
     keyFingerprint:leFingerprint(lePick(q,['answer','answers','accept','fields','model','rubric','production','arrowBoard','resonanceBoard'])),
     fingerprintPurpose:'Change detection only; not a cryptographic integrity check.',
     fieldLabels:(q.fields||[]).map((f,i)=>f.label||f[0]||'Field '+(i+1))};
@@ -15234,6 +15449,24 @@ function smStartWarmup(topic){
   const pool=smWarmupPool().filter(q=>!topic||q.topic===topic);
   if(startAdaptiveLearning({chapter:smChapter().id,poolIds:pool.map(q=>q.id),total:3,label:'Optional warm-up · '+smChapter().name,rotationKey:'warmup-'+smChapter().id+'-'+(topic||'all')}))smTagRun('practice','warmup');
 }
+function smStartVisualStereo(kind='mixed'){
+  const bank=CH5_VISUAL_STEREO_QUESTIONS.filter(q=>q.diff>1);
+  const pool=bank.filter(q=>kind==='meso'?q.type==='multiSelect':kind==='pairs'?q.type==='mc':true);
+  const total=kind==='meso'?4:6;
+  const slots=kind==='mixed'?Array.from({length:total},(_,i)=>({label:i%3===0?'meso selection':'isomer comparison',poolIds:pool.filter(q=>i%3===0?q.type==='multiSelect':q.type==='mc').map(q=>q.id)})):undefined;
+  if(startAdaptiveLearning({chapter:'ch5',poolIds:pool.map(q=>q.id),total,slots,rotationKey:'ch5-visual-stereo-'+kind,label:'Chapter 5 · Meso & isomer pairs'}))smTagRun('practice','visual-stereochemistry','ch5');
+}
+function smVisualStereoCard(){
+  const card=el('section',{class:'card sm-panel','data-visual-stereo-practice':true});
+  card.innerHTML='<h2>Meso &amp; isomer pairs</h2><p>Ring, chain and Fischer drawings. Select all meso compounds, or compare identical structures, enantiomers and diastereomers.</p>';
+  card.appendChild(el('p',{class:'muted'},CH5_VISUAL_STEREO_QUESTIONS.filter(q=>q.diff>1).length+' visual problems, plus 4 single-structure warm-ups. Original homework-style practice; written reasoning is optional.'));
+  const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'What would you like to practice?'));
+  const select=el('select',{'aria-label':'Visual stereochemistry practice'});
+  [['mixed','Mix both · up to 6 problems'],['meso','Meso selections · up to 4 problems'],['pairs','Isomer pairs · up to 6 problems']].forEach(([value,text])=>select.appendChild(el('option',{value},text)));
+  label.appendChild(select);card.appendChild(label);
+  card.appendChild(smButton('Start visual practice',()=>smStartVisualStereo(select.value),{class:'btn','data-start-visual-stereo':true}));
+  return card;
+}
 function smWorksheetCard(sheet){
   const c=el('section',{class:'card sm-panel','data-ws-sheet':sheet.id});c.appendChild(el('h2',{},esc(sheet.title)));
   const last=S.worksheetState.lastQuestion,continueItem=last?.sheet===sheet.id?sheet.items.find(i=>i.id===last.item):null;
@@ -15251,6 +15484,7 @@ VIEWS.modePractice=v=>{
   if(pool.length){const select=el('select',{'aria-label':'Warm-up skill'});select.appendChild(el('option',{value:''},'Mix of foundation skills'));topics.forEach(t=>select.appendChild(el('option',{value:t},esc(TOPICS[t]?.name||t))));warm.appendChild(select);warm.appendChild(smButton('Start warm-up',()=>smStartWarmup(select.value),{'data-study-warmup':true}));}
   else warm.appendChild(el('p',{},'Use a Learn lesson for a small first attempt. No short-question bank is available here yet.'));
   v.appendChild(warm);
+  if(smChapter().id==='ch5'&&typeof CH5_VISUAL_STEREO_QUESTIONS!=='undefined')v.appendChild(smVisualStereoCard());
   const h=el('header',{class:'sm-section-title'});h.innerHTML='<h2>Regular problems</h2><p>Class worksheet wording and linked parts stay together. No extra explanation is required unless the original problem asks for it.</p>';v.appendChild(h);
   const sheets=WS_SHEETS.filter(s=>s.chapter===smChapter().id),grid=el('div',{class:'sm-grid sm-sheets'});sheets.forEach(s=>grid.appendChild(smWorksheetCard(s)));v.appendChild(grid);
   if(!sheets.length)v.appendChild(el('p',{class:'card'},'No original worksheet is loaded for this chapter yet. Isolated practice is available above; it is not a replacement for a full paper problem.'));
@@ -15860,7 +16094,7 @@ function ccFingerprint(value){
   const stable=v=>v&&typeof v==='object'?(Array.isArray(v)?'['+v.map(stable).join(',')+']':'{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stable(v[k])).join(',')+'}'):JSON.stringify(v);
   const text=stable(value);let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619);}return 'cc-fnv1a32:'+((hash>>>0).toString(16));
 }
-function ccQuestionFingerprint(q){return ccFingerprint(ccPick(q,['id','type','prompt','template','choices','choiceLabels','answer','accept','tolerance','fields','model','rubric','production','arrowBoard','resonanceBoard','correctedAt']));}
+function ccQuestionFingerprint(q){return ccFingerprint(ccPick(q,['id','type','prompt','template','choices','choiceLabels','selectAll','answer','accept','tolerance','fields','model','rubric','production','arrowBoard','resonanceBoard','correctedAt']));}
 function ccQuestion(id){return QUESTIONS.find(q=>q.id===id)||null;}
 function ccFamilies(q){return typeof adaptiveLearningFamilies==='function'?adaptiveLearningFamilies(q):['id:'+q.id,...(q.transferFamily?['transfer:'+q.transferFamily]:[]),...(q.sourceModelIds||[]).map(id=>'source:'+id)];}
 function ccLevel(q){return typeof adaptiveLearningDifficulty==='function'?adaptiveLearningDifficulty(q):Math.max(0,Math.min(3,Number(q.diff)||2));}
