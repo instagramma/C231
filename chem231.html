@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.111 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.112 (LOCAL ONLY)
+  v3.112 (2026-10-11): OPTIONAL EXPLANATION VIDEOS + MY PROGRESS.
+  Topic-matched external videos in Learn; Khan or signed-in YouTube Premium.
+  No embedded playback. Read-only chapter/topic practice bars, with sample
+  counts and separate assisted/self-reviewed work. Not mastery or a forecast.
   v3.111 (2026-10-08): CHAPTER STARTING + READINESS CHECKS. Distinct fixed
   samples, sealed answers, saved drafts, separate manual review and topic gaps.
   v3.110 (2026-10-07): LEARN, CHECK, CONTINUE. Brief checks after selected main
@@ -1729,7 +1733,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.111 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.112 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -5273,6 +5277,9 @@ const RESOURCES={
 function resTile(topic){
   const r=RESOURCES[topic]; if(!r) return null;
   const d=el("details",{style:"margin-top:12px;border:2px solid rgba(0,0,0,.12);border-radius:10px;padding:8px 12px;background:rgba(0,0,0,.025)"});
+  if(typeof createLearningVideoPanel==='function'&&['learn','allLearn'].includes(S.view)){
+    d.innerHTML='<summary>Book reference</summary><p>'+r.klein+'</p>';return d;
+  }
   d.innerHTML='<summary style="cursor:pointer;font-size:.85rem;font-weight:800">📚 Stuck? Book section + videos for this topic</summary>'+
     '<div style="font-size:.85rem;margin-top:8px;line-height:1.7"><div>📖 <b>'+r.klein+'</b></div>'+
     '<div>🎓 Khan Academy: '+r.ka.map(x=>'<a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+'</a>').join(" · ")+'</div>'+
@@ -6271,14 +6278,9 @@ function renderLearningPath(v){
     a.appendChild(el("button",{class:"btn coral",onclick:()=>resumeDrill()},"▶ Resume saved work"));
   }else if(stage===0){
     a.innerHTML='<h3>Step 1 · '+esc(guide.videoTitle||"Learn the rule")+'</h3><div class="path-resource"><span class="path-resource-icon">▶️</span><div class="path-resource-copy"><b>'+esc(guide.videoBy||"Short lesson")+'</b><span>'+esc(guide.videoWhy||"")+'</span></div></div>';
-    if(guide.embedUrl&&!guide.textOnly){
-      const player=el("div",{class:"path-video"});
-      player.innerHTML='<iframe src="'+esc(guide.embedUrl)+'" title="'+esc(guide.videoTitle||"Lesson video")+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
-      a.appendChild(player);
-      if(guide.videoUrl)a.appendChild(el("a",{class:"path-video-source",href:guide.videoUrl,target:"_blank",rel:"noopener"},"Player not working? Open the official source ↗"));
-    }
     const row=el("div",{class:"path-controls"});
-    if(guide.videoUrl&&!guide.embedUrl){const watch=el("a",{class:"btn coral",href:guide.videoUrl,target:"_blank",rel:"noopener"},guide.textOnly?"Open the reading ↗":"▶ Watch the exact video ↗");row.appendChild(watch);}
+    if(guide.videoUrl){const watch=el("a",{class:"btn coral",href:guide.videoUrl,target:"_blank",rel:"noopener"},guide.textOnly?"Open the reading ↗":"Watch at the original source ↗");row.appendChild(watch);}
+    if(!guide.textOnly)a.appendChild(el('p',{class:'muted'},'Khan Academy is ad-free. For YouTube, use your signed-in Premium account; creator promotions may remain. No player loads inside this app.'));
     row.appendChild(el("button",{class:"btn ghost",onclick:()=>finishFlightLearning(st.id)},guide.textOnly?"Done reading — practice →":"Done watching — practice →")); a.appendChild(row);
     const help=el("details",{class:"mini-details"}); help.innerHTML='<summary>Rule, vocabulary, and backup video</summary><div class="path-decoder"><b>Decode:</b> '+esc(guide.decoder||"")+'</div><p class="muted"><b>Rule:</b> '+esc(guide.rule||"")+'</p>'+(guide.extraUrl?'<p class="muted">Need another explanation? <a class="path-link" href="'+guide.extraUrl+'" target="_blank" rel="noopener">'+esc(guide.extraTitle)+' ↗</a></p>':'')+'<button class="btn ghost small" type="button" onclick="go(\'learn\')">Open the full lesson</button>'; a.appendChild(help);
   }else if(stage===1){
@@ -8551,7 +8553,7 @@ VIEWS.learn = (v) => {
   if(ch && S.learnTopic){
     const k=S.learnTopic, L=LESSONS[k];
     v.appendChild(back(ch.name, ()=>{S.learnTopic=null;S.learnUnit=null; render();}));
-    const c=el("div",{class:"card cream"});
+    const c=el("div",{class:"card cream","data-learn-topic":k});
     c.innerHTML='<span class="tag violet">'+ch.ico+' '+ch.name+'</span><h2 style="margin:6px 0">'+tName(k)+'</h2>'+
       (L?'<p style="margin:0 0 10px">'+L.primer+'</p><p class="muted" style="margin:0 0 8px">📕 Read: <b>'+L.klein+'</b>'+(ch.id!=="prelim"?' (WileyPLUS eText → Course Resources)':'')+'</p>':'<p class="muted">Primer coming — use the videos below, then drill.</p>');
     const rt=resTile(k); if(rt){ rt.open=true; c.appendChild(rt); }
@@ -9662,8 +9664,8 @@ function renderCoursePath(v){
 }
 function renderCourseLessonExtras(lesson,u){
   const resource=CH4_VIDEO_RESOURCES[u.id];if(resource){
-    const d=el('details',{class:'card cream'});d.innerHTML='<summary><b>Need the video first?</b> '+esc(resource.title)+'</summary><p>Watch until the first worked example, pause, and reproduce it. You can start with the written example instead.</p>';
-    if(resource.id)d.insertAdjacentHTML('beforeend','<div class="path-video"><iframe src="https://www.youtube-nocookie.com/embed/'+resource.id+'" title="'+esc(resource.title)+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>');
+    const d=el('details',{class:'card cream'});d.innerHTML='<summary><b>Instructor resources</b> · '+esc(resource.title)+'</summary><p>Open the course page for assigned resources. The optional explanation videos are above.</p>';
+    if(resource.id&&typeof createLearningVideoPanel!=='function')d.insertAdjacentHTML('beforeend','<p><a href="https://www.youtube.com/watch?v='+resource.id+'" target="_blank" rel="noopener">Watch on YouTube ↗</a> · Sign into Premium to avoid YouTube ads; creator promotions may remain.</p>');
     d.insertAdjacentHTML('beforeend','<a target="_blank" rel="noopener" href="https://smccd.instructure.com/courses/73887/pages/'+resource.page+'">Open instructor page and Wiley SkillBuilder videos ↗</a>');lesson.appendChild(d);
   }
   lesson.appendChild(el('p',{class:'muted'},'Source: '+(u.source||'Canvas Chapter 4 objectives and lecture deck')+'.'));
@@ -15751,17 +15753,12 @@ render=function(){lcStop();LC_PREVIOUS_RENDER();};
 window.addEventListener('focus',()=>{const panel=document.querySelector('[data-focus-steps][data-lesson-phase="check"]');if(panel){const p=[...lcRuntime.values()].find(p=>p.lessonKey===panel.dataset.focusSteps&&p.phase==='check'&&!p.closed&&!p.passed);if(p){lcClock=p;lcLastTick=Date.now();}}});
 const lcStyle=el('style');lcStyle.textContent='.lc-options{border:0;padding:0;min-width:0;margin:16px 0}.lc-options legend{font-size:1.08rem;font-weight:650;margin-bottom:12px;line-height:1.5}.lc-choice{display:flex;gap:10px;align-items:center;border:1px solid #bacacf;border-radius:10px;padding:12px;margin:10px 0;min-height:44px;cursor:pointer;line-height:1.5}.lc-choice:has(input:checked){background:#e7f3f3;border-color:#176c72}.lc-choice input{flex:none;width:18px;height:18px}.lc-choice:focus-within{outline:3px solid #d99b18;outline-offset:2px}.lc-confidence{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0}.lc-confidence select{min-height:44px;max-width:100%;font:inherit}.lc-teach{border-left:3px solid #176c72;padding:8px 14px;line-height:1.6;max-width:60ch}.lc-note{font-size:.9rem}[data-lc-feedback] p{line-height:1.6}[data-lc-confusing]{font-size:.88rem;white-space:normal!important}[data-lc-skip]{white-space:normal!important}@media(max-width:500px){[data-focus-steps] .focus-actions{flex-direction:column}[data-focus-steps] .btn{max-width:100%;white-space:normal}.lc-options legend{font-size:1rem}}';document.head.appendChild(lcStyle);
 
-/* Resource exposure, 2026-10-07. Device-local and optional; never mastery.
- * Integration: load after the lesson modules. leEngagementExport() joins the
- * learning-evidence download; leEngagementPanel(host) adds its privacy controls.
- * Official player contract: https://developers.google.com/youtube/iframe_api_reference
- * Only explicitly loaded, assigned Ch5 videos use the player API. Ordinary
- * external links remain usable and cannot report viewing time back to this app.
+/* Resource exposure, 2026-10-11. Device-local and optional; never mastery.
+ * Videos open on YouTube. No in-app player or new playback timing is offered.
+ * Prior video sessions remain available in exports and privacy controls.
  */
-const LE_ENGAGEMENT_VERSION='2026-10-07.1';
+const LE_ENGAGEMENT_VERSION='2026-10-11.1';
 const LE_ENG_CLICK_CAP=500,LE_ENG_VIDEO_CAP=100;
-const leEngPlayers=new Set();
-let leEngApiPromise=null,leEngPlayerSequence=0;
 function leEngActor(){return typeof leActor==='function'?leActor():{profile:typeof PROFILE==='string'?PROFILE:null,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};}
 function leEngAllowed(){return !!leEngActor().profile&&safeStore.get('resourceMetricsEnabled',true)!==false;}
 function leEngList(key){const rows=safeStore.get(key,[]);return Array.isArray(rows)?rows:[];}
@@ -15778,10 +15775,14 @@ function leEngUrl(raw){
   }catch(_){return null;}
 }
 function leEngCatalog(){
-  const map=new Map(),add=(raw,label,videoId=null)=>{const url=leEngUrl(raw);if(url)map.set(url,{url,label:String(label||'Course resource').slice(0,160),videoId});};
+  const map=new Map(),add=(raw,label,videoId=null)=>{const url=leEngUrl(raw);if(url)map.set(url,{url,label:String(label||'Course resource').slice(0,160),videoId:videoId&&url==='https://www.youtube.com/watch?v='+videoId?videoId:null});};
   if(typeof CH5_COURSE!=='undefined'){
     add(CH5_COURSE.slides,'Chapter 5 slides');
     (CH5_COURSE.groups||[]).forEach(g=>{add(CH5_COURSE.canvas+'/pages/'+g.slug,g.title+' instructions');(g.videos||[]).forEach(([label,id])=>{if(/^[\w-]{11}$/.test(id))add('https://www.youtube.com/watch?v='+id,label,id);});});
+  }
+  if(typeof learningVideoCatalog==='function'){
+    const videos=learningVideoCatalog();
+    if(Array.isArray(videos))videos.forEach(video=>{if(video&&typeof video.url==='string')add(video.url,video.label,video.videoId);});
   }
   const units=[];
   if(typeof CH5_LESSONS!=='undefined')units.push(...CH5_LESSONS);
@@ -15794,8 +15795,9 @@ function leEngCatalog(){
   return map;
 }
 function leEngContext(){
-  const root=document.getElementById('view'),step=root?.querySelector('[data-focus-lesson]'),ch5=root?.querySelector('[data-ch5-lesson]'),ch4=root?.querySelector('[data-learn-unit]'),repair=root?.querySelector('[data-transfer-lesson]');
-  return {view:typeof S!=='undefined'?String(S.view||'').slice(0,80):null,lessonKey:step?.dataset.focusLesson||(ch5?'ch5:'+ch5.dataset.ch5Lesson:ch4?'ch4:'+ch4.dataset.learnUnit:repair?'repair:'+repair.dataset.transferLesson:null)};
+  const root=document.getElementById('view'),step=root?.querySelector('[data-focus-lesson]'),ch5=root?.querySelector('[data-ch5-lesson]'),unit=root?.querySelector('[data-learn-unit]'),repair=root?.querySelector('[data-transfer-lesson]');
+  const state=typeof S!=='undefined'?S:{},chapter=String(state.learnCh||'ch4').slice(0,80);
+  return {view:String(state.view||'').slice(0,80)||null,lessonKey:step?.dataset.focusLesson||(ch5?'ch5:'+ch5.dataset.ch5Lesson:unit?chapter+':'+unit.dataset.learnUnit:repair?'repair:'+repair.dataset.transferLesson:state.learnTopic&&['learn','allLearn'].includes(state.view)?chapter+':topic:'+String(state.learnTopic).slice(0,80):null)};
 }
 function leEngRecordClick(anchor,activation='click'){
   if(!leEngAllowed()||!anchor||!document.getElementById('view')?.contains(anchor))return null;
@@ -15806,11 +15808,8 @@ function leEngRecordClick(anchor,activation='click'){
 document.addEventListener('click',event=>{if(event.button===0)leEngRecordClick(event.target?.closest?.('a[href]'));},true);
 document.addEventListener('auxclick',event=>{if(event.button===1)leEngRecordClick(event.target?.closest?.('a[href]'),'middle-click');},true);
 
-/* Conservatively accept short, continuous position progress while the API says
- * PLAYING. A seek jump, buffering, pause, hidden page, long polling gap or rate
- * change earns no time for that interval. This remains an estimate: a small seek
- * inside the tolerance cannot be distinguished perfectly from normal playback.
- * We do not equate final playhead position or ENDED with full viewing.
+/* Historical estimator retained as a pure function to document old records.
+ * Nothing in the current app calls it to create or update playback evidence.
  */
 function leEngPlaybackSlice(previous,current){
   if(!previous||!current||previous.state!==1||current.state!==1||!previous.foreground||!current.foreground)return {ms:0,discontinuity:false};
@@ -15820,104 +15819,34 @@ function leEngPlaybackSlice(previous,current){
   if(delta<0||Math.abs(delta-expected)>tolerance)return {ms:0,discontinuity:true};
   return {ms:Math.max(0,Math.min(wall,delta/rate)*1000),discontinuity:false};
 }
-function leEngReadPlayer(entry,at=Date.now()){
-  try{
-    const currentUrl=leEngUrl(entry.player?.getVideoUrl?.());
-    // Recommended/next videos are outside the assigned-ID allowlist.
-    if(currentUrl!=='https://www.youtube.com/watch?v='+entry.videoId)return null;
-    const position=entry.player.getCurrentTime(),rate=entry.player.getPlaybackRate(),state=entry.player.getPlayerState();
-    if(!Number.isFinite(position)||!Number.isFinite(rate))return null;
-    return {at,position,rate,state,foreground:!document.hidden&&document.hasFocus()};
-  }catch(_){return null;}
-}
-function leEngVideoSave(entry){
-  if(!leEngAllowed()||!entry.row||entry.closed)return;
-  entry.row.updatedAt=Date.now();const rows=leEngList('videoExposureSessions'),index=rows.findIndex(r=>r.id===entry.row.id);
-  const row=JSON.parse(JSON.stringify(entry.row));if(index<0)rows.push(row);else rows[index]=row;
-  safeStore.set('videoExposureSessions',rows.slice(-LE_ENG_VIDEO_CAP));
-}
-function leEngVideoSample(entry,at=Date.now()){
-  if(entry.closed)return;
-  const current=leEngReadPlayer(entry,at);
-  if(!leEngAllowed()||!entry.row){entry.previous=null;return;}
-  if(current){const slice=leEngPlaybackSlice(entry.previous,current);entry.row.foregroundPlaybackMs+=slice.ms;if(slice.discontinuity)entry.row.discontinuities++;const duration=entry.player.getDuration?.();if(Number.isFinite(duration)&&duration>0)entry.row.durationSeconds=duration;}
-  entry.previous=current;
-  if(at-entry.lastSave>=5000){leEngVideoSave(entry);entry.lastSave=at;}
-}
-function leEngVideoClose(entry,reason='navigation'){
-  if(entry.closed)return;
-  leEngVideoSample(entry);if(entry.row){entry.row.closedAt=Date.now();entry.row.closeReason=reason;leEngVideoSave(entry);}
-  entry.closed=true;clearInterval(entry.timer);clearTimeout(entry.readyTimeout);try{entry.player?.destroy?.();}catch(_){}
-  if(entry.button?.isConnected){entry.button.disabled=false;entry.button.textContent='Load video';}
-  leEngPlayers.delete(entry);
-}
-function leEngLoadApi(){
-  if(window.YT?.Player)return Promise.resolve(window.YT);
-  if(leEngApiPromise)return leEngApiPromise;
-  leEngApiPromise=new Promise((resolve,reject)=>{
-    const previous=window.onYouTubeIframeAPIReady,script=document.createElement('script');let settled=false;
-    const finish=(error)=>{if(settled)return;settled=true;clearTimeout(timeout);if(error){script.remove();reject(error);}else resolve(window.YT);};
-    const timeout=setTimeout(()=>finish(new Error('The video player did not load.')),12000);
-    window.onYouTubeIframeAPIReady=()=>{if(typeof previous==='function'){try{previous();}catch(_){}}if(window.YT?.Player)finish();};
-    script.src='https://www.youtube.com/iframe_api';script.onerror=()=>finish(new Error('The video player could not connect.'));document.head.appendChild(script);
-  }).catch(error=>{leEngApiPromise=null;throw error;});
-  return leEngApiPromise;
-}
+// Compatibility hooks cannot connect to YouTube or write playback sessions.
+function leEngLoadApi(){return Promise.resolve(null);}
 async function leEngLoadVideo(anchor,host,status,button){
-  if(!leEngActor().profile)return;
-  const resource=leEngCatalog().get(leEngUrl(anchor.href));if(!resource?.videoId||anchor.dataset.ch5AssignedVideo!==resource.videoId)return;
-  if(!/^https?:$/.test(location.protocol)){status.textContent='Use the live app to load this player, or open the original video link.';return;}
-  button.disabled=true;status.textContent='Loading YouTube. Press Play when it is ready.';
-  const entry={videoId:resource.videoId,host,button,player:null,previous:null,row:null,lastSave:Date.now(),closed:false};leEngPlayers.add(entry);
-  if(leEngAllowed()){
-    entry.row={id:leEngId('video'),version:LE_ENGAGEMENT_VERSION,actor:leEngActor(),videoId:resource.videoId,label:resource.label,context:leEngContext(),startedAt:Date.now(),foregroundPlaybackMs:0,playEvents:0,pauseEvents:0,endEvents:0,discontinuities:0,durationSeconds:null,status:'loading',tier:'exposure',measure:'estimated-foreground-continuous-playback',coverage:'Unique viewed segments and complete viewing are not measured.'};leEngVideoSave(entry);
-  }
-  try{
-    const YT=await leEngLoadApi();if(entry.closed||!host.isConnected)return;
-    const iframe=document.createElement('iframe');iframe.id='le-assigned-player-'+(++leEngPlayerSequence);iframe.title=resource.label;iframe.width='100%';iframe.height='240';iframe.style.cssText='display:block;width:100%;min-height:200px;border:0';iframe.setAttribute('allowfullscreen','');iframe.setAttribute('allow','encrypted-media; picture-in-picture');iframe.referrerPolicy='strict-origin-when-cross-origin';
-    const url=new URL('https://www.youtube-nocookie.com/embed/'+resource.videoId);url.searchParams.set('enablejsapi','1');url.searchParams.set('autoplay','0');url.searchParams.set('playsinline','1');url.searchParams.set('origin',location.origin);iframe.src=url.href;host.appendChild(iframe);
-    const fail=()=>{if(entry.closed)return;status.textContent='This player is unavailable. Use the original video link; outside viewing is not timed.';if(entry.row){entry.row.status='unavailable';leEngVideoSave(entry);}leEngVideoClose(entry,'player-unavailable');button.disabled=false;button.textContent='Try loading again';};
-    entry.readyTimeout=setTimeout(fail,15000);
-    entry.player=new YT.Player(iframe,{events:{
-      onReady:()=>{if(entry.closed)return;clearTimeout(entry.readyTimeout);status.textContent=leEngAllowed()?'Press Play. Only observed playback here is timed—not outside YouTube viewing.':'Press Play. Resource tracking is off.';if(entry.row){entry.row.status='ready';leEngVideoSave(entry);}entry.timer=setInterval(()=>leEngVideoSample(entry),1000);},
-      onStateChange:event=>{if(entry.closed)return;leEngVideoSample(entry);if(!leEngAllowed()||!entry.row)return;const sample=leEngReadPlayer(entry);if(!sample)return;entry.row.status=({1:'playing',2:'paused',0:'ended',3:'buffering',5:'cued'})[event.data]||'unstarted';if(event.data===1)entry.row.playEvents++;if(event.data===2)entry.row.pauseEvents++;if(event.data===0)entry.row.endEvents++;entry.previous=sample;leEngVideoSave(entry);},
-      onPlaybackRateChange:()=>{entry.previous=null;},onError:fail
-    }});
-  }catch(_){if(entry.closed)return;status.textContent='YouTube did not load. The original video link still works; outside viewing is not timed.';if(entry.row){entry.row.status='unavailable';leEngVideoSave(entry);}leEngVideoClose(entry,'api-unavailable');button.disabled=false;button.textContent='Try loading again';}
+  if(status)status.textContent='Open this video on YouTube. Viewing outside this app is not timed.';
+  if(button){button.disabled=true;button.textContent='Use the YouTube link';}
+  return null;
 }
 function leEngagementMount(root=document.getElementById('view')){
-  [...leEngPlayers].forEach(entry=>{if(!entry.host.isConnected)leEngVideoClose(entry);});
-  if(!root||!leEngActor().profile)return;
-  const catalog=leEngCatalog();root.querySelectorAll('a[data-ch5-assigned-video]').forEach(anchor=>{
-    const resource=catalog.get(leEngUrl(anchor.href));if(!resource?.videoId||resource.videoId!==anchor.dataset.ch5AssignedVideo||anchor.dataset.lePlayerOffered)return;
-    anchor.dataset.lePlayerOffered='true';const details=el('details',{'data-le-video-option':resource.videoId,style:'margin:8px 0 16px'});details.appendChild(el('summary',{},'Watch here · optional'));
-    details.appendChild(el('p',{class:'muted'},'Loading connects to YouTube. This app can estimate playback here if resource tracking is on. It cannot tell whether you paid attention. The original link still works.'));
-    const host=el('div',{'data-le-player-host':resource.videoId}),status=el('p',{role:'status',class:'muted'}),button=el('button',{class:'btn ghost',type:'button','data-le-video-load':resource.videoId},'Load video');button.addEventListener('click',()=>leEngLoadVideo(anchor,host,status,button));details.appendChild(button);details.appendChild(status);details.appendChild(host);anchor.after(details);
-  });
+  root?.querySelectorAll('[data-le-video-option]').forEach(node=>node.remove());
 }
 function leEngagementExport(){
   if(!leEngActor().profile)return {enabled:false,events:[],videoSessions:[],scope:'Signed out; no resource evidence is read.'};
-  leEngPlayers.forEach(entry=>{leEngVideoSample(entry);leEngVideoSave(entry);});
   return {version:LE_ENGAGEMENT_VERSION,enabled:safeStore.get('resourceMetricsEnabled',true)!==false,storage:'current-profile device-local; no cloud sync',tier:'exposure',caps:{clicks:LE_ENG_CLICK_CAP,videoSessions:LE_ENG_VIDEO_CAP},
     events:leEngList('resourceClickEvents').map(r=>leEngPick(r,['id','version','ts','actor','kind','activation','url','label','videoId','context','tier','meaning'])),
     videoSessions:leEngList('videoExposureSessions').map(r=>leEngPick(r,['id','version','actor','videoId','label','context','startedAt','updatedAt','closedAt','closeReason','foregroundPlaybackMs','playEvents','pauseEvents','endEvents','discontinuities','durationSeconds','status','tier','measure','coverage'])),
-    limitations:['Clicks are not verified destination visits or watching.','Only explicitly loaded assigned Chapter 5 players report playback; external tabs and older embeds are not measured.','Playback time estimates accepted short continuous foreground intervals. Seeks, long polling gaps and background time are excluded; small seeks may be indistinguishable from playback.','Video end events do not prove full viewing. Unique watched segments, attention, reading and understanding are not measured.','Disabled and unrecorded activity is missing evidence, not zero studying.']};
+    limitations:['Clicks are not verified destination visits or watching.','Videos open on YouTube; external viewing and playback time are not measured. No new in-app video sessions are recorded.','Any video sessions below are preserved from earlier app versions. Their playback time estimated short continuous foreground intervals; seeks, long polling gaps and background time were excluded.','Historical video end events do not prove full viewing. Unique watched segments, attention, reading and understanding are not measured.','Disabled and unrecorded activity is missing evidence, not zero studying.']};
 }
 function leEngagementPanel(host){
   if(!leEngActor().profile)return;
-  const box=el('details',{'data-le-resource-settings':'true'});box.appendChild(el('summary',{},'Resource clicks & video time · this device'));
-  const label=el('label'),enabled=el('input',{type:'checkbox','aria-label':'Record course resource clicks and in-app video playback'});enabled.checked=safeStore.get('resourceMetricsEnabled',true)!==false;label.appendChild(enabled);label.appendChild(document.createTextNode(' Record resource use'));box.appendChild(label);
-  const description=el('p',{},'Keeps the latest 500 supported course-link clicks and 100 video sessions. Only videos loaded with “Watch here” are timed. This does not show reading or understanding. Stored here, not sent to Claude or Codex.');box.appendChild(description);
-  const counts=el('p',{role:'status'}),update=()=>{counts.textContent=leEngList('resourceClickEvents').length+' clicks · '+leEngList('videoExposureSessions').length+' video sessions retained. Included in the learning-evidence download.';};update();box.appendChild(counts);
-  enabled.addEventListener('change',()=>{leEngPlayers.forEach(entry=>{leEngVideoSample(entry);leEngVideoSave(entry);entry.previous=null;entry.row=null;});safeStore.set('resourceMetricsEnabled',enabled.checked);counts.textContent=enabled.checked?'Recording on. Reload an open video to begin a new timed session.':'Recording off. Existing records stay until you delete them.';});
-  const clear=el('button',{class:'btn ghost',type:'button','data-le-resource-delete':'true'},'Delete resource history');clear.addEventListener('click',()=>{if(!confirm('Delete this profile’s resource clicks and video sessions on this device? Lesson answers and practice scores will stay.'))return;[...leEngPlayers].forEach(entry=>leEngVideoClose(entry,'history-deleted'));safeStore.set('resourceClickEvents',[]);safeStore.set('videoExposureSessions',[]);update();});box.appendChild(clear);host.appendChild(box);return box;
+  const box=el('details',{'data-le-resource-settings':'true'});box.appendChild(el('summary',{},'Resource clicks · this device'));
+  const label=el('label'),enabled=el('input',{type:'checkbox','aria-label':'Record course resource clicks'});enabled.checked=safeStore.get('resourceMetricsEnabled',true)!==false;label.appendChild(enabled);label.appendChild(document.createTextNode(' Record course resource clicks'));box.appendChild(label);
+  const description=el('p',{},'Keeps the latest 500 supported course-link clicks. Videos open on YouTube; this app cannot measure watching. Older video records remain available in your download. Stored here, not sent to Claude or Codex.');box.appendChild(description);
+  const counts=el('p',{role:'status'}),update=()=>{counts.textContent=leEngList('resourceClickEvents').length+' clicks · '+leEngList('videoExposureSessions').length+' older video sessions retained. Included in the learning-evidence download.';};update();box.appendChild(counts);
+  enabled.addEventListener('change',()=>{safeStore.set('resourceMetricsEnabled',enabled.checked);counts.textContent=enabled.checked?'Recording course-link clicks. YouTube viewing is not timed.':'Recording off. Existing records stay until you delete them.';});
+  const clear=el('button',{class:'btn ghost',type:'button','data-le-resource-delete':'true'},'Delete resource history');clear.addEventListener('click',()=>{if(!confirm('Delete this profile’s resource clicks and older video sessions on this device? Lesson answers and practice scores will stay.'))return;safeStore.set('resourceClickEvents',[]);safeStore.set('videoExposureSessions',[]);update();});box.appendChild(clear);host.appendChild(box);return box;
 }
 const LE_ENG_PREVIOUS_RENDER=render;
-render=function(){[...leEngPlayers].forEach(entry=>leEngVideoClose(entry,'navigation'));LE_ENG_PREVIOUS_RENDER.apply(this,arguments);leEngagementMount();};
-window.addEventListener('pagehide',()=>[...leEngPlayers].forEach(entry=>leEngVideoClose(entry,'pagehide')));
-document.addEventListener('visibilitychange',()=>leEngPlayers.forEach(entry=>{leEngVideoSample(entry);entry.previous=null;leEngVideoSave(entry);}));
-window.addEventListener('blur',()=>leEngPlayers.forEach(entry=>{leEngVideoSample(entry);entry.previous=null;leEngVideoSave(entry);}));
-window.addEventListener('focus',()=>leEngPlayers.forEach(entry=>{entry.previous=null;}));
+render=function(){LE_ENG_PREVIOUS_RENDER.apply(this,arguments);leEngagementMount();};
 
 /* Chapter starting/final checks: fixed plans and device-local records only.
  * No DOM, bank mutation, S.drill mutation, ordinary attempt credit or mastery.
@@ -16298,6 +16227,294 @@ const ccStyle=el('style',{id:'chapter-check-style'});ccStyle.textContent=`
  @media(max-width:700px){.cc-workspace,.cc-domain-list{grid-template-columns:1fr}.cc-workspace{gap:16px}.cc-question,.cc-panel{padding:14px!important}.cc-question .qprompt{font-size:1rem}.cc-given svg{max-height:250px}.cc-actions .btn{font-size:.85rem;padding:10px;min-height:44px}.sm-next{flex-direction:row}.sm-next>span{flex-basis:100%}.sm-next .btn{font-size:.82rem;padding:9px}.cc-panel h1{font-size:1.4rem}}
  @media(min-width:350px) and (max-width:600px){.sm-next .btn{width:auto!important;flex:1 1 130px;font-size:.8rem;padding:9px 7px}}
 `;document.head.appendChild(ccStyle);
+
+/* Topic-matched alternatives, 2026-10-11. External playback only.
+ * No account access, player embeds, autoplay, remote thumbnails or mastery credit.
+ * Exact Chad IDs were matched to official lesson pages and YouTube oEmbed;
+ * OCT publishers were verified by oEmbed or official YouTube listings.
+ */
+const LV_PROVIDERS={khan:'Khan Academy',oct:'The Organic Chemistry Tutor',chad:'Chad’s Prep'};
+const LV_KHAN='https://www.khanacademy.org/science/organic-chemistry/';
+const LV_YOUTUBE='https://www.youtube.com/watch?v=';
+const LV_PINNED={
+  alkanes:[
+    ['khan','Name alkanes & cycloalkanes',LV_KHAN+'bond-line-structures-alkanes-cycloalkanes/naming-alkanes-cycloalkanes-bicyclic/v/alkane-and-cycloalkane-nomenclature-i'],
+    ['oct','Alkane naming',LV_YOUTUBE+'TYU_JluleME'],
+    ['chad','Naming alkanes',LV_YOUTUBE+'hcpWpluvXgc']
+  ],
+  conform:[
+    ['khan','Read a Newman projection','https://www.khanacademy.org/v/newman-projections'],
+    ['oct','Newman projections',LV_YOUTUBE+'_CCHTptAhLQ'],
+    ['chad','Newman projections',LV_YOUTUBE+'NC2LYq-nCok']
+  ],
+  chair:[
+    ['khan','Draw chair conformations','https://www.khanacademy.org/v/drawing-chair-conformations'],
+    ['oct','Chairs & ring flips',LV_YOUTUBE+'RXU_32X1oFI'],
+    ['chad','Chair conformations',LV_YOUTUBE+'hr7EtgUBmRM']
+  ],
+  stereoRS:[
+    ['khan','Assign R/S',LV_KHAN+'stereochemistry-topic/optical-activity/v/rs-system-new'],
+    ['oct','R/S & Fischer projections',LV_YOUTUBE+'yzfcrwJ37kI','Broad worked overview'],
+    ['chad','Assign R and S',LV_YOUTUBE+'n9mWVM0ShTk']
+  ],
+  fischer:[
+    ['khan','Read a Fischer projection',LV_KHAN+'stereochemistry-topic/optical-activity/v/fischer-projection-introduction'],
+    ['oct','Fischer projections & R/S',LV_YOUTUBE+'yzfcrwJ37kI','Includes R/S review'],
+    ['chad','Fischer projections',LV_YOUTUBE+'G_qXZv8-kAk']
+  ],
+  stereoRelations:[
+    ['khan','Enantiomers or diastereomers?',LV_KHAN+'stereochemistry-topic/diastereomers-meso-compounds/v/enantiomers-and-diastereomers'],
+    ['oct','Compare stereoisomers',LV_YOUTUBE+'XftIUcLWTEE','Includes meso & constitutional isomers'],
+    ['chad','Identify the relationship',LV_YOUTUBE+'Sm1w0NtSP80']
+  ],
+  stereoSymmetry:[
+    ['khan','Meso compounds',LV_KHAN+'stereochemistry-topic/diastereomers-meso-compounds/v/meso-compounds-new-july'],
+    ['oct','Meso compounds',LV_YOUTUBE+'cK5lbHf1Rlg'],
+    ['chad','Multiple centers & meso',LV_YOUTUBE+'XrKsXMd-uYA']
+  ],
+  stereoAlkenes:[
+    ['khan','Assign E or Z',LV_KHAN+'alkenes-alkynes/naming-alkenes-jay/v/e-z-system-new'],
+    ['oct','E/Z naming',LV_YOUTUBE+'frtnEDTSzi8'],
+    ['chad','E/Z within alkene naming',LV_YOUTUBE+'GshKARH9WL4&t=378s','Starts at the E/Z section · 6:18']
+  ],
+  stereoIntro:[
+    ['khan','Enantiomers & diastereomers',LV_KHAN+'stereochemistry-topic/diastereomers-meso-compounds/v/enantiomers-and-diastereomers'],
+    ['oct','Stereoisomer overview',LV_YOUTUBE+'gi55pE68dh4'],
+    ['chad','Identical or different?',LV_YOUTUBE+'Sm1w0NtSP80']
+  ]
+};
+const LV_TOPIC_LABELS={stereoIntro:'Types of isomers',chirality:'Chirality & chiral centers',stereoRS:'CIP priorities & R/S',fischer:'Fischer projections',stereoRelations:'Identical, enantiomers & diastereomers',stereoSymmetry:'Meso & symmetry',stereoAlkenes:'E/Z alkenes',stereoOptical:'Optical activity & mixtures',stereoRepresentations:'Newman, wedge–dash & chair views',stereoResolution:'Separating enantiomers',stereoDynamic:'Chirality beyond carbon centers'};
+function lvTopicName(topic){return LV_TOPIC_LABELS[topic]||String(TOPICS[topic]?.name||topic).replace(/<[^>]*>/g,'');}
+function lvTopicRows(topic){
+  const exact=LV_PINNED[topic];
+  if(exact)return exact.map(([provider,title,url,note])=>({provider,title,url,note:note||'Selected lesson',kind:'lesson'}));
+  // Honest fallbacks: channel/topic searches, not falsely labeled exact videos.
+  const title=lvTopicName(topic),term=encodeURIComponent(title);
+  const source=typeof RESOURCES!=='undefined'?RESOURCES[topic]:null;
+  const khan=source?.ka?.[0]?.[1]||'https://www.khanacademy.org/search?page_search_query='+term;
+  return [
+    {provider:'khan',title:'Find '+title,url:khan,note:'Topic search · choose a lesson',kind:'search'},
+    {provider:'oct',title:'Find '+title,url:'https://www.youtube.com/@TheOrganicChemistryTutor/search?query='+term,note:'Channel search · choose a lesson',kind:'search'},
+    {provider:'chad',title:'Find '+title,url:'https://www.youtube.com/@ChadsPrep/search?query='+term,note:'Channel search · choose a lesson',kind:'search'}
+  ];
+}
+function lvChapterTopics(chapter){
+  const ch=CHAPTERS.find(c=>c.id===chapter),units=CHAPTER_LEARNING_UNITS[chapter]||[];
+  return [...new Set(units.length?units.filter(u=>!u.preview).map(u=>u.topic):(ch?.topics||[]))].filter(Boolean);
+}
+function learningVideoCatalog(){
+  // Only exact verified links enter the optional click allowlist. Searches are
+  // deliberately not recorded, and external viewing time cannot be measured.
+  return Object.entries(LV_PINNED).flatMap(([topic,rows])=>rows.map(([provider,title,url])=>({url,label:LV_PROVIDERS[provider]+' · '+title,topic,videoId:new URL(url).searchParams.get('v')})));
+}
+function lvLink(url,label,attrs={}){return el('a',{href:url,target:'_blank',rel:'noopener noreferrer',...attrs},esc(label));}
+function lvSafetyNote(){
+  const note=el('aside',{class:'lv-safety'});
+  note.appendChild(el('p',{},'<strong>Ad-free routes:</strong> Khan Academy, or YouTube while signed into your Premium account.'));
+  note.appendChild(el('p',{class:'lv-small'},'No videos load inside this app. We cannot verify your sign-in; creator promotions can still appear on YouTube.'));
+  const links=el('div',{class:'lv-safety-links'});
+  links.appendChild(lvLink('https://www.youtube.com/paid_memberships','Check my Premium sign-in ↗'));
+  const details=el('details');details.appendChild(el('summary',{},'Why open another tab?'));
+  details.appendChild(el('p',{},'Embedded players may not recognize Premium. Your lesson stays here while the video opens in your normal YouTube app or browser. If you see a YouTube ad, check that the same account has Premium, or use Khan.'));
+  details.appendChild(lvLink('https://support.google.com/youtube/answer/7437519?hl=en','YouTube’s guidance ↗'));
+  details.appendChild(document.createTextNode(' · '));
+  details.appendChild(lvLink('https://support.khanacademy.org/hc/en-us/articles/202260114-Does-it-cost-money-to-use-Khan-Academy','Khan’s no-ads policy ↗'));
+  links.appendChild(details);note.appendChild(links);return note;
+}
+function createLearningVideoPanel(chapter,topic=null){
+  const topics=lvChapterTopics(chapter);if(topic&&!topics.includes(topic))topics.unshift(topic);
+  if(!topics.length)return null;
+  const key=chapter+':'+(topic||'library'),chosen=topic||(topics.includes(S.lvTopic)?S.lvTopic:topics[0]);
+  const panel=el('details',{class:'lv-panel','data-learning-videos':key});
+  panel.open=!!S.lvOpen?.[key];panel.addEventListener('toggle',()=>{(S.lvOpen||(S.lvOpen={}))[key]=panel.open;});
+  const summary=el('summary');summary.innerHTML='<span class="lv-play" aria-hidden="true">▷</span><span><strong>Watch an explanation</strong><small>'+(topic?esc(lvTopicName(topic)):'Khan · Organic Chemistry Tutor · Chad’s Prep')+'</small></span><span class="lv-chevron" aria-hidden="true">⌄</span>';panel.appendChild(summary);
+  const body=el('div',{class:'lv-body'});
+  const cards=el('div',{class:'lv-grid','data-video-cards':true});
+  const draw=t=>{
+    cards.replaceChildren();
+    lvTopicRows(t).forEach(row=>{
+      const card=el('section',{class:'lv-source','data-video-provider':row.provider});
+      card.appendChild(el('p',{class:'lv-provider'},esc(LV_PROVIDERS[row.provider])));
+      card.appendChild(el('h3',{},esc(row.title)));
+      card.appendChild(el('p',{class:'lv-small'},esc(row.note)));
+      card.appendChild(el('span',{class:'lv-access'},row.provider==='khan'?'Ad-free on Khan':'YouTube · Premium for no ads'));
+      card.appendChild(lvLink(row.url,row.kind==='search'?'Find a lesson ↗':row.provider==='khan'?'Watch on Khan ↗':'Watch on YouTube ↗',{class:'lv-watch','data-learning-video':t,'data-video-kind':row.kind}));cards.appendChild(card);
+    });
+  };
+  if(!topic){
+    const label=el('label',{class:'lv-topic'});label.appendChild(el('span',{},'What do you want explained?'));
+    const select=el('select',{'aria-label':'Video topic'});topics.forEach(t=>{const option=el('option',{value:t},esc(lvTopicName(t)));option.selected=t===chosen;select.appendChild(option);});
+    select.onchange=()=>{S.lvTopic=select.value;draw(select.value);};label.appendChild(select);body.appendChild(label);
+  }
+  body.appendChild(lvSafetyNote());draw(chosen);body.appendChild(cards);
+  body.appendChild(el('p',{class:'lv-return'},'Watch one explanation, then return to the same lesson and try an example. Watching is not scored as mastery.'));
+  panel.appendChild(body);return panel;
+}
+function mountLearningVideos(){
+  if(!courseNavigationAllowed())return;
+  const root=document.getElementById('view');if(!root||root.querySelector('[data-learning-videos]'))return;
+  if(S.view==='modeLearn'){
+    const panel=createLearningVideoPanel(smChapter().id);if(panel)root.querySelector('.sm-heading')?.after(panel);return;
+  }
+  if(!['learn','allLearn'].includes(S.view))return; // Never inject help into a cold check.
+  const target=root.querySelector('[data-ch5-lesson],[data-learn-unit],[data-learn-topic]');
+  if(!target)return;
+  const unitId=target.dataset.ch5Lesson||target.dataset.learnUnit;
+  const chapter=target.dataset.ch5Lesson?'ch5':S.learnCh;
+  const unit=(CHAPTER_LEARNING_UNITS[chapter]||[]).find(u=>u.id===unitId);
+  const topic=unit?.topic||target.dataset.learnTopic;if(!topic)return;
+  const panel=createLearningVideoPanel(chapter,topic);if(!panel)return;
+  const anchor=target.querySelector('.ch5-steps,.qp-stepper,[data-focus-steps],.learn-worked');
+  if(anchor)anchor.before(panel);else target.querySelector('h1,h2')?.after(panel);
+}
+const LV_PREVIOUS_RENDER=render;
+render=function(){LV_PREVIOUS_RENDER.apply(this,arguments);mountLearningVideos();};
+const lvStyle=el('style');lvStyle.textContent=`
+.lv-panel{border:1px solid #bfd8d8;border-radius:14px;background:#f8fcfc;margin:12px 0 20px;overflow:hidden;color:#203b46}
+.lv-panel>summary{display:flex;align-items:center;gap:12px;min-height:68px;padding:12px 18px;cursor:pointer;list-style:none;transition:background .15s ease}
+.lv-panel>summary::-webkit-details-marker{display:none}.lv-panel summary strong{font-size:1rem}.lv-panel summary small{display:block;color:#526f77;font-size:.79rem;margin-top:3px;line-height:1.45}.lv-play{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;background:#dff0ef;border-radius:50%;color:#126b70;font-size:1.55rem}.lv-chevron{margin-left:auto}.lv-panel[open]>summary{border-bottom:1px solid #dce9e9}.lv-panel[open] .lv-chevron{transform:rotate(180deg)}
+.lv-body{padding:16px 18px}.lv-topic{display:grid;gap:7px;font-weight:700;font-size:.85rem;margin-bottom:14px}.lv-topic select{box-sizing:border-box;min-height:44px;width:100%;max-width:100%;border:1px solid #a9c0c8;border-radius:9px;background:#fff;color:#203b46;font:inherit;padding:9px}
+.lv-safety{font-size:.83rem;line-height:1.5;margin-bottom:14px}.lv-safety p{margin:4px 0!important}.lv-small{font-size:.78rem!important;color:#546c76;line-height:1.5}.lv-safety-links{display:flex;gap:10px 20px;flex-wrap:wrap;margin-top:7px}.lv-safety a{color:#146777;text-underline-offset:3px}.lv-safety details{flex-basis:100%}.lv-safety details>summary{cursor:pointer;font-weight:650}.lv-safety details p{max-width:70ch}
+.lv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.lv-source{display:flex;flex-direction:column;min-width:0;border:1px solid #d2e0e4;background:#fff;border-radius:11px;padding:14px;gap:9px}.lv-provider{font-size:.72rem!important;color:#496970;letter-spacing:.02em;margin:0!important;font-weight:750}.lv-source h3{font-size:.98rem!important;line-height:1.4;margin:0!important}.lv-source .lv-small{margin:0!important}.lv-access{font-size:.7rem;color:#326359;line-height:1.4;margin-top:auto}.lv-watch{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid #a3c6cb;background:#eff8f7;border-radius:8px;color:#165968!important;text-decoration:none!important;font-weight:750;font-size:.8rem;padding:5px 8px;box-sizing:border-box;text-align:center}.lv-return{font-size:.8rem!important;color:#536d77;margin:14px 0 0!important;line-height:1.5}
+.lv-panel>summary:focus-visible,.lv-watch:focus-visible,.lv-topic select:focus-visible{outline:3px solid #d59c22;outline-offset:-3px}@media(hover:hover){.lv-panel>summary:hover{background:#eaf6f4}.lv-watch:hover{background:#dcefeb;border-color:#4b8b91}}@media(max-width:720px){.lv-grid{grid-template-columns:1fr}.lv-source{gap:6px;padding:12px}.lv-source h3{font-size:.94rem!important}.lv-panel>summary{padding:12px}.lv-body{padding:12px}.lv-source .lv-small{display:none}}@media(prefers-reduced-motion:reduce){.lv-panel>summary{transition:none}}
+`;document.head.appendChild(lvStyle);
+
+/* Experimental, descriptive practice bars. Read-only derivation: no attempt,
+ * grade, mastery, lesson gate, or learner-storage writes. */
+const TP_DAYS=30,TP_TOPIC_LIMIT=20;
+function tpIsQA(a){return !!(a?.qa||a?.evidence?.actor?.qa||a?.actor?.qa);}
+function tpSummarize(attempts,questions,chapters,now=Date.now()){
+  const bank=new Map(questions.map(q=>[q.id,q])),latest=new Map(),counts=new Map();
+  const cutoff=now-TP_DAYS*86400000;
+  (attempts||[]).forEach((a,index)=>{
+    if(!a||!a.id||tpIsQA(a))return;
+    counts.set(a.id,(counts.get(a.id)||0)+1);
+    const prior=latest.get(a.id),stamp=Number.isFinite(a.ts)?a.ts:0;
+    if(!prior||stamp>prior.stamp||(stamp===prior.stamp&&index>prior.index))latest.set(a.id,{a,index,stamp});
+  });
+  const byTopic={};
+  chapters.forEach(ch=>ch.topics.forEach(id=>{byTopic[id]={id,n:0,correct:0,percent:null,rows:[],attempted:0,helped:0,guessed:0,selfReviewed:0,unknown:0,older:0,repeated:0,available:questions.some(q=>q.topic===id&&!q.preview),latestAt:null,firstAt:null};}));
+  latest.forEach(({a,stamp})=>{
+    const q=bank.get(a.id),topic=byTopic[q?.topic||a.t||a.evidence?.question?.topic];if(!topic)return;
+    topic.attempted++;
+    if(!stamp||stamp>now){topic.unknown++;return;}
+    if(stamp<cutoff){topic.older++;return;}
+    // The chair geometry repair has no correctedAt on several real bank items.
+    // Require current drawing provenance even when an older row has none at all.
+    const chair=q?.production?.kind==='chair'||a.drawing?.kind==='chair';
+    const invalidChair=chair&&(a.drawing?.kind!=='chair'||a.drawing?.geometryVersion!==2);
+    const nonChemistry=q&&['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);
+    if(invalidChair||nonChemistry){topic.unknown++;return;}
+    const manual=!!a.sr||a.drawing?.kind==='freehand-self-review'||q?.type==='written'||q?.requiresDrawing;
+    const guessed=!!a.g||a.evidence?.confidence?.value==='guess';
+    const helped=Number(a.h)>0||!!a.hf||!!a.rf||a.transfer?.help===true||a.transfer?.phase==='guided'||a.coursePhase==='guided'||a.evidence?.externalHelp?.value===true||a.evidence?.recordedHelp?.used===true||a.drawing?.firstTry===false||a.drawing?.checks>1||a.drawing?.clean===false;
+    if(manual)topic.selfReviewed++;
+    if(guessed)topic.guessed++;
+    if(helped)topic.helped++;
+    if(manual||guessed||helped)return;
+    const knownHints=Number.isFinite(a.h)&&a.h>=0;
+    const scored=a.ok===0||a.ok===1||a.ok===true||a.ok===false;
+    // Stricter than the adaptive scheduler's date cutoff: accuracy needs an
+    // explicit matching correction revision, not an inferred submission date.
+    const revised=q?.correctedAt&&(a.questionRevision!==q.correctedAt);
+    if(!q||q.preview||!knownHints||!scored||a.dk||revised){topic.unknown++;return;}
+    topic.rows.push({id:a.id,ts:stamp,correct:a.ok===1||a.ok===true,repeated:counts.get(a.id)>1});
+  });
+  Object.values(byTopic).forEach(t=>{
+    t.rows.sort((a,b)=>b.ts-a.ts||String(a.id).localeCompare(String(b.id)));
+    t.rows=t.rows.slice(0,TP_TOPIC_LIMIT);t.n=t.rows.length;t.correct=t.rows.filter(a=>a.correct).length;
+    t.percent=t.n?Math.round(100*t.correct/t.n):null;t.repeated=t.rows.filter(a=>a.repeated).length;
+    t.latestAt=t.rows[0]?.ts||null;t.firstAt=t.rows.at(-1)?.ts||null;
+  });
+  return {days:TP_DAYS,limit:TP_TOPIC_LIMIT,topics:byTopic,chapters:chapters.map(ch=>{
+    const topics=ch.topics.map(id=>byTopic[id]),n=topics.reduce((sum,t)=>sum+t.n,0),correct=topics.reduce((sum,t)=>sum+t.correct,0);
+    return {id:ch.id,topics,n,correct,percent:n?Math.round(100*correct/n):null,covered:topics.filter(t=>t.n).length,total:topics.length,attempted:topics.reduce((sum,t)=>sum+t.attempted,0),latestAt:Math.max(0,...topics.map(t=>t.latestAt||0))||null};
+  })};
+}
+if(typeof module!=='undefined'&&module.exports)module.exports={tpSummarize,tpIsQA};
+if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
+  function tpText(tag,attrs,text){const node=el(tag,attrs);node.textContent=text;return node;}
+  function tpDate(ts){return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'America/Los_Angeles'});}
+  function tpOpen(){courseNavigationSaveWork();go('topicProgress');}
+  function tpLearn(chapter,topic){
+    courseNavigationSaveWork();smSetChapter(chapter);S.learnCh=chapter;S.learnUnit=null;S.learnTopic=topic;
+    const units=CHAPTER_LEARNING_UNITS[chapter]||[];
+    const unit=units.find(u=>!u.preview&&u.topic===topic)||units.find(u=>u.topic===topic);
+    if(unit)openLearningUnit(chapter,unit.id);else go('allLearn');
+  }
+  function tpMeter(host,summary,label){
+    const line=tpText('div',{class:'tp-score'},summary.n?summary.percent+'%':'Not checked yet');
+    line.appendChild(tpText('span',{},summary.n?'Practice accuracy':'No recent eligible answers'));host.appendChild(line);
+    if(summary.n){
+      const bar=el('progress',{class:'tp-meter',max:summary.n,value:summary.correct,'aria-label':label+' practice accuracy','aria-valuetext':summary.correct+' correct out of '+summary.n+' distinct questions; '+summary.percent+' percent'});
+      bar.textContent=summary.correct+' / '+summary.n;host.appendChild(bar);
+      host.appendChild(tpText('p',{class:'tp-sample'},summary.correct+' / '+summary.n+' distinct questions correct'+(summary.n<5?' · Small sample':'')));
+    }else host.appendChild(tpText('p',{class:'tp-sample'},summary.attempted?'Saved work exists; none qualifies for this bar.':'No recorded attempts in this topic range.'));
+  }
+  VIEWS.topicProgress=v=>{
+    const data=tpSummarize(S.attempts||[],QUESTIONS,CHAPTERS),selected=smChapter(),summary=data.chapters.find(ch=>ch.id===selected.id);
+    const page=el('section',{class:'tp-page','data-topic-progress':true}),head=el('header',{class:'sm-heading'});
+    head.appendChild(tpText('p',{class:'sm-eyebrow'},'EXPERIMENT · PRACTICE SNAPSHOT'));
+    head.appendChild(tpText('h1',{},'My progress'));
+    head.appendChild(tpText('p',{},'See what your recent answers show. Choose one topic to work on next.'));
+    head.appendChild(tpText('p',{class:'tp-boundary'},'These bars show practice accuracy—not understanding, mastery, or a predicted exam grade.'));
+    page.appendChild(head);
+    const intro=el('section',{class:'tp-method'});
+    intro.appendChild(tpText('p',{},'Last 30 days · latest answer per question · up to 20 distinct questions per topic.'));
+    intro.appendChild(tpText('p',{},'Only scored answers with recorded hint status and no recorded help or guess are included. Outside help may be unrecorded.'));
+    const more=el('details');more.appendChild(tpText('summary',{},'More · how these bars work'));
+    more.appendChild(tpText('p',{},'Observed practice snapshot · v1. Last 30 days; latest answer per question; at most 20 eligible questions per topic.'));
+    more.appendChild(tpText('p',{},'Each question counts once, using its latest saved answer. Repeats can change accuracy but do not add distinct questions. Even different questions may test a similar pattern. This is a limited practice sample.'));
+    more.appendChild(tpText('p',{},'Hinted, guided, guessed, flagged, self-reviewed, and uncertain older records are kept separate. Reading lessons and watching videos never raise these bars. A newer answer replaces the older score on the same question.'));
+    more.appendChild(tpText('p',{},'Chapter accuracy combines the eligible topic samples by question count. Topic coverage means a topic has at least one eligible recent answer; it does not mean the topic is complete. Older retained attempts still appear in Learning evidence.'));
+    intro.appendChild(more);page.appendChild(intro);
+    page.appendChild(tpText('h2',{},'Current chapter'));
+    const current=el('div',{class:'tp-current'}),other=el('details',{class:'tp-other','data-tp-other-chapters':true});
+    other.appendChild(tpText('summary',{},'Other chapters'));
+    const grid=el('div',{class:'tp-chapters'});
+    data.chapters.forEach(ch=>{
+      const title=CHAPTERS.find(x=>x.id===ch.id).name,card=el('section',{class:'tp-chapter'+(selected.id===ch.id?' is-selected':''),'data-tp-chapter':ch.id});
+      card.appendChild(tpText('h3',{},title));tpMeter(card,ch,title);
+      card.appendChild(tpText('p',{class:'tp-coverage'},ch.covered+' / '+ch.total+' topics checked recently'));
+      if(ch.latestAt)card.appendChild(tpText('p',{class:'tp-date'},'Most recent included answer · '+tpDate(ch.latestAt)));
+      const button=smButton(ch.id===selected.id?'Showing topics ↓':'View topics →',()=>{smSetChapter(ch.id);render();document.getElementById('tp-topics')?.scrollIntoView({block:'start'});},{'data-tp-select':ch.id,'aria-pressed':String(selected.id===ch.id)});card.appendChild(button);(ch.id===selected.id?current:grid).appendChild(card);
+    });page.appendChild(current);other.appendChild(grid);page.appendChild(other);
+    const topics=el('section',{id:'tp-topics','data-tp-selected':selected.id});
+    topics.appendChild(tpText('h2',{},selected.name));
+    topics.appendChild(tpText('p',{class:'tp-subtitle'},'Topic details · a short sample, not a full chapter test'));
+    summary.topics.forEach(t=>{
+      const title=TOPICS[t.id]?.name||t.id,card=el('article',{class:'tp-topic','data-tp-topic':t.id}),left=el('div');
+      left.appendChild(tpText('h3',{},title));
+      const topicUnits=(CHAPTER_LEARNING_UNITS[selected.id]||[]).filter(u=>u.topic===t.id);
+      if(topicUnits.length&&topicUnits.every(u=>u.preview))left.appendChild(tpText('p',{class:'tp-separate'},'Extra textbook topic · outside the supplied course objectives'));
+      tpMeter(left,t,title);
+      if(t.n)left.appendChild(tpText('p',{class:'tp-date'},(t.firstAt===t.latestAt?'Checked '+tpDate(t.latestAt):tpDate(t.firstAt)+' – '+tpDate(t.latestAt))+' · '+t.repeated+' repeated question'+(t.repeated===1?'':'s')+' in this sample'));
+      const separated=[];if(t.helped)separated.push(t.helped+' with help, review flags, or rechecks');if(t.guessed)separated.push(t.guessed+' guessed');if(t.selfReviewed)separated.push(t.selfReviewed+' self-reviewed');if(t.unknown)separated.push(t.unknown+' not assessable');if(t.older)separated.push(t.older+' older than 30 days');
+      if(separated.length)left.appendChild(tpText('p',{class:'tp-separate'},'Outside this bar: '+separated.join(' · ')+'. Counts can overlap.'));
+      if(!t.available)left.appendChild(tpText('p',{class:'tp-separate'},'No current practice bank is available for this topic.'));
+      card.appendChild(left);card.appendChild(smButton('Learn this topic →',()=>tpLearn(selected.id,t.id),{'data-tp-learn':t.id,'aria-label':'Learn '+title}));topics.appendChild(card);
+    });page.appendChild(topics);
+    const foot=el('div',{class:'tp-footer'});foot.appendChild(smButton('See learning evidence',()=>go('learningEvidence')));foot.appendChild(smButton('Back to Learn',()=>smGo('learn')));page.appendChild(foot);v.appendChild(page);
+  };
+  NAV_GROUP.topicProgress='learn';
+  const tpPreviousActivity=smActivity;
+  smActivity=function(){return S.view==='topicProgress'?{mode:'learn',chapter:smChapter().id,detail:'My progress · practice snapshot'}:tpPreviousActivity();};
+  const tpPreviousRender=render;
+  render=function(){
+    tpPreviousRender();
+    if(!courseNavigationAllowed()||!['home','modeLearn'].includes(S.view))return;
+    const v=document.getElementById('view');if(!v||v.querySelector('[data-tp-open]'))return;
+    const host=S.view==='home'?(v.querySelector('.sm-links')||v):v.querySelector('.sm-heading')||v;
+    host.appendChild(smButton('My progress →',tpOpen,{class:'btn ghost tp-entry','data-tp-open':true}));
+  };
+  const style=el('style',{id:'topic-progress-style'});style.textContent=`
+    .tp-page{max-width:1000px;margin:auto;min-width:0}.tp-page h2{font-size:1.16rem;margin:26px 0 12px}.tp-page h3{font-size:1rem;line-height:1.4;margin:0 0 14px;overflow-wrap:anywhere}.tp-page p{line-height:1.5}.tp-boundary{font-size:.85rem;color:#425e65}.tp-method{border-left:3px solid #438d82;background:#f0f7f5;padding:12px 16px;border-radius:0 12px 12px 0}.tp-method p{font-size:.86rem;margin:3px 0 8px}.tp-method summary{font-size:.83rem;cursor:pointer;padding:7px 0;min-height:32px}.tp-method details p{color:#486269}.tp-chapters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.tp-chapter{border:1px solid #d0dfdc;border-radius:14px;background:#fff;padding:16px;min-width:0;display:flex;flex-direction:column}.tp-chapter.is-selected{border-color:#337e73;box-shadow:inset 0 0 0 1px #337e73;background:#f4faf8}.tp-chapter h3{min-height:2.8em}.tp-score{font-size:1.75rem;line-height:1.1;font-weight:750;color:#255e57;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.tp-score>span{font-size:.72rem;font-weight:600;color:#4a6268}.tp-meter{appearance:none;-webkit-appearance:none;display:block;width:100%;height:10px;margin:14px 0 8px;border:0;border-radius:99px;overflow:hidden;background:#e0ebe7;accent-color:#287c6d}.tp-meter::-webkit-progress-bar{background:#e0ebe7;border-radius:99px}.tp-meter::-webkit-progress-value{background:#287c6d;border-radius:99px}.tp-meter::-moz-progress-bar{background:#287c6d;border-radius:99px}.tp-sample,.tp-coverage,.tp-date,.tp-separate,.tp-subtitle{font-size:.78rem;color:#47616a;margin:6px 0}.tp-coverage{font-weight:650;margin:7px 0 13px}.tp-chapter .btn{margin:auto 0 0;width:100%}.tp-topic{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:26px;align-items:center;background:white;border:1px solid #d4e0de;border-radius:14px;padding:18px;margin:12px 0}.tp-topic>div{min-width:0}.tp-topic h3{margin-bottom:10px}.tp-topic .tp-score{font-size:1.5rem}.tp-topic .btn{margin:0;max-width:100%;white-space:normal}.tp-date{color:#587075}.tp-separate{font-size:.75rem;overflow-wrap:anywhere}.tp-footer{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.tp-entry{font-size:.82rem;min-height:42px}.tp-page .btn{min-height:44px;white-space:normal;overflow-wrap:anywhere}.tp-page .btn:focus-visible,.tp-page summary:focus-visible{outline:3px solid #b8820d;outline-offset:3px}#tp-topics{scroll-margin-top:20px}
+    .tp-current .tp-chapter{display:block}.tp-current .tp-chapter h3{min-height:0}.tp-current .tp-chapter .btn{width:auto;margin-top:10px}.tp-other{margin:12px 0}.tp-other>summary{cursor:pointer;min-height:44px;display:list-item;padding:10px 0;box-sizing:border-box;font-size:.86rem;font-weight:650;color:#315f58}.tp-other[open]>.tp-chapters{margin-top:8px}
+    @media(max-width:800px){.tp-chapters{grid-template-columns:repeat(2,minmax(0,1fr))}.tp-topic{gap:16px}}
+    @media(max-width:520px){.tp-chapters{grid-template-columns:1fr}.tp-chapter{padding:14px}.tp-chapter h3{min-height:0}.tp-topic{grid-template-columns:1fr;padding:14px;gap:10px}.tp-topic .btn{justify-self:start}.tp-method{padding:10px 12px}.tp-page h2{font-size:1.08rem}.tp-score{font-size:1.5rem}}
+    @media(prefers-reduced-motion:reduce){.tp-page *,.tp-entry{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+  `;document.head.appendChild(style);
+}
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
