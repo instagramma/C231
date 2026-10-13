@@ -7,7 +7,35 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.9  ·  built 2026-09-09, reskinned 2026-09-13, bank extended 2026-09-16, equation-picker 2026-09-23
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.12  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-12
+  v2.12 (2026-10-12, Mon): INERTIAL FRAMES + EXAM RUNWAY — today's transcript
+        corrects the stale post-Thanksgiving exam assumption. Home and Course Map now show
+        the Nov 2 practice test and Nov 4 test, Chapters 1–7, six problems + three conceptual
+        questions, 30 points, with a formula sheet. Eight lecture-grounded conceptual items
+        cover reference frames, inertial vs accelerating frames, Galileo's incline argument,
+        and the absence of absolute space. Newton's First Law on the Cheat Sheet now names
+        the required inertial frame. Source transcript and summary preserved under Lecture Notes.
+        Archived v2.11 before editing. Learning result is awaiting learner evidence.
+  v2.11 (2026-10-05, Mon): STANDARD PROBLEMS — two instructor worksheets added to
+        the Problem Lab as seven complete, step-gated problems: four 1D-motion problems
+        and three projectile-motion problems. Each keeps the worksheet's full story,
+        separates setup from equation choice, and ends with the source answer as a check.
+        Archived v2.10 before editing. Engine, storage, theme and nav untouched.
+  v2.10 (2026-10-05, Mon): READABLE — every item is a complete word problem.
+        Gabe, opening "The 37° hiker" in the Problem Lab: "uhh... i need a full word problem
+        here. otherwise idk whats going on. Make sure for all physics stuff in the app its
+        complete. again again readable for me." He was right: the Lab showed a symbol line
+        ("d = 50 m at 37° N of E") with no sentence saying what was happening, and ~45 drill
+        items were fragments ("Hypotenuse 20, angle 53°") or chained to a previous item
+        ("Same wrench…", "That same 2 s drop…") that a shuffled drill never shows first.
+        (1) Every Problem Lab entry now opens with a plain-English STORY — the full problem
+            as a human would say it — above the symbol line, which is now labelled "the same
+            thing in symbols".
+        (2) 45 drill prompts rewritten as self-contained sentences. No item depends on
+            another item having been read. Answers, ids, topics and tolerances unchanged.
+        (3) STANDING RULE for this bank, from today: a new item ships only if it reads as a
+            complete sentence a stranger could answer with no other context.
+        Archived v2.9 before editing. Engine, storage, theme and nav untouched.
   v2.9 (2026-09-23, Wed): WHICH EQUATION? — built from a self-diagnosis, not a guess.
         While writing up the Projectile Motion lab Gabe said: "Often times, especially during
         lecture and lab, I don't know what equation to use, nor do I know how to use it."
@@ -254,6 +282,9 @@
   @media(max-width:520px){
     header h1{font-size:1.15rem}
   }
+  /* v2.10 */
+  .story{font-size:1.08rem;line-height:1.65;margin:12px 0 10px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .givenlabel{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin:6px 0 4px}
   /* v2.9 */
   .symbols{font-size:.82rem;line-height:1.7;opacity:.85;margin:8px 0 4px;padding:8px 10px;border-left:3px solid var(--gold);background:rgba(255,255,255,.03)}
   .symbols .sym{white-space:nowrap}
@@ -1063,54 +1094,54 @@ const QUESTIONS = [
 {id:"u8",topic:"units",type:"mc",prompt:"Which formula is dimensionally IMPOSSIBLE?",choices:["x = v · t² (m from m/s × s²?)","x = v · t","v = a · t","x = ½at²"],answer:0,why:"v·t² gives (m/s)(s²) = <b>m·s — not meters</b>. Unit-checking every formula you write catches algebra mistakes before the arithmetic even starts. Quantify, don't eyeball."},
 {id:"u9",topic:"units",type:"mc",prompt:"1 newton (N) is the same as:",choices:["1 kg·m/s²","1 kg·m/s","1 kg/s²","1 m/s²"],answer:0,why:"F = ma → N = kg × m/s² = <b>kg·m/s²</b>. Knowing what a unit unpacks into lets you rebuild formulas you forget."},
 /* --- algebra fluency --- */
-{id:"al1",topic:"algebra",type:"num",prompt:"x = ½at². If a = 4 m/s² and t = 3 s, x = ? (meters)",answer:18,why:"½ × 4 × 9 = <b>18 m</b>. Square the time FIRST, then multiply — order-of-operations slips are the #1 easy-point leak."},
+{id:"al1",topic:"algebra",type:"num",prompt:"The position equation x = ½at² applies. If a = 4 m/s² and t = 3 s, what is x? (meters)",answer:18,why:"½ × 4 × 9 = <b>18 m</b>. Square the time FIRST, then multiply — order-of-operations slips are the #1 easy-point leak."},
 {id:"al2",topic:"algebra",type:"mc",prompt:"Solve v = v₀ + at for t:",choices:["t = (v − v₀)/a","t = v/a − v₀","t = a(v − v₀)","t = (v₀ − v)/a"],answer:0,why:"Subtract v₀, divide by a: <b>t = (v − v₀)/a</b>. Rearrange with SYMBOLS first, plug numbers last — fewer errors, and you can reuse the rearranged form."},
-{id:"al3",topic:"algebra",type:"num",prompt:"v² = v₀² + 2aΔx. If v = 20 m/s, v₀ = 0, Δx = 50 m, then a = ? (m/s²)",answer:4,why:"400 = 0 + 2a(50) → a = 400/100 = <b>4 m/s²</b>. Note v² = 400, not 40 — squaring first is the whole game."},
+{id:"al3",topic:"algebra",type:"num",prompt:"Use v² = v₀² + 2aΔx. A car goes from rest (v₀ = 0) to v = 20 m/s over a distance Δx = 50 m. What is its acceleration a? (m/s²)",answer:4,why:"400 = 0 + 2a(50) → a = 400/100 = <b>4 m/s²</b>. Note v² = 400, not 40 — squaring first is the whole game."},
 {id:"al4",topic:"algebra",type:"mc",prompt:"Solve x = ½at² for t:",choices:["t = √(2x/a)","t = 2x/a","t = √(x/2a)","t = (2x/a)²"],answer:0,why:"Multiply by 2, divide by a, THEN square-root: <b>t = √(2x/a)</b>. Undo operations in reverse order, square root last."},
-{id:"al5",topic:"algebra",type:"num",prompt:"F = ma. If F = 24 N and m = 6 kg, a = ? (m/s²)",answer:4,why:"a = F/m = 24/6 = <b>4 m/s²</b>."},
-{id:"al6",topic:"algebra",type:"num",prompt:"v = v₀ + at. If v₀ = 5 m/s, a = 2 m/s², v = 17 m/s, then t = ? (s)",answer:6,why:"t = (17 − 5)/2 = <b>6 s</b>. Same rearrangement you just did symbolically — that's why symbols-first pays."},
+{id:"al5",topic:"algebra",type:"num",prompt:"Use F = ma. A net force of F = 24 N acts on a mass of m = 6 kg. What is the acceleration a? (m/s²)",answer:4,why:"a = F/m = 24/6 = <b>4 m/s²</b>."},
+{id:"al6",topic:"algebra",type:"num",prompt:"Use v = v₀ + at. An object starts at v₀ = 5 m/s, accelerates at a = 2 m/s², and reaches v = 17 m/s. How long did that take? (s)",answer:6,why:"t = (17 − 5)/2 = <b>6 s</b>. Same rearrangement you just did symbolically — that's why symbols-first pays."},
 {id:"al7",topic:"algebra",type:"mc",prompt:"Solve v² = v₀² + 2aΔx for Δx:",choices:["Δx = (v² − v₀²)/(2a)","Δx = (v − v₀)²/2a","Δx = 2a(v² − v₀²)","Δx = (v² + v₀²)/(2a)"],answer:0,why:"Subtract v₀², divide by 2a: <b>Δx = (v² − v₀²)/(2a)</b>. Watch the minus — (v−v₀)² is NOT v²−v₀²."},
 {id:"al8",topic:"algebra",type:"num",prompt:"Δx = v·t. A runner covers 140 m in 20 s at constant speed. v = ? (m/s)",answer:7,why:"v = 140/20 = <b>7 m/s</b>."},
 {id:"al9",topic:"algebra",type:"mc",prompt:"a = (v − v₀)/t with v, v₀ in m/s and t in s. The units of a come out as:",choices:["m/s²","m/s","m·s","s/m"],answer:0,why:"(m/s)/s = <b>m/s²</b> ✓. Carrying units through EVERY line is your anti-eyeballing rule wearing its physics uniform."},
 /* --- trig --- */
-{id:"t1",topic:"trig",type:"num",prompt:"Right triangle: hypotenuse 10, angle 30°. The side OPPOSITE the 30° = ? (sin 30° = 0.5)",answer:5,why:"opp = hyp × sin θ = 10 × 0.5 = <b>5</b>. SOH: <b>S</b>in = <b>O</b>pp/<b>H</b>yp."},
-{id:"t2",topic:"trig",type:"num",prompt:"Same triangle (hyp 10, 30°): the side ADJACENT to 30° = ? (cos 30° ≈ 0.87)",answer:8.7,tolerance:0.2,why:"adj = hyp × cos θ = 10 × 0.87 ≈ <b>8.7</b>. CAH: <b>C</b>os = <b>A</b>dj/<b>H</b>yp."},
+{id:"t1",topic:"trig",type:"num",prompt:"A right triangle has a hypotenuse of 10 and one angle of 30°. How long is the side OPPOSITE the 30° angle? (sin 30° = 0.5)",answer:5,why:"opp = hyp × sin θ = 10 × 0.5 = <b>5</b>. SOH: <b>S</b>in = <b>O</b>pp/<b>H</b>yp."},
+{id:"t2",topic:"trig",type:"num",prompt:"A right triangle has a hypotenuse of 10 and one angle of 30°. How long is the side ADJACENT to the 30° angle? (cos 30° ≈ 0.87)",answer:8.7,tolerance:0.2,why:"adj = hyp × cos θ = 10 × 0.87 ≈ <b>8.7</b>. CAH: <b>C</b>os = <b>A</b>dj/<b>H</b>yp."},
 {id:"t3",topic:"trig",type:"mc",prompt:"SOH-CAH-TOA: sin θ equals…",choices:["opposite / hypotenuse","adjacent / hypotenuse","opposite / adjacent","hypotenuse / opposite"],answer:0,why:"<b>S</b>OH: sin = opp/hyp. This one mnemonic runs 80% of the early physics math."},
-{id:"t4",topic:"trig",type:"num",prompt:"Legs 3 and 4. Hypotenuse = ?",answer:5,why:"√(9+16) = √25 = <b>5</b>. The 3-4-5 triangle shows up constantly (as does 6-8-10). Recognize it and skip the arithmetic."},
-{id:"t5",topic:"trig",type:"num",prompt:"Opposite = 3, adjacent = 4. tan θ = ? (decimal)",answer:0.75,why:"TOA: tan = opp/adj = 3/4 = <b>0.75</b>."},
+{id:"t4",topic:"trig",type:"num",prompt:"A right triangle has legs of 3 and 4. How long is the hypotenuse?",answer:5,why:"√(9+16) = √25 = <b>5</b>. The 3-4-5 triangle shows up constantly (as does 6-8-10). Recognize it and skip the arithmetic."},
+{id:"t5",topic:"trig",type:"num",prompt:"In a right triangle, the side opposite angle θ is 3 and the side adjacent to θ is 4. What is tan θ? (decimal)",answer:0.75,why:"TOA: tan = opp/adj = 3/4 = <b>0.75</b>."},
 {id:"t6",topic:"trig",type:"num",prompt:"If tan θ = 3/4, then θ ≈ ? (degrees)",answer:37,tolerance:1,why:"tan⁻¹(0.75) ≈ <b>37°</b>. The 3-4-5 triangle's angles are ~37° and ~53° — physics problems reuse these numbers on purpose."},
-{id:"t7",topic:"trig",type:"num",prompt:"Hypotenuse 20, angle 53°. Opposite side ≈ ? (sin 53° ≈ 0.8)",answer:16,tolerance:0.5,why:"20 × 0.8 = <b>16</b>."},
+{id:"t7",topic:"trig",type:"num",prompt:"A right triangle has a hypotenuse of 20 and one angle of 53°. How long is the side opposite the 53° angle? (sin 53° ≈ 0.8)",answer:16,tolerance:0.5,why:"20 × 0.8 = <b>16</b>."},
 {id:"t8",topic:"trig",type:"mc",prompt:"The hypotenuse is always…",choices:["Opposite the right angle (the longest side)","The horizontal side","The vertical side","Whichever side is unknown"],answer:0,why:"<b>Opposite the 90°</b>, always the longest. In vector problems the vector itself is the hypotenuse; its components are the legs."},
-{id:"t9",topic:"trig",type:"num",prompt:"Adjacent = 12, angle 60°, cos 60° = 0.5. Hypotenuse = ?",answer:24,why:"adj = hyp·cos θ → hyp = adj/cos θ = 12/0.5 = <b>24</b>. Dividing (not multiplying) here is the classic flip — write the equation first, then rearrange."},
+{id:"t9",topic:"trig",type:"num",prompt:"In a right triangle, the side adjacent to a 60° angle is 12. How long is the hypotenuse? (cos 60° = 0.5)",answer:24,why:"adj = hyp·cos θ → hyp = adj/cos θ = 12/0.5 = <b>24</b>. Dividing (not multiplying) here is the classic flip — write the equation first, then rearrange."},
 /* --- vector components (THE priority topic) --- */
 {id:"vc1",topic:"vectors",type:"num",prompt:"A 50 m displacement at 37° above the +x axis (cos 37° ≈ 0.8, sin 37° ≈ 0.6). x-component = ?",answer:40,why:"Ax = A cos θ = 50 × 0.8 = <b>40 m</b>. θ measured from the x-axis → x gets cos."},
-{id:"vc2",topic:"vectors",type:"num",prompt:"Same vector (50 m at 37°): y-component = ?",answer:30,why:"Ay = A sin θ = 50 × 0.6 = <b>30 m</b>. Audit: √(40² + 30²) = 50 ✓ — components must rebuild the original."},
+{id:"vc2",topic:"vectors",type:"num",prompt:"A 50 m displacement points 37° above the +x axis (sin 37° ≈ 0.6). What is its y-component? (m)",answer:30,why:"Ay = A sin θ = 50 × 0.6 = <b>30 m</b>. Audit: √(40² + 30²) = 50 ✓ — components must rebuild the original."},
 {id:"vc3",topic:"vectors",type:"mc",prompt:"With θ measured from the +x axis, the x-component is:",choices:["A cos θ","A sin θ","A tan θ","A/cos θ"],answer:0,why:"<b>x ↔ cos, y ↔ sin — WHEN θ is from the x-axis.</b> If the problem gives the angle from vertical, they swap. Don't memorize 'x = cos'; memorize 'adjacent gets cos'."},
-{id:"vc4",topic:"vectors",type:"num",prompt:"100 m at 60° above +x (cos 60° = 0.5). x-component = ?",answer:50,why:"100 × 0.5 = <b>50 m</b>. Steeper angle → smaller x-share. Sanity-check direction: at 60° the vector leans more vertical than horizontal."},
-{id:"vc5",topic:"vectors",type:"num",prompt:"100 m at 60° (sin 60° ≈ 0.87): y-component ≈ ?",answer:87,tolerance:1,why:"100 × 0.87 ≈ <b>87 m</b>. And 50² + 87² ≈ 100² ✓."},
+{id:"vc4",topic:"vectors",type:"num",prompt:"A 100 m displacement points 60° above the +x axis (cos 60° = 0.5). What is its x-component? (m)",answer:50,why:"100 × 0.5 = <b>50 m</b>. Steeper angle → smaller x-share. Sanity-check direction: at 60° the vector leans more vertical than horizontal."},
+{id:"vc5",topic:"vectors",type:"num",prompt:"A 100 m displacement points 60° above the +x axis (sin 60° ≈ 0.87). What is its y-component? (m)",answer:87,tolerance:1,why:"100 × 0.87 ≈ <b>87 m</b>. And 50² + 87² ≈ 100² ✓."},
 {id:"vc6",topic:"vectors",type:"mc",prompt:"A vector points up-and-left (135° from +x). Signs of (x, y):",choices:["(−, +)","(+, +)","(−, −)","(+, −)"],answer:0,why:"Left = negative x, up = positive y → <b>(−, +)</b>. Signs come from the DIRECTION, and sign errors are the #1 vector mistake — write the sign before the number."},
-{id:"vc7",topic:"vectors",type:"num",prompt:"20 m at exactly 90° (straight up). x-component = ?",answer:0,why:"cos 90° = 0 → <b>0</b>. All 20 m is vertical. Extreme angles (0°, 90°) are free sanity checks."},
-{id:"vc8",topic:"vectors",type:"num",prompt:"That same 20 m at 90°: y-component = ?",answer:20,why:"sin 90° = 1 → <b>20 m</b>."},
+{id:"vc7",topic:"vectors",type:"num",prompt:"A 20 m displacement points straight up, at 90° from the +x axis. What is its x-component? (m)",answer:0,why:"cos 90° = 0 → <b>0</b>. All 20 m is vertical. Extreme angles (0°, 90°) are free sanity checks."},
+{id:"vc8",topic:"vectors",type:"num",prompt:"A 20 m displacement points straight up, at 90° from the +x axis. What is its y-component? (m)",answer:20,why:"sin 90° = 1 → <b>20 m</b>."},
 {id:"vc9",topic:"vectors",type:"num",prompt:"A ball is kicked at 60 m/s, 30° above horizontal (sin 30° = 0.5). Vertical component = ?",answer:30,why:"60 × 0.5 = <b>30 m/s</b>. Projectile motion = this exact decomposition, done on day one of every problem."},
 {id:"vc10",topic:"vectors",type:"mc",prompt:"WHY decompose vectors into components at all?",choices:["x and y motion can then be solved independently","It makes the vector longer","Professors require it","It removes the need for trig"],answer:0,why:"<b>Independence of axes</b> — gravity only touches y; horizontal motion doesn't care. Split, solve each axis alone, recombine at the end. That's the entire method of projectile problems."},
 /* --- vector addition --- */
-{id:"va1",topic:"vecadd",type:"num",prompt:"A = (3, 4), B = (1, −2). Resultant x-component = ?",answer:4,why:"3 + 1 = <b>4</b>. Add x's with x's — components never mix axes."},
-{id:"va2",topic:"vecadd",type:"num",prompt:"Same A + B: resultant y-component = ?",answer:2,why:"4 + (−2) = <b>2</b>. The minus sign rides along — that's why you write signs first."},
+{id:"va1",topic:"vecadd",type:"num",prompt:"Vector A = (3, 4) and vector B = (1, −2). What is the x-component of the sum A + B?",answer:4,why:"3 + 1 = <b>4</b>. Add x's with x's — components never mix axes."},
+{id:"va2",topic:"vecadd",type:"num",prompt:"Vector A = (3, 4) and vector B = (1, −2). What is the y-component of the sum A + B?",answer:2,why:"4 + (−2) = <b>2</b>. The minus sign rides along — that's why you write signs first."},
 {id:"va3",topic:"vecadd",type:"num",prompt:"Walk 30 m east, then 40 m north. Magnitude of your displacement = ? (m)",answer:50,why:"Perpendicular legs → Pythagoras: √(30² + 40²) = <b>50 m</b> (the 3-4-5 again). Displacement ≠ distance walked (70 m)."},
-{id:"va4",topic:"vecadd",type:"num",prompt:"Same walk (30 E, 40 N): direction ≈ ? degrees north of east",answer:53,tolerance:1,why:"tan θ = 40/30 → θ = tan⁻¹(1.33) ≈ <b>53°</b> N of E. Always name the reference: '53°' alone is not a direction."},
-{id:"va5",topic:"vecadd",type:"num",prompt:"Magnitude of the vector (4, 2) ≈ ? (one decimal)",answer:4.5,tolerance:0.1,why:"√(16+4) = √20 ≈ <b>4.5</b>."},
+{id:"va4",topic:"vecadd",type:"num",prompt:"You walk 30 m east, then 40 m north. In what direction does your total displacement point? (degrees north of east)",answer:53,tolerance:1,why:"tan θ = 40/30 → θ = tan⁻¹(1.33) ≈ <b>53°</b> N of E. Always name the reference: '53°' alone is not a direction."},
+{id:"va5",topic:"vecadd",type:"num",prompt:"What is the magnitude (length) of the vector (4, 2)? (one decimal)",answer:4.5,tolerance:0.1,why:"√(16+4) = √20 ≈ <b>4.5</b>."},
 {id:"va6",topic:"vecadd",type:"mc",prompt:"To add two vectors that are NOT parallel, you:",choices:["Add their components axis-by-axis","Add their magnitudes","Multiply their magnitudes","Average their angles"],answer:0,why:"<b>Components, always.</b> Magnitudes only add when vectors point the same way. 30+40 = 70 walked, but the displacement was 50 — magnitudes lie."},
-{id:"va7",topic:"vecadd",type:"num",prompt:"5 m/s east + 5 m/s west. Resultant magnitude = ?",answer:0,why:"+5 + (−5) = <b>0</b>. Opposite directions cancel — vectors are signed, not just sized."},
-{id:"va8",topic:"vecadd",type:"num",prompt:"Magnitude of (6, 8) = ?",answer:10,why:"√(36+64) = <b>10</b> — the 3-4-5 scaled ×2. Spot the family, skip the work."},
+{id:"va7",topic:"vecadd",type:"num",prompt:"Two velocities combine: 5 m/s east and 5 m/s west. What is the magnitude of the resultant? (m/s)",answer:0,why:"+5 + (−5) = <b>0</b>. Opposite directions cancel — vectors are signed, not just sized."},
+{id:"va8",topic:"vecadd",type:"num",prompt:"What is the magnitude (length) of the vector (6, 8)?",answer:10,why:"√(36+64) = <b>10</b> — the 3-4-5 scaled ×2. Spot the family, skip the work."},
 /* --- 1D kinematics concepts --- */
 {id:"k1",topic:"kin1",type:"mc",prompt:"Velocity differs from speed because velocity…",choices:["Includes direction (it can be negative)","Is always larger","Is measured in different units","Only applies to cars"],answer:0,why:"Velocity is a <b>vector</b>: −8 m/s means 8 m/s in the negative direction. The sign IS information — never drop it."},
-{id:"k2",topic:"kin1",type:"num",prompt:"A car goes 0 → 20 m/s in 4 s. Acceleration = ? (m/s²)",answer:5,why:"a = Δv/Δt = 20/4 = <b>5 m/s²</b> — it gains 5 m/s of speed every second."},
-{id:"k3",topic:"kin1",type:"num",prompt:"Constant velocity 15 m/s for 6 s. Displacement = ? (m)",answer:90,why:"Δx = vt = 15 × 6 = <b>90 m</b>. Constant v → no ½at² term, don't overcomplicate it."},
+{id:"k2",topic:"kin1",type:"num",prompt:"A car speeds up from 0 to 20 m/s in 4 s. What is its acceleration? (m/s²)",answer:5,why:"a = Δv/Δt = 20/4 = <b>5 m/s²</b> — it gains 5 m/s of speed every second."},
+{id:"k3",topic:"kin1",type:"num",prompt:"A cyclist rides at a constant 15 m/s for 6 s. What is her displacement? (m)",answer:90,why:"Δx = vt = 15 × 6 = <b>90 m</b>. Constant v → no ½at² term, don't overcomplicate it."},
 {id:"k4",topic:"kin1",type:"mc",prompt:"On a position-time graph, the SLOPE is the:",choices:["Velocity","Acceleration","Displacement","Distance"],answer:0,why:"Slope = rise/run = Δx/Δt = <b>velocity</b>. (On a velocity-time graph, slope = acceleration.) Graph questions are free points once these two facts are cold."},
 {id:"k5",topic:"kin1",type:"mc",prompt:"A ball is thrown straight up. At the very top of its flight:",choices:["v = 0 but a = −9.8 m/s² still","v = 0 and a = 0","Both v and a point up","a = 0 but v is maximum"],answer:0,why:"Velocity passes through zero, but gravity never turns off: <b>a = −9.8 m/s² the whole flight</b>. 'v = 0 so a = 0' is the single most-tested misconception in kinematics."},
-{id:"k6",topic:"kin1",type:"num",prompt:"Displacement of +120 m in 60 s. Average velocity = ? (m/s)",answer:2,why:"v̄ = Δx/Δt = 120/60 = <b>+2 m/s</b>. (Velocity needs displacement, a signed vector — distance alone only gives average speed.)"},
+{id:"k6",topic:"kin1",type:"num",prompt:"A runner's displacement is +120 m over 60 s. What is his average velocity? (m/s)",answer:2,why:"v̄ = Δx/Δt = 120/60 = <b>+2 m/s</b>. (Velocity needs displacement, a signed vector — distance alone only gives average speed.)"},
 {id:"k7",topic:"kin1",type:"mc",prompt:"On a velocity-time graph, the AREA under the curve is the:",choices:["Displacement","Acceleration","Average speed","Jerk"],answer:0,why:"Area = v × t summed = <b>displacement</b>. Slope-and-area on the two graphs: four facts that answer every graph question the course will throw."},
-{id:"k8",topic:"kin1",type:"num",prompt:"Moving at 10 m/s, braking at 2 m/s². Time to stop = ? (s)",answer:5,why:"t = Δv/a = 10/2 = <b>5 s</b>."},
+{id:"k8",topic:"kin1",type:"num",prompt:"A car moving at 10 m/s brakes with a steady deceleration of 2 m/s². How long does it take to stop? (s)",answer:5,why:"t = Δv/a = 10/2 = <b>5 s</b>."},
 {id:"k9",topic:"kin1",type:"mc",prompt:"'Uniform acceleration' means:",choices:["Velocity changes by equal amounts in equal times","Velocity is constant","The object moves equal distances each second","Speed only increases"],answer:0,why:"Uniform a → <b>Δv is the same every second</b> (distances are NOT — they grow). This is exactly when the kinematic equations apply, and only then."},
 /* --- saved homework sources + close transfer: speed, velocity, and motion graphs --- */
 {id:"g1",topic:"graphs",type:"multi",origin:"Pearson HW source · 2026-09-09",prompt:"Which statements about average speed are correct? <b>Select all that apply.</b>",choices:["The average speed can never be greater than the magnitude of the average velocity.","If the average speed is zero, then the average velocity must be zero.","The average speed is equal to the magnitude of the average velocity.","If the average velocity is zero, then the average speed must be zero.","The average speed can never be less than the magnitude of the average velocity."],answer:[1,4],why:"Average speed = total distance/Δt; |average velocity| = |displacement|/Δt. Because distance ≥ |displacement|, <b>average speed ≥ |average velocity|</b>. Zero distance forces zero displacement, but a round trip can have zero displacement and positive distance."},
@@ -1121,45 +1152,53 @@ const QUESTIONS = [
 {id:"g6",topic:"graphs",type:"multi",origin:"Close transfer",prompt:"What does this velocity–time graph tell you? <b>Select all that apply.</b>",figure:"vtFlat",choices:["The object moves in the positive direction.","Its speed is constant.","Its acceleration is zero.","Its position is constant.","It must be at a positive position."],answer:[0,1,2],why:"The graph's positive height is velocity, so motion is in the positive direction at constant speed. Its slope is zero, so acceleration is zero. A v–t graph does not directly reveal the object's position."},
 /* --- kinematic equations --- */
 {id:"q1",topic:"kin2",type:"mc",prompt:"Which kinematic equation contains NO Δx?",choices:["v = v₀ + at","v² = v₀² + 2aΔx","Δx = v₀t + ½at²","Δx = ½(v₀ + v)t"],answer:0,why:"<b>v = v₀ + at</b>. Pick the equation by the variable you DON'T have/need — that's the entire selection method, not vibes."},
-{id:"q2",topic:"kin2",type:"num",prompt:"Dropped from rest, g ≈ 9.8 m/s². Speed after 2 s ≈ ? (m/s)",answer:19.6,tolerance:0.3,why:"v = 0 + 9.8 × 2 = <b>19.6 m/s</b>. Free fall = kinematics with a = g, nothing more."},
-{id:"q3",topic:"kin2",type:"num",prompt:"That same 2 s drop: distance fallen ≈ ? (m)",answer:19.6,tolerance:0.3,why:"Δy = ½gt² = ½ × 9.8 × 4 = <b>19.6 m</b>. (Same number as v is a 2-second coincidence — don't generalize it.)"},
-{id:"q4",topic:"kin2",type:"num",prompt:"Thrown up at 20 m/s, g ≈ 10. Max height = ? (m)",answer:20,why:"At the top v = 0: 0 = 20² − 2(10)Δy → Δy = 400/20 = <b>20 m</b>. v² = v₀² + 2aΔx is THE no-time equation — reach for it whenever t isn't given."},
-{id:"q5",topic:"kin2",type:"num",prompt:"From rest, a = 3 m/s², until v = 30 m/s. Distance covered = ? (m)",answer:150,why:"v² = 2aΔx → Δx = 900/6 = <b>150 m</b>."},
+{id:"q2",topic:"kin2",type:"num",prompt:"A rock is dropped from rest (g ≈ 9.8 m/s²). How fast is it moving after 2 s? (m/s)",answer:19.6,tolerance:0.3,why:"v = 0 + 9.8 × 2 = <b>19.6 m/s</b>. Free fall = kinematics with a = g, nothing more."},
+{id:"q3",topic:"kin2",type:"num",prompt:"A rock is dropped from rest (g ≈ 9.8 m/s²). How far has it fallen after 2 s? (m)",answer:19.6,tolerance:0.3,why:"Δy = ½gt² = ½ × 9.8 × 4 = <b>19.6 m</b>. (Same number as v is a 2-second coincidence — don't generalize it.)"},
+{id:"q4",topic:"kin2",type:"num",prompt:"A ball is thrown straight up at 20 m/s (use g ≈ 10 m/s²). How high above the launch point does it go? (m)",answer:20,why:"At the top v = 0: 0 = 20² − 2(10)Δy → Δy = 400/20 = <b>20 m</b>. v² = v₀² + 2aΔx is THE no-time equation — reach for it whenever t isn't given."},
+{id:"q5",topic:"kin2",type:"num",prompt:"A car starts from rest and accelerates at a constant 3 m/s² until it reaches 30 m/s. How far has it travelled? (m)",answer:150,why:"v² = 2aΔx → Δx = 900/6 = <b>150 m</b>."},
 {id:"q6",topic:"kin2",type:"mc",prompt:"The FIRST move of every kinematics problem:",choices:["List knowns/unknowns and pick a positive direction","Plug numbers into the first equation you remember","Compute the average of the given numbers","Draw the answer"],answer:0,why:"<b>Setup first</b>: knowns, unknown, axis + sign convention. Most lost points are setup errors, not math errors — which is why the Problem Lab makes you do this step explicitly."},
-{id:"q7",topic:"kin2",type:"num",prompt:"v₀ = 0, a = 2 m/s², t = 5 s. Δx = ? (m)",answer:25,why:"Δx = 0 + ½ × 2 × 25 = <b>25 m</b>."},
-{id:"q8",topic:"kin2",type:"num",prompt:"Time to fall 45 m from rest (g ≈ 10) = ? (s)",answer:3,why:"45 = ½ × 10 × t² → t² = 9 → <b>3 s</b>. Rearrange symbolically first: t = √(2Δy/g)."},
+{id:"q7",topic:"kin2",type:"num",prompt:"An object starts from rest and accelerates at 2 m/s² for 5 s. How far does it travel? (m)",answer:25,why:"Δx = 0 + ½ × 2 × 25 = <b>25 m</b>."},
+{id:"q8",topic:"kin2",type:"num",prompt:"A rock is dropped from rest and falls 45 m (use g ≈ 10 m/s²). How long does the fall take? (s)",answer:3,why:"45 = ½ × 10 × t² → t² = 9 → <b>3 s</b>. Rearrange symbolically first: t = √(2Δy/g)."},
 {id:"q9",topic:"kin2",type:"mc",prompt:"One ball is dropped; another is thrown HORIZONTALLY at the same instant from the same height. Which lands first?",choices:["They land together — vertical motion is independent of horizontal","The dropped one","The thrown one","Depends on the throw speed"],answer:0,why:"<b>Axes are independent</b> — both start with v_y = 0 and fall under the same g. The horizontal throw adds x-motion, not flight time. This is vc10's 'why components' as an exam classic."},
 /* --- Newton's laws --- */
-{id:"n1",topic:"newton",type:"num",prompt:"F = ma: net force 5 N on a 10 kg box. a = ? (m/s²)",answer:0.5,why:"a = F/m = 5/10 = <b>0.5 m/s²</b>. Big mass, small force → small a. Sanity-check magnitudes."},
-{id:"n2",topic:"newton",type:"num",prompt:"Weight of a 5.0 kg object (g ≈ 9.8) ≈ ? (N)",answer:49,tolerance:0.5,why:"W = mg = 5 × 9.8 = <b>49 N</b>. Weight is a FORCE (newtons); mass is kg. Mixing them is the classic week-4 error."},
+{id:"n1",topic:"newton",type:"num",prompt:"A net force of 5 N acts on a 10 kg box. What is the box's acceleration? (m/s²)",answer:0.5,why:"a = F/m = 5/10 = <b>0.5 m/s²</b>. Big mass, small force → small a. Sanity-check magnitudes."},
+{id:"n2",topic:"newton",type:"num",prompt:"What is the weight of a 5.0 kg object on Earth? (N, g ≈ 9.8 m/s²)",answer:49,tolerance:0.5,why:"W = mg = 5 × 9.8 = <b>49 N</b>. Weight is a FORCE (newtons); mass is kg. Mixing them is the classic week-4 error."},
 {id:"n3",topic:"newton",type:"mc",prompt:"A car moves at constant 25 m/s in a straight line. The net force on it is:",choices:["Zero","Forward, constant","Forward, growing","Equal to its weight"],answer:0,why:"Constant velocity = zero acceleration = <b>zero NET force</b> (N1). Engine force exists — it just cancels friction/drag. Net ≠ individual."},
-{id:"n4",topic:"newton",type:"num",prompt:"1200 kg car, a = 2.5 m/s². Net force = ? (N)",answer:3000,why:"F = ma = 1200 × 2.5 = <b>3000 N</b>."},
+{id:"n4",topic:"newton",type:"num",prompt:"A 1200 kg car accelerates at 2.5 m/s². What net force is acting on it? (N)",answer:3000,why:"F = ma = 1200 × 2.5 = <b>3000 N</b>."},
 {id:"n5",topic:"newton",type:"mc",prompt:"Newton's 3rd law pairs (equal & opposite forces) never cancel because they…",choices:["Act on DIFFERENT objects","Are different sizes","Act at different times","Only exist during collisions"],answer:0,why:"You push the wall, the wall pushes YOU — one force per object. Forces only cancel when they act <b>on the same object</b>. This resolves every '3rd-law paradox' question."},
-{id:"n6",topic:"newton",type:"num",prompt:"20 N right and 6 N left act on a box. Net force = ? (N)",answer:14,why:"20 − 6 = <b>14 N</b> (rightward). Net force is a signed SUM — this is vectors again, just wearing forces."},
+{id:"n6",topic:"newton",type:"num",prompt:"A 20 N force pushes a box to the right while a 6 N force pushes it to the left. What is the net force on the box? (N, take right as positive)",answer:14,why:"20 − 6 = <b>14 N</b> (rightward). Net force is a signed SUM — this is vectors again, just wearing forces."},
 {id:"n7",topic:"newton",type:"mc",prompt:"Take a 10 kg dumbbell to the Moon. What changes?",choices:["Weight drops; mass stays 10 kg","Mass drops; weight stays","Both drop","Neither"],answer:0,why:"<b>Mass is intrinsic</b>; weight = mg depends on the local g (Moon ≈ 1.6 m/s²). The dumbbell is just as hard to shake side-to-side up there."},
 {id:"n8",topic:"newton",type:"num",prompt:"A 20 N book rests on a table. The normal force on it = ? (N)",answer:20,why:"At rest → net = 0 → N balances W: <b>20 N</b> up. (Normal = weight only when nothing else pushes vertically — on inclines this breaks.)"},
 {id:"n9",topic:"newton",type:"mc",prompt:"The net force on an object always points in the direction of its:",choices:["Acceleration","Velocity","Displacement","Motion history"],answer:0,why:"F_net ∥ <b>a</b>, NOT v. A braking car moves forward while its net force points backward. Divorcing force from velocity is half of understanding Newton."},
-{id:"n10",topic:"newton",type:"num",prompt:"4 kg box pushed with 26 N; friction resists with 6 N. a = ? (m/s²)",answer:5,why:"Net = 26 − 6 = 20 N → a = 20/4 = <b>5 m/s²</b>. NET force in F = ma — always subtract the opposition first."},
+{id:"n10",topic:"newton",type:"num",prompt:"A 4 kg box is pushed with 26 N while friction pushes back with 6 N. What is the box's acceleration? (m/s²)",answer:5,why:"Net = 26 − 6 = 20 N → a = 20/4 = <b>5 m/s²</b>. NET force in F = ma — always subtract the opposition first."},
+{id:"n11",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"Newton's First Law is valid when motion is described from:",choices:["An inertial frame of reference","Any accelerating frame","Absolute space","Only the surface of Earth"],answer:0,why:"The missing condition is the frame. <b>In an inertial frame</b>, zero net external force means constant velocity, including rest. 'At rest' or 'moving' has no meaning until the reference frame is named."},
+{id:"n12",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"You are sitting still relative to the classroom. Are you also at rest relative to the Sun?",choices:["No — rest and motion depend on the chosen reference frame","Yes — rest is absolute","Yes, unless a force acts on you","There is not enough information to discuss any motion"],answer:0,why:"You are at rest relative to the room but moving with Earth relative to the Sun. <b>Motion is relative</b>; always name what the motion is measured against."},
+{id:"n13",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"Which situation is closest to an inertial frame for a passenger?",choices:["An airplane cruising straight at constant velocity","An airplane speeding up for takeoff","A car turning a corner","A car braking hard"],answer:0,why:"A frame is inertial when it is <b>not accelerating</b>. Speeding up, slowing down, and changing direction are all acceleration. A smooth straight cruise at constant velocity is the inertial choice."},
+{id:"n14",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"A passenger feels pushed into the seat as a car speeds up. Relative to the accelerating car, that car frame is:",choices:["Non-inertial","Inertial","Absolute","Frictionless"],answer:0,why:"The car is accelerating, so its frame is <b>non-inertial</b>. This is why Newton's laws cannot be used there in their simplest form without accounting for the accelerating frame."},
+{id:"n15",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"In Galileo's two-incline experiment, lowering the angle of the second incline made the marble travel:",choices:["Farther before reaching the same height","A shorter distance","To a lower final height even without friction","At zero speed immediately"],answer:0,why:"As the return incline became flatter, the marble had to travel <b>farther</b> to regain the same height. At zero angle on an ideal frictionless surface, the argument leads to motion continuing indefinitely."},
+{id:"n16",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"On an ideal horizontal surface with no friction and no net force, Galileo's inertia argument predicts that a moving marble will:",choices:["Continue at constant velocity","Slow down naturally","Speed up forever","Stop when its force runs out"],answer:0,why:"No net force means no acceleration. The marble keeps the <b>same velocity</b>; motion does not require a continuing force. Friction is what makes ordinary objects appear to stop on their own."},
+{id:"n17",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"Aristotle called motion caused by an external push or kick:",choices:["Violent motion","Natural motion","Inertial motion","Relative motion"],answer:0,why:"In Aristotle's model, <b>natural motion</b> carried elements toward their natural places; an outside push or kick produced <b>violent motion</b>. Galileo's experiments later challenged this account."},
+{id:"n18",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"According to the relativity principle discussed in class, which statement is correct?",choices:["There is no absolute inertial frame of reference","Earth is the one absolute frame","The Sun is the one absolute frame","The center of the galaxy is perfectly stationary"],answer:0,why:"No experiment identifies one absolute state of rest. Choose a useful <b>inertial frame</b> for the problem—Earth for a car, the Sun for a planet—but do not call it absolute."},
 /* --- Mastering Physics homework · 2026-09-16 — scaling/ratio reasoning --- */
 {id:"sc1",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"The radius of a circle of area A is doubled. The new area is ___ × A.",answer:4,why:"A = πr². Replace r with 2r: π(2r)² = π·4r² = <b>4A</b>. The exponent on r does the work — r is squared, so the factor gets squared too (2² = 4)."},
-{id:"sc2",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Same circle, radius doubled. The new circumference is ___ × C.",answer:2,why:"C = 2πr → 2π(2r) = <b>2C</b>. Here r is to the FIRST power, so the factor passes straight through. Same circle, two different scaling laws — read the exponent, never assume."},
+{id:"sc2",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"A circle has circumference C. Its radius is doubled. The new circumference is ___ × C.",answer:2,why:"C = 2πr → 2π(2r) = <b>2C</b>. Here r is to the FIRST power, so the factor passes straight through. Same circle, two different scaling laws — read the exponent, never assume."},
 {id:"sc3",topic:"scale",type:"num",origin:"Close transfer",prompt:"The radius of a sphere is tripled. Its volume (V = ⁴⁄₃πr³) becomes ___ × V.",answer:27,why:"3³ = <b>27</b>. Cube the factor when the variable is cubed. Seen as \u0027raise the factor to the same power\u0027, all of these are one move."},
 {id:"sc4",topic:"scale",type:"mc",origin:"Close transfer",prompt:"Q = kx². If x is multiplied by 5, then Q is multiplied by:",choices:["25","5","10","2.5"],answer:0,why:"5² = <b>25</b>. The general rule worth writing on your cheat sheet once: <b>if Q ∝ xⁿ and x → cx, then Q → cⁿQ.</b> Stop re-deriving it per problem."},
 {id:"sc5",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Two cars at equal speeds brake at the same instant. Car A\u0027s braking acceleration is 4× car B\u0027s. If car A stops in a distance D, car B stops in ___ × D.",answer:4,why:"From v² = v₀² + 2a·x with v = 0: x = v₀²/(2a). Same v₀, so <b>distance ∝ 1/a</b>. A quarter of the acceleration → <b>4D</b>. Sanity check: the car that brakes harder must stop shorter ✓."},
-{id:"sc6",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Same two cars. If car B stops in time T, car A stops in ___ × T.",answer:0.25,tolerance:0.01,why:"From v = v₀ + at with v = 0: t = v₀/a, so <b>time ∝ 1/a</b> as well. Four times the acceleration → a quarter of the time: <b>0.25T</b>."},
+{id:"sc6",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Two cars at equal speeds brake at the same instant. Car A\u0027s braking acceleration is 4× car B\u0027s. If car B stops in time T, car A stops in ___ × T.",answer:0.25,tolerance:0.01,why:"From v = v₀ + at with v = 0: t = v₀/a, so <b>time ∝ 1/a</b> as well. Four times the acceleration → a quarter of the time: <b>0.25T</b>."},
 {id:"sc7",topic:"scale",type:"num",origin:"Close transfer",prompt:"You double your car\u0027s speed and brake just as hard. Your stopping distance is multiplied by ___.",answer:4,why:"x = v₀²/(2a) — v₀ is <b>squared</b>. Double the speed, quadruple the stopping distance. Probably the most useful scaling fact in the chapter."},
 {id:"sc8",topic:"scale",type:"mc",origin:"Close transfer",prompt:"With the initial speed fixed, how do stopping DISTANCE and stopping TIME scale with the braking acceleration a?",choices:["Both ∝ 1/a","Distance ∝ 1/a, time ∝ 1/a²","Distance ∝ 1/a², time ∝ 1/a","Both ∝ 1/a²"],answer:0,why:"x = v₀²/(2a) and t = v₀/a — a sits to the first power in both denominators, so <b>both are ∝ 1/a</b>. What differs is how they scale with v₀: squared for distance, linear for time."},
 /* --- Mastering Physics homework · 2026-09-16 — free fall, other planets, big-a/short-t --- */
 {id:"mn1",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"An astronaut throws a wrench 15.0 m straight up on Earth. With the SAME launch speed on the Moon (g_moon = 0.165g), how high does it go? (m)",answer:90.9,tolerance:0.8,why:"At the top v = 0, so 0 = v₀² − 2gh → h = v₀²/(2g). Same v₀ means <b>h ∝ 1/g</b>: h = 15.0/0.165 = <b>90.9 m</b>. You never have to find v₀ — everything that stays the same cancels."},
-{id:"mn2",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Same wrench: what launch speed produces a 15.0 m maximum height on Earth? (m/s, g = 9.80)",answer:17.1,tolerance:0.3,why:"v₀² = 2gh = 2(9.80)(15.0) = 294 → v₀ = √294 = <b>17.1 m/s</b>. You need this the moment the question turns to TIME, because time does not cancel the way height did."},
-{id:"mn3",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"That wrench is in the air (up AND down) how much LONGER on the Moon than on Earth? (s)",answer:17.7,tolerance:0.6,why:"Flight time t = 2v₀/g. Earth: 2(17.1)/9.80 = 3.50 s. Moon: g = 0.165(9.80) = 1.617 m/s², t = 2(17.1)/1.617 = 21.2 s. The word is <b>longer</b>, so subtract: 21.2 − 3.50 = <b>17.7 s</b>. Writing 21.2 is the trap — the comparison word turns the problem into a subtraction."},
+{id:"mn2",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"An astronaut throws a wrench straight up on Earth and it reaches a maximum height of 15.0 m. What launch speed did that take? (m/s, g = 9.80)",answer:17.1,tolerance:0.3,why:"v₀² = 2gh = 2(9.80)(15.0) = 294 → v₀ = √294 = <b>17.1 m/s</b>. You need this the moment the question turns to TIME, because time does not cancel the way height did."},
+{id:"mn3",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"An astronaut throws a wrench 15.0 m straight up on Earth. With the same launch speed on the Moon (g_moon = 0.165g), how much LONGER is it in the air (up and down) than on Earth? (s)",answer:17.7,tolerance:0.6,why:"Flight time t = 2v₀/g. Earth: 2(17.1)/9.80 = 3.50 s. Moon: g = 0.165(9.80) = 1.617 m/s², t = 2(17.1)/1.617 = 21.2 s. The word is <b>longer</b>, so subtract: 21.2 − 3.50 = <b>17.7 s</b>. Writing 21.2 is the trap — the comparison word turns the problem into a subtraction."},
 {id:"mn4",topic:"kin2",type:"mc",origin:"Close transfer",prompt:"Thrown up with the same speed, how do an object\u0027s MAXIMUM HEIGHT and TOTAL FLIGHT TIME depend on g?",choices:["h ∝ 1/g and t ∝ 1/g","h ∝ 1/g² and t ∝ 1/g","h ∝ 1/g and t ∝ 1/g²","Both ∝ 1/g²"],answer:0,why:"h = v₀²/(2g) and t = 2v₀/g — <b>both inversely proportional to g</b>. On the Moon g is 0.165×, so both come out about 6× bigger."},
 {id:"ab1",topic:"units",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"An airbag acts for 31 ms. Express that in seconds.",answer:0.031,tolerance:0.0005,why:"milli = 10⁻³, so 31 ms = <b>0.031 s</b>. Every kinematic equation wants seconds. Convert on the line where you list knowns, not later — this is the same slip as reading 876 mg as 0.876 g too late."},
 {id:"ab2",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"An airbag brings a passenger to a complete stop at a constant 60g over 31 ms. How far does the person travel while stopping? (m, g = 9.80)",answer:0.28,tolerance:0.03,why:"a = 60(9.80) = 588 m/s², t = 0.031 s. Ending at rest lets you use d = ½at² straight away: ½(588)(0.031)² = <b>0.28 m</b>. (Long route: v₀ = at = 18.2 m/s, then d = v₀t − ½at² = the same 0.28 m.)"},
-{id:"ab3",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Same airbag (60g for 31 ms, ending at rest): how fast was the passenger moving when the bag first reached them? (m/s)",answer:18.2,tolerance:0.4,why:"v = v₀ + at with v = 0 → v₀ = at = 588 × 0.031 = <b>18.2 m/s</b> (≈ 41 mph). Working backwards from \u0027comes to a complete stop\u0027 is standard: the final condition is a given, not a missing piece."},
+{id:"ab3",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"An airbag brings a passenger to a complete stop at a constant 60g over 31 ms. How fast was the passenger moving when the bag first reached them? (m/s, g = 9.80)",answer:18.2,tolerance:0.4,why:"v = v₀ + at with v = 0 → v₀ = at = 588 × 0.031 = <b>18.2 m/s</b> (≈ 41 mph). Working backwards from \u0027comes to a complete stop\u0027 is standard: the final condition is a given, not a missing piece."},
 {id:"ab4",topic:"kin2",type:"mc",origin:"Close transfer",prompt:"An object starts OR ends at rest under constant acceleration. The fastest distance formula is:",choices:["d = ½at²","d = v₀t","d = v₀t + ½at²","d = v²/2"],answer:0,why:"With one velocity equal to zero the v₀t term vanishes (from rest) or the two terms collapse to the same value (to rest): <b>d = ½at²</b>. Spotting \u0027from rest\u0027 or \u0027to a complete stop\u0027 saves a whole step."},
 {id:"jf1",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"A pilot accelerates from rest at a constant 5.00g. How long does it take to reach 993 m/s? (s, g = 9.80)",answer:20.3,tolerance:0.5,why:"a = 5.00(9.80) = 49.0 m/s². t = v/a = 993/49.0 = <b>20.3 s</b>. Set that against the ~4.9 s a pilot can take 5g before blacking out — the answer to \u0027does he black out\u0027 is the COMPARISON, not the number."},
-{id:"jf2",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"Same pilot at 5.00g from rest. What speed has he reached after 4.90 s? (m/s)",answer:240,tolerance:4,why:"v = v₀ + at = 0 + 49.0(4.90) = <b>240 m/s</b> — as fast as he can get before the blackout limit, and well short of 993 m/s."},
+{id:"jf2",topic:"kin2",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"A pilot accelerates from rest at a constant 5.00g. What speed has he reached after 4.90 s? (m/s, g = 9.80)",answer:240,tolerance:4,why:"v = v₀ + at = 0 + 49.0(4.90) = <b>240 m/s</b> — as fast as he can get before the blackout limit, and well short of 993 m/s."},
 /* --- v2.9: WHICH EQUATION? — selection only, no arithmetic. The skill is: list knowns,
    mark the want, find what is MISSING, pick the equation that leaves it out. --- */
 {id:"pk0",topic:"pick",type:"mc",prompt:"You've listed what you know and what you want. The equation to use is the one that:",choices:["leaves OUT the one variable you neither have nor want","has the most variables in it","you remember best","has the unknown on the left side"],answer:0,why:"That is the entire method. Every kinematic equation is missing exactly one of {Δx, v, v₀, a, t}. Find which one you don't have and don't need — grab the equation without it. No vibes, no 'which one fits the situation'."},
@@ -1168,7 +1207,7 @@ const QUESTIONS = [
 {id:"pk3",topic:"pick",type:"mc",prompt:"A sprinter starts from rest and accelerates at 3 m/s² for 4 s. You want her final speed.<br><span class='muted'>Have: v₀ = 0, a, t · Want: v · Missing: ?</span>",choices:["v = v₀ + at &nbsp;<span class='muted'>(no Δx)</span>","Δx = v₀t + ½at² &nbsp;<span class='muted'>(no v)</span>","v² = v₀² + 2aΔx &nbsp;<span class='muted'>(no t)</span>","Δx = ½(v₀ + v)t &nbsp;<span class='muted'>(no a)</span>"],answer:0,why:"Have v₀, a, t. Want v. <b>Missing: Δx.</b> The equation with no Δx is <b>v = v₀ + at</b>."},
 {id:"pk4",topic:"pick",type:"mc",prompt:"A train slows from 30 m/s to 10 m/s over 20 s. You want how far it travelled while slowing.<br><span class='muted'>Have: v₀, v, t · Want: Δx · Missing: ?</span>",choices:["v = v₀ + at &nbsp;<span class='muted'>(no Δx)</span>","Δx = v₀t + ½at² &nbsp;<span class='muted'>(no v)</span>","v² = v₀² + 2aΔx &nbsp;<span class='muted'>(no t)</span>","Δx = ½(v₀ + v)t &nbsp;<span class='muted'>(no a)</span>"],answer:3,why:"Have v₀, v, t. Want Δx. <b>Missing: a.</b> The equation with no a is <b>Δx = ½(v₀ + v)t</b> — the average-velocity one. (You could also find a first and use another; this is the one-step route.)"},
 {id:"pk5",topic:"pick",type:"mc",prompt:"A ball is thrown straight up at 15 m/s. You want how high it goes.<br><span class='muted'>Have: v₀, v at the top = 0, a = −g · Want: Δy · Missing: ?</span>",choices:["v = v₀ + at &nbsp;<span class='muted'>(no Δx)</span>","Δx = v₀t + ½at² &nbsp;<span class='muted'>(no v)</span>","v² = v₀² + 2aΔx &nbsp;<span class='muted'>(no t)</span>","Δx = ½(v₀ + v)t &nbsp;<span class='muted'>(no a)</span>"],answer:2,why:"Have v₀, v (0 at the top), a. Want Δy. <b>Missing: t.</b> → <b>v² = v₀² + 2aΔy</b>. 'How high' means the top, and the top hands you v = 0 for free."},
-{id:"pk6",topic:"pick",type:"mc",prompt:"Same ball, thrown up at 15 m/s. You want how long it takes to reach the top.<br><span class='muted'>Have: v₀, v = 0, a = −g · Want: t · Missing: ?</span>",choices:["v = v₀ + at &nbsp;<span class='muted'>(no Δx)</span>","Δx = v₀t + ½at² &nbsp;<span class='muted'>(no v)</span>","v² = v₀² + 2aΔx &nbsp;<span class='muted'>(no t)</span>","Δx = ½(v₀ + v)t &nbsp;<span class='muted'>(no a)</span>"],answer:0,why:"Have v₀, v, a. Want t. <b>Missing: Δy.</b> → <b>v = v₀ + at</b>. Same story as pk5, different want, different missing variable, different equation."},
+{id:"pk6",topic:"pick",type:"mc",prompt:"A ball is thrown straight up at 15 m/s. You want how long it takes to reach the top.<br><span class='muted'>Have: v₀, v = 0, a = −g · Want: t · Missing: ?</span>",choices:["v = v₀ + at &nbsp;<span class='muted'>(no Δx)</span>","Δx = v₀t + ½at² &nbsp;<span class='muted'>(no v)</span>","v² = v₀² + 2aΔx &nbsp;<span class='muted'>(no t)</span>","Δx = ½(v₀ + v)t &nbsp;<span class='muted'>(no a)</span>"],answer:0,why:"Have v₀, v, a. Want t. <b>Missing: Δy.</b> → <b>v = v₀ + at</b>. Same story as pk5, different want, different missing variable, different equation."},
 {id:"pk7",topic:"pick",type:"mc",prompt:"A bike moving at 5 m/s speeds up at 2 m/s² for 6 s. You want the distance covered.<br><span class='muted'>Have: v₀, a, t · Want: Δx · Missing: ?</span>",choices:["v = v₀ + at &nbsp;<span class='muted'>(no Δx)</span>","Δx = v₀t + ½at² &nbsp;<span class='muted'>(no v)</span>","v² = v₀² + 2aΔx &nbsp;<span class='muted'>(no t)</span>","Δx = ½(v₀ + v)t &nbsp;<span class='muted'>(no a)</span>"],answer:1,why:"Have v₀, a, t. Want Δx. <b>Missing: v.</b> → <b>Δx = v₀t + ½at²</b>."},
 {id:"pk8",topic:"pick",type:"mc",prompt:"The phrase <b>\"comes to a stop\"</b> hands you which known for free?",choices:["v = 0","v₀ = 0","a = 0","t = 0"],answer:0,why:"Final velocity is zero. The word bank: <b>from rest</b> → v₀ = 0 · <b>comes to a stop</b> → v = 0 · <b>at the top</b> → v_y = 0 · <b>dropped / thrown / in flight</b> → a = g downward · <b>constant velocity</b> → a = 0. Half the knowns in a problem are words, not numbers."},
 {id:"pk9",topic:"pick",type:"mc",prompt:"The word <b>\"dropped\"</b> hands you:",choices:["v₀ = 0 AND a = g downward","only a = g downward","only v₀ = 0","v = 0"],answer:0,why:"Two knowns from one word: it starts at rest (v₀ = 0) and gravity is the only acceleration (a = g, down). Missing knowns are usually hiding in the verbs."},
@@ -1182,10 +1221,10 @@ const QUESTIONS = [
 {id:"pj1",topic:"proj",type:"num",prompt:"Ignoring air, a ball's horizontal acceleration during flight is ? (m/s²)",answer:0,why:"<b>0.</b> Nothing pushes sideways once it leaves the launcher. That's why x = v₀ₓ t is so simple — constant velocity sideways."},
 {id:"pj2",topic:"proj",type:"num",prompt:"Up is positive. A ball's vertical acceleration during flight is ? (m/s²)",answer:-9.8,tolerance:0.05,why:"<b>−9.8 m/s²</b>, every instant, including at the top. Sign comes from your choice of positive direction; with up positive, gravity is negative."},
 {id:"pj3",topic:"proj",type:"num",origin:"Projectile Motion lab · 2026-09-22",prompt:"A ball rolls horizontally off a ledge 1.164 m high. Flight time ≈ ? (s)",answer:0.49,tolerance:0.02,why:"y-axis, v₀ᵧ = 0: h = ½gt² → t = √(2h/g) = √(2 × 1.164 / 9.8) = <b>0.49 s</b>. Only the height matters — how fast it was rolling doesn't change the fall time."},
-{id:"pj4",topic:"proj",type:"num",origin:"Projectile Motion lab · 2026-09-22",prompt:"Same ledge (1.164 m). The ball lands 2.00 m out horizontally. Its speed leaving the ledge ≈ ? (m/s)",answer:4.1,tolerance:0.1,why:"x-axis: x = v₀ₓ t → v₀ₓ = 2.00 / 0.487 = <b>4.1 m/s</b>. Horizontal launch means v₀ IS v₀ₓ (no vertical component), so this is the launch speed."},
+{id:"pj4",topic:"proj",type:"num",origin:"Projectile Motion lab · 2026-09-22",prompt:"A ball rolls horizontally off a ledge 1.164 m high and lands 2.00 m away horizontally. How fast was it moving when it left the ledge? (m/s)",answer:4.1,tolerance:0.1,why:"x-axis: x = v₀ₓ t → v₀ₓ = 2.00 / 0.487 = <b>4.1 m/s</b>. Horizontal launch means v₀ IS v₀ₓ (no vertical component), so this is the launch speed."},
 {id:"pj5",topic:"proj",type:"mc",prompt:"At the very top of a projectile's arc, which of these is zero?",choices:["vᵧ (vertical velocity)","v (the whole velocity)","aᵧ (vertical acceleration)","vₓ (horizontal velocity)"],answer:0,why:"Only <b>vᵧ = 0</b>. It's still moving sideways (vₓ ≠ 0), and gravity never switches off (aᵧ = −g). 'Velocity is zero at the top' is a one-dimensional fact that does NOT survive into 2D."},
-{id:"pj6",topic:"proj",type:"num",prompt:"Launch speed 6.0 m/s at 30° above horizontal. v₀ₓ = ? (m/s) &nbsp;<span class='muted'>(cos 30° ≈ 0.866)</span>",answer:5.2,tolerance:0.1,why:"v₀ₓ = v₀ cos θ = 6.0 × 0.866 = <b>5.2 m/s</b>. Adjacent gets cos — same rule as the hiker."},
-{id:"pj7",topic:"proj",type:"num",prompt:"Same launch (6.0 m/s at 30°). v₀ᵧ = ? (m/s)",answer:3.0,tolerance:0.1,why:"v₀ᵧ = v₀ sin θ = 6.0 × 0.5 = <b>3.0 m/s</b>. Check: √(5.2² + 3.0²) ≈ 6.0 ✓."},
+{id:"pj6",topic:"proj",type:"num",prompt:"A ball is launched at 6.0 m/s, 30° above horizontal (cos 30° ≈ 0.866). What is v₀ₓ, the horizontal part of its launch velocity? (m/s)",answer:5.2,tolerance:0.1,why:"v₀ₓ = v₀ cos θ = 6.0 × 0.866 = <b>5.2 m/s</b>. Adjacent gets cos — same rule as the hiker."},
+{id:"pj7",topic:"proj",type:"num",prompt:"A ball is launched at 6.0 m/s, 30° above horizontal (sin 30° = 0.5). What is v₀ᵧ, the vertical part of its launch velocity? (m/s)",answer:3.0,tolerance:0.1,why:"v₀ᵧ = v₀ sin θ = 6.0 × 0.5 = <b>3.0 m/s</b>. Check: √(5.2² + 3.0²) ≈ 6.0 ✓."},
 {id:"pj8",topic:"proj",type:"mc",prompt:"Horizontal launch. You double the launch height. Flight time is multiplied by:",choices:["√2 ≈ 1.41","2","4","½"],answer:0,why:"t = √(2h/g) — t goes as h to the ½ power, so doubling h multiplies t by 2^½ = <b>√2</b>. Same scaling rule as the doubled-radius circle: raise the factor to the power the variable carries."},
 {id:"pj9",topic:"proj",type:"num",origin:"Projectile Motion lab · 2026-09-22",prompt:"Your lab: launched at 45° from h = 1.164 m, average range R = 5.045 m. Launch speed v₀ ≈ ? (m/s)",answer:6.3,tolerance:0.15,why:"At 45° the two-axis solution collapses to v₀ = R √(g / (R + h)) = 5.045 × √(9.8 / 6.209) = <b>6.3 m/s</b>. No stopwatch needed — three tape/protractor numbers pin it down."},
 {id:"pj10",topic:"proj",type:"mc",prompt:"Your lab: the geometry (h, R, θ) predicts a 1.13 s flight; the stopwatch average was 0.95 s. Which do you trust for the final answer, and why?",choices:["Geometry — tape and protractor have no reaction time; a stopwatch does","Stopwatch — it's a direct measurement","Average the two","Whichever gives an answer closer to what you expected"],answer:0,why:"The measurement with no human timing in it wins. And the last option is the trap from the gravity lab: <b>never judge a method by how close it lands to the expected number.</b>"},
@@ -1198,6 +1237,7 @@ const QUESTIONS = [
    Add problems freely: steps run in order, num answers support tolerance. */
 const PROBLEMS = [
   { key:"hiker", due:"2026-08-08", formula:"The 37° hiker", blurb:"The owed Aug-8 warm-up. 50 m at 37° north of east — the components, done properly.",
+    story:"A hiker walks 50 m in a straight line, heading 37° north of east. How far east did she travel, and how far north? (Use sin 37° ≈ 0.6 and cos 37° ≈ 0.8.)",
     given:"d = <span class='hl'>50 m</span> at <span class='hl'>37°</span> N of E · sin 37° ≈ 0.6 · cos 37° ≈ 0.8",
     symbols:["d", "θ"],
     steps:[
@@ -1208,6 +1248,7 @@ const PROBLEMS = [
       {cat:"setup", type:"mc", ask:"<b>Audit.</b> How do you CHECK the answer before moving on?", choices:["√(40² + 30²) should rebuild 50","Add 40 + 30 and compare to 50","Check that 40 > 30","No check is possible"], answer:0, why:"Components must reassemble the original: √(1600+900) = √2500 = 50 ✓. Every vector decomposition ships with its own free audit — use it every time."},
     ]},
   { key:"solvet", due:"2026-08-09", formula:"Solve for t", blurb:"Pure algebra under a physics costume — symbols first, numbers last.",
+    story:"An object starts from rest and speeds up at a constant 10 m/s². How many seconds does it take to cover 20 m? Start from x = ½at² and rearrange for t in symbols before you plug in any numbers.",
     given:"x = ½at² · x = <span class='hl'>20 m</span> · a = <span class='hl'>10 m/s²</span> · find t",
     symbols:["x", "a", "t"],
     steps:[
@@ -1216,6 +1257,7 @@ const PROBLEMS = [
       {cat:"number", type:"num", ask:"<b>Number.</b> t = ? (s)", answer:2, why:"t = √(2×20/10) = √4 = <b>2 s</b>. Units check: √(m ÷ m/s²) = √(s²) = s ✓."},
     ]},
   { key:"caraccel", due:"2026-08-14", formula:"The accelerating car", blurb:"Two-part kinematics: find a, then use it — chained answers, like real problem sets.",
+    story:"A car starts from rest and reaches 24 m/s after 6 s of constant acceleration. First find the acceleration. Then find how far the car travelled during those 6 s.",
     given:"car: <span class='hl'>0 → 24 m/s</span> in <span class='hl'>6 s</span> · find a, then Δx",
     symbols:["v₀", "v", "t", "a", "Δx"],
     steps:[
@@ -1224,6 +1266,7 @@ const PROBLEMS = [
       {cat:"number", type:"num", ask:"<b>Number.</b> Δx = ? (m)", answer:72, why:"12 m/s × 6 s = <b>72 m</b>. (Cross-check: ½at² = ½×4×36 = 72 ✓ — two routes agreeing is the strongest audit there is.)"},
     ]},
   { key:"freefall", due:"2026-08-14", formula:"The 45 m drop", blurb:"Free fall = kinematics with a = g. Nothing new — if the setup is right.",
+    story:"A rock is dropped from rest off a 45 m cliff. Using g ≈ 10 m/s², how many seconds does it take to hit the ground?",
     given:"dropped from rest · Δy = <span class='hl'>45 m</span> · g ≈ <span class='hl'>10 m/s²</span> · find t",
     symbols:["Δy", "g", "t"],
     steps:[
@@ -1233,6 +1276,7 @@ const PROBLEMS = [
       {cat:"number", type:"num", ask:"<b>Number.</b> t = ? (s)", answer:3, why:"√(2×45/10) = √9 = <b>3 s</b>."},
     ]},
   { key:"newtoncar", due:"2026-08-15", formula:"Newton's car", blurb:"F = ma feeding into kinematics — the week-4 pattern, previewed.",
+    story:"A 1200 kg car starts from rest. Its engine produces a net forward force of 3000 N. Find the car's acceleration, then its speed after 8 s.",
     given:"m = <span class='hl'>1200 kg</span> · F_net = <span class='hl'>3000 N</span> · from rest · find a, then v at t = 8 s",
     symbols:["m", "F_net", "a", "v", "t"],
     steps:[
@@ -1241,6 +1285,7 @@ const PROBLEMS = [
       {cat:"number", type:"num", ask:"<b>Number.</b> v = ? (m/s)", answer:20, why:"0 + 2.5 × 8 = <b>20 m/s</b> (≈ 45 mph — plausible for 8 s of hard acceleration ✓)."},
     ]},
   { key:"walk", due:"2026-08-12", formula:"The L-shaped walk", blurb:"30 m east, 40 m north — addition is components, never magnitudes.",
+    story:"You walk 30 m east, then turn and walk 40 m north. What is your total displacement from where you started — how far, and in what direction?",
     given:"legs: <span class='hl'>30 m E</span> then <span class='hl'>40 m N</span> · find the displacement (size + direction)",
     symbols:["d", "θ"],
     steps:[
@@ -1249,6 +1294,7 @@ const PROBLEMS = [
       {cat:"number", type:"num", ask:"<b>Number.</b> Direction ≈ ? degrees north of east (tan⁻¹ of 40/30)", answer:53, tolerance:1, why:"tan⁻¹(1.33) ≈ <b>53°</b> N of E. A magnitude without a named direction is half an answer."},
     ]},
   { key:"moonwrench", due:"2026-09-16", formula:"The Moon wrench", blurb:"Same throw, different gravity. Two ratios and one comparison word — that is the whole problem.",
+    story:"An astronaut throws a wrench straight up on Earth and it rises 15.0 m before falling back. On the Moon, where gravity is 0.165 times Earth's (Earth g = 9.80 m/s²), she throws it with the same launch speed. How high does it rise there, and how much LONGER is it in the air than on Earth?",
     given:"same launch speed both places · Earth max height = <span class='hl'>15.0 m</span> · g_moon = <span class='hl'>0.165 g</span> · g = <span class='hl'>9.80 m/s²</span>",
     symbols:["h", "v₀", "g", "t"],
     steps:[
@@ -1262,6 +1308,7 @@ const PROBLEMS = [
       {cat:"setup", type:"num", ask:"<b>Read the question.</b> It asked how much <i>longer</i> on the Moon. Answer = ? (s)", answer:17.7, tolerance:0.6, why:"21.2 − 3.50 = <b>17.7 s</b>. The comparison word turns the problem into a subtraction. Circling \u0027longer\u0027 / \u0027more than\u0027 / \u0027difference\u0027 before you start is a ten-second habit that protects a real point."},
     ]},
   { key:"launcher45", due:"2026-09-23", formula:"The 45° launcher (your lab)", blurb:"The actual Projectile Motion lab — no stopwatch, two axes, one shared clock. If you can do this cold, you own Chapter 3.",
+    story:"In the Projectile Motion lab, your group launched a ball at 45° above horizontal from a launcher whose barrel was 1.164 m above the floor. The ball landed an average of 5.045 m away horizontally. Using g = 9.8 m/s², how fast was the ball moving when it left the launcher? (Your stopwatch said the flight took 0.95 s — hold onto that for the last step.)",
     given:"launch angle θ = <span class='hl'>45°</span> · launch height h = <span class='hl'>1.164 m</span> · range R = <span class='hl'>5.045 m</span> · g = 9.8 m/s² · find v₀",
     symbols:["θ","h","R","v₀","t","g"],
     steps:[
@@ -1274,6 +1321,7 @@ const PROBLEMS = [
       {cat:"setup", type:"mc", ask:"<b>Audit.</b> The stopwatch average was 0.95 s. What do you write in the discussion?", choices:["Trust the geometry; the stopwatch carries reaction time, and the ~16% gap is the error to explain","Trust the stopwatch; it's a direct measurement","Use whichever gives an answer nearer the expected value","Average 1.13 and 0.95"], answer:0, why:"h, R, θ are tape/protractor numbers with no human timing. The disagreement isn't a problem to hide — it's the error analysis. (And 'nearer the expected value' is the gravity-lab trap, again.)"},
     ]},
   { key:"tablelaunch", due:"2026-09-25", formula:"Off the table", blurb:"Horizontal launch — the simplest 2D problem. One axis gives you time, the other gives you speed.",
+    story:"A ball rolls off a horizontal ledge 1.164 m above the floor and lands 2.00 m away horizontally. Using g = 9.8 m/s², how fast was the ball moving when it left the ledge?",
     given:"ball leaves a ledge horizontally · h = <span class='hl'>1.164 m</span> · lands x = <span class='hl'>2.00 m</span> out · g = 9.8 m/s² · find launch speed",
     symbols:["h","x","v₀","t","g"],
     steps:[
@@ -1282,6 +1330,87 @@ const PROBLEMS = [
       {cat:"algebra", type:"mc", ask:"<b>Algebra.</b> Solved for t:", choices:["t = √(2h/g)","t = 2h/g","t = √(h/2g)","t = h/g"], answer:0, why:"×2, ÷g, √ last. Same rearrangement as 'Solve for t' back in August — it keeps coming back."},
       {cat:"number", type:"num", ask:"<b>Number.</b> t = ? (s)", answer:0.49, tolerance:0.02, why:"√(2 × 1.164 / 9.8) = √0.2376 = <b>0.49 s</b>."},
       {cat:"number", type:"num", ask:"<b>Number.</b> Now the x-axis: v₀ = x / t = ? (m/s)", answer:4.1, tolerance:0.1, why:"2.00 / 0.487 = <b>4.1 m/s</b>. This time R/t IS the launch speed — because the launch was horizontal. At 45° it wouldn't be."},
+    ]},
+  { key:"std1d-topeka", due:"2026-10-05", formula:"Topeka: work backward", blurb:"Standard Problems 2 · 1D problem 1. Constant velocity, but the question asks for an earlier position.",
+    story:"A car drives straight east at a constant 30 m/s. At 11:00 a.m. it is 500 km east of Topeka. How far east of Topeka was the car at 9:00 a.m.?",
+    given:"east is positive · v = <span class='hl'>30 m/s</span> · x at 11:00 a.m. = <span class='hl'>500 km</span> · Δt = <span class='hl'>2.00 h</span> · find x at 9:00 a.m.",
+    symbols:["x","v","Δx","t"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> What is the cleanest plan?", choices:["Find how far the car travels in 2 h, then subtract that from 500 km","Add the 2 h travel distance to 500 km","Use an acceleration equation","Divide 500 km by 2 h"], answer:0, why:"Eleven o'clock is the later position. To rewind to 9:00 a.m., find the eastward change during those two hours and subtract it."},
+      {cat:"number", type:"num", ask:"<b>Units.</b> Two hours equals how many seconds?", answer:7200, tolerance:1, why:"2.00 h × 3600 s/h = <b>7200 s</b>. The speed is in m/s, so time must be in seconds."},
+      {cat:"equation", type:"mc", ask:"<b>Equation.</b> For constant velocity, the distance travelled in that interval is:", choices:["Δx = vΔt","Δx = ½aΔt²","v² = v₀² + 2aΔx","Δx = v/Δt"], answer:0, why:"Constant velocity means distance change = velocity × time: <b>Δx = vΔt</b>."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> How far did the car travel from 9:00 to 11:00? (km)", answer:216, tolerance:0.5, why:"30 m/s × 7200 s = 216,000 m = <b>216 km</b>."},
+      {cat:"number", type:"num", ask:"<b>Final.</b> Position at 9:00 a.m. = ? (km east of Topeka)", answer:284, tolerance:0.5, why:"500 km − 216 km = <b>284 km east of Topeka</b>."},
+    ]},
+  { key:"std1d-runway", due:"2026-10-05", formula:"Runway takeoff", blurb:"Standard Problems 2 · 1D problem 2. Choose the equation that leaves time out.",
+    story:"A plane starts from rest and needs to reach 50 m/s to take off. If the runway is 200 m long, what minimum constant acceleration must the plane have?",
+    given:"v₀ = <span class='hl'>0</span> · v = <span class='hl'>50 m/s</span> · Δx = <span class='hl'>200 m</span> · find a · time is not given",
+    symbols:["v₀","v","Δx","a","t"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> Which variable do you neither know nor need?", choices:["time t","final speed v","distance Δx","acceleration a"], answer:0, why:"You have starting speed, final speed, and distance. You want acceleration. <b>Time is the missing variable</b>, so choose the equation without time."},
+      {cat:"equation", type:"mc", ask:"<b>Equation.</b> Which equation leaves time out?", choices:["v² = v₀² + 2aΔx","v = v₀ + at","Δx = v₀t + ½at²","Δx = ½(v₀ + v)t"], answer:0, why:"The no-time equation is <b>v² = v₀² + 2aΔx</b>."},
+      {cat:"algebra", type:"mc", ask:"<b>Algebra.</b> Solve for a:", choices:["a = (v² − v₀²)/(2Δx)","a = (v − v₀)/Δx","a = 2Δx/(v² − v₀²)","a = v²/Δx"], answer:0, why:"Subtract v₀², then divide by 2Δx: <b>a = (v² − v₀²)/(2Δx)</b>."},
+      {cat:"number", type:"num", ask:"<b>Final.</b> Minimum acceleration = ? (m/s²)", answer:6.25, tolerance:0.02, why:"(50² − 0)/(2×200) = 2500/400 = <b>6.25 m/s²</b>."},
+    ]},
+  { key:"std1d-child", due:"2026-10-05", formula:"Reaction, then braking", blurb:"Standard Problems 2 · 1D problem 3. Treat reaction and braking as two separate intervals.",
+    story:"A driver moving at 20 m/s sees a child 40 m ahead. The driver's reaction time is 0.50 s. After reacting, the car brakes with acceleration −10 m/s². Will the car stop before reaching the child?",
+    given:"v₀ = <span class='hl'>20 m/s</span> · child is <span class='hl'>40 m</span> ahead · reaction time = <span class='hl'>0.50 s</span> · braking a = <span class='hl'>−10 m/s²</span>",
+    symbols:["v₀","v","Δx","a","t"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> Why must this be split into two intervals?", choices:["During reaction the speed stays 20 m/s; only afterward does braking begin","The car accelerates during reaction","The child moves during braking","One equation cannot contain meters and seconds"], answer:0, why:"First interval: reaction, with constant speed. Second interval: braking, with acceleration. Mixing them hides the reaction distance."},
+      {cat:"number", type:"num", ask:"<b>Reaction interval.</b> Distance travelled before braking starts = vΔt = ? (m)", answer:10, tolerance:0.1, why:"20 m/s × 0.50 s = <b>10 m</b>. The car now has only 30 m left."},
+      {cat:"equation", type:"mc", ask:"<b>Braking interval.</b> You know v₀, final v = 0, and a; you want distance. Which equation?", choices:["v² = v₀² + 2aΔx","v = v₀ + at","Δx = v₀t + ½at²","Δx = vt"], answer:0, why:"Time is not needed, so use <b>v² = v₀² + 2aΔx</b>."},
+      {cat:"number", type:"num", ask:"<b>Braking interval.</b> Braking distance = ? (m)", answer:20, tolerance:0.2, why:"0 = 20² + 2(−10)Δx, so Δx = <b>20 m</b>."},
+      {cat:"setup", type:"mc", ask:"<b>Conclusion.</b> Does the driver avoid the child?", choices:["Yes; total stopping distance is 30 m, leaving 10 m","No; the car needs 50 m","Yes; braking distance is only 10 m","No; reaction time cannot be included"], answer:0, why:"Reaction distance 10 m + braking distance 20 m = <b>30 m total</b>. The child is 40 m away, so the car stops 10 m short."},
+    ]},
+  { key:"std1d-lake", due:"2026-10-05", formula:"Ball through air and water", blurb:"Standard Problems 2 · 1D problem 4. One trip, two motion models.",
+    story:"A lead ball is dropped from a diving board 5.00 m above a lake. After entering the water, it sinks at a constant speed equal to its impact speed. It reaches the bottom 3.40 s after release. How deep is the lake? Use g = 9.80 m/s².",
+    given:"air drop h = <span class='hl'>5.00 m</span> · total time = <span class='hl'>3.40 s</span> · v₀ in air = <span class='hl'>0</span> · speed in water stays equal to impact speed",
+    symbols:["h","v₀","v","g","t","d"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Setup.</b> Which description is correct?", choices:["Air: accelerated motion; water: constant-speed motion","Both intervals have acceleration g","Both intervals have constant speed","Air is constant speed; water is accelerated"], answer:0, why:"Gravity speeds the ball up in air. The problem then explicitly says its speed in water is constant."},
+      {cat:"equation", type:"mc", ask:"<b>Air time.</b> Starting from rest and falling 5.00 m:", choices:["t_air = √(2h/g)","t_air = h/g","t_air = 2h/g","t_air = √(h/2g)"], answer:0, why:"From h = ½gt², solve to get <b>t = √(2h/g)</b>."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Time in the air = ? (s)", answer:1.01, tolerance:0.02, why:"√(2×5.00/9.80) = <b>1.01 s</b>."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Impact speed, v = gt_air = ? (m/s)", answer:9.90, tolerance:0.1, why:"9.80 × 1.01 ≈ <b>9.90 m/s</b>. That becomes the constant sinking speed."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Time spent underwater = 3.40 − t_air = ? (s)", answer:2.39, tolerance:0.03, why:"3.40 − 1.01 = <b>2.39 s</b>."},
+      {cat:"number", type:"num", ask:"<b>Final.</b> Lake depth = speed × underwater time = ? (m)", answer:23.7, tolerance:0.3, why:"9.90 m/s × 2.39 s = <b>23.7 m</b>. Do not add the 5.00 m air drop; the question asks for the water depth."},
+    ]},
+  { key:"stdproj-building", due:"2026-10-05", formula:"Arrow to a building", blurb:"Projectile Motion Problems · problem 1. The x- and y-motions share one clock.",
+    story:"An archer fires an arrow from 2.00 m above the ground at 100 m/s and 35.0° above horizontal toward a building 900 m away. (a) What maximum height does the arrow reach above the ground? (b) At what height does it reach the building? Ignore air resistance and use g = 9.80 m/s².",
+    given:"v₀ = <span class='hl'>100 m/s</span> · θ = <span class='hl'>35.0°</span> · y₀ = <span class='hl'>2.00 m</span> · building x = <span class='hl'>900 m</span>",
+    symbols:["v₀","θ","x","y","v","g","t"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Components.</b> Which pair is correct?", choices:["v₀ₓ = v₀ cos35° and v₀ᵧ = v₀ sin35°","v₀ₓ = v₀ sin35° and v₀ᵧ = v₀ cos35°","v₀ₓ = v₀ and v₀ᵧ = 0","Both components equal 100 m/s"], answer:0, why:"The angle is measured from horizontal, so horizontal is adjacent → cosine; vertical is opposite → sine."},
+      {cat:"number", type:"num", ask:"<b>Number.</b> Initial vertical component v₀ᵧ = ? (m/s)", answer:57.4, tolerance:0.3, why:"100 sin35° = <b>57.4 m/s</b>."},
+      {cat:"equation", type:"mc", ask:"<b>Maximum height.</b> At the top vᵧ = 0. Which equation avoids time?", choices:["vᵧ² = v₀ᵧ² − 2gΔy","y = y₀ + v₀ᵧt − ½gt²","vᵧ = v₀ᵧ − gt","x = v₀ₓt"], answer:0, why:"You know both vertical velocities and g, and want vertical displacement. Time is missing, so use the no-time equation."},
+      {cat:"number", type:"num", ask:"<b>Part a.</b> Maximum height above the ground = ? (m)", answer:170, tolerance:1.0, why:"Rise = 57.4²/(2×9.80) = 167.9 m. Add the 2.00 m launch height: <b>169.9 m ≈ 170 m</b>."},
+      {cat:"number", type:"num", ask:"<b>Shared clock.</b> Time to reach the building, t = 900/(100 cos35°) = ? (s)", answer:11.0, tolerance:0.1, why:"Horizontal speed is constant: 900/81.9 = <b>11.0 s</b>. Use this same time in the y equation."},
+      {cat:"equation", type:"mc", ask:"<b>Part b equation.</b> Height at the building:", choices:["y = y₀ + v₀ᵧt − ½gt²","y = v₀ₓt","y = y₀ + gt","y = v₀ᵧ²/(2g)"], answer:0, why:"Vertical position after a known time is <b>y = y₀ + v₀ᵧt − ½gt²</b>."},
+      {cat:"number", type:"num", ask:"<b>Part b.</b> Height at the building = ? (m)", answer:40.7, tolerance:0.8, why:"2.00 + 57.4(10.99) − 4.90(10.99²) = <b>40.7 m</b>."},
+    ]},
+  { key:"stdproj-tennis", due:"2026-10-05", formula:"Tennis ball to a wall", blurb:"Projectile Motion Problems · problem 2. Horizontal distance gives the time; time unlocks height.",
+    story:"A tennis ball is hit from 1.00 m above the ground at 50.0 m/s and 10.0° above horizontal. A vertical wall is 10.0 m away. How high above the ground is the ball when it reaches the wall? Ignore air resistance and use g = 9.80 m/s².",
+    given:"y₀ = <span class='hl'>1.00 m</span> · v₀ = <span class='hl'>50.0 m/s</span> · θ = <span class='hl'>10.0°</span> · wall x = <span class='hl'>10.0 m</span>",
+    symbols:["y","v₀","θ","x","g","t"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>First decision.</b> What does the 10.0 m horizontal distance help you find first?", choices:["The time to reach the wall","The final vertical speed","The maximum height","The acceleration"], answer:0, why:"The x-motion has no acceleration, so x = v₀ₓt gives the shared time directly."},
+      {cat:"number", type:"num", ask:"<b>Component.</b> Horizontal speed v₀ₓ = 50 cos10° = ? (m/s)", answer:49.2, tolerance:0.2, why:"50 cos10° = <b>49.2 m/s</b>."},
+      {cat:"number", type:"num", ask:"<b>Shared clock.</b> Time to wall, t = 10/v₀ₓ = ? (s)", answer:0.203, tolerance:0.005, why:"10.0/49.2 = <b>0.203 s</b>."},
+      {cat:"number", type:"num", ask:"<b>Component.</b> Initial vertical speed v₀ᵧ = 50 sin10° = ? (m/s)", answer:8.68, tolerance:0.1, why:"50 sin10° = <b>8.68 m/s</b>."},
+      {cat:"equation", type:"mc", ask:"<b>Height equation.</b> Which equation now uses the known time?", choices:["y = y₀ + v₀ᵧt − ½gt²","x = v₀ₓt","vᵧ² = v₀ᵧ² − 2gΔy","y = v₀t"], answer:0, why:"Now use the shared time in the vertical position equation."},
+      {cat:"number", type:"num", ask:"<b>Final.</b> Height at the wall = ? (m)", answer:2.56, tolerance:0.05, why:"1.00 + 8.68(0.203) − 4.90(0.203²) = <b>2.56 m</b>."},
+    ]},
+  { key:"stdproj-slope", due:"2026-10-05", formula:"Archer on a slope", blurb:"Projectile Motion Problems · challenge 3. Write one equation for the arrow and one for the hillside.",
+    story:"An archer stands on a hillside that slopes 15.0° downward. The arrow starts 1.75 m above the ground and is fired at 50.0 m/s, 20.0° above horizontal. How far down the slope does the arrow land? Ignore air resistance and use g = 9.80 m/s².",
+    given:"slope = <span class='hl'>15.0° downward</span> · launch height = <span class='hl'>1.75 m</span> · v₀ = <span class='hl'>50.0 m/s</span> · launch θ = <span class='hl'>20.0°</span>",
+    symbols:["d","x","y","v₀","θ","g"],
+    steps:[
+      {cat:"setup", type:"mc", ask:"<b>Sketch.</b> Put the launch point at (0,0). Which equation describes the ground below the arrow?", choices:["y_ground = −1.75 − x tan15°","y_ground = 1.75 + x tan15°","y_ground = −x tan20°","y_ground = −1.75"], answer:0, why:"At x = 0, the ground is 1.75 m below the arrow: y = −1.75. As x increases, the downhill ground falls farther: subtract x tan15°."},
+      {cat:"equation", type:"mc", ask:"<b>Arrow path.</b> Eliminate time from projectile motion:", choices:["y_arrow = x tan20° − gx²/(2v₀²cos²20°)","y_arrow = x tan20° − ½gx²","y_arrow = v₀x − gx²","y_arrow = x tan15°"], answer:0, why:"Use t = x/(v₀cosθ) inside y = v₀sinθ·t − ½gt². This gives the standard trajectory equation."},
+      {cat:"algebra", type:"mc", ask:"<b>Landing condition.</b> What must be true when the arrow hits the slope?", choices:["y_arrow = y_ground","y_arrow = 0","vᵧ = 0","x = y"], answer:0, why:"The arrow lands where both equations describe the same point. Set the arrow height equal to the ground height."},
+      {cat:"algebra", type:"mc", ask:"<b>Combined equation.</b> Which quadratic should you solve for horizontal x?", choices:["−[g/(2v₀²cos²20°)]x² + (tan20° + tan15°)x + 1.75 = 0","−gx² + tan20°x − 1.75 = 0","x² + (tan20° − tan15°)x = 0","v₀²cos²20° = gx"], answer:0, why:"Move y_ground to the arrow side. The two uphill-looking angle terms add because the ground slopes downward."},
+      {cat:"number", type:"num", ask:"<b>Quadratic.</b> Choose the positive root. Horizontal distance x = ? (m)", answer:287.4, tolerance:1.0, why:"The roots are about −2.74 m and <b>287.4 m</b>. The negative root is behind the archer, so reject it."},
+      {cat:"number", type:"num", ask:"<b>Final geometry.</b> Distance down the 15° slope is d = x/cos15°. What is d? (m)", answer:297.6, tolerance:1.2, why:"287.4/cos15° = <b>297.6 m</b>. The requested distance is along the slope, not the horizontal x-distance."},
     ]},
 ];
 const STEPCATS = {setup:"Setup", equation:"Equation", algebra:"Algebra", number:"Number+units"};
@@ -1408,6 +1537,15 @@ VIEWS.home = (v) => {
     card0.appendChild(el("button",{class:"btn coral",style:"margin-top:8px",onclick:()=>{ startDrill("pick"); }},"🔑 &nbsp;Which equation? — 2-minute drill"));
     card0.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{ go("map"); }},"🧭 &nbsp;Confused about how this class works? Course Map"));
     v.appendChild(card0);
+    if(t <= "2026-11-04"){
+      const examDays = Math.max(0, Math.ceil((new Date("2026-11-04T12:00:00")-new Date(t+"T12:00:00"))/86400000));
+      const exam = el("div",{class:"card cream"});
+      exam.innerHTML = '<span class="tag coral">Exam runway · '+examDays+' days</span>'+
+        '<h2 style="font-size:1.35rem">Practice test Mon Nov 2 · test Wed Nov 4</h2>'+
+        '<p style="line-height:1.7;margin:6px 0 14px"><b>Scope:</b> Chapters 1–7, ending with energy. <b>Format:</b> six problems × 4 points plus three conceptual questions × 2 points = 30 points. A formula sheet will be provided. Today\'s highest-priority concept is identifying an <b>inertial frame of reference</b>.</p>';
+      exam.appendChild(el("button",{class:"bigbtn",onclick:()=>{ startDrill("newton"); }},"▶ &nbsp;Practice Newton + inertial frames"));
+      v.appendChild(exam);
+    }
     const a0 = accuracy();
     const st0 = el("div",{class:"statrow"});
     st0.innerHTML =
@@ -1624,6 +1762,8 @@ VIEWS.lab = (v) => {
   wrap.appendChild(st);
   const card=el("div",{class:"card"});
   card.innerHTML='<span class="tag">Problem Lab · '+p.formula+'</span>';
+  if (p.story) card.appendChild(el("div",{class:"story"},p.story));
+  card.appendChild(el("div",{class:"givenlabel"},"The same thing in symbols"));
   card.appendChild(el("div",{class:"givenbox"},p.given));
   { const lg=symbolsLegend(p.symbols||autoSymbols(p.given)); if(lg) card.appendChild(lg); }
   if (L.step>=p.steps.length){ // solved
@@ -1747,7 +1887,7 @@ VIEWS.map = (v) => {
   v.appendChild(el("div",{class:"card teal"},
     '<span class="tag gold">The map</span>'+
     '<h2>There IS a structure — it just isn\'t shaped like a reading list</h2>'+
-    '<p style="margin:6px 0 0;opacity:.92">No assigned chapters, no slides, no test until late November. The course runs on <b>four continuous streams + one midterm</b>. Once you see the streams, the confusion goes away.</p>'));
+    '<p style="margin:6px 0 0;opacity:.92">The course runs on <b>four continuous streams + one midterm</b>. The current lecture announcement places the practice test on Nov 2 and the actual test on Nov 4. Once you see the streams and the dates, the confusion goes away.</p>'));
 
   // grade ruler
   const gr = el("div",{class:"card"});
@@ -1782,14 +1922,14 @@ VIEWS.map = (v) => {
   // midterm
   v.appendChild(el("div",{class:"card"},
     '<h3>The midterm — the only test</h3>'+
-    '<p style="line-height:1.7"><b>When:</b> right after Thanksgiving. <b>Scope:</b> linear motion only — kinematics → forces → energy → momentum, stops before rotation. <b>Weight:</b> 30%, no final to recover on, no makeups without documentation.</p>'+
-    '<p class="muted"><b>"Ready for the exam" is not a November project.</b> Everything on it gets taught and drilled week by week between now and then — the exam is the output of the drip. Only blank-page reps count as prep; solution-visible reps don\'t transfer. That\'s what the Problem Lab is for.</p>'));
+    '<p style="line-height:1.7"><b>Practice test:</b> Monday, Nov 2. <b>Actual test:</b> Wednesday, Nov 4. <b>Scope announced Oct 12:</b> Chapters 1–7, ending with energy. <b>Format:</b> six problems worth 4 points each and three conceptual questions worth 2 points each, for 30 points total. Mohsen said a formula sheet will be provided.</p>'+
+    '<p class="muted"><b>Preparation starts now.</b> Use the Problem Lab for blank-page calculations and the Drill for conceptual distinctions such as inertial versus accelerating frames. A formula sheet removes memorization pressure; it does not replace knowing when and why an equation applies.</p>'));
 
   // failure mode
   v.appendChild(el("div",{class:"card",style:"border-color:var(--coral)"},
     '<span class="tag coral">The one thing that kills this grade</span>'+
     '<h3>Weeks 3–6: the silent-drift window</h3>'+
-    '<p style="line-height:1.7">Three months with no test means <b>nothing external tells you you\'re behind until it\'s expensive</b>. The syllabus\'s own words: <i>"It is very easy to fall behind."</i> Your only alarms are MP due dates, lab deadlines, and the journal — treat a missed one as the real alarm, because it\'s the only one you get.</p>'));
+    '<p style="line-height:1.7">The test is now close enough that passive familiarity is risky. <b>Journal exposure is not the same as being able to answer cold.</b> Use each entry to name the concepts, then test them in Drill and solve the calculation problems from a blank page in Problem Lab.</p>'));
 
   // weekly rhythm
   v.appendChild(el("div",{class:"card"},
@@ -1834,7 +1974,8 @@ VIEWS.cheat = (v) => {
     '<tr><td>velocity–time</td><td>acceleration</td><td>displacement</td></tr></table>'));
   v.appendChild(el("div",{class:"card"},
     '<h3>Newton\'s laws</h3>'+
-    '<p style="line-height:1.8"><b>N1:</b> no net force ↔ constant velocity (including zero). <b>N2:</b> F_net = ma — NET force, and a points along F_net, not along v. <b>N3:</b> equal/opposite pairs act on <i>different</i> objects, so they never cancel.</p>'+
+    '<p style="line-height:1.8"><b>N1:</b> in an <b>inertial frame</b>, no net external force ↔ constant velocity (including zero). <b>N2:</b> F_net = ma — NET force, and a points along F_net, not along v. <b>N3:</b> equal/opposite pairs act on <i>different</i> objects, so they never cancel.</p>'+
+    '<p class="muted">Reference-frame check: motion must be stated relative to something. A frame moving at constant velocity is inertial; a frame that speeds up, slows down, or turns is non-inertial.</p>'+
     '<p class="mono center" style="margin:6px 0">W = mg · N = kg·m/s² · g ≈ 9.8 m/s²</p>'+
     '<p class="muted">Mass (kg) is intrinsic; weight (N) is a force. Constant v ⇒ net 0 — engine force just cancels friction.</p>'));
   v.appendChild(el("div",{class:"card"},
