@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.115 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.116 (LOCAL ONLY)
+  v3.116 (2026-10-14): NEXT ACTION + DAILY PULSE + MATCHED EXAMPLES.
+  Bounded local coaching, five daily questions, preserved saved work and plain
+  study modes. Conversion practice and separate task-kind evidence. No forecasts.
   v3.115 (2026-10-12): VISUAL OPTICAL ACTIVITY + SPECIFIC ROTATION.
   Original multi-representation selection problems and separate warm-ups.
   v3.114 (2026-10-12): CHAIR PAIRS + IUPAC NAMES.
@@ -1739,7 +1742,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.115 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.116 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2046,8 +2049,10 @@ const SEMESTER = [ // courseWeek -> topics INTRODUCED that week (app-bank keys o
 ];
 const CHECKPOINTS = [ // fixed, from the verified schedule; quizzes come via S.nextQuiz
   {name:"Exam 1",   date:"2026-09-15", topics:["valence","lewis","isomers","formal","polarity","hybrid","imf","bondline","fgroups","arrows","resonance","acidbase1","acidbase2","lewisab"]}, // v3.60: date CONFIRMED (Gabe 9/9); +fgroups/arrows/lewisab — those banks exist now and Ch 2-3 are in scope
-  {name:"Exam 2",   date:"2026-10-20", topics:null, tentative:true}, // null = cumulative at that date
-  {name:"Exam 3",   date:"2026-11-10", topics:null},
+  {name:"Chapter 5 quiz · A3 lab",date:"2026-10-15",topics:['stereoIntro','chirality','stereoRS','fischer','stereoRelations','stereoSymmetry','stereoOptical','stereoAlkenes','stereoRepresentations']},
+  {name:"Exam 2 · Part A", date:"2026-10-20", topics:null, tentative:false}, // A3; Canvas assignment and Oct 14 section confirmation
+  {name:"Exam 2 · Part B", date:"2026-10-22", topics:null, tentative:false},
+  {name:"Exam 3",   date:"2026-11-12", topics:null}, // current course schedule, checked Oct 12; subject to change
   {name:"Final (comprehensive)", date:"2026-12-15", topics:null},
 ];
 function courseWeek(){ const ms=new Date()-new Date(CLASS_START+"T00:00:00"); return Math.max(0, Math.floor(ms/(7*86400000))+1); }
@@ -5355,7 +5360,7 @@ function render(){ renderNav(); const v=$("#view"); v.innerHTML=""; VIEWS[S.view
   // v3.0: after class starts, the countdown tracks the next graded checkpoint instead
   let txt;
   if (d>0) txt = d+" days to class"; else if (d===0) txt = "CLASS STARTS TODAY";
-  else { const cp=nextCheckpoint(); txt = cp ? (cp.tentative?"Exam 2 · week Oct 19 (tentative)":cp.name+" in "+daysTo(cp.date)+"d") : "semester live"; }
+  else { const cp=nextCheckpoint(); txt = cp ? cp.name+" in "+daysTo(cp.date)+"d"+(cp.tentative?" (tentative)":"") : "semester live"; }
   $("#countdown").textContent = txt; }
 
 /* ================= VIEWS ================= */
@@ -9524,7 +9529,7 @@ const COURSE_UPDATE = {
   modules:'https://smccd.instructure.com/courses/73887/modules',
   homework:'https://smccd.instructure.com/courses/73887/assignments/2086517',
   objectives:'https://smccd.instructure.com/courses/73887/pages/chapter-4-overview-and-learning-objectives',
-  examNote:'Exam 2: week of October 19 on the tentative schedule; exact date and scope need confirmation.',
+  examNote:'Exam 2: Part A October 20 in lab; Part B October 22 in lecture. Published focus: Chapters 4, 5 and some 6, with Chapters 1–3 as background. Dates and scope checked October 12; A3 section confirmed October 14.',
   quizNote:'Gabe supplied Chapter 4 Quiz A: Naming and drawing structures, and Quiz B: Structure and Stability. Quiz B is 10 questions × 2 points, 25 minutes, on paper in lab; preparation covers projection conversions, butane energy, strain, chairs, faces, stability and combustion. The returned Quiz A has ten multiple-choice questions and is available as explicitly familiar review. Other practice is original preparation, not the instructor’s quiz.'
 };
 const CH4_VIDEO_RESOURCES = {
@@ -11801,7 +11806,7 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
  * Derives current routing from immutable attempts; never rewrites old evidence.
  * Fixed quizzes, diagnostics, proof, mastery, and instructor/manual sets are excluded.
  */
-const ADAPTIVE_LEARNING_VERSION=2;
+const ADAPTIVE_LEARNING_VERSION=3;
 function adaptiveLearningEligible(q){
   // These two cards concern course logistics/scope, not chemistry performance.
   return !!q&&q.adaptiveEligible!==false&&!['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);
@@ -11834,8 +11839,11 @@ function adaptiveLearningOutcome(a){
   if(a.feedbackCode==='naming-form')return 'format-repair';
   if(!a.ok)return a.g?'uncertain-miss':'miss';
   if(a.sr||a.drawing?.kind==='freehand-self-review')return 'self-review';
-  if(a.g)return 'guessed-right';
-  if(a.h>0||a.drawing?.clean===false||a.drawing?.firstTry===false||a.drawing?.checks>1)return 'supported-right';
+  if(a.g||['unsure','guess'].includes(a.evidence?.confidence?.value))return 'guessed-right';
+  if(a.h>0||a.hf||a.transfer?.help===true||a.transfer?.phase==='guided'||a.coursePhase==='guided'||a.evidence?.externalHelp?.value===true||a.evidence?.recordedHelp?.used===true||a.drawing?.clean===false||a.drawing?.firstTry===false||a.drawing?.checks>1)return 'supported-right';
+  // Missing hint metadata is unknown, not a zero. "Clean" only means no
+  // recorded help/flags; it cannot establish independence outside this app.
+  if(!Number.isFinite(a.h)||a.h<0)return 'unknown-right';
   return 'clean-right';
 }
 function adaptiveLearningValidAttempt(a,q){
@@ -11872,7 +11880,7 @@ function adaptiveLearningEvidence(pool,attempts,options={}){
     const latest=skill.recent.at(-1);
     if(latest&&['miss','uncertain-miss','learn-first'].includes(latest.outcome))target=Math.max(minimum,Math.min(target,latest.level-1));
     skill.target=target;skill.baseline=minimum;skill.promoted=target>minimum;skill.latest=latest||null;
-    skill.status=latest&&latest.outcome!=='clean-right'?'repair':skill.freshClean>=2?'building':'calibrating';
+    skill.status=latest&& !['clean-right','unknown-right'].includes(latest.outcome)?'repair':skill.freshClean>=2?'building':'calibrating';
     skill.note=skill.granularity==='topic-heuristic'?'Topic-level routing estimate; difficulty is not calibrated.':'Practice routing estimate, not a mastery judgment.';
   });
   return {version:ADAPTIVE_LEARNING_VERSION,skills,seenFamilies:[...seen]};
@@ -11889,7 +11897,7 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   if(scoped.length)candidates=scoped;
   const evidence=adaptiveLearningEvidence(pool,attempts,options),rawLast=options.lastAttempt,rawLastQ=rawLast&&byId.get(rawLast.id);
   const now=options.now||Date.now(),last=rawLastQ&&adaptiveLearningValidAttempt(rawLast,rawLastQ)&&rawLast.ts>=now-30*86400000?rawLast:null,lastQ=last&&rawLastQ,outcome=adaptiveLearningOutcome(last);
-  const repair=!!lastQ&&outcome!=='clean-right'&&outcome!=='calibrate';
+  const repair=!!lastQ&&!['clean-right','calibrate','unknown-right'].includes(outcome);
   const foundation=((options.index||0)+1)%5===0;
   const anchor=repair?adaptiveLearningSkill(lastQ).key:null;
   let working=anchor?candidates.filter(q=>adaptiveLearningSkill(q).key===anchor):candidates;
@@ -11924,13 +11932,13 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   }).sort((a,b)=>a.score-b.score||a.lastPlanned-b.lastPlanned||String(a.q.id).localeCompare(String(b.q.id)));
   const pick=ranked[0],role=repair?(repairFallback?'repair-fallback':foundation?'foundation-repair':'repair'):foundation?(pick.level<pick.skill.target?'foundation-check':'foundation-fallback'):pick.skill.promoted?'challenge':'calibration';
   const levelNames=['recall','foundation','intermediate','challenge'];
-  let reason=repair?(repairFallback?'The same-skill bank has no unused distinct sibling; continue with another in-scope skill and keep the missed skill in review. ':'A recent '+outcome.replace(/-/g,' ')+' needs another question on this skill. '):foundation?(pick.level<pick.skill.target?'A scheduled easier check keeps the foundations active. ':'A foundation check is due; no easier distinct item is available, so this is same-level retrieval. '):pick.skill.promoted?'Distinct, unassisted in-app first answers support trying a harder task. ':'Start at the available authored level to gauge this skill; no improvement is assumed. ';
+  let reason=repair?(repairFallback?'The same-skill bank has no unused distinct sibling; continue with another in-scope skill and keep the missed skill in review. ':'A recent '+outcome.replace(/-/g,' ')+' needs another question on this skill. '):foundation?(pick.level<pick.skill.target?'A scheduled easier check keeps the foundations active. ':'A foundation check is due; no easier distinct item is available, so this is same-level retrieval. '):pick.skill.promoted?'Different in-app first answers with no recorded help support trying a harder task. Outside help may be unknown. ':'Start at the available authored level to gauge this skill; no improvement is assumed. ';
   reason+='Selected '+levelNames[pick.level]+' practice. '+(pick.familySeen?'This is review, not fresh-transfer proof. ':'A new in-app item is not proof that it is unfamiliar outside the app. ')+pick.skill.note;
   if(outcome==='format-repair')reason+='The connectivity was recognized; practise the requested naming format at the same level.';
   if(pick.level!==pick.desired)reason+='The exact target level is unavailable among the remaining distinct items.';
   if(slot)reason+=' '+(slotFallback?'No distinct item remains for '+slot.label+'; using another in-scope task.':'This slot keeps '+slot.label+' in the round.');
   if(rotating&&selections.length)reason+=' '+(alternatives.length?'A different item from the previous round is available.':'This small skill pool needs a repeat; use it as retrieval practice, not new proof.');
-  const summary=repair?(repairFallback?'That skill needs more work. Try another skill while it stays on your review list.':'Practise the step you just missed or needed help with.'):foundation?'Check a basic skill before moving on.':pick.skill.promoted?'You handled different problems without help. Try a harder one.':'Try this problem so we can see what needs practice.';
+  const summary=repair?(repairFallback?'That skill needs more work. Try another skill while it stays on your review list.':'Practise the step you just missed or needed help with.'):foundation?'Check a basic skill before moving on.':pick.skill.promoted?'Your recent answers support trying a harder problem.':'Try this problem so we can see what needs practice.';
   return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role,target:pick.desired,level:pick.level,reason,summary,freshInApp:!pick.familySeen,slot:slot?.label||null,slotFallback}};
 }
 function adaptiveLearningPool(options={}){
@@ -12572,17 +12580,70 @@ CHAPTERS.push({id:'ch5',ico:'🪞',name:'Chapter 5 — Stereochemistry',sub:'Ste
 CHAPTER_LEARNING_UNITS.ch5=CH5_LESSONS;
 QUESTIONS.push(...CH5_QUESTIONS);
 
+// Keep a short teaching sequence even when later modules add full problem banks.
+// A replacement must be explicitly matched to the same decision AND response
+// format. A recognition item must never replace a construction/conversion task.
+const CH5_LESSON_SEEDS=Object.fromEntries(CH5_LESSONS.map(u=>[u.id,{practice:[...u.practiceIds],check:[...u.coldIds]}]));
+const CH5_ROTATION_KEYS={
+  'CH5-F07':'identify-four-different-groups','CH5-F08':'identify-four-different-groups',
+  'CH5-F14':'assign-rs-wedge','CH5-F15':'draw-requested-rs-wedge',
+  'CH5-F20':'assign-rs-fischer','CH5-F21':'fischer-convert-wedge',
+  'CH5-A01':'configuration-not-rotation-sign','CH5-OV02':'configuration-not-rotation-sign',
+  'CH5-A03':'ee-to-composition','CH5-A07':'fischer-pair-relationship',
+  'CH5-C14':'wedge-to-newman','CH5-C18':'chair-flip-drawing','CH5-C22':'rotation-to-ee'
+};
+function ch5LessonSlotKey(q){return q.lessonRotationKey||CH5_ROTATION_KEYS[q.id]||q.id;}
+function ch5LessonSeedIds(u,phase='practice'){return [...(CH5_LESSON_SEEDS[u.id]?.[phase==='check'?'check':'practice']||[])];}
+function ch5LessonSelectionScope(id,phase){return 'ch5-lesson-'+id+'-'+phase;}
+function ch5PreviousLessonSet(id,phase='practice'){
+  const matches=D=>D?.learnReturn?.chapter==='ch5'&&D.learnReturn.unit===id&&D.learnReturn.phase===phase;
+  if(matches(S.drill))return S.drill.queue.map(q=>q.id);
+  if(matches(S.pausedDrill))return [...S.pausedDrill.ids];
+  return [...((S.practiceSelections||[]).filter(x=>x.scope===ch5LessonSelectionScope(id,phase)).at(-1)?.plannedIds||[])];
+}
+function ch5LessonPlan(u,phase='practice',mode='different'){
+  const seeds=ch5LessonSeedIds(u,phase),previous=ch5PreviousLessonSet(u.id,phase),byId=new Map(CH5_QUESTIONS.map(q=>[q.id,q]));
+  if(seeds.some(id=>!byId.has(id)))throw Error('Missing Chapter 5 lesson question');
+  const rows=(S.attempts||[]).filter(a=>!a.qa&&!a.evidence?.actor?.qa&&!a.actor?.qa),attempted=new Set(rows.map(a=>a.id));
+  const selections=(S.practiceSelections||[]).filter(x=>x.scope===ch5LessonSelectionScope(u.id,phase));
+  const planned=new Set(selections.flatMap(x=>x.plannedIds||[]));
+  const finish=(ids,mode,slots=[])=>({ids,mode,slots,previousIds:previous,attemptedCount:ids.filter(id=>attempted.has(id)).length,
+    previousCount:ids.filter(id=>previous.includes(id)).length,previouslyPlannedCount:ids.filter(id=>planned.has(id)).length,
+    changed:!!previous.length&&JSON.stringify(ids)!==JSON.stringify(previous),sameItems:!!previous.length&&ids.length===previous.length&&ids.every(id=>previous.includes(id))});
+  if(mode==='repeat'&&previous.length&&previous.every(id=>byId.has(id)))return finish(previous,'repeat');
+  // A no-hint check has its own authored set. It is never called an unseen test.
+  if(phase==='check')return finish(seeds,'check');
+  const reserved=new Set(CH5_LESSONS.flatMap(x=>x.coldIds||[])),allowed=new Set(u.practiceIds||[]),used=new Set();
+  const lastUsed=id=>Math.max(0,...selections.filter(x=>x.plannedIds?.includes(id)).map(x=>Number(x.ts)||0),...rows.filter(a=>a.id===id).map(a=>Number(a.ts)||0));
+  const slots=seeds.map(seedId=>{
+    const seed=byId.get(seedId),key=ch5LessonSlotKey(seed);
+    const pool=CH5_QUESTIONS.filter(q=>allowed.has(q.id)&&!reserved.has(q.id)&&q.topic===seed.topic&&q.type===seed.type&&!!q.requiresDrawing===!!seed.requiresDrawing&&!!q.preview===!!seed.preview&&ch5LessonSlotKey(q)===key&&q.lessonRotationRole!=='check'&&q.lessonRotationRole!=='challenge');
+    const candidates=pool.filter(q=>!used.has(q.id));
+    candidates.sort((a,b)=>Number(previous.includes(a.id))-Number(previous.includes(b.id))||Number(attempted.has(a.id))-Number(attempted.has(b.id))||Number(planned.has(a.id))-Number(planned.has(b.id))||lastUsed(a.id)-lastUsed(b.id)||Number(b.id===seedId)-Number(a.id===seedId)||a.id.localeCompare(b.id));
+    const pick=candidates[0]||seed;used.add(pick.id);
+    return {seedId,id:pick.id,key,poolSize:pool.length};
+  });
+  return finish(slots.map(x=>x.id),'different',slots);
+}
+function ch5LessonPlanNote(plan){
+  if(plan.mode==='repeat')return 'Same questions, starting again. Your earlier answers and saved work are kept.';
+  if(plan.mode==='check')return plan.attemptedCount?'No hints. '+plan.attemptedCount+' of these questions have recorded attempts; this is a repeat check, not a fresh test.':'No hints. No attempts are recorded for these questions; earlier exposure or outside help may still be unrecorded.';
+  if(plan.sameItems)return 'This skill has a small matching bank, so this set reuses the same questions. It is review, not a fresh test.';
+  if(plan.previousCount)return (plan.ids.length-plan.previousCount)+' different question'+(plan.ids.length-plan.previousCount===1?'':'s')+' from your last set; '+plan.previousCount+' retained to cover the same skills. Repeated questions are review.';
+  return 'Same skills, matched examples. Hints are optional; drawings are self-reviewed.';
+}
+
 function ch5Unit(id){return CH5_LESSONS.find(u=>u.id===id);}
 function ch5IsRun(D){return D?.learnReturn?.chapter==='ch5'||D?.learningAdaptive?.chapter==='ch5';}
 function ch5Attempts(unit){
   const ids=new Set(unit?[...unit.practiceIds,...unit.coldIds]:CH5_QUESTIONS.map(q=>q.id));
-  return (S.attempts||[]).filter(a=>ids.has(a.id));
+  return (S.attempts||[]).filter(a=>ids.has(a.id)&&!a.qa&&!a.evidence?.actor?.qa&&!a.actor?.qa);
 }
 function ch5Signal(unit){
   const rows=ch5Attempts(unit),latest=new Map();rows.forEach(a=>latest.set(a.id,a));
   const values=[...latest.values()],repair=values.some(a=>!a.ok||a.g||a.dk||a.rf);
-  const cold=values.filter(a=>a.c&&!a.sr&&!a.g&&!a.dk&&!a.rf&&!a.h&&a.ok).length;
-  return {rows,seen:latest.size,repair,cold,label:!rows.length?'Not yet assessed':repair?'Revisit a step':cold?'Building independent evidence':'Practice started'};
+  const cold=values.filter(a=>{const q=QUESTIONS.find(q=>q.id===a.id);return a.c&&a.h===0&&!a.sr&&!a.g&&!a.dk&&!a.rf&&!a.hf&&!a.transfer?.help&&!a.evidence?.externalHelp?.value&&!a.evidence?.recordedHelp?.used&&a.drawing?.kind!=='freehand-self-review'&&q?.type!=='written'&&!q?.requiresDrawing&&a.ok;}).length;
+  return {rows,seen:latest.size,repair,cold,label:!rows.length?'Not yet assessed':repair?'Revisit a step':cold?'Correct answers · no app hints recorded':'Practice started'};
 }
 function ch5NextUnit(){
   return CH5_CORE_LESSONS.find(u=>ch5Signal(u).repair)||CH5_CORE_LESSONS.find(u=>!ch5Signal(u).cold)||CH5_CORE_LESSONS[0];
@@ -12591,13 +12652,14 @@ function ch5OpenUnit(id,step=0){
   if(!ch5Unit(id))return;
   courseNavigationSaveWork();S.learnCh='ch5';S.learnUnit=id;S.learnTopic=null;S.ch5LessonStep=step;go('allLearn');
 }
-function startCh5Lesson(id,phase='practice'){
+function startCh5Lesson(id,phase='practice',mode='different'){
   const u=ch5Unit(id);if(!u)return;
-  const cold=phase==='check',ids=cold?u.coldIds:u.practiceIds;
+  const cold=phase==='check',plan=ch5LessonPlan(u,phase,mode),ids=plan.ids;
   const queue=ids.map(id=>QUESTIONS.find(q=>q.id===id));
   if(!queue.length||queue.some(q=>!q))throw Error('Missing Chapter 5 lesson question');
   parkCurrentDrill();S.learnCh='ch5';S.learnUnit=id;
-  S.drill={queue,i:0,right:0,wrong:0,topic:u.topic,answered:false,log:[],runId:makeRunId('ch5-'+phase),scopeName:'Chapter 5 · '+u.title,cold,learnReturn:{chapter:'ch5',unit:id,phase},sketchDrafts:{},reasoningDrafts:{}};
+  S.drill={queue,i:0,right:0,wrong:0,topic:u.topic,answered:false,log:[],runId:makeRunId('ch5-'+phase),scopeName:'Chapter 5 · '+u.title,cold,learnReturn:{chapter:'ch5',unit:id,phase,lessonSet:plan},sketchDrafts:{},reasoningDrafts:{}};
+  S.practiceSelections=[...(S.practiceSelections||[]),{runId:S.drill.runId,scope:ch5LessonSelectionScope(id,phase),ts:Date.now(),plannedIds:[...ids],purpose:'planned-lesson-set-not-performance'}].slice(-30);
   snapshotDrill(0);save();go('drill');
 }
 function startCh5Adaptive(){
@@ -12671,9 +12733,16 @@ function renderCh5Lesson(v,u){
     body.innerHTML='<h2>Follow the worked example</h2>'+u.exampleHtml();
     body.appendChild(ch5Button('Now I’ll try →',()=>{S.ch5LessonStep=2;render();}));
   }else{
-    body.innerHTML='<h2>Read it → draw it → check it</h2><p>Try '+u.practiceIds.length+' tasks with optional hints. Then use '+u.coldIds.length+' different tasks without hints. Use paper or the expandable drawing canvas; extra written notes are optional.</p>';
-    const row=ch5Actions();row.appendChild(ch5Button('Practice · '+u.practiceIds.length+' tasks',()=>startCh5Lesson(u.id),false,{'data-ch5-practice':u.id}));row.appendChild(ch5Button('No-hint check · '+u.coldIds.length+' tasks',()=>startCh5Lesson(u.id,'check'),true,{'data-ch5-check':u.id}));body.appendChild(row);
-    body.appendChild(el('p',{class:'muted'},'A repeat is retrieval practice, not a fresh test. Drawings use honest self-review against the model and rubric.'));
+    const plan=ch5LessonPlan(u),hasPrevious=!!plan.previousIds.length,checkCount=ch5LessonSeedIds(u,'check').length;
+    body.innerHTML='<h2>Your turn</h2><p>'+plan.ids.length+' short practice tasks. Use hints when needed. Draw on paper or in the expandable canvas.</p>';
+    const row=ch5Actions();row.appendChild(ch5Button((hasPrevious?'Different examples':'Start practice')+' · '+plan.ids.length+' tasks',()=>startCh5Lesson(u.id),false,{'data-ch5-practice':u.id}));body.appendChild(row);
+    body.appendChild(el('p',{class:'muted','data-ch5-rotation-note':'true'},ch5LessonPlanNote(plan)));
+    const more=el('details',{class:'ch5-scope'});more.appendChild(el('summary',{},'Check without hints or repeat a set'));
+    const other=ch5Actions();other.appendChild(ch5Button('No-hint check · '+checkCount+' tasks',()=>startCh5Lesson(u.id,'check'),true,{'data-ch5-check':u.id}));
+    if(hasPrevious)other.appendChild(ch5Button('Repeat this set',()=>startCh5Lesson(u.id,'practice','repeat'),true,{'data-ch5-repeat':u.id}));more.appendChild(other);
+    more.appendChild(el('p',{},'The check uses a separate set. A repeated check is review, not a fresh readiness test. Drawings are self-reviewed, not automatically graded.'));body.appendChild(more);
+    const saved=[S.drill,S.pausedDrill,...(S.parkedDrills||[])].find(D=>D?.learnReturn?.chapter==='ch5'&&D.learnReturn.unit===u.id&&(D.i||0)<(D.queue||D.ids||[]).length);
+    if(saved){row.firstElementChild.classList.add('ghost');const resume=ch5Button('Continue my saved set',()=>saved===S.drill?go('drill'):saved===S.pausedDrill?resumeDrill():resumeParkedDrill(saved.runId),false,{'data-ch5-resume':u.id});row.prepend(resume);}
     if(['ch5-symmetry','ch5-relationships'].includes(u.id)&&typeof smStartVisualStereo==='function'){
       body.appendChild(ch5Button('Try a short visual problem set →',()=>smStartVisualStereo(u.id==='ch5-symmetry'?'meso':'pairs'),true,{'data-ch5-visual-set':u.id}));
     }
@@ -12697,11 +12766,13 @@ function renderCh5Result(v,D){
   const u=ch5Unit(D.learnReturn?.unit),rows=D.log||[],manual=rows.filter(a=>a.sr).length,flagged=rows.filter(a=>a.g||a.dk||a.h||a.rf).length;
   const card=el('section',{class:'card ch5-result','data-ch5-result':'true'});
   card.innerHTML='<span class="qp-eyebrow">CHAPTER 5 · '+(D.cold?'NO-HINT CHECK':'PRACTICE')+' COMPLETE</span><h1>'+D.right+' / '+D.queue.length+' tasks marked correct</h1><p>'+manual+' self-reviewed drawing/written tasks · '+flagged+' tasks with hints, uncertainty or review flags. This is practice evidence, not a predicted grade or certified mastery.</p>';
+  if(D.learnReturn?.lessonSet)card.appendChild(el('p',{class:'muted'},ch5LessonPlanNote(D.learnReturn.lessonSet)));
   const actions=ch5Actions();
   if(rows.length)actions.appendChild(ch5Button('Review my answers & explanations',()=>{D.reviewIdx=0;render();},true));
-  if(u&&!D.cold)actions.appendChild(ch5Button('Try different questions without hints →',()=>startCh5Lesson(u.id,'check')));
+  if(u&&!D.cold)actions.appendChild(ch5Button('Check without hints →',()=>startCh5Lesson(u.id,'check')));
   else if(u){const path=u.preview?CH5_EXTRA_LESSONS:CH5_CORE_LESSONS,next=path[path.indexOf(u)+1];actions.appendChild(ch5Button(D.wrong?'Revisit this worked example':next?'Next lesson →':'Chapter 5 overview',()=>D.wrong?ch5OpenUnit(u.id,1):next?ch5OpenUnit(next.id):courseNavigationGo('ch5')));}
   else actions.appendChild(ch5Button('Return to my Chapter 5 path',()=>courseNavigationGo('ch5')));
+  if(u&&!D.cold){const options=el('details',{class:'ch5-scope'});options.appendChild(el('summary',{},'More practice'));const row=ch5Actions();row.appendChild(ch5Button('Different examples',()=>startCh5Lesson(u.id),true,{'data-ch5-result-different':u.id}));row.appendChild(ch5Button('Repeat this set',()=>startCh5Lesson(u.id,'practice','repeat'),true,{'data-ch5-result-repeat':u.id}));options.appendChild(row);card.appendChild(options);}
   actions.appendChild(ch5Button('Chapter 5 lessons',()=>courseNavigationGo('ch5'),true));card.appendChild(actions);v.appendChild(card);
 }
 const CH5_PREVIOUS_VIEWS={learn:VIEWS.learn,allLearn:VIEWS.allLearn,drill:VIEWS.drill,home:VIEWS.home,practice:VIEWS.practice,exam:VIEWS.exam};
@@ -13265,6 +13336,109 @@ if(typeof document!=='undefined'&&!document.getElementById('ch5-optical-visual-s
   const style=document.createElement('style');style.id='ch5-optical-visual-style';
   style.textContent='.ch5-ov-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.ch5-ov-card{border:1px solid var(--border,#ccdadd);border-radius:12px;padding:7px;min-width:0}.ch5-ov-letter{display:block;font-size:1rem}.ch5-ov-diagram{display:block;width:100%;height:auto;max-height:185px;color:var(--text,#193d45)}.ch5-ov-card .ch5-cp-figure{border:0;margin:0;padding:0}.ch5-ov-card .ch5-cp-figure figcaption{font-size:.8rem;font-weight:400}.ch5-ov-single{grid-template-columns:1fr;max-width:480px;margin-left:auto;margin-right:auto}.ch5-ov-single .ch5-ov-diagram{max-height:240px}.ch5-ov-given{font-size:.88rem;line-height:1.4;margin:8px 0}.ch5-ov-note{font-size:.78rem;line-height:1.35;margin:5px 0}@media(max-width:600px){.ch5-ov-grid:not(.ch5-ov-single){grid-template-columns:1fr}.ch5-ov-diagram{max-height:176px}.ch5-ov-single .ch5-ov-diagram{max-height:210px}}';
   document.head.appendChild(style);
+}
+
+/* Original Chapter 5 projection/linked practice · 2026-10-14.
+ * Load after ch5-optical-visual-bank.js. Models preserve configuration, not a
+ * prescribed page orientation. Freehand answers remain explicitly self-reviewed.
+ * Source references establish conventions; these are not copied assigned items.
+ */
+const CH5_TP_SOURCES={fischer:'https://openstax.org/books/organic-chemistry/pages/25-2-representing-carbohydrate-stereochemistry-fischer-projections',cip:'https://openstax.org/books/organic-chemistry/pages/5-5-sequence-rules-for-specifying-configuration'};
+function ch5TPFigure(body,title,width,height,description){return '<figure class="ch5-tp-figure"><figcaption>'+ch5FEscape(title)+'</figcaption><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+ch5FEscape(description)+'"><title>'+ch5FEscape(description)+'</title>'+body+'</svg></figure>';}
+function ch5TPFischer(spec,title='Fischer projection'){
+  const ys=spec.sides.map((_,i)=>82+i*70),bottom=ys.at(-1)+60;
+  let body=ch5FLine([150,38],[150,bottom])+ch5FText(150,27,spec.top)+ch5FText(150,bottom+26,spec.bottom);
+  spec.sides.forEach((side,i)=>{const y=ys[i],left=side==='left'?spec.group:'H',right=side==='right'?spec.group:'H';body+='<g data-tp-fischer-center="'+(i+2)+'" data-group-side="'+side+'">'+ch5FLine([90,y],[210,y])+ch5FText(62,y+6,left)+ch5FText(238,y+6,right)+ch5FText(165,y-12,'C'+(i+2),13)+'</g>';});
+  return ch5TPFigure(body,title,300,bottom+46,'Fischer: top '+spec.top+', bottom '+spec.bottom+'. '+spec.sides.map((s,i)=>'C'+(i+2)+' '+spec.group+' '+s+', H '+(s==='left'?'right':'left')).join('; ')+'.');
+}
+function ch5TPZigzag(spec,kinds,title='One valid zigzag',annotate=true){
+  const pts=Array.from({length:spec.n},(_,i)=>[48+i*58,i%2?110:165]),w=96+(spec.n-1)*58;
+  let body=pts.slice(0,-1).map((p,i)=>ch5FLine(p,pts[i+1])).join('');
+  spec.sides.forEach((_,i)=>{const site=i+1,p=pts[site],dy=site%2?-54:54,kind=kinds[i];body+='<g data-tp-zigzag-center="'+(site+1)+'" data-kind="'+kind+'">'+ch5FBond(p,[p[0],p[1]+dy],kind)+ch5FText(p[0],p[1]+dy+(dy<0?-9:24),spec.group)+'</g>';});
+  pts.forEach((p,i)=>{if(annotate)body+=ch5FText(p[0],p[1]+(i%2?23:-13),'C'+(i+1)+(i>0&&i<=spec.configs.length?' · '+spec.configs[i-1]:''),12);});
+  return ch5TPFigure(body,title,w,255,'Numbered '+spec.n+'-carbon zigzag. '+kinds.map((k,i)=>'C'+(i+2)+' '+spec.group+' '+(k==='wedge'?'toward':'away')+', implicit H opposite').join('; ')+'.');
+}
+function ch5TPNewman(spec,title='One valid staggered Newman · C2 → C3'){
+  const xy=(angle,r)=>[180+Math.cos(angle*Math.PI/180)*r,145+Math.sin(angle*Math.PI/180)*r];
+  let body='<circle cx="180" cy="145" r="29" stroke="currentColor" fill="white" stroke-width="2.5"/>';
+  [['rear',spec.rear,[90,210,330]],['front',spec.front,[-90,30,150]]].forEach(([side,labels,angles])=>labels.forEach((label,i)=>{const a=angles[i],p=xy(a,108);body+='<g data-tp-newman-side="'+side+'" data-angle="'+a+'" data-label="'+ch5FEscape(label)+'">'+ch5FLine(xy(a,side==='front'?0:29),xy(a,76))+ch5FText(p[0],p[1]+6,label,19)+'</g>';}));
+  body+='<circle cx="180" cy="145" r="5" fill="currentColor"/>';
+  return ch5TPFigure(body,title,360,285,'Look C2 to C3: front '+spec.front.join(', ')+', at −90, 30, 150 screen degrees; rear '+spec.rear.join(', ')+', at 90, 210, 330 screen degrees.');
+}
+function ch5TPAlkene(spec,title){
+  // One connected molecule: CH3–CH=CH–CH(Br)–CH3. The right-hand
+  // stereocenter stays above the alkene; flipping the left methyl changes E/Z.
+  const a=[110,155],b=[190,155],c=[270,90],methyl=[340,145],br=[230,30],h=[320,30];
+  const leftUp=spec.ez==='Z',lm=[52,leftUp?105:205],lh=[52,leftUp?205:105];
+  let body=ch5FLine([110,151],[190,151])+ch5FLine([110,159],[190,159]);
+  body+=ch5FLine(a,lm)+ch5FText(lm[0]-13,lm[1]+6,'CH₃',18)+ch5FLine(a,lh)+ch5FText(lh[0]-13,lh[1]+6,'H',18);
+  body+=ch5FLine(b,c)+ch5FLine(b,[230,215])+ch5FText(241,233,'H',18)+ch5FLine(c,methyl)+ch5FText(367,160,'CH₃',18);
+  body+='<g data-tp-center-br="'+spec.brKind+'">'+ch5FBond(c,br,spec.brKind)+'</g>'+ch5FText(215,19,'Br',19)+'<g data-tp-center-h="'+(spec.brKind==='wedge'?'hash':'wedge')+'">'+ch5FBond(c,h,spec.brKind==='wedge'?'hash':'wedge')+'</g>'+ch5FText(335,19,'H',18);
+  body+='<g data-tp-alkene="'+spec.ez+'" data-br-kind="'+spec.brKind+'"></g>';
+  return ch5TPFigure(body,title,410,260,'Connected CH3–CH=CH–CH(Br)–CH3. Left alkene methyl '+(leftUp?'above':'below')+', its H opposite. Right alkene carbon chain above, H below. At the brominated carbon: Br '+(spec.brKind==='wedge'?'toward':'away')+', H opposite.');
+}
+function ch5TPQuestion(n,topic,type,extra){
+  const unit={fischer:'ch5-fischer',stereoRS:'ch5-rs',stereoRepresentations:'ch5-representations',stereoRelations:'ch5-relationships',stereoAlkenes:'ch5-ez'}[topic];
+  return {id:'CH5-TP'+String(n).padStart(2,'0'),chapter:5,courseRoute:'ch5',topic,type,diff:2,difficulty:2,adaptiveSkill:unit,transferFamily:'ch5-transfer-'+n,formatRole:'direct-answer',transferPracticeBank:true,transferPracticeRole:'regular',learningCapability:type==='written'?'conversion':'recognition',source:'Original projection/linked practice, 2026-10-14. Not an instructor question. Conventions: '+CH5_TP_SOURCES.fischer+' ; '+CH5_TP_SOURCES.cip,sourceKind:'original-practice',sourceUrl:CH5_TP_SOURCES.fischer,scopeStatus:'course-objectives',eligibleForUnseenTransfer:true,...extra};
+}
+function ch5TPConversion(n,spec,kinds,options={}){
+  const configs=spec.configs.map((c,i)=>'C'+(i+2)+' '+c).join(', '),rankRows=spec.priority2.map((side,i)=>'<li>C'+(i+2)+': '+spec.group+' first; chain '+side+' second; other chain third; H fourth.</li>').join('');
+  return ch5TPQuestion(n,'fischer','written',{prompt:'Draw a <b>bond-line zigzag</b> for this compound. Use wedges and dashes to preserve every stereocenter.'+ch5TPFischer(spec),requiresDrawing:true,reviewMode:'self-reviewed-paper',answer:configs+'. Same connectivity as the Fischer projection.',model:ch5TPZigzag(spec,kinds)+'<p><b>Check configurations, not the direction of the OH/halogen on the page.</b> '+configs+'. A different zigzag is valid if these configurations and connections match.</p><details><summary>More: why the wedge/dash changes</summary><p>The Fischer horizontals point toward you in that projection. Redrawing the backbone changes the view. Do not copy “horizontal = wedge” onto a new zigzag.</p><ol><li>Rank and assign each Fischer center. H is horizontal, so reverse the apparent 1 → 2 → 3 result.</li><li>Build the zigzag and check the same centers.</li><li>If one center is opposite, reverse its wedge/dash; do not change other centers.</li></ol><ul>'+rankRows+'</ul><p>'+spec.rankNote+'</p><p>In this zigzag the carbon-chain bonds lie in the page. The implicit H is opposite the displayed wedge/dash substituent.</p></details>',rubric:['Same '+spec.n+'-carbon connectivity and '+spec.group+' positions as the Fischer','Every stereocenter is shown with an unambiguous wedge/dash',...spec.configs.map((c,i)=>'C'+(i+2)+' remains '+c),'Rotated drawings and other conformations are accepted if connections and all configurations match'],hints:['Track the carbon numbers from one drawing to the other. The configuration stays the same even when the view changes.','Assign R/S in the Fischer, then use those labels as your check on the zigzag.'],why:'Configuration is the invariant. Saved ink and this rubric are self-reviewed, not automatically graded.',transferFamily:spec.configs.length===1?'ch5-transfer-single-fischer':'ch5-transfer-fischer-'+spec.configs.length,transferPracticeAudit:{kind:'conversion',spec,kinds},...options});
+}
+const ch5TPSpecs={
+  pentane:{n:5,group:'Cl',top:'CH₃',bottom:'CH₂CH₃',sides:['right','right'],priority2:['down','up'],configs:['S','R'],rankNote:'At either center, the route to the other Cl-bearing carbon outranks the terminal alkyl route: [Cl,C,H] beats [C,H,H] or [H,H,H].'},
+  meso:{n:4,group:'Br',top:'CH₃',bottom:'CH₃',sides:['left','left'],priority2:['down','up'],configs:['R','S'],rankNote:'The adjacent Br-bearing carbon outranks CH₃. The identical ends also make this RS form meso; R/S labels alone are not a general meso test.'},
+  triolA:{n:7,group:'OH',top:'CH₃',bottom:'CH₂CH₂CH₃',sides:['right','right','left'],priority2:['down','down','up'],configs:['S','S','S'],rankNote:'At C3 both carbon routes first give [O,C,H]. Continue: the lower route continues through CH₂, while the upper route ends at CH₃. [C,H,H] beats [H,H,H], so the lower route is priority 2. At C2 and C4, the neighboring OH-bearing carbon already wins at [O,C,H].'},
+  triolB:{n:7,group:'OH',top:'CH₃',bottom:'CH₂CH₂CH₃',sides:['left','left','right'],priority2:['down','down','up'],configs:['R','R','R'],rankNote:'At C3, compare beyond the first tied [O,C,H] lists: the route toward the propyl end wins at the next comparison. At C2 and C4, the neighboring OH-bearing carbon outranks the terminal alkyl side.'},
+  singleR:{n:5,group:'Cl',top:'CH₃',bottom:'CH₂CH₂CH₃',sides:['left'],priority2:['down'],configs:['R'],rankNote:'Cl > propyl > methyl > H. Propyl starts [C,H,H]; methyl gives [H,H,H].'},
+  singleS:{n:4,group:'Br',top:'CH₃',bottom:'CH₂CH₃',sides:['right'],priority2:['down'],configs:['S'],rankNote:'Br > ethyl > methyl > H. Ethyl starts [C,H,H]; methyl gives [H,H,H].'}
+};
+function ch5TPLinked(n,spec,kinds,newman,name,active){
+  const config=spec.configs.map((c,i)=>(i+2)+c).join(','),optical=active?'A pure sample of this single stereoisomer is expected to be optically active. Neither the sign nor the numerical rotation follows from R/S.':'This is the meso compound: one achiral stereoisomer, with zero optical rotation. It is not a racemic mixture.';
+  return ch5TPQuestion(n,'stereoRepresentations','written',{learningCapability:'construction',transferFamily:'ch5-transfer-name-newman-'+(active?'asymmetric-pentane':'meso-butane'),prompt:'For <b>('+config+')-'+name+'</b>:<ol type="a"><li>Draw a bond-line structure using wedges and dashes.</li><li>Draw a staggered Newman projection looking <b>C2 → C3</b>.</li><li>State whether a pure sample of this single stereoisomer is expected to be optically active.</li></ol>',requiresDrawing:true,reviewMode:'self-reviewed-paper',answer:'Keep '+config+' in both drawings. '+(active?'Optically active; sign cannot be inferred.':'Meso; optically inactive.'),model:'<div class="ch5-tp-model-grid">'+ch5TPZigzag(spec,kinds)+ch5TPNewman(newman)+'</div><p>'+optical+'</p><details><summary>More: check each requested part</summary><p>At C2 and C3, '+spec.group+' has priority 1, the adjacent halogen-bearing carbon has priority 2, the outer alkyl group has priority 3, and H has priority 4. The dot is C2 and the circle is C3. Rotation around C2–C3 changes the conformation, not either R/S label.</p><p>Compare both drawings with the <em>requested</em> configuration—not only with each other. Two matching drawings can still show the wrong stereoisomer.</p></details>',rubric:['Correct '+name+' connectivity and substituent positions','Bond-line drawing has C2 '+spec.configs[0]+' and C3 '+spec.configs[1],'Newman: C2 front with '+newman.front.join('/'), 'Newman: C3 rear with '+newman.rear.join('/'),'Newman retains C2 '+spec.configs[0]+' and C3 '+spec.configs[1]+' (any staggered rotamer is valid)',active?'Pure single stereoisomer identified as optically active; no invented +/− sign':'Identified as meso and optically inactive, not called a racemate'],hints:['Make a small checklist: correct target → same molecule in Newman → optical activity.','The name specifies absolute configuration. The Newman must preserve it.'],why:'All three parts belong to the same compound. Work is self-reviewed; a completed drawing is not verified readiness evidence.',transferPracticeAudit:{kind:'linked',spec,kinds,newman,active,name}});
+}
+const ch5TPRelations=['Identical compounds','Enantiomers','Diastereomers','Constitutional isomers'];
+function ch5TPRelationship(n,a,b,relation,why){
+  return ch5TPQuestion(n,'stereoRelations','mc',{prompt:'What is the relationship between <b>A and B</b>?'+ '<div class="ch5-tp-model-grid">'+ch5TPAlkene(a,'A')+ch5TPAlkene(b,'B')+'</div>',choices:ch5TPRelations.slice(),answer:ch5TPRelations.indexOf(relation),learningCapability:'recognition',transferFamily:'ch5-transfer-ez-and-rs',hints:['Compare connections, then every stereogenic element: the double bond as well as the tetrahedral center.'],why,transferPracticeAudit:{kind:'relationship',a,b,relationship:relation}});
+}
+const CH5_TRANSFER_PRACTICE_QUESTIONS=[
+  ch5TPQuestion(1,'fischer','text',{diff:1,difficulty:1,formatRole:'foundation',transferPracticeRole:'warm-up',prompt:'Assign <b>R or S at C2 only</b> in this Fischer projection.'+ch5TPFischer(ch5TPSpecs.pentane),answer:'S',accept:['S','(S)'],why:'At C2: Cl 1, lower carbon chain 2, CH₃ 3, H 4. The apparent path is clockwise, but horizontal H points toward you. Reverse it: S.',transferPracticeAudit:{kind:'fischer-one',spec:ch5TPSpecs.pentane,center:2}}),
+  ch5TPQuestion(2,'stereoRS','mc',{diff:1,difficulty:1,formatRole:'foundation',transferPracticeRole:'warm-up',prompt:'At a stereocenter, compare <b>–CH₂CH₂CH₃</b> with <b>–CH₂CH₃</b>. Which has higher CIP priority?',choices:['–CH₂CH₂CH₃','–CH₂CH₃','They tie because both start CH₂'],answer:0,why:'Both attached carbons give [C,H,H], so go one bond farther. Propyl continues to CH₂: [C,H,H]. Ethyl ends at CH₃: [H,H,H]. Carbon beats hydrogen at that first difference.'}),
+  ch5TPQuestion(3,'stereoRepresentations','mc',{diff:1,difficulty:1,formatRole:'foundation',transferPracticeRole:'warm-up',prompt:'You redraw a Fischer projection as a zigzag. What must stay the same?',choices:['The left/right position of each label on the page','Every original horizontal bond must be a wedge in the zigzag','The connections and each stereocenter’s R/S configuration'],answer:2,why:'A new view can change wedge/dash appearance and page position. Preserve connectivity and the configuration of each corresponding atom.'}),
+  ch5TPQuestion(4,'stereoAlkenes','mc',{diff:1,difficulty:1,formatRole:'foundation',transferPracticeRole:'warm-up',prompt:'A molecule contains one <b>R/S center</b> and one <b>E/Z double bond</b>. What happens in its mirror image?',choices:['R/S inverts; E/Z stays the same','Both R/S and E/Z invert','E/Z inverts; R/S stays the same'],answer:0,why:'Reflection reverses the handed tetrahedral center. The high-priority alkene groups remain on the same or opposite sides relative to each other, so E/Z is unchanged.'}),
+  ch5TPConversion(5,ch5TPSpecs.pentane,['hash','wedge']),
+  ch5TPConversion(6,ch5TPSpecs.meso,['wedge','hash']),
+  ch5TPConversion(7,ch5TPSpecs.triolA,['hash','wedge','wedge']),
+  ch5TPConversion(8,ch5TPSpecs.triolB,['wedge','hash','hash']),
+  ch5TPLinked(9,ch5TPSpecs.meso,['wedge','hash'],{front:['CH₃','H','Br'],rear:['CH₃','H','Br']},'2,3-dibromobutane',false),
+  ch5TPLinked(10,{...ch5TPSpecs.pentane,sides:['left','right'],configs:['R','R']},['wedge','wedge'],{front:['CH₃','H','Cl'],rear:['CH₂CH₃','Cl','H']},'2,3-dichloropentane',true),
+  ch5TPRelationship(11,{ez:'E',brKind:'wedge',rs:'S'},{ez:'Z',brKind:'hash',rs:'R'},'Diastereomers','Both drawings have the same connections. A has E and S; B has Z and R. A true mirror image would reverse S → R but keep E. Because E/Z changes too, these are diastereomers.'),
+  ch5TPRelationship(12,{ez:'Z',brKind:'wedge',rs:'S'},{ez:'Z',brKind:'hash',rs:'R'},'Enantiomers','The double bond stays Z and the only tetrahedral stereocenter changes S → R. Same connections, opposite configuration, no meso symmetry: these are enantiomers.'),
+  ch5TPConversion(13,ch5TPSpecs.singleR,['wedge'],{diff:3,difficulty:3,lessonRotationKey:'fischer-convert-wedge',lessonRotationRole:'practice',dailyPulseEligible:true}),
+  ch5TPConversion(14,ch5TPSpecs.singleS,['hash'],{diff:3,difficulty:3,lessonRotationKey:'fischer-convert-wedge',lessonRotationRole:'practice',dailyPulseEligible:true})
+];
+for(const q of CH5_TRANSFER_PRACTICE_QUESTIONS){
+  if(!QUESTIONS.some(old=>old.id===q.id))QUESTIONS.push(q);
+  if(!CH5_QUESTIONS.some(old=>old.id===q.id))CH5_QUESTIONS.push(q);
+  const lesson=CH5_LESSONS.find(u=>u.id===q.adaptiveSkill);
+  if(lesson&&!lesson.practiceIds.includes(q.id))lesson.practiceIds.push(q.id);
+}
+function smStartTransferPractice(kind='mixed'){
+  const warm=kind==='warmup',pool=CH5_TRANSFER_PRACTICE_QUESTIONS.filter(q=>warm?q.transferPracticeRole==='warm-up':q.transferPracticeRole==='regular'&&(kind==='mixed'||kind==='convert'&&q.transferPracticeAudit?.kind==='conversion'||kind==='linked'&&q.transferPracticeAudit?.kind==='linked'));
+  if(startAdaptiveLearning({chapter:'ch5',poolIds:pool.map(q=>q.id),total:warm?3:Math.min(3,pool.length),rotationKey:'ch5-transfer-practice-'+kind,label:warm?'Conversion warm-up · one decision':'Chapter 5 · Convert & connect'}))smTagRun('practice',warm?'warmup':'conversion-linked','ch5');
+}
+function smTransferPracticeCard(){
+  const card=el('section',{class:'card sm-panel','data-transfer-practice':true});
+  card.innerHTML='<h2>Convert &amp; connect</h2><p>Fischer → zigzag, Newman drawings, and whole-molecule comparisons. Up to 3 complete problems per round.</p><p class="muted">10 original practice problems. Drawings are self-reviewed against a model—not automatically graded.</p>';
+  card.appendChild(smButton('Start 3 problems',()=>smStartTransferPractice(),{class:'btn','data-start-transfer-practice':true}));
+  const more=el('details');more.appendChild(el('summary',{},'Choose a focus or warm up first'));
+  more.appendChild(smButton('Fischer → zigzag',()=>smStartTransferPractice('convert')));
+  more.appendChild(smButton('Linked drawing problems',()=>smStartTransferPractice('linked')));
+  more.appendChild(smButton('3 quick warm-up questions',()=>smStartTransferPractice('warmup'),{'data-transfer-warmup':true}));card.appendChild(more);return card;
+}
+if(typeof document!=='undefined'){
+  const style=document.createElement('style');style.id='ch5-transfer-practice-style';
+  style.textContent='.ch5-tp-figure{margin:10px 0;padding:8px;border:1px solid var(--border);border-radius:12px;min-width:0}.ch5-tp-figure figcaption{font-size:.84rem;font-weight:700}.ch5-tp-figure svg{display:block;width:100%;height:auto;max-height:300px;color:var(--text,#193d45)}.ch5-tp-model-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ch5-tp-figure text{font-family:system-ui,sans-serif}@media(max-width:650px){.ch5-tp-model-grid{grid-template-columns:1fr}.ch5-tp-figure svg{max-height:270px}}';document.head.appendChild(style);
 }
 
 /* BEGIN ARROW LAB (resonance you draw), 2026-10-02 */
@@ -15190,7 +15364,8 @@ function focusPlan(now=todayStr()){
   const exam=upcoming.find(c=>/Exam 2/.test(c.name))||upcoming[0];
   let anchor=exam&&focusDate(exam.date);
   if(anchor&&exam.tentative)anchor=focusOffset(anchor,-((anchor.getDay()+6)%7));
-  const quiz=S.nextQuiz,quizDate=quiz&&!quiz.cancelled&&focusDate(quiz.date)>=today?focusDate(quiz.date):null;
+  const savedQuiz=S.nextQuiz,defaultQuiz={name:'Chapter 5 quiz · A3 lab',date:'2026-10-15',topics:['stereoIntro','chirality','stereoRS','fischer','stereoRelations','stereoSymmetry','stereoOptical','stereoAlkenes','stereoRepresentations']};
+  const quiz=savedQuiz&&!savedQuiz.cancelled&&focusDate(savedQuiz.date)>=today?savedQuiz:focusDate(defaultQuiz.date)>=today?defaultQuiz:null,quizDate=quiz?focusDate(quiz.date):null;
   return {exam,anchor,examTarget:anchor&&focusOffset(anchor,-14),quiz:quizDate?quiz:null,quizDate,quizTarget:quizDate&&focusOffset(quizDate,-3)};
 }
 function focusNextAction(){
@@ -15242,18 +15417,18 @@ VIEWS.prepPlan=v=>{
   const p=focusPlan(),c=el('article',{class:'card focus-plan','data-focus-plan-view':'true'});
   v.appendChild(etBtn('← Study desk',()=>go('home'),true));
   c.innerHTML='<h1>Get ready early</h1><p>Learn now. Test without help. Fix misses. Check again later.</p>';
-  const exam=el('section');exam.innerHTML='<h2>Exam</h2>'+(p.exam?'<p>'+esc(p.exam.name)+': '+(p.exam.tentative?'week of ':'')+focusDateLabel(p.anchor)+(p.exam.tentative?' · tentative':'')+'</p><p><b>First full no-hint practice goal: '+focusDateLabel(p.examTarget)+'.</b> That leaves two weeks for repair.</p>':'<p>No upcoming exam date is set.</p>')+'<p>Exact exam date and scope still need confirmation. This is a prep target, not a claim that you’re ready.</p>';
+  const exam=el('section');exam.innerHTML='<h2>Exam</h2>'+(p.exam?'<p>'+esc(p.exam.name)+': '+(p.exam.tentative?'week of ':'')+focusDateLabel(p.anchor)+(p.exam.tentative?' · tentative':'')+'</p><p><b>Early practice target: '+focusDateLabel(p.examTarget)+'.</b> If that date has passed, start a check now.</p>':'<p>No upcoming exam date is set.</p>')+'<p>Preparation targets are not readiness grades. The app does not yet cover all Chapter 6 exam work.</p>';
   exam.appendChild(etBtn('Learn Chapter 5',()=>courseNavigationGo('ch5'),true));exam.appendChild(etBtn('Check Chapter 5 skills',startCh5Coverage,true));exam.appendChild(etBtn('Review Chapter 4 skills',startQuizCoverage,true));
-  const sources=focusDetails('What is confirmed?','<p>Checked October 7: Ciesla’s October 4 announcement places class in Chapter 5 this week. No Exam 2 topic list was found in the published modules or announcements.</p><p>The live schedule places Exam 2 in the week of October 19 and lists Chapters 4–7 between Exams 1 and 2. That is planned teaching order, not confirmed exam coverage. Its pacing is ahead of the current announcement, so the date stays tentative here.</p><p><a href="https://docs.google.com/spreadsheets/d/1jwWTZWfLK17B4Uf-AiADdKV9QEB8cANrf-UP20bAGnc/edit?gid=0#gid=0" target="_blank" rel="noopener">Course schedule</a> · <a href="https://smccd.instructure.com/courses/73887/discussion_topics/1365021" target="_blank" rel="noopener">Current-week announcement</a> · <a href="https://smccd.instructure.com/courses/73887/modules" target="_blank" rel="noopener">Course modules</a></p>');exam.appendChild(sources);c.appendChild(exam);
+  const sources=focusDetails('What is confirmed?','<p>Canvas checked October 12; Gabe confirmed A3 October 14. Chapter 5 quiz: Thursday October 15 in A3 lab, 10 questions in 40 minutes. The newer section announcement says lab; the older assignment text says lecture.</p><p>Exam 2 Part A: Tuesday October 20 in lab, 40 multiple-choice questions in 80 minutes. Part B: Thursday October 22 in lecture, 75 minutes, choose 2 of 3 problems. Focus: Chapters 4, 5 and some 6; Chapters 1–3 remain background.</p><p><a href="https://smccd.instructure.com/courses/73887/discussion_topics/1367360" target="_blank" rel="noopener">Quiz announcement</a> · <a href="https://smccd.instructure.com/courses/73887/assignments/2086546" target="_blank" rel="noopener">Exam Part A</a> · <a href="https://smccd.instructure.com/courses/73887/assignments/2086571" target="_blank" rel="noopener">Exam Part B</a> · <a href="https://smccd.instructure.com/courses/73887/modules/items/5586779" target="_blank" rel="noopener">Published exam scope</a></p><p>These are saved dates, not a live Canvas feed. Check announcements for changes.</p>');exam.appendChild(sources);c.appendChild(exam);
   const quiz=el('section');quiz.innerHTML='<h2>Quiz</h2>'+(p.quizDate?'<p>'+esc(p.quiz.name||'Next quiz')+' · '+focusDateLabel(p.quizDate)+'</p><p>First no-hint practice goal: <b>'+focusDateLabel(p.quizTarget)+'</b>.</p>':'<p>No upcoming quiz date confirmed. Keep practising now.</p>');
   const form=el('form');form.innerHTML='<label>Quiz name<input name="quizName" class="answerbox wide" maxlength="80" aria-label="Quiz name"></label><label>Quiz date<input name="quizDate" class="answerbox" type="date" required aria-label="Quiz date"></label>';
   form.elements.quizName.value=p.quiz?.name||'';form.elements.quizDate.value=p.quiz?.date||'';form.elements.quizDate.min=todayStr();
   form.appendChild(el('button',{class:'btn ghost',type:'submit'},'Save quiz date'));const status=el('p',{role:'status'});form.appendChild(status);
-  form.addEventListener('submit',e=>{e.preventDefault();const date=form.elements.quizDate.value;if(!focusDate(date)||date<todayStr()){status.textContent='Use today or a future date.';return;}S.nextQuiz={...(S.nextQuiz||{}),name:form.elements.quizName.value.trim()||'Next quiz',date,cancelled:false,topics:S.nextQuiz?.topics||[]};save();render();});quiz.appendChild(focusDetails('Set or update quiz date',form));c.appendChild(quiz);
+  form.addEventListener('submit',e=>{e.preventDefault();const date=form.elements.quizDate.value;if(!focusDate(date)||date<todayStr()){status.textContent='Use today or a future date.';return;}S.nextQuiz={...(p.quiz||{}),name:form.elements.quizName.value.trim()||'Next quiz',date,cancelled:false,topics:p.quiz?.topics||[],setAt:new Date().toISOString()};save();render();});quiz.appendChild(focusDetails('Set or update quiz date',form));c.appendChild(quiz);
   const evidence=el('section');evidence.innerHTML='<h2>What still needs checking?</h2><p>These are practice signals—not a predicted grade.</p>';
   const rows=quizCoverageEvidence(),fresh=rows.filter(r=>r.fresh>0||r.fresh===true).length;
   evidence.appendChild(el('p',{},'Chapter 4: '+fresh+' / '+rows.length+' skills have a recent correct, first-recorded no-hint answer.'));
-  renderQuizCoverage(evidence);evidence.appendChild(el('p',{},'Drawings still need checking. Repeat the skills later without notes. The full exam topic list is not yet confirmed.'));c.appendChild(evidence);
+  renderQuizCoverage(evidence);evidence.appendChild(el('p',{},'Drawings still need checking. Repeat the skills later without notes, and use the published exam scope for work not yet in the app.'));c.appendChild(evidence);
   const rationale=focusDetails('How the plan works','<p>Two weeks before an exam and three days before a quiz are starting prep goals, not proven ideal intervals for you. A missed goal means start checking now—not wait for the next date. Use the instructor’s confirmed scope for full practice.</p><p>The repair route checks again after 1, 3, then 7 days. A wrong or helped answer sends you back to the missed step. Time spent never raises your score.</p>');c.appendChild(rationale);
   const timing=focusDetails('Lesson time · this device only');
   const enabled=el('input',{type:'checkbox','aria-label':'Record lesson viewing time'});enabled.checked=safeStore.get('lessonTimeEnabled',true);enabled.addEventListener('change',()=>{focusVisitSave(true);focusVisit=null;safeStore.set('lessonTimeEnabled',enabled.checked);});
@@ -15404,7 +15579,7 @@ const wsStyle=el('style');wsStyle.textContent=`
  * attempt payload. Worksheet work and lesson exposure stay device-local.
  * No new cloud reads, credentials, health fields, or inferred mental causes.
  */
-const LE_EVIDENCE_VERSION='2026-10-07.2';
+const LE_EVIDENCE_VERSION='2026-10-14.1';
 const LE_SCHEMA='chem231-learning-evidence';
 function leClone(value){return value===undefined?null:JSON.parse(JSON.stringify(value));}
 function lePick(value,keys){const out={};keys.forEach(k=>{if(value&&Object.prototype.hasOwnProperty.call(value,k))out[k]=leClone(value[k]);});return out;}
@@ -15421,6 +15596,7 @@ function leFingerprint(value){
 function leActor(){return {profile:typeof PROFILE==='string'?PROFILE:null,role:typeof P!=='undefined'?P.role:null,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};}
 function leQuestionMetadata(q){
   return {id:q.id,revision:q.correctedAt||null,responseFormat:q.type||'unspecified',topic:q.topic||null,source:q.source||null,
+    capability:q.learningCapability||(typeof tpCapability==='function'?tpCapability(q):null),capabilityProvenance:q.learningCapability?'authored':'task-format classification, not demonstrated ability',
     itemFingerprint:leFingerprint(lePick(q,['id','type','prompt','template','choices','choiceLabels','selectAll','fields','production','arrowBoard','resonanceBoard'])),
     keyFingerprint:leFingerprint(lePick(q,['answer','answers','accept','fields','model','rubric','production','arrowBoard','resonanceBoard'])),
     fingerprintPurpose:'Change detection only; not a cryptographic integrity check.',
@@ -15555,6 +15731,7 @@ function leBuildExport(){
       chapterChecks:'Current device/profile only; starting and final chapter samples with sealed first submissions, revisions, confidence, coverage limits and separately self-reviewed drawings. Not an exam prediction or a mastery award.',
       lessonChecks:'Current device/profile only; immediate checks after teaching. First responses, supported retries and skips stay separate; no readiness credit.',
       resourceEngagement:'Current device/profile only; resource clicks are not viewing. Optional player measurements describe observed playback, never understanding.',
+      dailyCoach:'Current device/profile only; daily selection plans are not performance. Submitted answers and self-reviewed drawings remain separate.',
       fieldSelection:'Explicit learning-data field allowlist. Account credentials and separate sensitive data sources are not read.',
       crossAssistantDelivery:'Download must be supplied to the shared Signals/exports folder or the reviewing assistant. No automatic delivery.'},
     summary:leSummary(attempts,worksheets,lessons),attempts,
@@ -15566,6 +15743,7 @@ function leBuildExport(){
     chapterChecks:typeof ccExport==='function'?ccExport():null,
     lessonChecks:typeof lcExport==='function'?lcExport():null,
     resourceEngagement:typeof leEngagementExport==='function'?leEngagementExport():null,
+    dailyCoach:typeof dcExport==='function'?dcExport():null,
     retentionAndMissingness:{attemptCap:5000,writtenNoteCap:120,lessonVisitCap:400,olderMissingFields:'Not captured or unknown; never fill with zero, confident, independent, or no study.'}};
 }
 function leDownload(){
@@ -15730,7 +15908,7 @@ function smSelectChapter(host){
   const label=el('label',{class:'sm-scope'});label.appendChild(el('span',{},'Your focus'));
   const select=el('select',{'aria-label':'Study chapter'});
   CHAPTERS.forEach(ch=>{const option=el('option',{value:ch.id},esc(ch.name));option.selected=ch.id===smChapter().id;select.appendChild(option);});
-  select.onchange=()=>{courseNavigationSaveWork();smSetChapter(select.value);S.learnCh=select.value;render();};label.appendChild(select);host.appendChild(label);
+  select.onchange=()=>{courseNavigationSaveWork();smSetChapter(select.value);if(typeof dcChooseFocus==='function')dcChooseFocus(select.value);S.learnCh=select.value;render();};label.appendChild(select);host.appendChild(label);
 }
 function smHeading(v,mode){
   const m=STUDY_MODES[mode],h=el('header',{class:'sm-heading'});
@@ -15834,12 +16012,19 @@ VIEWS.modePractice=v=>{
   if(pool.length){const select=el('select',{'aria-label':'Warm-up skill'});select.appendChild(el('option',{value:''},'Mix of foundation skills'));topics.forEach(t=>select.appendChild(el('option',{value:t},esc(TOPICS[t]?.name||t))));warm.appendChild(select);warm.appendChild(smButton('Start warm-up',()=>smStartWarmup(select.value),{'data-study-warmup':true}));}
   else warm.appendChild(el('p',{},'Use a Learn lesson for a small first attempt. No short-question bank is available here yet.'));
   v.appendChild(warm);
-  if(smChapter().id==='ch5'&&typeof CH5_OPTICAL_VISUAL_QUESTIONS!=='undefined')v.appendChild(smOpticalVisualCard());
-  if(smChapter().id==='ch5'&&typeof CH5_CHAIR_PAIR_QUESTIONS!=='undefined')v.appendChild(smChairPairCard());
-  if(smChapter().id==='ch5'&&typeof CH5_VISUAL_STEREO_QUESTIONS!=='undefined')v.appendChild(smVisualStereoCard());
   const h=el('header',{class:'sm-section-title'});h.innerHTML='<h2>Regular problems</h2><p>Class worksheet wording and linked parts stay together. No extra explanation is required unless the original problem asks for it.</p>';v.appendChild(h);
   const sheets=WS_SHEETS.filter(s=>s.chapter===smChapter().id),grid=el('div',{class:'sm-grid sm-sheets'});sheets.forEach(s=>grid.appendChild(smWorksheetCard(s)));v.appendChild(grid);
   if(!sheets.length)v.appendChild(el('p',{class:'card'},'No original worksheet is loaded for this chapter yet. Isolated practice is available above; it is not a replacement for a full paper problem.'));
+  if(smChapter().id==='ch5'){
+    const skills=el('details',{class:'card sm-panel','data-study-skill-banks':true});
+    skills.appendChild(el('summary',{},'Practice by skill · original app problems'));
+    skills.appendChild(el('p',{},'Choose a skill for different examples. These are original problems modeled on class tasks, not copies of your assigned worksheets.'));
+    if(typeof smTransferPracticeCard==='function')skills.appendChild(smTransferPracticeCard());
+    if(typeof CH5_VISUAL_STEREO_QUESTIONS!=='undefined')skills.appendChild(smVisualStereoCard());
+    if(typeof CH5_CHAIR_PAIR_QUESTIONS!=='undefined')skills.appendChild(smChairPairCard());
+    if(typeof CH5_OPTICAL_VISUAL_QUESTIONS!=='undefined')skills.appendChild(smOpticalVisualCard());
+    v.appendChild(skills);
+  }
   const more=el('details',{class:'card sm-panel'});more.appendChild(el('summary',{},'More practice & older rounds'));
   more.appendChild(smButton('All class worksheets',()=>{courseNavigationSaveWork();go('worksheets');}));
   more.appendChild(smButton('More isolated skill practice',()=>{const ch=smChapter();courseNavigationSaveWork();S.learnCh=ch.id;if(['ch4','ch5'].includes(ch.id))go('practice');else startAdaptiveLearning({chapter:ch.id,total:6,label:ch.name+' · isolated skill practice'});}));
@@ -17017,7 +17202,20 @@ function tpSummarize(attempts,questions,chapters,now=Date.now()){
     return {id:ch.id,topics,n,correct,percent:n?Math.round(100*correct/n):null,covered:topics.filter(t=>t.n).length,total:topics.length,attempted:topics.reduce((sum,t)=>sum+t.attempted,0),latestAt:Math.max(0,...topics.map(t=>t.latestAt||0))||null};
   })};
 }
-if(typeof module!=='undefined'&&module.exports)module.exports={tpSummarize,tpIsQA};
+function tpCapability(q){
+  if(['recognition','response','construction','conversion'].includes(q.learningCapability))return q.learningCapability;
+  if(['CH5-F21','CH5-F24','CH5-C14','CH5-C16','CH5-C18','CH5-C20'].includes(q.id))return 'conversion';
+  if(q.type==='written'||q.requiresDrawing||q.type==='ch4production')return 'construction';
+  return ['mc','multiSelect','tf'].includes(q.type)?'recognition':'response';
+}
+function tpCapabilities(attempts,questions,topic,now=Date.now()){
+  const labels={recognition:'Recognize or choose',response:'Write or calculate',construction:'Draw a structure',conversion:'Change drawing style'};
+  const bank=questions.filter(q=>q.topic===topic).map(q=>({...q,topic:tpCapability(q)}));
+  const ids=new Set(bank.map(q=>q.id));
+  const data=tpSummarize((attempts||[]).filter(a=>ids.has(a.id)),bank,[{id:'capabilities',topics:Object.keys(labels)}],now);
+  return Object.values(data.topics).map(t=>({...t,label:labels[t.id]})).filter(t=>t.available||t.attempted);
+}
+if(typeof module!=='undefined'&&module.exports)module.exports={tpSummarize,tpIsQA,tpCapability,tpCapabilities};
 if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   function tpText(tag,attrs,text){const node=el(tag,attrs);node.textContent=text;return node;}
   function tpDate(ts){return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'America/Los_Angeles'});}
@@ -17077,6 +17275,13 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
       if(t.n)left.appendChild(tpText('p',{class:'tp-date'},(t.firstAt===t.latestAt?'Checked '+tpDate(t.latestAt):tpDate(t.firstAt)+' – '+tpDate(t.latestAt))+' · '+t.repeated+' repeated question'+(t.repeated===1?'':'s')+' in this sample'));
       const separated=[];if(t.helped)separated.push(t.helped+' with help, review flags, or rechecks');if(t.guessed)separated.push(t.guessed+' guessed');if(t.selfReviewed)separated.push(t.selfReviewed+' self-reviewed');if(t.unknown)separated.push(t.unknown+' not assessable');if(t.older)separated.push(t.older+' older than 30 days');
       if(separated.length)left.appendChild(tpText('p',{class:'tp-separate'},'Outside this bar: '+separated.join(' · ')+'. Counts can overlap.'));
+      const skills=tpCapabilities(S.attempts||[],QUESTIONS,t.id);
+      if(skills.length>1){
+        const detail=el('details',{'data-tp-capabilities':t.id});detail.appendChild(tpText('summary',{},'Which kind of task?'));
+        detail.appendChild(tpText('p',{class:'tp-separate'},'Choosing an answer and drawing it are different checks. Self-reviewed drawings do not raise the accuracy bar.'));
+        skills.forEach(skill=>detail.appendChild(tpText('p',{class:'tp-separate'},skill.label+': '+(skill.n?skill.correct+' / '+skill.n+' scored answers correct':'No recent eligible scored answers')+(skill.selfReviewed?' · '+skill.selfReviewed+' self-reviewed drawing'+(skill.selfReviewed===1?'':'s'):'')+'.')));
+        left.appendChild(detail);
+      }
       if(!t.available)left.appendChild(tpText('p',{class:'tp-separate'},'No current practice bank is available for this topic.'));
       card.appendChild(left);card.appendChild(smButton('Learn this topic →',()=>tpLearn(selected.id,t.id),{'data-tp-learn':t.id,'aria-label':'Learn '+title}));topics.appendChild(card);
     });page.appendChild(topics);
@@ -17099,6 +17304,290 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     @media(max-width:800px){.tp-chapters{grid-template-columns:repeat(2,minmax(0,1fr))}.tp-topic{gap:16px}}
     @media(max-width:520px){.tp-chapters{grid-template-columns:1fr}.tp-chapter{padding:14px}.tp-chapter h3{min-height:0}.tp-topic{grid-template-columns:1fr;padding:14px;gap:10px}.tp-topic .btn{justify-self:start}.tp-method{padding:10px 12px}.tp-page h2{font-size:1.08rem}.tp-score{font-size:1.5rem}}
     @media(prefers-reduced-motion:reduce){.tp-page *,.tp-entry{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+  `;document.head.appendChild(style);
+}
+
+/* Local, transparent study routing. A suggestion is not a diagnosis or a grade.
+ * Daily Pulse is device/profile-local; its answers use the existing attempt log.
+ * Load after study-modes-ui.js and topic-progress-ui.js. No network or AI calls. */
+const DC_VERSION=1,DC_STORE='dailyStudyCoachV1';
+const DC_ASSESSMENTS=[
+  {id:'ch5-a3-quiz',date:'2026-10-15',title:'Chapter 5 quiz · A3 lab',chapters:['ch5'],detail:'10 questions · 40 minutes',source:'https://smccd.instructure.com/courses/73887/discussion_topics/1367360',verified:'2026-10-14',note:'The newer announcement places A3 in lab; the assignment page still says lecture.'},
+  {id:'exam2-a',date:'2026-10-20',title:'Exam 2 · Part A',chapters:['ch4','ch5'],detail:'40 multiple-choice questions · 80 minutes',source:'https://smccd.instructure.com/courses/73887/assignments/2086546',verified:'2026-10-14',note:'Exam scope includes Chapters 4, 5 and some 6. This coach only selects from available banks; it does not cover missing Chapter 6 work.'},
+  {id:'exam2-b',date:'2026-10-22',title:'Exam 2 · Part B',chapters:['ch4','ch5'],detail:'75 minutes · choose 2 of 3 problems',source:'https://smccd.instructure.com/courses/73887/assignments/2086571',verified:'2026-10-14',note:'Exam scope includes Chapters 4, 5 and some 6. Use class material for any scope not yet in the app.'}
+];
+function dcDay(now=Date.now()){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now));
+}
+function dcHash(value){let hash=2166136261;for(const c of String(value)){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619);}return hash>>>0;}
+function dcCapability(q){
+  if(q.learningCapability||q.capability)return q.learningCapability||q.capability;
+  if(q.requiresDrawing||q.type==='written'||q.type==='ch4production')return /convert|redraw|projection.*wedge|fischer.*zigzag/i.test(q.prompt||'')?'conversion':'construction';
+  return ['text','num','blanks'].includes(q.type)?'response':'recognition';
+}
+function dcIsQA(a){return !!(a?.qa||a?.evidence?.actor?.qa||a?.actor?.qa);}
+function dcEligible(q){return !!q&&!q.preview&&q.adaptiveEligible!==false&&!['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);}
+function dcChapter(q,chapters){return chapters.find(ch=>ch.topics.includes(q.topic))?.id||q.courseRoute||null;}
+function dcEvidence(attempts,questions,now=Date.now()){
+  const bank=new Map(questions.map(q=>[q.id,q])),latest=new Map(),counts={},history={},groups={};
+  for(const a of attempts||[]){
+    const q=bank.get(a?.id);if(!dcEligible(q)||dcIsQA(a)||!Number.isFinite(a.ts)||a.ts>now)continue;
+    counts[a.id]=(counts[a.id]||0)+1;
+    if(a.ts<now-30*86400000||q.correctedAt&&a.questionRevision!==q.correctedAt)continue;
+    if((q.production?.kind==='chair'||a.drawing?.kind==='chair')&&(a.drawing?.kind!=='chair'||a.drawing.geometryVersion!==2))continue;
+    (history[a.id]||(history[a.id]=[])).push(a);
+    if(!latest.has(a.id)||a.ts>=latest.get(a.id).ts)latest.set(a.id,a);
+  }
+  for(const [id,a] of latest){
+    const q=bank.get(id),capability=dcCapability(q),key=q.topic+'::'+capability;
+    const group=groups[key]||(groups[key]={key,topic:q.topic,capability,rows:[],misses:0,correct:0,recordedClean:0,selfReviewed:0,unknown:0,repeatedMisses:0,latestAt:0});
+    const manual=!!a.sr||a.drawing?.kind==='freehand-self-review'||q.requiresDrawing||q.type==='written';
+    const scored=[true,false,0,1].includes(a.ok),correct=a.ok===true||a.ok===1;
+    const helped=Number(a.h)>0||!!a.hf||!!a.rf||a.transfer?.help===true||a.transfer?.phase==='guided'||a.coursePhase==='guided'||a.evidence?.externalHelp?.value===true||a.evidence?.recordedHelp?.used===true||a.drawing?.checks>1||a.drawing?.clean===false||a.drawing?.firstTry===false;
+    const uncertain=!!a.g||!!a.dk||['guess','unsure'].includes(a.evidence?.confidence?.value);
+    const knownHints=Number.isFinite(a.h)&&a.h>=0;
+    const clean=scored&&correct&&knownHints&&!manual&&!helped&&!uncertain;
+    const repeatMiss=(history[id]||[]).filter(r=>[false,0].includes(r.ok)).length>=2&&!correct;
+    const row={id,ts:a.ts,correct,scored,manual,helped,uncertain,knownHints,clean,repeated:(counts[id]||0)>1,repeatMiss};
+    group.rows.push(row);group.latestAt=Math.max(group.latestAt,a.ts);
+    if(scored&&!correct)group.misses++;if(scored&&correct)group.correct++;
+    if(clean)group.recordedClean++;if(manual)group.selfReviewed++;
+    if(!knownHints||!scored)group.unknown++;if(repeatMiss)group.repeatedMisses++;
+  }
+  for(const g of Object.values(groups))g.rows.sort((a,b)=>b.ts-a.ts);
+  return {groups,counts,latest:[...latest.values()].map(a=>({id:a.id,ts:a.ts}))};
+}
+function dcContext({now=Date.now(),settings={},chapters=[]}={}){
+  const day=dcDay(now),assessment=DC_ASSESSMENTS.find(a=>a.date>=day)||null;
+  const override=chapters.some(ch=>ch.id===settings.focus)?settings.focus:null;
+  const chapter=override||assessment?.chapters.at(-1)||chapters.find(ch=>ch.id==='ch5')?.id||chapters[0]?.id||null;
+  return {day,assessment,chapter,override:!!override,minutes:[10,25,45].includes(Number(settings.minutes))?Number(settings.minutes):25};
+}
+function dcRecommend({questions=[],attempts=[],chapters=[],settings={},now=Date.now()}={}){
+  const context=dcContext({now,settings,chapters}),pool=questions.filter(q=>dcEligible(q)&&dcChapter(q,chapters)===context.chapter),evidence=dcEvidence(attempts,pool,now);
+  if(!pool.length)return {...context,kind:'material',topic:null,title:'Open your class material',why:'No practice bank is loaded for this focus. A missing bank is not evidence that you are ready.'};
+  // A later success on a different item in the SAME capability can advance the
+  // next activity. Old item misses remain in the ledger, not a permanent loop.
+  const groups=Object.values(evidence.groups),repair=groups.filter(g=>g.rows[0]&&(!g.rows[0].correct&&g.rows[0].scored||g.rows[0].uncertain)).sort((a,b)=>{
+    const weight=g=>(g.capability==='conversion'||g.capability==='construction'?8:0)+g.repeatedMisses*5+g.misses*2;
+    return weight(b)-weight(a)||b.latestAt-a.latestAt;
+  })[0];
+  if(repair)return {...context,kind:'repair',topic:repair.topic,capability:repair.capability,questionId:repair.rows[0].id,title:'Fix one missed step',why:(repair.repeatedMisses?'More than one retained miss appears on this skill. ':'A recent retained answer needs another look. ')+(repair.selfReviewed?'Drawing results here are self-reported, not an automatic chemistry grade. ':'')+'Correct recognition answers do not settle a separate drawing or conversion skill.'};
+  const uncertain=groups.find(g=>g.selfReviewed||g.unknown||g.rows.some(r=>r.helped));
+  if(uncertain)return {...context,kind:'practice',topic:uncertain.topic,capability:uncertain.capability,title:'Work a full problem',why:'This skill has self-reviewed, helped, or incomplete evidence. Work a regular problem; it is not a timed readiness claim. A small bank may repeat an item.'};
+  const topics=[...new Set(pool.map(q=>q.topic))],unseen=topics.find(t=>!groups.some(g=>g.topic===t));
+  if(unseen)return {...context,kind:'probe',topic:unseen,title:'Check one unmeasured skill',why:'There is no recent usable app answer for this skill. That means unknown—not that you did not study it.'};
+  const next=[...groups].sort((a,b)=>a.latestAt-b.latestAt)[0];
+  return {...context,kind:'practice',topic:next?.topic,capability:next?.capability,title:'Work a full problem',why:'Recent structured answers are available. Keep the linked parts together; use a new example when available. A small bank may repeat an item. App correctness alone does not establish paper readiness.'};
+}
+function dcPulsePlan({questions=[],attempts=[],chapters=[],settings={},day=dcDay(),profile='learner',previousIds=[],now=Date.now()}={}){
+  const context=dcContext({now,settings,chapters}),evidence=dcEvidence(attempts,questions,now),byId=new Map(questions.map(q=>[q.id,q]));
+  const quick=questions.filter(q=>dcEligible(q)&&!q.requiresDrawing&&!q.arrowBoard&&!q.resonanceBoard&&['mc','text','num'].includes(q.type)&&(q.diff??q.difficulty??2)<=2&&(!q.opticalVisualBank||q.opticalVisualRole==='warm-up')&&(!q.visualStereoBank||q.visualPracticeRole==='warm-up'));
+  // Explicit short-drawing list: do not silently turn a five-item check into a long worksheet.
+  const shortDrawingIds=['CH5-F03','CH5-F09','CH5-F21'];
+  const drawings=questions.filter(q=>dcEligible(q)&&(q.dailyPulseEligible===true||shortDrawingIds.includes(q.id))&&(q.requiresDrawing||q.type==='written'||q.type==='ch4production'));
+  const cleanIds=new Set(Object.values(evidence.groups).flatMap(g=>g.rows.filter(r=>r.clean).map(r=>r.id)));
+  const knownTopics=new Set(Object.values(evidence.groups).filter(g=>g.recordedClean>=2).map(g=>g.topic));
+  const repairGroups=Object.values(evidence.groups).filter(g=>g.rows[0]&&(!g.rows[0].correct&&g.rows[0].scored||g.rows[0].uncertain));
+  const repairTopics=new Set(repairGroups.map(g=>g.topic));
+  const focus=quick.filter(q=>dcChapter(q,chapters)===context.chapter),familiar=quick.filter(q=>knownTopics.has(q.topic)||cleanIds.has(q.id));
+  const old=new Set(previousIds),used=new Set(),selected=[],notes=[];
+  function pick(candidates,role,fallback){
+    let available=candidates.filter(q=>!used.has(q.id));
+    if(!available.length){available=(fallback||quick).filter(q=>!used.has(q.id));notes.push(role+': no unused matching item; another short available skill was used.');}
+    if(!available.length)return;
+    available.sort((a,b)=>Number(old.has(a.id))-Number(old.has(b.id))||((evidence.counts[a.id]||0)-(evidence.counts[b.id]||0))||dcHash(day+'|'+profile+'|'+a.id)-dcHash(day+'|'+profile+'|'+b.id));
+    const q=available[0];used.add(q.id);selected.push({id:q.id,role,manual:q.requiresDrawing||q.type==='written',capability:dcCapability(q),previouslyAttempted:!!evidence.counts[q.id]});
+  }
+  pick(familiar,'familiar skill',quick);pick(familiar,'familiar skill',quick);
+  pick(focus,'current focus',quick);
+  const focusDrawings=drawings.filter(q=>dcChapter(q,chapters)===context.chapter),repairDrawings=focusDrawings.filter(q=>repairGroups.some(g=>g.topic===q.topic&&g.capability===dcCapability(q)));
+  if(focusDrawings.length)pick(repairDrawings.length?repairDrawings:focusDrawings,repairDrawings.length?'drawing repair · self-reviewed':'short drawing · self-reviewed',focusDrawings);
+  else {pick(focus,'current focus',quick);notes.push('No eligible short construction item is loaded for this focus. This set does not check drawing.');}
+  const quickRepairs=focus.filter(q=>repairGroups.some(g=>g.topic===q.topic&&g.capability===dcCapability(q)));
+  pick(quickRepairs.length?quickRepairs:focus,quickRepairs.length?'repair check':'focus probe',focus.length?focus:quick);
+  if(repairTopics.size&&!quickRepairs.length)notes.push('No short automatic item matches the missed capability. The last item is a focus probe, not proof that a drawing gap is repaired.');
+  if(!familiar.length)notes.push('No familiar-skill answers are recorded yet; the first two items are foundation probes, not established strengths.');
+  if(!repairTopics.size)notes.push('No recent repair target is recorded; the last item is another focus probe.');
+  return {version:DC_VERSION,day,chapter:context.chapter,ids:selected.map(x=>x.id),roles:selected,notes,createdAt:now,runId:null,status:'ready',log:[],snapshot:null,qa:false};
+}
+if(typeof module!=='undefined'&&module.exports)module.exports={dcDay,dcHash,dcCapability,dcEvidence,dcContext,dcRecommend,dcPulsePlan,DC_ASSESSMENTS};
+
+// This public hook must stay at script scope: the built app runs in strict mode.
+// Function declarations inside the browser-only block are intentionally private.
+function dcExport(){
+  const saved=safeStore.get(DC_STORE,{}),data={settings:saved.settings||{},records:saved.records||[]},cutoff=Date.now()-30*86400000;
+  return {version:DC_VERSION,scope:'Current device/profile. Selection is not learning evidence; drawings are self-reviewed.',settings:{focus:data.settings.focus||'auto',minutes:data.settings.minutes||25},
+    modelExposure:safeStore.get('dailyCoachModelViews',[]).filter(r=>(r.ts||0)>=cutoff).map(r=>({id:r.id,day:r.day,ts:r.ts,chapter:r.chapter,capability:r.capability,tier:'exposure',qa:!!r.qa})),
+    rounds:data.records.filter(r=>(r.createdAt||0)>=cutoff).map(r=>({day:r.day,chapter:r.chapter,ids:r.ids,roles:r.roles,notes:r.notes,createdAt:r.createdAt,updatedAt:r.updatedAt,runId:r.runId,status:r.status,qa:!!r.qa,
+      outcomes:(r.log||[]).map(a=>({id:a.id,ok:a.ok,sr:a.sr,g:a.g,h:a.h,dk:a.dk,rf:a.rf}))}))};
+}
+// Explicit chapter choices in Learn/Practice must also guide the Home coach.
+// Internal route restoration still uses smSetChapter without changing this preference.
+function dcChooseFocus(chapter){
+  if(!CHAPTERS.some(ch=>ch.id===chapter))return;
+  const saved=safeStore.get(DC_STORE,{});
+  safeStore.set(DC_STORE,{...saved,settings:{...(saved.settings||{}),focus:chapter}});
+}
+
+if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
+  function dcText(tag,attrs,text){const n=el(tag,attrs);n.textContent=text;return n;}
+  function dcRead(){const saved=safeStore.get(DC_STORE,{});return {settings:saved.settings||{},records:saved.records||[]};}
+  function dcWrite(data){safeStore.set(DC_STORE,{...data,records:data.records.slice(-30)});}
+  function dcCurrentPlan(day=dcDay()){return dcRead().records.filter(r=>r.day===day).at(-1)||null;}
+  function dcInputs(){return {questions:QUESTIONS,attempts:S.attempts||[],chapters:CHAPTERS,settings:dcRead().settings};}
+  function dcIsPulse(D){return smRunContext(D)?.kind==='daily-pulse';}
+  function dcRecord(D,idx){
+    if(!dcIsPulse(D))return;
+    const data=dcRead(),context=smRunContext(D),ids=D.queue.map(q=>q.id);
+    // Two devices may each have started a different local set on the same day.
+    // Match the run, not just the date. Preserve the other set intact rather
+    // than combining one queue with another queue's progress or drawing ink.
+    let record=data.records.find(r=>r.day===context.day&&r.runId===D.runId);
+    if(!record)record=data.records.find(r=>r.day===context.day&&!r.runId&&JSON.stringify(r.ids)===JSON.stringify(ids));
+    if(!record){record={version:DC_VERSION,day:context.day,chapter:context.chapter,ids,roles:context.roles||[],notes:['Resumed from a saved run; the original selection details may be unavailable on this device. Other same-day local sets are retained separately.'],createdAt:Date.now()};data.records.push(record);}
+    record.ids=ids;record.chapter=context.chapter;record.roles=context.roles||record.roles||[];
+    record.runId=D.runId;record.log=JSON.parse(JSON.stringify(D.log||[]));record.status=idx>=D.queue.length?'done':'started';record.updatedAt=Date.now();record.qa=!!QA_MODE;
+    record.snapshot={ids:D.queue.map(q=>q.id),i:Math.min(idx,D.queue.length),right:D.right,wrong:D.wrong,topic:D.topic,cold:D.cold,scopeName:D.scopeName,runId:D.runId,log:record.log,studyContext:context};
+    for(const key of ['sketchDrafts','reasoningDrafts','navAnswerDrafts','arrowDrafts','_hintState','ch4Drafts','ch4Evidence','guessedRight','hinted'])if(D[key]!==undefined)record.snapshot[key]=JSON.parse(JSON.stringify(D[key]));
+    data.records=data.records.filter(r=>r!==record);data.records.push(record);dcWrite(data);
+  }
+  const dcPreviousSnapshot=snapshotDrill;
+  snapshotDrill=function(idx){dcPreviousSnapshot(idx);dcRecord(S.drill,idx);};
+  const dcPreviousAttempt=logAttempt;
+  logAttempt=function(q,ok,guessed,D,dk,answer){const event=dcPreviousAttempt.apply(this,arguments);if(dcIsPulse(D)&&event.evidence)event.evidence.studyContext={...smRunContext(D),roles:undefined};return event;};
+  function dcStartPulse(day=dcDay()){
+    const data=dcRead();let record=data.records.filter(r=>r.day===day).at(-1);
+    if(!record){
+      record=dcPulsePlan({...dcInputs(),day,profile:typeof PROFILE==='string'?PROFILE:'learner',previousIds:data.records.at(-1)?.ids||[]});
+      record.qa=!!QA_MODE;data.records.push(record);dcWrite(data);
+    }
+    const queue=record.ids.map(id=>QUESTIONS.find(q=>q.id===id));
+    if(!queue.length||queue.some(q=>!q)){alert('This saved set uses a question that is no longer available. Your saved answers were kept. Use Practice today; a new Daily Pulse will be available tomorrow.');return;}
+    parkCurrentDrill();
+    const context={mode:'practice',kind:'daily-pulse',chapter:record.chapter,day:record.day,roles:record.roles};
+    const p=record.snapshot||{};
+    S.drill={...p,queue,i:p.i||0,right:p.right||0,wrong:p.wrong||0,topic:'__daily_pulse',cold:true,answered:false,log:p.log||[],runId:record.runId||makeRunId('daily-pulse'),scopeName:'Daily Pulse · '+record.day,studyContext:context,sketchDrafts:p.sketchDrafts||{},reasoningDrafts:p.reasoningDrafts||{}};
+    const contexts=safeStore.get('studyRunContexts',{});contexts[S.drill.runId]=context;safeStore.set('studyRunContexts',Object.fromEntries(Object.entries(contexts).slice(-100)));
+    snapshotDrill(S.drill.i);save();go('drill');
+  }
+  function dcOpenLearn(rec){
+    courseNavigationSaveWork();smSetChapter(rec.chapter);S.learnCh=rec.chapter;
+    const q=QUESTIONS.find(q=>q.id===rec.questionId);
+    if(q?.model&&['conversion','construction'].includes(rec.capability)){
+      S.dailyCoachRepair={...rec};go('dailyCoachRepair');return;
+    }
+    const unit=(CHAPTER_LEARNING_UNITS[rec.chapter]||[]).find(u=>!u.preview&&u.topic===rec.topic);
+    if(unit&&rec.chapter==='ch5')ch5OpenUnit(unit.id,1);else if(unit)openLearningUnit(rec.chapter,unit.id);else {S.learnTopic=rec.topic;S.learnUnit=null;go('allLearn');}
+  }
+  function dcOpenRegular(rec){
+    courseNavigationSaveWork();smSetChapter(rec.chapter);
+    if(rec.chapter==='ch5'&&rec.kind!=='probe'&&rec.minutes>10&&(!rec.capability||rec.capability==='recognition')){
+      if(rec.topic==='stereoRelations'&&typeof smStartVisualStereo==='function'){smStartVisualStereo('pairs');return;}
+      if(rec.topic==='stereoOptical'&&typeof smStartOpticalVisual==='function'){smStartOpticalVisual();return;}
+    }
+    // Full authored items only; do not add a hidden explain-every-step demand.
+    const pool=QUESTIONS.filter(q=>dcEligible(q)&&dcChapter(q,CHAPTERS)===rec.chapter&&q.topic===rec.topic&&(q.diff??2)>=2&&q.id!==rec.questionId);
+    if(pool.length&&typeof startAdaptiveLearning==='function'){
+      const candidates=rec.capability?pool.filter(q=>dcCapability(q)===rec.capability):pool;
+      if(!candidates.length&&['conversion','construction'].includes(rec.capability)){smGo('practice');return;}
+      if(startAdaptiveLearning({chapter:rec.chapter,poolIds:(candidates.length?candidates:pool).map(q=>q.id),total:rec.kind==='probe'||rec.minutes===10?1:3,label:'Practice · '+(TOPICS[rec.topic]?.name||rec.topic),rotationKey:'daily-coach-'+rec.chapter+'-'+rec.topic}))smTagRun('practice','coach-regular-problem',rec.chapter);
+    }else smGo('practice');
+  }
+  function dcGoRecommendation(rec){
+    if(rec.kind==='repair')dcOpenLearn(rec);
+    else if(rec.kind==='material'){smSetChapter(rec.chapter);smGo('practice');}
+    else dcOpenRegular(rec);
+  }
+  function dcSourceDetails(host,rec){
+    const details=el('details',{class:'dc-details'});details.appendChild(dcText('summary',{},'Why this next? · change focus or time'));
+    details.appendChild(dcText('p',{},rec.why));
+    details.appendChild(dcText('p',{class:'muted'},'Local rules use retained answers—not clicks or time on screen. No recorded help is not proof of independent work. Your choice always overrides this suggestion.'));
+    const settings=dcRead().settings,controls=el('div',{class:'dc-controls'});
+    const focusLabel=el('label');focusLabel.appendChild(dcText('span',{},'Study focus'));
+    const focus=el('select',{'aria-label':'Coach study focus','data-dc-focus':true});focus.appendChild(dcText('option',{value:'auto'},'Auto · nearest saved assessment'));
+    CHAPTERS.forEach(ch=>focus.appendChild(dcText('option',{value:ch.id},ch.name)));focus.value=settings.focus||'auto';
+    focus.onchange=()=>{const data=dcRead();data.settings.focus=focus.value;dcWrite(data);if(focus.value!=='auto')smSetChapter(focus.value);render();};focusLabel.appendChild(focus);controls.appendChild(focusLabel);
+    const timeLabel=el('label');timeLabel.appendChild(dcText('span',{},'Time available'));
+    const time=el('select',{'aria-label':'Time available','data-dc-minutes':true});[10,25,45].forEach(n=>time.appendChild(dcText('option',{value:String(n)},n+' minutes')));time.value=String(rec.minutes);
+    time.onchange=()=>{const data=dcRead();data.settings.minutes=Number(time.value);dcWrite(data);render();};timeLabel.appendChild(time);controls.appendChild(timeLabel);details.appendChild(controls);
+    if(rec.assessment){details.appendChild(dcText('p',{},rec.assessment.title+' · '+rec.assessment.date+' · '+rec.assessment.detail));details.appendChild(dcText('p',{},rec.assessment.note));details.appendChild(el('a',{href:rec.assessment.source,target:'_blank',rel:'noopener'},'Canvas source · checked Oct 14, 2026'));}
+    else details.appendChild(dcText('p',{},'No future confirmed assessment is saved here. Choose a chapter; this is ordinary practice, not a newly inferred deadline.'));
+    details.appendChild(dcText('p',{class:'muted'},'Dates do not update automatically. Daily sets and coach choices are saved on this device/profile; attempts keep their existing sync behavior.'));
+    host.appendChild(details);
+  }
+  function dcHome(host){
+    const rec=dcRecommend(dcInputs()),card=el('section',{class:'dc-next','data-daily-coach':true});
+    if(rec.chapter)smSetChapter(rec.chapter);
+    card.appendChild(dcText('p',{class:'sm-eyebrow'},'NEXT FOR YOU'));
+    card.appendChild(dcText('h2',{},rec.title));
+    const mode=rec.kind==='repair'?'Learn':'Practice',topic=TOPICS[rec.topic]?.name;
+    card.appendChild(dcText('p',{class:'dc-objective'},[mode,topic||CHAPTERS.find(ch=>ch.id===rec.chapter)?.name,rec.minutes+' minutes available'].filter(Boolean).join(' · ')));
+    if(rec.assessment)card.appendChild(dcText('p',{class:'dc-agenda'},'Next saved assessment · '+rec.assessment.title+' · '+rec.assessment.date));
+    const label=rec.kind==='repair'?'Open one worked example →':rec.kind==='material'?'Open class practice →':rec.kind==='probe'?'Try a first problem →':'Start regular practice →';
+    card.appendChild(smButton(label,()=>dcGoRecommendation(rec),{class:'btn','data-focus-primary':true,'data-dc-start':true}));
+    if(S.pausedDrill)card.appendChild(smButton('Resume saved work',()=>resumeDrill(),{class:'btn ghost','data-dc-resume':true}));
+    dcSourceDetails(card,rec);host.appendChild(card);
+    const pulse=el('section',{class:'dc-pulse','data-daily-pulse':true}),today=dcCurrentPlan();
+    const text=el('div');text.appendChild(dcText('h2',{},'Daily Pulse'));
+    text.appendChild(dcText('p',{},today?.status==='done'?'Finished today. A different set tomorrow.':'Optional · 5 short tasks, including one drawing when available.'));
+    text.appendChild(dcText('p',{class:'muted'},'A quick pulse—not your main study block or a readiness grade.'));
+    pulse.appendChild(text);pulse.appendChild(smButton(today?.status==='done'?'View today’s check':today?'Continue Daily Pulse':'Start Daily Pulse',()=>dcStartPulse(),{'data-dc-pulse-start':true}));host.appendChild(pulse);
+  }
+  const dcPreviousHome=VIEWS.home;
+  VIEWS.home=function(v){
+    dcPreviousHome(v);const root=v.querySelector('[data-focus-home]');if(!root)return;
+    const heading=root.querySelector('.sm-heading');if(heading){const h=heading.querySelector('h1');if(h)h.textContent='Your study desk';heading.querySelector('.sm-scope')?.remove();heading.querySelector('.sm-scope-note')?.remove();const eyebrow=heading.querySelector('.sm-eyebrow');if(eyebrow)eyebrow.textContent='CHEM 231 · ONE STEP AT A TIME';}
+    root.querySelector('.sm-next')?.remove();const holder=el('div',{class:'dc-start'});dcHome(holder);heading?heading.after(holder):root.prepend(holder);
+  };
+  VIEWS.dailyCoachRepair=function(v){
+    const rec=S.dailyCoachRepair,q=QUESTIONS.find(q=>q.id===rec?.questionId);
+    if(!q?.model){smGo('learn');return;}
+    const shown=safeStore.get('dailyCoachModelViews',[]),prior=shown.find(r=>r.id===q.id&&r.day===dcDay());
+    if(!prior){shown.push({id:q.id,day:dcDay(),ts:Date.now(),chapter:rec.chapter,capability:rec.capability,tier:'exposure',qa:!!QA_MODE});safeStore.set('dailyCoachModelViews',shown.slice(-100));}
+    const card=el('section',{class:'card dc-repair','data-dc-repair':q.id});
+    card.appendChild(dcText('p',{class:'sm-eyebrow'},'LEARN · ONE WORKED EXAMPLE'));
+    card.appendChild(dcText('h1',{},rec.capability==='conversion'?'Keep the configuration when you redraw':'Check the drawing, one decision at a time'));
+    card.appendChild(dcText('p',{},rec.capability==='conversion'?'Check R/S before and after. The drawing style may change; each center’s configuration must stay the same.':'Match the requested groups and connections first. Then check the stereochemistry.'));
+    const prompt=el('div',{class:'qprompt'});prompt.innerHTML=q.prompt;card.appendChild(prompt);
+    const model=el('section',{class:'dc-worked-model'});model.appendChild(dcText('h2',{},'Worked answer · key shown'));
+    const drawing=el('div');drawing.innerHTML=typeof q.model==='function'?q.model():q.model;model.appendChild(drawing);card.appendChild(model);
+    const more=el('details');more.appendChild(dcText('summary',{},'More · what to check'));
+    (q.rubric||[]).forEach(rule=>more.appendChild(dcText('p',{},rule)));if(q.why){const p=el('p');p.innerHTML=q.why;more.appendChild(p);}card.appendChild(more);
+    card.appendChild(dcText('p',{class:'muted'},'Seeing this answer is exposure, not a correct attempt. Your next problem uses a different item; freehand drawings remain self-reviewed.'));
+    const hasDifferent=QUESTIONS.some(item=>dcEligible(item)&&item.topic===rec.topic&&dcCapability(item)===rec.capability&&item.id!==q.id);
+    if(!hasDifferent)card.appendChild(dcText('p',{class:'muted'},'No different matching drawing is loaded in this bank yet. Choose a class worksheet problem for the next attempt.'));
+    card.appendChild(smButton(hasDifferent?'Now try a different drawing →':'Open class problems →',()=>dcOpenRegular({...rec,minutes:10,kind:'practice'}),{class:'btn','data-dc-repair-try':true}));
+    card.appendChild(smButton('Back to study desk',()=>go('home')));v.appendChild(card);
+  };
+  NAV_GROUP.dailyCoachRepair='learn';
+  const dcPreviousActivity=smActivity;
+  smActivity=function(){return S.view==='dailyCoachRepair'?{mode:'learn',chapter:S.dailyCoachRepair?.chapter,detail:'One worked drawing → your turn'}:dcPreviousActivity();};
+  const dcPreviousDrill=VIEWS.drill;
+  VIEWS.drill=function(v){
+    const D=S.drill;if(!dcIsPulse(D)){dcPreviousDrill(v);return;}
+    if(D.i>=D.queue.length&&D.reviewIdx==null){
+      dcRecord(D,D.queue.length);
+      const rows=D.log||[],auto=rows.filter(r=>!r.sr&&!QUESTIONS.find(q=>q.id===r.id)?.requiresDrawing),manual=rows.filter(r=>r.sr||QUESTIONS.find(q=>q.id===r.id)?.requiresDrawing);
+      const correct=auto.filter(r=>r.ok).length,flagged=auto.filter(r=>r.g||r.dk||r.h>0||r.rf).length;
+      const card=el('section',{class:'card dc-result','data-dc-result':true});card.appendChild(dcText('p',{class:'sm-eyebrow'},'DAILY PULSE · FINISHED'));
+      card.appendChild(dcText('h1',{},'Your quick check is done.'));
+      card.appendChild(dcText('p',{},correct+' / '+auto.length+' automatically checked answers correct'+(flagged?' · '+flagged+' with uncertainty or recorded help.':'.')));
+      if(manual.length)card.appendChild(dcText('p',{},manual.length+' drawing task'+(manual.length===1?'':'s')+' self-reviewed · '+manual.filter(r=>r.ok).length+' marked correct by you. Not part of the automatic score.'));
+      card.appendChild(dcText('p',{},'This small set can show what to revisit. It does not certify readiness or predict your grade.'));
+      const details=el('details');details.appendChild(dcText('summary',{},'What this set checked'));
+      const record=dcCurrentPlan(smRunContext(D).day);(record?.roles||[]).forEach(role=>details.appendChild(dcText('p',{},role.role+' · '+(TOPICS[QUESTIONS.find(q=>q.id===role.id)?.topic]?.name||role.id)+(role.previouslyAttempted?' · repeated item':' · not in retained item history'))));
+      (record?.notes||[]).forEach(note=>details.appendChild(dcText('p',{class:'muted'},note)));card.appendChild(details);
+      if(rows.length)card.appendChild(smButton('Review my answers',()=>{D.reviewIdx=0;render();}));
+      card.appendChild(smButton('Done · back to study desk',()=>{S.drill=null;go('home');},{class:'btn','data-dc-done':true}));v.appendChild(card);return;
+    }
+    dcPreviousDrill(v);
+    if(D.reviewIdx==null){const note=el('p',{class:'dc-run-note','data-dc-run-note':true});note.textContent='Daily Pulse · '+(D.i+1)+' of '+D.queue.length+' · same set when you return today. Drawing checks are self-reviewed.';v.prepend(note);}
+  };
+  const style=el('style',{id:'daily-study-coach-style'});style.textContent=`
+    .dc-next{padding:20px;border:1px solid #a7cec2;border-radius:16px;background:#eff8f3;margin:0 0 12px;min-width:0}.dc-next h2{font-size:1.3rem;margin:5px 0 8px;line-height:1.25}.dc-next p{font-size:.88rem;line-height:1.45;margin:6px 0 12px}.dc-next .sm-eyebrow{font-size:.72rem}.dc-objective{font-weight:650}.dc-agenda{color:#46665d}.dc-next .btn,.dc-pulse .btn,.dc-result .btn{min-height:44px;white-space:normal;margin:4px 8px 4px 0;max-width:100%;overflow-wrap:anywhere}.dc-details{margin-top:8px;border-top:1px solid #cfe0d9}.dc-details summary,.dc-result summary{cursor:pointer;min-height:44px;padding:12px 0;box-sizing:border-box;font-size:.82rem;font-weight:650}.dc-details p{font-size:.82rem}.dc-controls{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}.dc-controls label{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1 1 220px;font-size:.8rem}.dc-controls select{min-height:44px;font:inherit;padding:8px;border:1px solid #acc4bc;border-radius:8px;max-width:100%;width:100%;background:white;color:#173e47}.dc-pulse{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border:1px solid #d4dedb;border-radius:12px;background:#fff;margin-bottom:20px;min-width:0}.dc-pulse>div{min-width:0}.dc-pulse h2{font-size:1rem;margin:0 0 5px}.dc-pulse p{font-size:.8rem;margin:3px 0;line-height:1.4}.dc-pulse .muted{font-size:.74rem}.dc-pulse>.btn{flex:0 0 auto;max-width:44%;font-size:.82rem}.dc-result{max-width:760px;margin:auto}.dc-result p{line-height:1.5}.dc-run-note{font-size:.8rem;color:#46665d;margin:0 0 10px}.dc-next a{overflow-wrap:anywhere}.dc-start button:focus-visible,.dc-start select:focus-visible,.dc-start summary:focus-visible{outline:3px solid #a67816;outline-offset:3px}
+    .dc-repair{max-width:850px;margin:auto}.dc-repair h1{font-size:1.45rem;line-height:1.25}.dc-repair p{line-height:1.5}.dc-repair figure{max-width:100%;margin:10px 0}.dc-repair svg{max-width:100%;height:auto;max-height:330px}.dc-worked-model{padding:14px;border-radius:12px;background:#f0f7f4;border:1px solid #cadfd6}.dc-worked-model h2{font-size:1rem}.dc-repair summary{cursor:pointer;min-height:44px;padding:12px 0;box-sizing:border-box}.dc-repair .btn{min-height:44px;white-space:normal}.dc-repair .muted{font-size:.8rem}
+    @media(max-width:600px){.dc-next{padding:14px}.dc-next h2{font-size:1.15rem}.dc-pulse{align-items:flex-start;flex-direction:column;padding:12px}.dc-pulse>.btn{max-width:100%;margin:4px 0 0}.dc-controls{gap:8px}.dc-next p{font-size:.82rem}.dc-next .btn{font-size:.86rem}.dc-next .dc-details p{font-size:.78rem}.dc-repair h1{font-size:1.2rem}.dc-repair{padding:14px!important}}
   `;document.head.appendChild(style);
 }
 
