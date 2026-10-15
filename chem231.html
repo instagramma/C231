@@ -6,7 +6,13 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.116 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.118 (LOCAL ONLY)
+  v3.118 (2026-10-14): WHOLE-APP QA + MORE PRECISE COACHING.
+  Skill-specific repair evidence, strict numeric grading, bounded chemistry
+  corrections, complete evaluated image inventory, and narrow-screen repairs.
+  v3.117 (2026-10-14): SCHEDULED PULSE + THREE CHAPTER CHECKS.
+  Topic-scoped daily checks, visible starting/mid/final diagnostics and coverage
+  gaps, rotating samples, and a topic picker for the existing Challenge pool.
   v3.116 (2026-10-14): NEXT ACTION + DAILY PULSE + MATCHED EXAMPLES.
   Bounded local coaching, five daily questions, preserved saved work and plain
   study modes. Conversion practice and separate task-kind evidence. No forecasts.
@@ -1742,7 +1748,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.116 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.118 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2109,6 +2115,7 @@ function excludeRecentRounds(pool, need){
 /* v3.12.1 (audit r5 F5): exact-twin questions (same fact, different id) must not co-occur
    in one short set — the recency system sees them as unrelated. */
 const CONCEPT_FAMILY={v5:"ve-co2","x2-v08":"ve-co2",v6:"ve-nh3","x2-v09":"ve-nh3",v9:"ve-oh","x2-v10":"ve-oh",r5:"res-major","x2-r06":"res-major",b3:"acid-hfw","x2-ac05":"acid-hfw",
+  v2:"ve-nitrogen","x2-pt02":"ve-nitrogen",v4:"ve-chlorine","x2-pt03":"ve-chlorine",
   /* v3.13: the Ch-2 twins — a set shouldn't serve two questions that test the same recognition */
   fg09:"co-tree",fg10:"co-tree",fg11:"co-tree",fg12:"co-tree",fg13:"co-tree",fg14:"co-tree",fg15:"co-tree",
   fg16:"amine-amide",fg17:"amine-amide",
@@ -3134,9 +3141,9 @@ const QUESTIONS = [
 {id:"l1b2",topic:"bondline",type:"num",diff:2,prompt:"Same structure:<svg viewBox='0 0 150 85' width='150' style='display:block;margin:8px 0'><g stroke='currentColor' fill='none' stroke-width='2'><line x1='15' y1='60' x2='45' y2='30'/><line x1='19' y1='64' x2='49' y2='34'/><line x1='45' y1='30' x2='75' y2='60'/><line x1='75' y1='60' x2='105' y2='30'/></g><g font-size='11' fill='currentColor'><text x='4' y='76'>C1</text><text x='41' y='21'>C2</text><text x='70' y='76'>C3</text><text x='102' y='21'>C4</text></g></svg>How many implicit hydrogens are on <b>C2</b>?",answer:1,why:"C2 has a DOUBLE bond to C1 (counts as 2) + a single bond to C3 = 3 bonds shown → <b>1 hidden H</b>. Her homework for next class is exactly this skill."},
 
 /* v3.3 written items — lecture 1 */
-{id:"WR-CH1-007",topic:"hybrid",type:"written",diff:3,prompt:"<b>Lone-pair orbitals:</b> a molecule has two nitrogens — N1 has three single bonds + 1 lone pair; N2 has a double bond, a single bond + 1 lone pair. For EACH nitrogen: give its hybridization AND name the orbital holding its lone pair. Then state the general rule.",
+{id:"WR-CH1-007",correctedAt:"2026-10-14",topic:"hybrid",type:"written",diff:3,prompt:"<b>Localized lone-pair orbitals:</b> N1 has three single bonds + 1 lone pair; N2 has a double bond, a single bond + 1 lone pair. Both lone pairs are localized: neither can join a neighboring π system. For EACH nitrogen: give its hybridization AND name the orbital holding its lone pair. Then state the rule for a localized lone pair.",
  model:"<b>N1:</b> 4 electron domains (3 bonds + 1 LP) → <b>sp³</b>; its lone pair is in an <b>sp³ orbital</b>. <b>N2:</b> 3 domains (double bond counts as ONE domain, + single bond + LP) → <b>sp²</b>; lone pair in an <b>sp² orbital</b>. <b>Rule:</b> a localized lone pair lives in a hybridized orbital, and WHICH one is set by the hybridization of the atom it sits on.",
- rubric:["Both hybridizations derived from domain count (double bond = one domain)","Lone-pair orbital = atom's hybridization, stated as the rule","sp³/sp² assigned to the right nitrogens"]},
+ rubric:["Both hybridizations derived from domain count (double bond = one domain)","Localized lone pair occupies a hybrid orbital; a delocalized pair may instead need a p orbital","sp³/sp² assigned to the right nitrogens"]},
 {id:"WR-CH1-008",topic:"polarity",type:"written",diff:2,prompt:"<b>The C–Br trap:</b> ΔEN(C–Br) = 0.3, below the 0.5 cutoff — 'pure covalent' by the numbers. Is the C–Br bond polar? Explain what the ΔEN method misses.",
  model:"<b>Polar.</b> Course rule: carbon bonded to ANY halogen is always polar, regardless of ΔEN. The cutoff method oversimplifies: bond polarity is really <b>charge distribution over distance</b> — bromine is a much larger atom than carbon, so even a small EN difference produces a real dipole. (Related: C–Li at ΔEN 1.5 is drawn BOTH as ionic and polar covalent — it's a spectrum.)",
  rubric:["Answers polar despite the cutoff","States the C–halogen-always-polar rule","Mentions size / charge-over-distance as what ΔEN misses"]},
@@ -3606,7 +3613,7 @@ const QUESTIONS = [
 {id:"x2-ac12",topic:"acidbase2",type:"mc",diff:3,prompt:"What's the single question to ask when ranking acidity?",choices:["Which conjugate base is more stable?","Which acid is bigger?","Which has more hydrogens?","Which is more polar?"],answer:0,why:"<b>Always look at the conjugate base.</b> Acidity is decided by what's left AFTER the proton leaves. Deprotonate both, compare the anions with ARIO, and the more stable anion came from the stronger acid. Never try to rank the acids directly."},
 {id:"AB3-arw01",topic:"acidbase1",type:"mc",diff:1,prompt:"In a Brønsted acid–base step, the curved arrow must START at:",choices:["The lone pair on the base","The proton (H) being transferred","The positive charge on the acid","The bond angle between the two molecules"],answer:0,why:"<b>The lone pair on the base.</b> Ciesla, 2026-09-03: <i>&ldquo;if your arrow starts at the H it is wrong — that is not where the electron density is.&rdquo;</i> Arrows track ELECTRONS, and H⁺ has none. This is exactly why she wants you to say <b>the base steals the proton</b> rather than <b>the acid donates the proton</b> — the first phrasing puts the arrow where it belongs."},
 {id:"AB3-arw02",topic:"acidbase1",type:"mc",diff:2,prompt:"Why does Ciesla want you to think &ldquo;the base steals the proton&rdquo; instead of &ldquo;the acid donates the proton&rdquo;?",choices:["Because the donate-phrasing makes students draw the arrow starting at the proton, which has no electrons","Because acids do not actually donate protons","Because it is the Lewis definition","Because bases are always stronger than acids"],answer:0,why:"Her stated reason, verbatim: students who think <i>donate</i> draw the arrow from the proton — <b>but the proton has no electrons</b>. Thinking <i>steal</i> puts the arrow on the base, where the electron density actually is. A mental-model fix aimed at one specific graded error."},
-{id:"AB3-arw03",topic:"acidbase1",type:"num",diff:2,prompt:"How many curved arrows does a complete Brønsted acid–base step require?",answer:2,tolerance:0,why:"<b>Two</b>, drawn simultaneously (one step, never two). Arrow 1: lone pair on the base → the H. Arrow 2: the H–A bond → back onto A. One arrow makes the bond, one breaks it. Slide 3-6: <i>two pairs of electrons move simultaneously</i>."},
+{id:"AB3-arw03",correctedAt:"2026-10-14",topic:"acidbase1",type:"num",diff:2,prompt:"A base uses a localized lone pair to remove H from an H–A bond. No additional resonance shift is needed. How many curved arrows show this proton-transfer step?",answer:2,tolerance:0,why:"<b>Two.</b> Lone pair → H makes the new bond; H–A bond → A breaks the old bond. Both arrows belong to the same step. This is not a universal arrow count: adding a free H⁺ or including a resonance shift can require a different number."},
 {id:"AB3-arw04",topic:"acidbase1",type:"mc",diff:2,prompt:"The second arrow in an acid–base step starts at the H–A bond. Where does it END?",choices:["On atom A (becoming a new lone pair)","On the H","On the base","In empty space beside the molecule"],answer:0,why:"<b>On A.</b> The shared pair leaves H behind and localises on A as a new lone pair — which is why A picks up a negative formal charge. Ciesla warned specifically about arrows <i>&ldquo;going off into space&rdquo;</i>: an arrow that does not land on an atom or a bond <b>gets no credit</b>."},
 {id:"AB3-arw05",topic:"acidbase1",type:"mc",diff:3,prompt:"You have been drawing curved arrows since resonance (Ch 2). What changes in Ch 3?",choices:["Ch 3 arrows show a real chemical reaction — bonds actually break and form, and connectivity changes","Nothing, they mean the same thing","Ch 3 arrows move atoms instead of electrons","Ch 3 arrows are optional"],answer:0,why:"<b>Connectivity changes.</b> Resonance arrows shuffle lone pairs and π bonds between structures of the <i>same</i> molecule — no reaction occurs. Mechanism arrows break and make real bonds between atoms. Same notation, different claim. Ciesla flagged this as the Ch 2 → Ch 3 shift."},
 {id:"AB3-arw06",topic:"acidbase1",type:"multi",diff:3,prompt:"An amine nitrogen (3 bonds + 1 lone pair) uses that lone pair to steal a proton. After the step, give the formal charges.",fields:[{label:"Charge on N after it grabs H⁺",answer:1},{label:"Charge on the O that lost the H (now 1 bond, 3 lone pairs)",answer:-1}],why:"<b>N = +1:</b> 4 bonds, 0 lone pairs → FC = 5 − 0 − 4 = <b>+1</b>. <b>O = −1:</b> 1 bond, 3 lone pairs → FC = 6 − 6 − 1 = <b>−1</b>. Ciesla, same lecture: <i>&ldquo;formal charges have to be checked&rdquo;</i> — the arrows and the charges are graded together, and forgetting the charge after a transfer is the standard lost point."},
@@ -3663,13 +3670,13 @@ const QUESTIONS = [
 {id:"fg09",topic:"fgroups",type:"text",diff:1,prompt:"Identify the carbonyl functional group in the bond-line structure."+courseStructureDiagram("pentanone","Five-carbon bond-line chain with an internal carbonyl carbon bonded to carbon on both sides"),answer:"ketone",accept:["ketone","ketones"],why:"<b>Ketone</b> — carbonyl flanked by two carbons. Compare: swap one carbon for an H and it becomes an aldehyde."},
 {id:"fg10",topic:"fgroups",type:"text",diff:1,prompt:"Identify the carbonyl functional group in the bond-line structure."+courseStructureDiagram("propanal","Three-carbon bond-line structure whose terminal carbonyl carbon bears an explicit hydrogen"),answer:"aldehyde",accept:["aldehyde","aldehydes"],why:"<b>Aldehyde.</b> The second half of the definition matters: an H on the carbonyl is not enough by itself — formic acid (H–COOH) and formamide (H–CO–NH₂) also have one, and they're a carboxylic acid and an amide. The other side must be H or plain carbon. The carbonyl carbon of an aldehyde is therefore always terminal (it can't be an interior chain carbon); a ketone's is always interior."},
 {id:"fg11",topic:"fgroups",type:"text",diff:1,prompt:"Identify the carbonyl functional group in the bond-line structure."+courseStructureDiagram("propanoic-acid","Three-carbon bond-line structure ending in a carbonyl carbon directly bonded to OH"),answer:"carboxylic acid",accept:["carboxylic acid","carboxylicacid","carboxylic"],why:"<b>Carboxylic acid</b> (–COOH). Note it is NOT an alcohol despite the OH — the table's alcohol definition requires the attached carbon to hold only H/C, and here it's a carbonyl."},
-{id:"fg12",topic:"fgroups",type:"text",diff:1,prompt:"Identify the nitrogen-containing functional group in the bond-line structure."+courseStructureDiagram("acetamide","Bond-line structure with nitrogen directly bonded to a carbonyl carbon"),answer:"amide",accept:["amide","amides"],why:"<b>Amide.</b> The key word is <b>directly</b> — the N must be bonded straight to the carbonyl carbon. Nitrogen anywhere else in the molecule is an amine instead, and that mix-up is the error she named as most common."},
+{id:"fg12",topic:"fgroups",type:"text",diff:1,prompt:"Identify the nitrogen-containing functional group in the bond-line structure."+courseStructureDiagram("acetamide","Bond-line structure with nitrogen directly bonded to a carbonyl carbon"),answer:"amide",accept:["amide","amides"],why:"<b>Amide.</b> This N is bonded directly to the carbonyl carbon. An amine has an amine-type N without that direct carbonyl connection. Do not call every other nitrogen an amine: nitriles and nitro groups are different functional groups."},
 {id:"fg13",topic:"fgroups",type:"text",diff:2,prompt:"Identify the carbonyl functional group in the bond-line structure."+courseStructureDiagram("acetyl-chloride","Bond-line structure with chlorine directly bonded to a carbonyl carbon"),answer:"acyl halide",accept:["acyl halide","acylhalide","acid halide","acidhalide"],why:"<b>Acyl halide</b> (a.k.a. acid halide). She listed it in the C=O decision tree. Heads-up: it does <b>not</b> appear on the 12-row printed table — learn the decision tree, but know the table is the graded reference."},
 {id:"fg14",topic:"fgroups",type:"text",diff:2,prompt:"Identify the carbonyl functional group in the bond-line structure."+courseStructureDiagram("acetic-anhydride","Bond-line structure with two carbonyl groups joined through one oxygen"),answer:"anhydride",accept:["anhydride","anhydrides","acid anhydride"],why:"<b>Anhydride</b> — two carbonyls sharing one oxygen. She was openly unsure whether it's assessed ('I don't think it asks you… actually'), and it is not on the printed table. Recognize it; don't lose sleep over it."},
 {id:"fg15",topic:"fgroups",type:"text",diff:2,prompt:"Identify the carbonyl functional group in the bond-line structure."+courseStructureDiagram("ethyl-acetate","Bond-line structure with a carbonyl carbon bonded to an oxygen that continues to a carbon chain"),answer:"ester",accept:["ester","esters"],why:"<b>Ester.</b> The 'plain carbon' qualifier is doing real work: if that second carbon were itself a C=O you'd have an <b>anhydride</b> instead. Table's mnemonic: an ester is a carboxylic acid with the acidic H replaced by carbon — or an ether where one of the oxygen's carbons is a carbonyl."},
 
 /* --- THE DISCRIMINATIONS (where marks are actually lost) --- */
-{id:"fg16",topic:"fgroups",type:"mc",diff:2,prompt:"Identify the nitrogen-containing group in the bond-line structure."+courseStructureDiagram("trimethylamine","Bond-line structure with one neutral nitrogen bonded to three carbon endpoints and no carbonyl"),choices:["Amine","Amide","Nitrile","Ammonium"],answer:0,why:"<b>Amine.</b> Her most-common-error warning, verbatim: 'people don't see whether something is connected to a C=O or it's not.' N alone → amine. N on a carbonyl → amide. Always check the neighbour before naming nitrogen."},
+{id:"fg16",topic:"fgroups",type:"mc",diff:2,prompt:"Identify the nitrogen-containing group in the bond-line structure."+courseStructureDiagram("trimethylamine","Bond-line structure with one neutral nitrogen bonded to three carbon endpoints and no carbonyl"),choices:["Amine","Amide","Nitrile","Ammonium"],answer:0,why:"<b>Amine.</b> Here the neutral N has three single bonds to carbon groups and a lone pair; it is not directly attached to a carbonyl carbon. A direct N–C(=O) connection would make an amide. Check the actual bonds: nitriles and nitro groups also contain nitrogen but are not amines."},
 {id:"fg17",topic:"fgroups",type:"mc",diff:2,prompt:"Compare the two bond-line structures. What is the DEFINING structural difference between an ester and an amide?"+courseStructurePair("ethyl-acetate","acetamide","Ester and amide bond-line structures shown side by side"),choices:["The heteroatom bonded to the carbonyl: O for an ester, N for an amide","The number of carbons","Ester has a double bond, amide doesn't","Nothing — they're the same group"],answer:0,why:"<b>O vs N on the carbonyl.</b> Table's phrasing: 'amides look like esters, but the oxygen is replaced by nitrogen.' Same skeleton, one atom swapped, completely different reactivity — which is exactly why functional-group recognition has to be automatic."},
 {id:"fg18",topic:"fgroups",type:"mc",diff:2,prompt:"Use the two bond-line structures: how do you tell an ETHER from an ESTER?"+courseStructurePair("dimethyl-ether","ethyl-acetate","Ether and ester bond-line structures shown side by side"),choices:["An ester has a C=O on one of the oxygen's carbons; an ether's carbons carry only H/C","An ether has two oxygens","An ester has no oxygen","They're the same"],answer:0,why:"<b>Look for the carbonyl.</b> R–O–R with plain carbons = ether. If one of those carbons is doubled to an O, it's an ester. This is the C=O-first habit paying off again."},
 {id:"fg19",topic:"fgroups",type:"mc",diff:2,prompt:"Use the two bond-line structures: how do you tell an ALDEHYDE from a KETONE?"+courseStructurePair("propanal","pentanone","Aldehyde and ketone bond-line structures shown side by side"),choices:["Aldehyde has at least one H on the carbonyl carbon; a ketone has carbons on both sides","Aldehyde has two oxygens","Ketone has an OH","Ketones are always cyclic"],answer:0,why:"<b>Count what's on the carbonyl carbon.</b> H present → aldehyde (necessarily at a chain end). Carbon on both sides → ketone (necessarily interior). Same C=O, different neighbours."},
@@ -3733,7 +3740,7 @@ const QUESTIONS = [
 {id:"vs-d2",topic:"hybrid",type:"blanks",diff:3,prompt:"Work <b>SO₂</b> all the way through the ladder (sulfur is the central atom).",template:"Attached atoms: {{0}} · nonbonding pairs on S: {{1}} · steric number: {{2}} · arrangement of electron pairs: {{3}} · molecular geometry: {{4}} · bond angle: {{5}}",fields:[{label:"attached atoms",kind:"num",answer:2},{label:"lone pairs on S",kind:"num",answer:1},{label:"steric number",kind:"num",answer:3},{label:"electron arrangement",kind:"select",choices:["Linear","Trigonal planar","Tetrahedral"],answer:"Trigonal planar"},{label:"molecular geometry",kind:"select",choices:["Bent","Linear","Tetrahedral","Trigonal planar","Trigonal pyramidal"],answer:"Bent"},{label:"bond angle",kind:"select",choices:["a little less than 120°","exactly 120°","about 109.5°","about 104.5°","180°"],answer:"a little less than 120°"}],why:"SN <b>3</b> → sp², trigonal planar electron arrangement, <b>bent</b> molecular shape, angle <b>a little less than 120°</b>. Both the expanded-octet Lewis structure (S with two double bonds) and the charge-separated one give sulfur the same three domains, so the angle answer is identical either way."},
 {id:"vs-d3",topic:"hybrid",type:"mc",diff:3,prompt:"H₂O and SO₂ are both bent. Which has the LARGER bond angle, and why?",choices:["SO₂ — it is bent from steric number 3 (base 120°), water from steric number 4 (base 109.5°)","H₂O — oxygen is more electronegative","H₂O — it has more lone pairs so it spreads wider","They are equal; both are bent"],answer:0,why:"<b>SO₂ (~119°) beats H₂O (~104.5°) by roughly 15°.</b> The shape name is identical and tells you nothing about the number — the steric number does. Derivation order, always: count domains → steric number → base angle → subtract a little per lone pair."},
 {id:"vs-d4",topic:"hybrid",type:"mc",diff:3,prompt:"You are asked for a bond angle on an exam. What is the correct order of steps?",choices:["Count domains on the CENTRAL atom → steric number → base angle (180/120/109.5) → subtract a little for each lone pair","Name the shape → recall the angle that shape usually has","Find the hybridization from the formula → look up the angle","Count total valence electrons → divide by the number of bonds"],answer:0,why:"<b>Domains first, shape name last.</b> Ciesla: \"to get the bond angle, you need to know the geometry\" — meaning the ELECTRON geometry, which comes from the steric number. Going shape-name-first is exactly what produces 109° for SO₂."},
-{id:"vs-d5",topic:"hybrid",type:"mc",diff:3,prompt:"Which pairing is impossible?",choices:["Steric number 3 with an angle of 109.5°","Steric number 4 with an angle of 104.5°","Steric number 3 with an angle just under 120°","Steric number 4 with an angle of 107°"],answer:0,why:"<b>SN 3 can never give 109.5°.</b> Three domains start at 120° and only ever get pushed slightly below it by lone pairs — they cannot collapse a full 10°. 109.5° belongs to SN 4 only. Use this as a sanity check on every angle you write down."},
+{id:"vs-d5",correctedAt:"2026-10-14",topic:"hybrid",type:"mc",diff:3,prompt:"Which pairing mismatches the <b>ideal electron-domain angle</b>?",choices:["Steric number 3: 109.5°","Steric number 4: 109.5°","Steric number 3: 120°","Steric number 2: 180°"],answer:0,why:"<b>SN 3 has an ideal angle of 120°, not 109.5°.</b> Ideal SN 4 is 109.5° and ideal SN 2 is 180°. Actual molecular bond angles can differ because of lone pairs, bonding and ring constraints; these ideal values are not an absolute ban on other measured angles."},
 {id:"vs-w1",topic:"hybrid",type:"written",diff:3,prompt:"<b>Derive, don't recall:</b> H₂O and SO₂ are both called \"bent,\" yet their bond angles are different numbers. Explain why, and give both approximate values.",
  model:"Both shapes are bent because each central atom carries lone pairs that do not appear in the shape name — but the ANGLE comes from the electron arrangement, not the shape. Water's O has 2 bonds + 2 lone pairs = steric number <b>4</b> → tetrahedral arrangement, base 109.5°, compressed by two lone pairs to ≈<b>104.5°</b>. Sulfur in SO₂ has 2 attached O + 1 lone pair = steric number <b>3</b> → trigonal planar arrangement, base 120°, compressed slightly by one lone pair to <b>a little under 120°</b>. Same shape word, different steric number, about 15° apart.",
  rubric:["States that 'bent' is a shape name and does not fix the angle","Gets both steric numbers right (H₂O = 4, SO₂ = 3)","Names both base angles (109.5° and 120°) before compression","Gives ≈104.5° for water and just-under-120° for SO₂","Attributes the compression to lone-pair repulsion"]},
@@ -3828,7 +3835,7 @@ const QUESTIONS = [
 {id:"fg2-03",topic:"fgroups",type:"mc",diff:1,prompt:"Identify the carbonyl group in the bond-line structure."+courseStructureDiagram("pentanone","Internal carbonyl carbon bonded to carbon on both sides"),choices:["A ketone","An aldehyde","An ester","A carboxylic acid"],answer:0,why:"<b>Ketone.</b> Carbon on both sides, no H, no heteroatom."},
 {id:"fg2-04",topic:"fgroups",type:"mc",diff:1,prompt:"Identify the carbonyl group in the bond-line structure."+courseStructureDiagram("ethyl-acetate","Carbonyl carbon directly bonded to an oxygen that continues to carbon"),choices:["An ester","An ether","A ketone","A carboxylic acid"],answer:0,why:"<b>Ester.</b> Carbonyl plus an –OR. If that oxygen carried an H instead of an R, it'd be a carboxylic acid."},
 {id:"fg2-05",topic:"fgroups",type:"mc",diff:1,prompt:"Identify the nitrogen-containing group in the bond-line structure."+courseStructureDiagram("acetamide","Nitrogen directly bonded to a carbonyl carbon"),choices:["An amide","An amine","A nitrile","An imine"],answer:0,why:"<b>Amide.</b> The nitrogen touching a carbonyl is the whole definition — and it's why an amide's N is barely basic (see the resonance topic)."},
-{id:"fg2-06",topic:"fgroups",type:"mc",diff:2,prompt:"Ciesla flagged the two bond-line structures as a 'very common mistake' to mix up. Which pair is shown?"+courseStructurePair("dimethyl-ether","ethyl-acetate","Ether and ester structures for direct visual comparison"),choices:["Ether and ester","Ketone and aldehyde","Alkene and alkyne","Alcohol and phenol"],answer:0,why:"<b>Ether vs ester.</b> They sound alike and both contain C–O–C. The difference is the carbonyl: an <b>ester has a C=O</b>, an <b>ether does not</b> — it's just a carbon–oxygen–carbon bridge with no double bond anywhere."},
+{id:"fg2-06",topic:"fgroups",type:"mc",diff:2,prompt:"Ciesla flagged the two bond-line structures as a 'very common mistake' to mix up. Which pair is shown?"+courseStructurePair("dimethyl-ether","ethyl-acetate","Ether and ester structures for direct visual comparison"),choices:["Ether and ester","Ketone and aldehyde","Alkene and alkyne","Alcohol and phenol"],answer:0,why:"<b>Ether vs ester.</b> Look next to the bridging oxygen. An ester has C(=O)–O–C: the oxygen is directly bonded to a carbonyl carbon. An ether has C–O–C without that direct carbonyl connection. An ether-containing molecule may still have a double bond elsewhere."},
 {id:"fg2-07",topic:"fgroups",type:"mc",diff:2,prompt:"She said to 'make sure you know the difference' between the two bond-line structures. Which pair is shown?"+courseStructurePair("trimethylamine","acetamide","Amine and amide structures for direct visual comparison"),choices:["Amine and amide","Alkane and alkene","Ester and ketone","Nitrile and nitro"],answer:0,why:"<b>Amine vs amide.</b> One letter, completely different chemistry. <b>Amide's nitrogen touches a C=O; an amine's does not.</b> An amine is a base; an amide essentially isn't."},
 {id:"fg2-08",topic:"fgroups",type:"mc",diff:2,prompt:"Compare the two six-membered bond-line rings. What are they?"+courseStructureDiagram("aromatic-ring-pair","One ring with three alternating double bonds and one ring with only two double bonds separated by an sp3 carbon"),choices:["Aromatic (benzene) and a plain alkene","Both aromatic","Both alkenes","An aromatic and an alkyne"],answer:0,why:"<b>The sp³ carbon breaks it.</b> Her exact point in lecture — a hexagon is not automatically aromatic. Aromaticity needs the pi system continuous all the way round; one sp³ carbon interrupts it and you just have a cyclic alkene. Same 'brick wall' idea as resonance."},
 {id:"fg2-09",topic:"fgroups",type:"mc",diff:2,prompt:"Identify the OH-containing group in the bond-line structure."+courseStructureDiagram("phenol","A benzene ring with OH attached directly to a ring carbon"),choices:["A phenol","An alcohol","An ether","An aryl alkoxide"],answer:0,why:"<b>Phenol.</b> She said 'aromatic + alcohol' still earns full credit at this stage, but the name is phenol — <b>because the OH doesn't behave like a normal alcohol when it's bonded to an aromatic ring</b> (it's far more acidic, for resonance reasons you'll meet in Ch 3)."},
@@ -3990,7 +3997,7 @@ const QUESTIONS = [
 {id:"lp-04",topic:"resonance",type:"mc",diff:2,prompt:"In Ciesla's hybridization shortcut, does a DELOCALIZED lone pair count toward the atom's steric number?",choices:["No — and that changes the hybridization assignment","Yes, all lone pairs count","Only if the atom is charged","Only in rings"],answer:0,why:"<b>No in this course's shortcut.</b> The pair occupies the atom's unhybridized p orbital rather than one of its hybrid orbitals. Amide nitrogen has three sigma-bonding regions; its delocalized pair occupies p, so the nitrogen is <b>sp² and planar</b>, not sp³. The electron density is still real — 'do not count it' means do not count it as a hybrid-orbital domain for this assignment."},
 {id:"lp-05",topic:"resonance",type:"blanks",diff:2,prompt:"The amide nitrogen, start to finish. It is drawn with 3 bonds and 1 lone pair, next to a C=O.",template:"At a glance the steric number looks like {{0}} → {{1}}. But the lone pair is allylic to the C=O, so it is {{2}}. It therefore lives in {{3}}, does NOT count in the steric number, and the real hybridization is {{4}}.",fields:[{label:"apparent SN",kind:"num",answer:4},{label:"apparent hybridization",kind:"select",choices:["sp³","sp²","sp"],answer:"sp³"},{label:"localized or delocalized",kind:"select",choices:["delocalized","localized"],answer:"delocalized"},{label:"orbital",kind:"select",choices:["an unhybridized p orbital","an sp³ orbital","an sp² orbital"],answer:"an unhybridized p orbital"},{label:"real hybridization",kind:"select",choices:["sp²","sp³","sp"],answer:"sp²"}],why:"Her exact worked example, and the reason this matters: <b>hybridization questions now require a resonance check first.</b> The drawing says sp³; the delocalized pair says <b>sp², in a p orbital, planar</b> — which is what the real hybrid looks like. If you answer hybridization straight off the drawing, you'll get amide-type nitrogens wrong every time."},
 {id:"lp-06",topic:"resonance",type:"mc",diff:2,prompt:"THE RING EXCEPTION. A nitrogen sits in a ring and already has a pi bond of its own (pyridine-type). Its lone pair is:",choices:["Localized — in an sp² orbital, even though it sits next to the ring's pi system","Delocalized — everything in a ring delocalizes","Delocalized — it's next to a pi bond","Half and half"],answer:0,why:"<b>Localized, sp² orbital.</b> Her top tip verbatim: <i>heteroatom in a ring, already pi-bonded → the lone pair is localized.</i> It LOOKS allylic — that's the trap — but the nitrogen's p orbital is already being used to make its own pi bond, and the lone pair sits in an sp² orbital in the plane of the ring, perpendicular to the pi system. Gabe's own worksheet checklist: heteroatom ✓ · in a ring ✓ · already pi-bonded ✓ = <b>localized</b>."},
-{id:"lp-07",topic:"resonance",type:"mc",diff:3,prompt:"WHY does the ring exception work? An atom has three p orbitals (pₓ, p_y, p_z). They are:",choices:["Mutually perpendicular — only the one parallel to the neighboring p orbitals can join that pi system","Parallel to each other","All able to overlap with each other","Interchangeable during resonance"],answer:0,why:"<b>Orthogonal.</b> The nitrogen's p orbital aligned with the ring is already committed to its own pi bond. The other two p orbitals point at 90° to it, so they cannot overlap with that same chain of neighboring p orbitals. The lone pair therefore stays in an in-plane sp² hybrid orbital. For pi overlap, think <b>parallel and side-by-side</b>, not merely 'on the same molecule.'"},
+{id:"lp-07",topic:"resonance",type:"mc",diff:3,prompt:"WHY does the ring exception work? An atom has three p orbitals (pₓ, p_y, p_z). They are:",choices:["Mutually perpendicular — only the one parallel to the neighboring p orbitals can join that pi system","Parallel to each other","All able to overlap with each other","Interchangeable during resonance"],answer:0,why:"<b>Orthogonal means mutually perpendicular.</b> In pyridine-like sp² N, one p orbital remains unhybridized and joins the ring π system. The other two atomic p orbitals mix with an s orbital to form the three sp² hybrids. The lone pair occupies an in-plane sp² hybrid, not the perpendicular p orbital. For π overlap, look for parallel, side-by-side orbitals."},
 {id:"lp-08",topic:"resonance",type:"mc",diff:2,prompt:"A nitrogen sits in the SAME kind of ring but has NO pi bond of its own (pyrrole-type) — just 3 sigma bonds and a lone pair, flanked by the ring's pi bonds. Its lone pair is:",choices:["Delocalized — into the ring's pi system, in a p orbital","Localized — it's in a ring","Localized — nitrogen never delocalizes","Delocalized only if the ring is charged"],answer:0,why:"<b>Delocalized.</b> The exception needs BOTH conditions: in a ring <b>and already pi-bonded</b>. This nitrogen has no pi bond of its own, so its p orbital is free, and the lone pair joins the pi system. Side-by-side: pyridine-type N (has a pi bond) → localized, sp²; pyrrole-type N (no pi bond) → delocalized, p orbital. She put exactly this pair on the board."},
 {id:"lp-09",topic:"resonance",type:"blanks",diff:2,prompt:"Run the complete lone-pair checklist on a nitrogen that is part of a ring and already forms a C=N pi bond within that ring.",template:"Heteroatom? {{0}} · In a ring? {{1}} · Already pi-bonded? {{2}} → the lone pair is {{3}}, found in {{4}}.",fields:[{label:"heteroatom",kind:"select",choices:["yes","no"],answer:"yes"},{label:"in a ring",kind:"select",choices:["yes","no"],answer:"yes"},{label:"already pi-bonded",kind:"select",choices:["yes","no"],answer:"yes"},{label:"verdict",kind:"select",choices:["localized","delocalized"],answer:"localized"},{label:"orbital",kind:"select",choices:["an sp² orbital","an unhybridized p orbital","an sp³ orbital"],answer:"an sp² orbital"}],why:"Three yeses = localized. The nitrogen's p orbital is already used in the C=N pi bond, so its lone pair remains in an in-plane sp² orbital. This complete checklist is fast enough to run on every ring heteroatom the quiz shows you."},
 {id:"lp-10",topic:"resonance",type:"mc",diff:2,prompt:"An oxygen carries TWO lone pairs and one of them can do resonance. How do you assess them?",choices:["One lone pair at a time — one can be delocalized while the other stays localized","Both must be the same","Average them","Only the first drawn one counts"],answer:0,why:"<b>One at a time.</b> Her words: don't start 'the mind gymnastics of what's happening with the other one.' An ester/acid oxygen is the standard case: one pair delocalizes into the C=O (p orbital), the other stays localized (sp² orbital). One atom, two different answers, and that's fine."},
@@ -4007,7 +4014,7 @@ const QUESTIONS = [
 {id:"rk-06",topic:"resonance",type:"mc",diff:2,prompt:"Her guideline for how many formal charges a generated structure should carry:",choices:["About two at most — and the same TOTAL charge you started with","As many as needed","Exactly zero","One per atom"],answer:0,why:"<b>≈2 formal charges, and conserve the total.</b> A +1 ion should generate structures that are still +1 overall — if you start neutral and produce three or four scattered charges, you took a wrong turn (usually by starting in the wrong place). Conservation of charge is the per-step audit: check the SUM after every single push."},
 {id:"rk-07",topic:"resonance",type:"blanks",diff:2,prompt:"Conservation of charge as a working check. You start from an anion with total charge −1 and generate three more structures.",template:"Structure 2 must sum to {{0}} · structure 3 must sum to {{1}} · structure 4 must sum to {{2}}. If one sums to 0 instead, the mistake is almost always a {{3}}.",fields:[{label:"S2",kind:"select",choices:["−1","0","+1"],answer:"−1"},{label:"S3",kind:"select",choices:["−1","0","+1"],answer:"−1"},{label:"S4",kind:"select",choices:["−1","0","+1"],answer:"−1"},{label:"likely error",kind:"select",choices:["missed formal charge on an atom an arrow touched","wrong arrow direction","broken sigma bond"],answer:"missed formal charge on an atom an arrow touched"}],why:"Every structure of a −1 ion sums to <b>−1</b>, no exceptions. When the sum drifts, recount the atoms your last arrow touched — one of them gained or lost a pair and didn't get its charge updated. This check catches the error at the step where it happened instead of three structures later."},
 {id:"rk-08",topic:"resonance",type:"mc",diff:1,prompt:"RANKING, rule 1 — the 'absolute top dog':",choices:["Every atom has an octet — regardless of where any formal charge sits","Fewest formal charges","Negative charge on the most electronegative atom","Most double bonds"],answer:0,why:"<b>Full octets beat everything.</b> Rules in priority order: (1) all atoms have octets, (2) fewest formal charges / least separation, (3) placement of the charge on the appropriate atom. You apply rule 2 only to break ties under rule 1, and rule 3 only under rule 2."},
-{id:"rk-09",topic:"resonance",type:"mc",diff:3,prompt:"THE TRAP she warned about: structure A has a positive charge on OXYGEN but every atom has an octet. Structure B is a carbocation (positive on carbon, six electrons). Which is more stable?",choices:["A — the all-octet structure wins even with + on the electronegative oxygen","B — never put + on oxygen","They're equal","Neither is valid"],answer:0,why:"<b>A.</b> This is the one she said 'trips students up in an assessment situation': the instinct says + on oxygen is terrible, but octets are rule 1 and placement is only rule 3. An O⁺ with four bonds and an octet beats a six-electron carbon. On your worksheet ranking, this is exactly why the O⁺ structure was #1 — MAJOR CONTRIBUTOR, your words."},
+{id:"rk-09",topic:"resonance",type:"mc",diff:3,prompt:"THE TRAP she warned about: structure A has a positive charge on OXYGEN but every atom has an octet. Structure B is a carbocation (positive on carbon, six electrons). Which is more stable?",choices:["A — the all-octet structure wins even with + on the electronegative oxygen","B — never put + on oxygen","They're equal","Neither is valid"],answer:0,why:"<b>A.</b> For these resonance contributors, completing the octets outweighs placing the positive charge on oxygen. O⁺ with three bond orders and one lone pair has an octet: formal charge = 6 − 2 − 3 = +1. Four bond orders and no lone pairs would instead give oxygen +2."},
 {id:"rk-10",topic:"resonance",type:"mc",diff:2,prompt:"Two structures BOTH have all octets. One is neutral everywhere; the other carries a +1 and a −1. Rule 2 says:",choices:["The uncharged one is more stable — fewer formal charges / no charge separation","The charged one — charges add stability","Equal","Check electronegativity first"],answer:0,why:"<b>Fewest charges wins the tie.</b> Separating + from − costs energy. Only when octets AND charge-count tie do you move to rule 3, placement."},
 {id:"rk-11",topic:"resonance",type:"mc",diff:2,prompt:"Rule 3, placement. Both structures: all octets, one formal charge each. Negative on oxygen vs negative on carbon:",choices:["Negative on oxygen — the more electronegative atom holds − better","Negative on carbon","Equal","Whichever has fewer hydrogens"],answer:0,why:"<b>− goes on the electronegative atom.</b> And the mirror rule: <b>+ is better on the LESS electronegative atom</b> — a positive on N beats a positive on O, because oxygen wants electron density, not a deficit. Both directions showed up on the board today."},
 {id:"rk-12",topic:"resonance",type:"mc",diff:1,prompt:"Resonance structures that are equally stable are called:",choices:["Equivalent (or degenerate) — they contribute to the hybrid equally","Major contributors","Tautomers","Conformers"],answer:0,why:"<b>Equivalent / degenerate.</b> Acetate's two symmetry-related structures are the textbook case. Do not call contributors equivalent merely because neither is the major one: equal contribution needs equal stability, usually supported by symmetry or the same octet/charge environment."},
@@ -4085,7 +4092,7 @@ const QUESTIONS = [
 {id:"EXACT-RB3-20260902-10",sourceAssetUids:["ASSET-RB3-20260902-11"],sourceFiles:["exact-11-cycloserine-lone-pair-localization.png"],topic:"resonance",type:"blanks",diff:3,prompt:"For each numbered atom in cycloserine, classify its lone pair(s) as localized, delocalized, or absent."+rb3Shot("exact-11-cycloserine-lone-pair-localization.png",1076,1174,70,215,680,370,"Cycloserine and its numbered atoms 1 through 7"),template:"1 {{0}} · 2 {{1}} · 3 {{2}} · 4 {{3}} · 5 {{4}} · 6 {{5}} · 7 {{6}}",fields:[{label:"atom 1",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"localized"},{label:"atom 2",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"no lone pairs"},{label:"atom 3",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"delocalized"},{label:"atom 4",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"no lone pairs"},{label:"atom 5",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"localized"},{label:"atom 6",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"localized"},{label:"atom 7",kind:"select",choices:["localized","delocalized","no lone pairs"],answer:"no lone pairs"}],why:"Atom 3 is the amide-like ring nitrogen directly attached to C=O, so its lone pair is delocalized. The carbonyl O (1), exocyclic amino N (5), and saturated ring O (6) have localized pairs. Carbons 2, 4, and 7 have no lone pairs."},
 {id:"SIM-RB3-20260902-01",topic:"bondline",type:"mc",diff:2,bondLineFirst:["rb3-transfer-dimethoxypropane"],prompt:"Build CH₃OCH₂CH₂CH₂OCH₃, then audit the checked bond-line graph.",choices:["5 carbons, 2 oxygens, chain C–O–C–C–C–O–C","6 carbons, 2 oxygens","5 carbons with an O–O bond","4 carbons, 1 oxygen"],answer:0,why:"The different formula expands to methyl–O–three-carbon chain–O–methyl: <b>C–O–C–C–C–O–C</b>. That is five carbons and two oxygens."},
 {id:"SIM-RB3-20260902-02",topic:"arrows",type:"blanks",diff:2,prompt:"Convert one nitrite contributor, O=N–O⁻, into the other equivalent contributor.",template:"Use {{0}} arrows. A lone pair from {{1}} forms N=O while the old pi pair moves to {{2}}. Nitrogen's formal charge is {{3}} and the ion remains {{4}}.",fields:[{label:"arrow count",kind:"num",answer:2},{label:"donor",kind:"select",choices:["single-bonded O−","nitrogen","double-bonded O"],answer:"single-bonded O−"},{label:"destination",kind:"select",choices:["the formerly double-bonded O","nitrogen","the N–O sigma bond"],answer:"the formerly double-bonded O"},{label:"nitrogen charge",kind:"select",choices:["0","+1","−1"],answer:"0"},{label:"net charge",kind:"select",choices:["−1","0","+1"],answer:"−1"}],why:"Like ozone, the single-bonded O⁻ donates while the old π pair leaves. Unlike ozone, nitrite's central nitrogen is formally neutral in these contributors. Net charge remains −1."},
-{id:"SIM-RB3-20260902-03",topic:"hybrid",type:"blanks",diff:3,prompt:"Compare the two nitrogens of imidazole: one is pyridine-like (=N–) and one is pyrrole-like (–NH–)."+namedMoleculeDiagram("imidazole","Imidazole","C₃H₄N₂","Imidazole bond-line structure with one pyridine-like nitrogen and one N-H pyrrole-like nitrogen"),template:"Both nitrogens are {{0}} and {{1}}. The pyridine-like lone pair is {{2}} in an {{3}} orbital; the pyrrole-like lone pair is {{4}} in a {{5}} orbital.",fields:[{label:"hybridization",kind:"select",choices:["sp2","sp3","sp"],answer:"sp2"},{label:"geometry",kind:"select",choices:["trigonal planar","trigonal pyramidal","linear"],answer:"trigonal planar"},{label:"pyridine-like pair",kind:"select",choices:["localized","delocalized"],answer:"localized"},{label:"pyridine-like orbital",kind:"select",choices:["sp2 hybrid","p","sp3 hybrid"],answer:"sp2 hybrid"},{label:"pyrrole-like pair",kind:"select",choices:["delocalized","localized"],answer:"delocalized"},{label:"pyrrole-like orbital",kind:"select",choices:["p","sp2 hybrid","sp3 hybrid"],answer:"p"}],why:"Both atoms need an unhybridized p orbital in the aromatic ring and are sp²/planar. The pyridine-like N uses its p orbital in a π bond, leaving its lone pair localized in an sp² hybrid. The pyrrole-like N contributes its lone pair from the p orbital to the aromatic sextet."},
+{id:"SIM-RB3-20260902-03",correctedAt:"2026-10-14",topic:"hybrid",type:"blanks",diff:3,prompt:"Compare the two nitrogens of imidazole: one is pyridine-like (=N–) and one is pyrrole-like (–NH–)."+namedMoleculeDiagram("imidazole","Imidazole","C₃H₄N₂","Imidazole bond-line structure with one pyridine-like nitrogen and one N-H pyrrole-like nitrogen"),template:"Both nitrogens are {{0}}; their three sp² hybrid orbitals have a {{1}} arrangement. The pyridine-like lone pair is {{2}} in an {{3}} orbital; the pyrrole-like lone pair is {{4}} in a {{5}} orbital.",fields:[{label:"hybridization",kind:"select",choices:["sp2","sp3","sp"],answer:"sp2"},{label:"hybrid-orbital arrangement",kind:"select",choices:["trigonal planar","trigonal pyramidal","linear"],answer:"trigonal planar"},{label:"pyridine-like pair",kind:"select",choices:["localized","delocalized"],answer:"localized"},{label:"pyridine-like orbital",kind:"select",choices:["sp2 hybrid","p","sp3 hybrid"],answer:"sp2 hybrid"},{label:"pyrrole-like pair",kind:"select",choices:["delocalized","localized"],answer:"delocalized"},{label:"pyrrole-like orbital",kind:"select",choices:["p","sp2 hybrid","sp3 hybrid"],answer:"p"}],why:"Both N atoms are sp², with three in-plane hybrid orbitals and one perpendicular p orbital. The pyridine-like lone pair occupies an sp² hybrid; the pyrrole-like lone pair occupies the p orbital and contributes to aromaticity. The orbital arrangement is not the same as molecular shape: the two bonded neighbors at pyridine-like N form a bent molecular shape."},
 {id:"SIM-RB3-20260902-04",topic:"resonance",type:"blanks",diff:3,prompt:"For 2,4-hexadienal, O=CH–CH=CH–CH=CH–CH₃, locate the resonance-derived electron-deficient carbon sites. <i>(Number the carbons from the C=O carbon: it is C1, the next is C2, and so on.)</i>",template:"There are {{0}} δ+ carbons: C1 (the carbonyl carbon) plus {{1}} and {{2}}. Oxygen is {{3}}.",fields:[{label:"site count",kind:"num",answer:3},{label:"first alternating site",kind:"select",choices:["C3","C2","C4"],answer:"C3"},{label:"second alternating site",kind:"select",choices:["C5","C4","C6 (the terminal CH₃)"],answer:"C5"},{label:"oxygen polarity",kind:"select",choices:["δ−","δ+","neutral"],answer:"δ−"}],why:"Carbonyl polarization and two successive conjugated π shifts place electron deficiency at the carbonyl carbon, β carbon, and δ carbon. The aldehyde skeleton differs from the aryl source, but the alternating-site rule is the same."},
 {id:"SIM-RB3-20260902-05",topic:"resonance",type:"mc",diff:2,prompt:"Across the significant contributors of phenoxide, at which site can the negative charge not appear?"+namedMoleculeDiagram("phenoxide","Phenoxide","C₆H₅O⁻","Phenoxide bond-line structure with a negatively charged oxygen attached to a benzene ring"),choices:["Oxygen","Either ortho carbon","Para carbon","Either meta carbon"],answer:3,why:"O-lone-pair conjugation places negative charge at the two ortho positions and para. Meta positions are skipped by the alternating π pathway, just as meta cations are absent from the benzyl-cation contributor set."},
 {id:"SIM-RB3-20260902-06",topic:"hybrid",type:"mc",diff:2,prompt:"Which nitrogen is sp³-hybridized?"+namedMoleculeSet([["piperidine","A · Piperidine","C₅H₁₁N","Saturated six-membered piperidine ring with N-H and a nitrogen lone pair"],["pyridine","B · Pyridine","C₅H₅N","Aromatic six-membered pyridine ring with one nitrogen and a lone pair"],["pyrrole","C · Pyrrole","C₄H₅N","Aromatic five-membered pyrrole ring with N-H and a lone pair"],["dimethylformamide","D · N,N-Dimethylformamide","HCON(CH₃)₂","Dimethylformamide with a carbonyl bonded to nitrogen bearing two methyl groups"]],"Structures of the four nitrogen compounds in answer order"),choices:["A · Piperidine nitrogen","B · Pyridine nitrogen","C · Pyrrole nitrogen","D · N,N-dimethylformamide nitrogen"],answer:0,why:"Piperidine is a saturated amine with a localized lone pair and pyramidal sp³ nitrogen. Pyridine and pyrrole nitrogens are part of aromatic systems; the formamide nitrogen is conjugated with C=O. Those three are sp²."},
@@ -4189,7 +4196,7 @@ const QUESTIONS = [
 {id:"lv-03",topic:"acidbase1",type:"mc",diff:2,prompt:"You dissolve sulfuric acid (pKa −9) in water intending to protonate something whose conjugate acid has pKa −7.3. What acid are you ACTUALLY working with, and does the reaction still go?",choices:["H₃O⁺ (pKa −1.7) — and NO: −1.7 is above −7.3, so the step no longer works","H₂SO₄ — water is just a spectator","H₃O⁺ — and yes, it still works fine","HSO₄⁻ — and yes"],answer:0,why:"Her worked example verbatim. With H₂SO₄ directly the step goes (−9 &lt; −7.3, ~10² product ratio). But in water the H₂SO₄ is leveled to H₃O⁺ first, and −1.7 → −7.3 is uphill. <b>Same reagent on paper, different acid in the flask.</b>"},
 {id:"lv-04",topic:"acidbase1",type:"blanks",diff:2,prompt:"HER METHOD for any 'can this run in water?' question (she promised a pKa table comes with it).",template:"Step 1: write out the reaction you WANT as a {{0}}. Step 2: substitute the strong acid with {{1}} (or the strong base with {{2}}). Step 3: re-check the pKas — if the rewritten reaction is uphill, the answer is {{3}}.",fields:[{label:"setup",kind:"select",choices:["reaction scheme","word equation","table"],answer:"reaction scheme"},{label:"acid sub",kind:"select",choices:["hydronium (H₃O⁺)","hydroxide","the solvent"],answer:"hydronium (H₃O⁺)"},{label:"base sub",kind:"select",choices:["hydroxide (OH⁻)","hydronium","ammonia"],answer:"hydroxide (OH⁻)"},{label:"verdict",kind:"select",choices:["no — cannot run in water","yes anyway","need ARIO"],answer:"no — cannot run in water"}],why:"She said it twice: <b>set the problem up as a reaction scheme</b> — 'if you don't, I guarantee you it's hard to work out.' The whole leveling question is one substitution plus one pKa comparison you already know how to do."},
 {id:"lv-05",topic:"acidbase1",type:"mc",diff:2,prompt:"BASE SIDE: amide ion (NH₂⁻ — conjugate acid NH₃, pKa 38) is dropped into water (pKa 14). What are you actually working with?",choices:["Hydroxide — NH₂⁻ rips a proton off water (14 ≪ 38), leaving OH⁻ and ammonia","NH₂⁻ — bases are immune to leveling","Ammonium","Hydronium"],answer:0,why:"Leveling runs on the base side too: any base stronger than hydroxide deprotonates the SOLVENT before it ever meets your substrate. NH₂⁻ + H₂O → NH₃ + OH⁻ is steeply downhill (14 vs 38), so the flask holds hydroxide."},
-{id:"lv-06",topic:"acidbase1",type:"mc",diff:3,prompt:"Her acetone example: you want amide ion to deprotonate acetone (pKa 19.2). Can you do it in WATER?",choices:["No — in water you really have OH⁻ (conj. acid pKa 14), and 14 → 19.2 is uphill, favoring reactants","Yes — amide is strong enough","Yes — water makes bases stronger","No — acetone dissolves poorly"],answer:0,why:"Dry: NH₂⁻ takes acetone's proton easily (19.2 vs 38). In water: leveled to OH⁻, and hydroxide (14) cannot favorably deprotonate a pKa-19.2 ketone — equilibrium sits on the reactant side (favor the higher-pKa acid's side). <b>This is WHY the solvent choice is chemistry, not logistics.</b>"},
+{id:"lv-06",correctedAt:"2026-10-14",topic:"acidbase1",type:"mc",diff:3,prompt:"Her acetone example: you want amide ion to deprotonate acetone (pKa 19.2). Can you do it in WATER? Use the course's water pKa value of 14.",choices:["No — in water you really have OH⁻ (conjugate acid pKa 14), and 19.2 → 14 is uphill, favoring reactants","Yes — amide is strong enough","Yes — water makes bases stronger","No — acetone dissolves poorly"],answer:0,why:"First level the base: NH₂⁻ + H₂O → NH₃ + OH⁻. Then rewrite the intended transfer: acetone + OH⁻ ⇌ enolate + H₂O. Compare the acid on each side: <b>19.2 → 14</b>. The product acid has lower pKa, so this transfer favors reactants. In a suitable dry solvent, the comparison with NH₃ is 19.2 → 38 and favors products."},
 {id:"lv-07",topic:"acidbase1",type:"mc",diff:1,prompt:"Why did she call beating the leveling effect 'the holy grail'?",choices:["Most organic reactions need acids/bases OUTSIDE water's window, but water is the cheap, green solvent everyone wishes they could use","Water is expensive","Because hydronium is unstable","It is a trick question"],answer:0,why:"The leveling effect is <b>the reason most organic chemistry is not done in water</b>: the reagents that make reactions go are stronger than H₃O⁺/OH⁻ and get leveled on contact. Running those reactions in water anyway would be cleaner and cheaper — hence the grail."},
 {id:"lv-08",topic:"acidbase1",type:"mc",diff:1,prompt:"Her two exam promises about leveling questions (both said out loud today):",choices:["You WILL get the pKa values, and leveling will never be combined with an ARIO ranking in one question","No pKa values — memorize them","Leveling + ARIO combos are her favorite","Leveling will not be tested"],answer:0,why:"Verbatim: 'I wouldn't ask you a leveling-effect question without pKa' and 'I'm not going to ask you to do an ARIO problem when it involves leveling effects.' So when you see a pKa table + 'can you deprotonate X in water?' — that IS the leveling question. Write the scheme, substitute, compare."},
 {id:"lv-09",topic:"acidbase1",type:"written",diff:3,prompt:"<b>PAPER, her exam format:</b> Given pKas — HA (−6), H₃O⁺ (−1.7), substrate-H⁺ conjugate acid (−4). Question: can HA protonate the substrate in water? Set it up as a reaction scheme and justify.",model:"Step 1, the reaction I WANT: HA + substrate → A⁻ + substrate-H⁺ — goes when dry, since −6 &lt; −4. Step 2, leveling: in water HA (pKa −6, stronger than hydronium) is converted to H₃O⁺, so substitute: H₃O⁺ + substrate → H₂O + substrate-H⁺. Step 3, compare: acid pKa −1.7 vs conjugate-acid pKa −4 → going from HIGHER pKa to LOWER pKa is uphill; equilibrium favors reactants. ANSWER: <b>No — in water the effective acid is H₃O⁺ and the step no longer goes.</b>",rubric:["The WANTED reaction written as a scheme first","Leveling applied: acid replaced by hydronium because pKa −6 &lt; −1.7","pKa comparison run on the SUBSTITUTED reaction, not the original","Explicit verdict tied to which side the equilibrium favors"]},
@@ -4248,7 +4255,7 @@ const QUESTIONS = [
 {id:"ab3-25",topic:"acidbase2",type:"mc",diff:2,prompt:"Why does solvation stabilize an anion at all?",choices:["Solvent molecules aim their δ+ ends at the negative charge — attractive ion–dipole contacts, stronger the closer they get","The solvent absorbs the charge","Solvation makes the ion bigger","It doesn't — solvation is neutral"],answer:0,why:"<b>A shell of δ+ pointed at the −.</b> Alcohols and water are good at this. Distance matters — intermolecular forces fall off fast — which is exactly why blocking the approach (sterics) costs real stability."},
 {id:"ab3-26",topic:"acidbase2",type:"mc",diff:1,prompt:"Her rule about writing RANKINGS on an exam:",choices:["Label it unambiguously — 'A > B > C' or 'strongest → weakest'; if she has to figure out which end is which, no credit","Any order is fine if the letters are right","Ambiguous answers get partial credit","Circle the strongest only"],answer:0,why:"<b>Unlabeled = ungraded.</b> Verbatim: if there's a 'figuring out step' for her, it's not an acceptable answer — and going deliberately vague in hope of partial credit backfires to zero. Free points: write 'strongest' and 'weakest' at the ends. This costs ten seconds and is the cheapest rule on the whole quiz."},
 {id:"ab3-27",topic:"acidbase2",type:"mc",diff:2,prompt:"In the acid–base mechanism, why does she insist you think 'the base STEALS the proton' rather than 'the acid donates it'?",choices:["Because arrows show ELECTRONS moving — donor-thinking makes students start arrows on the H, which is always wrong","Because bases are more important","Because acids can't act first","It's just a saying"],answer:0,why:"<b>Arrow discipline.</b> Arrow 1: base's lone pair → the H. Arrow 2: the H–A bond's electrons → back onto A. Think 'donate' and your arrow sprouts from a hydrogen — electrons don't live there. And check conservation of charge across the whole reaction, same as resonance."},
-{id:"ab3-28",topic:"acidbase2",type:"blanks",diff:3,prompt:"One molecule, four candidate hydrogens (like today's worksheet): H_A on an sp² carbon · H_B on an sp³ carbon (its anion >1 C from a fluorine) · H_C on a carbon whose anion has resonance · H_D on an oxygen.",template:"Most acidic: {{0}} (atom type — oxygen). Next: {{1}} (resonance). Next: {{2}} ({{3}} beats sp³, since the fluorine is too far for induction to count). If asked for INCREASING pKa, list them {{4}} first.",fields:[{label:"1st",kind:"select",choices:["H_D","H_A","H_B","H_C"],answer:"H_D"},{label:"2nd",kind:"select",choices:["H_C","H_B","H_A","H_D"],answer:"H_C"},{label:"3rd",kind:"select",choices:["H_A","H_B"],answer:"H_A"},{label:"deciding factor",kind:"select",choices:["sp² orbital","induction","sterics"],answer:"sp² orbital"},{label:"list order",kind:"select",choices:["most acidic","least acidic"],answer:"most acidic"}],why:"Her full worksheet procedure: redraw with the negative at EACH site, then run the ladder ACROSS the sites — atom type crowns H_D, resonance places H_C, and A-vs-B falls to <b>orbital</b> because the fluorine sits more than one carbon away (induction fallen off). Final trap is the question's wording: <b>increasing pKa starts at the MOST acidic H</b>. Read what's asked."},
+{id:"ab3-28",correctedAt:"2026-10-14",topic:"acidbase2",type:"blanks",diff:3,prompt:"Rank four reference hydrogens using these approximate pKa values: H_A = ethene C–H (44); H_B = ethane C–H (50); H_C = acetone's C–H next to C=O (20); H_D = ethanol O–H (16). These are four different molecules, not an exact worksheet redraw.",template:"Most acidic: {{0}}. Next: {{1}}. Next: {{2}}. For ethene versus ethane, the more stable conjugate base holds the pair in an {{3}}. INCREASING pKa lists the {{4}} hydrogen first.",fields:[{label:"1st",kind:"select",choices:["H_D","H_A","H_B","H_C"],answer:"H_D"},{label:"2nd",kind:"select",choices:["H_C","H_B","H_A","H_D"],answer:"H_C"},{label:"3rd",kind:"select",choices:["H_A","H_B"],answer:"H_A"},{label:"deciding factor",kind:"select",choices:["sp² orbital","sp³ orbital","unhybridized p orbital"],answer:"sp² orbital"},{label:"list order",kind:"select",choices:["most acidic","least acidic"],answer:"most acidic"}],why:"<b>Lower pKa means stronger acid:</b> 16 < 20 < 44 < 50, so D > C > A > B in acidity. Resonance stabilizes acetone's enolate; greater s character helps ethene's sp² conjugate base relative to ethane's sp³ one. O–H wins in this set, not in every molecule: a C–H between two carbonyls can be more acidic than an alcohol. Always identify the actual sites."},
 {id:"ab3-29",topic:"acidbase1",type:"mc",diff:2,prompt:"PRE-READ for Thursday — the LEVELING EFFECT. In water, what happens if you dissolve a base stronger than hydroxide?",choices:["It just deprotonates water, leaving you with hydroxide — you can't use a stronger base than the solvent's conjugate base","It works at full strength","It explodes","Water protects it"],answer:0,why:"<b>The solvent caps your base strength.</b> Drop NaNH₂ into water and it instantly rips a proton off H₂O, leaving NH₃ + OH⁻ — the super-base is 'leveled' down to hydroxide. Strong bases beyond OH⁻ only survive in non-aqueous solvents. She flagged this as a topic that 'causes a lot of mistakes on exams' — read the section before Thursday."},
 {id:"ab3-30",topic:"acidbase1",type:"mc",diff:3,prompt:"Leveling, acid side: what is the strongest acid that can actually EXIST in water?",choices:["H₃O⁺ — anything stronger just protonates water completely and becomes H₃O⁺","HCl","H₂SO₄","There is no limit"],answer:0,why:"<b>Hydronium is the floor.</b> HCl (pKa −7) dumped in water transfers essentially every proton to H₂O; what's actually in the flask is H₃O⁺ and Cl⁻. Stronger acids are all leveled to hydronium's strength — mirror image of the base-side rule."},
 {id:"ab3-31",topic:"acidbase2",type:"written",diff:3,prompt:"<b>PAPER, in her exam format:</b> Rank these three acids and justify every step: (1) CH₃CH₂OH · (2) CH₃COOH · (3) ClCH₂COOH. Label the ranking unambiguously.",
@@ -7331,7 +7338,7 @@ VIEWS.drill = (v) => {
     '<div class="qprompt">'+(q.arrowBoard&&q.type!=="written"?'Draw both curved arrows for this proton transfer, then choose the product or charge.':q.prompt)+'</div>';
   if(['ch4','ch5'].includes(q.courseRoute)){const tag=c.querySelector('.tag');if(tag)tag.textContent=(TOPICS[q.topic]?.name||'Course practice')+' · '+(D.i+1)+'/'+D.queue.length+(D.cold?' · independent':' · with support');}
   c.insertBefore(questionIdRow(q),c.querySelector(".question-orientation, .qprompt"));
-  if(['ch4','ch5'].includes(q.courseRoute)&&q.source){const source=el('details',{class:'mini-details'});source.innerHTML='<summary>Course source</summary><p>'+esc(q.source)+'</p>';c.appendChild(source);}
+  if(q.source){const source=el('details',{class:'mini-details'});source.innerHTML='<summary>Course source</summary><p>'+esc(q.source)+'</p>';c.appendChild(source);}
   if(q.arrowBoard)c.appendChild(el('div',{'data-proton-arrow-host':''}));
   addHintCoach(c,q,D);
   const structureDone=!!(D.structureBuilt&&D.structureBuilt[q.id]===q.drawMol);
@@ -7509,7 +7516,7 @@ VIEWS.drill = (v) => {
       if(isRankingOrderField(f)){
         ctl=makeRankingControl(f);displayCtl=ctl._widget;
       }else if(f.kind==="select"){
-        ctl=el("select",{class:"answerbox",style:"width:auto;min-width:110px;padding:8px;margin:0 4px","aria-label":f.label});
+        ctl=el("select",{class:"answerbox",style:"width:auto;min-width:110px;max-width:calc(100% - 8px);box-sizing:border-box;padding:8px;margin:0 4px","aria-label":f.label});
         ctl.appendChild(el("option",{value:""},"choose"));
         f.choices.forEach(x=>ctl.appendChild(el("option",{value:String(x)},String(x))));
       }else{
@@ -7524,7 +7531,7 @@ VIEWS.drill = (v) => {
       const vals=q.fields.map((f,i)=>(controls[i]?.dataset?.rankValue||controls[i]?.value||"").trim());
       if(vals.some(v=>v===""))return;
       const norm=s=>String(s).toLowerCase().replace(/²/g,"2").replace(/³/g,"3").replace(/°/g,"").replace(/[\s.]/g,"");
-      const checks=q.fields.map((f,i)=>f.kind==="num"?Math.abs(Number(vals[i])-Number(f.answer))<=(f.tolerance||0):(f.accept||[f.answer]).some(a=>norm(a)===norm(vals[i])));
+      const checks=q.fields.map((f,i)=>f.kind==="num"?ccNumericMatch(f,vals[i]):(f.accept||[f.answer]).some(a=>norm(a)===norm(vals[i])));
       const ok=checks.every(Boolean);
       const correct=q.fields.map(f=>f.label+": "+f.answer).join(" · ");
       const submitted=q.fields.map((f,i)=>f.label+": "+vals[i]).join(" · ");
@@ -7596,7 +7603,7 @@ VIEWS.drill = (v) => {
       if(D.answered)return;
       let ok=false, val=inp.value.trim();
       if(!val)return;
-      if(q.type==="num"){ const n=parseFloat(val.replace("−","-")); const tol=q.tolerance||0; ok=Math.abs(n-q.answer)<=tol; }
+      if(q.type==="num")ok=ccNumericMatch(q,val);
       else { const norm=s=>s.toLowerCase().replace(/[\s−]/g,"-").replace(/-+/g,"-").replace(/[^a-z0-9+\-]/g,""); const acc=(q.accept||[String(q.answer)]).map(norm); ok=acc.includes(norm(val)); }
       finish(ok,"<b class='mono'>"+q.answer+"</b>",undefined,val); // v3.11: record what he typed
     }},"Check");
@@ -11363,7 +11370,10 @@ function compactCh4Question(v,D){
   }
   const controls=el('div',{class:'cq-quick-help'});
   if(help.length){const d=ch4WorkspaceDetails('Need a hint?',help,'cq-hint');d.open=hintUse(D,q).count>0;controls.appendChild(d);}
-  if(tag)tag.textContent=(D.cold?'No-hint check':'Practice')+' · '+(D.i+1)+' / '+D.queue.length+(q.namingTier?' · '+q.namingTier.charAt(0).toUpperCase()+q.namingTier.slice(1):'');
+  // "Cold" defers feedback but some legacy checks still allow recorded help.
+  // Match the label to the actual controls, not just the cold-run flag.
+  const runLabel=D.studyContext?.kind==='daily-pulse'?'Daily Pulse':D.cold?(help.length?'Check · help available':'No-hint check'):'Practice';
+  if(tag)tag.textContent=runLabel+' · '+(D.i+1)+' / '+D.queue.length+(q.namingTier?' · '+q.namingTier.charAt(0).toUpperCase()+q.namingTier.slice(1):'');
   if(controls.childNodes.length)card.insertBefore(controls,prompt);
   const isBuild=q.type==='ch4production',isDrawing=q.type==='written'&&q.requiresDrawing;
   const workspace=el('div',{class:'cq-workspace'+(isBuild?' cq-build':'')+(!isBuild&&(isDrawing||prompt.querySelector('figure'))?' cq-split':'')+(isDrawing?' cq-ink':'')});
@@ -11806,7 +11816,7 @@ function renderCh4ChairEditor(host,q,D,finish,reviewOnly=false){
  * Derives current routing from immutable attempts; never rewrites old evidence.
  * Fixed quizzes, diagnostics, proof, mastery, and instructor/manual sets are excluded.
  */
-const ADAPTIVE_LEARNING_VERSION=3;
+const ADAPTIVE_LEARNING_VERSION=4;
 function adaptiveLearningEligible(q){
   // These two cards concern course logistics/scope, not chemistry performance.
   return !!q&&q.adaptiveEligible!==false&&!['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);
@@ -11846,8 +11856,11 @@ function adaptiveLearningOutcome(a){
   if(!Number.isFinite(a.h)||a.h<0)return 'unknown-right';
   return 'clean-right';
 }
-function adaptiveLearningValidAttempt(a,q){
-  if(!Number.isFinite(a.ts))return false;
+function adaptiveLearningRecordedAttempt(a,now=Date.now()){
+  return !!a&&Number.isFinite(a.ts)&&a.ts>0&&a.ts<=now&&!a.qa&&!a.synthetic&&!a.actor?.qa&&!a.evidence?.actor?.qa;
+}
+function adaptiveLearningValidAttempt(a,q,now=Date.now()){
+  if(!q||!adaptiveLearningRecordedAttempt(a,now))return false;
   // A date-only correction cannot prove whether a legacy same-day answer used
   // the old or repaired key. New events carry an exact content-revision label.
   let correction=q.correctedAt?Date.parse(q.correctedAt):0;
@@ -11858,14 +11871,15 @@ function adaptiveLearningValidAttempt(a,q){
 }
 function adaptiveLearningEvidence(pool,attempts,options={}){
   pool=pool.filter(adaptiveLearningEligible);
-  const now=options.now||Date.now(),cutoff=now-30*86400000,byId=new Map(pool.map(q=>[q.id,q])),allById=new Map((typeof QUESTIONS!=='undefined'?QUESTIONS:pool).map(q=>[q.id,q])),skills={},seen=new Set();
+  const now=options.now??Date.now(),cutoff=now-30*86400000,byId=new Map(pool.map(q=>[q.id,q])),allById=new Map((typeof QUESTIONS!=='undefined'?QUESTIONS:pool).map(q=>[q.id,q])),skills={},seen=new Set();
   pool.forEach(q=>{const s=adaptiveLearningSkill(q);if(!skills[s.key])skills[s.key]={...s,levels:[],recent:[],cleanByLevel:{},target:1,freshClean:0};skills[s.key].levels.push(adaptiveLearningDifficulty(q));});
   const rows=[...(attempts||[])].sort((a,b)=>(a.ts||0)-(b.ts||0));
   rows.forEach(a=>{
+    if(!adaptiveLearningRecordedAttempt(a,now))return;
     const q=byId.get(a.id)||allById.get(a.id);if(!adaptiveLearningEligible(q))return;
     const family=adaptiveLearningFamilies(q),first=!family.some(k=>seen.has(k));family.forEach(k=>seen.add(k));
     if(!byId.has(q.id))return;
-    if((a.ts||0)<cutoff||!adaptiveLearningValidAttempt(a,q))return;
+    if((a.ts||0)<cutoff||!adaptiveLearningValidAttempt(a,q,now))return;
     const skill=skills[adaptiveLearningSkill(q).key],level=adaptiveLearningDifficulty(q),outcome=adaptiveLearningOutcome(a);
     const unfamiliar=q.eligibleForUnseenTransfer!==false&&!q.familiarRepresentation&&q.sourceKind!=='learner-homework-redraw';
     const freshClean=first&&unfamiliar&&outcome==='clean-right';
@@ -11896,7 +11910,7 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   const slotFallback=!!slotIds&&!scoped.length;
   if(scoped.length)candidates=scoped;
   const evidence=adaptiveLearningEvidence(pool,attempts,options),rawLast=options.lastAttempt,rawLastQ=rawLast&&byId.get(rawLast.id);
-  const now=options.now||Date.now(),last=rawLastQ&&adaptiveLearningValidAttempt(rawLast,rawLastQ)&&rawLast.ts>=now-30*86400000?rawLast:null,lastQ=last&&rawLastQ,outcome=adaptiveLearningOutcome(last);
+  const now=options.now??Date.now(),last=rawLastQ&&adaptiveLearningValidAttempt(rawLast,rawLastQ,now)&&rawLast.ts>=now-30*86400000?rawLast:null,lastQ=last&&rawLastQ,outcome=adaptiveLearningOutcome(last);
   const repair=!!lastQ&&!['clean-right','calibrate','unknown-right'].includes(outcome);
   const foundation=((options.index||0)+1)%5===0;
   const anchor=repair?adaptiveLearningSkill(lastQ).key:null;
@@ -11915,7 +11929,7 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   const rotating=!!options.rotationKey;
   if(rotating&&alternatives.length)working=alternatives;
   const priorCounts={},latestTs={};
-  (attempts||[]).forEach(a=>{priorCounts[a.id]=(priorCounts[a.id]||0)+1;latestTs[a.id]=Math.max(latestTs[a.id]||0,a.ts||0);});
+  (attempts||[]).filter(a=>adaptiveLearningRecordedAttempt(a,now)).forEach(a=>{priorCounts[a.id]=(priorCounts[a.id]||0)+1;latestTs[a.id]=Math.max(latestTs[a.id]||0,a.ts||0);});
   const usedSkills={};used.forEach(id=>{const q=byId.get(id);if(q){const key=adaptiveLearningSkill(q).key;usedSkills[key]=(usedSkills[key]||0)+1;}});
   const ranked=working.map(q=>{
     const skill=evidence.skills[adaptiveLearningSkill(q).key],level=adaptiveLearningDifficulty(q);
@@ -16033,12 +16047,27 @@ VIEWS.modePractice=v=>{
 };
 // Preserve the old chapter-specific options without making them the opening desk.
 VIEWS.quizRehearsals=v=>{quizAssessmentChoices(v);quizPaperCard(v);};
-function smChallengePool(){return adaptiveLearningPool({chapter:smChapter().id}).filter(q=>!q.preview&&q.diff>=2&&['mc','text','num'].includes(q.type)&&!q.requiresDrawing);}
+function smChallengePool(topic=''){return adaptiveLearningPool({chapter:smChapter().id}).filter(q=>!q.preview&&q.diff>=2&&['mc','text','num'].includes(q.type)&&!q.requiresDrawing&&(!topic||q.topic===topic));}
 VIEWS.modeChallenge=v=>{
   smHeading(v,'challenge');
-  const c=el('section',{class:'card sm-panel'});c.innerHTML='<h2>Answer it, then explain a wrong turn</h2><p><b>Added demand:</b> after each answer, explain why one tempting wrong answer fails. This extra explanation is self-reviewed, not automatically graded.</p><p>These are app-authored skill questions, not the original worksheet format.</p>';
+  const c=el('section',{class:'card sm-panel'});c.innerHTML='<h2>Choose a topic to stretch</h2><p><b>Added demand:</b> answer the question, then explain why one tempting wrong answer fails. Your explanation is self-reviewed, not automatically graded.</p><p class="muted">This reuses the practice bank with an extra step. It is not a separate bank of new problems.</p>';
   const pool=smChallengePool();
-  if(pool.length)c.appendChild(smButton('Start 3 challenge questions',()=>{if(startAdaptiveLearning({chapter:smChapter().id,poolIds:pool.map(q=>q.id),total:3,label:'Challenge · explain a wrong turn',rotationKey:'challenge-'+smChapter().id}))smTagRun('challenge','explain-wrong-turn');},{class:'btn'}));
+  if(pool.length){
+    const chapter=smChapter(),topics=[...new Set(pool.map(q=>q.topic))],saved=safeStore.get('studyChallengeTopics',{});
+    const label=el('label',{class:'sm-challenge-topic'});label.appendChild(el('span',{},'Challenge topic'));
+    const select=el('select',{'aria-label':'Challenge topic','data-challenge-topic':true});
+    select.appendChild(el('option',{value:''},'Mix this chapter'));
+    topics.forEach(topic=>select.appendChild(el('option',{value:topic},esc(TOPICS[topic]?.name||topic)+' · '+pool.filter(q=>q.topic===topic).length+' available')));
+    select.value=topics.includes(saved[chapter.id])?saved[chapter.id]:'';label.appendChild(select);c.appendChild(label);
+    const count=el('p',{class:'muted','data-challenge-count':true,'aria-live':'polite'});c.appendChild(count);
+    const start=smButton('',()=>{
+      const selected=smChallengePool(select.value),name=select.value?(TOPICS[select.value]?.name||select.value):'Chapter mix';
+      if(startAdaptiveLearning({chapter:chapter.id,poolIds:selected.map(q=>q.id),total:Math.min(3,selected.length),label:'Challenge · '+name,rotationKey:'challenge-'+chapter.id+'-'+(select.value||'mix')}))smTagRun('challenge','explain-wrong-turn');
+    },{class:'btn','data-challenge-start':true});
+    const update=()=>{const size=smChallengePool(select.value).length,n=Math.min(3,size);count.textContent=size+' existing question'+(size===1?'':'s')+' available · '+n+' in this round.'+(size<3?' Small topic bank; repeats are possible.':' Questions rotate when alternatives are available.');start.textContent='Start '+n+' challenge question'+(n===1?'':'s');};
+    select.onchange=()=>{safeStore.set('studyChallengeTopics',{...safeStore.get('studyChallengeTopics',{}),[chapter.id]:select.value});update();};update();c.appendChild(start);
+    c.appendChild(el('p',{class:'muted'},'Full drawing and linked-part problems are under Practice → Practice by skill. They are not included in this short-answer challenge.'));
+  }
   else c.appendChild(el('p',{},'This chapter has no eligible stretch set yet. Choose another chapter or work a full Practice problem.'));v.appendChild(c);
   if(smChapter().id==='ch4'){const n=el('details',{class:'card sm-panel'});n.innerHTML='<summary>Extra naming difficulty</summary><p>Competing parent chains and bicyclic numbering. Bicyclic work is supplemental unless assigned.</p>';n.appendChild(smButton('Open naming challenge',()=>{startNamingTier('challenge');smTagRun('challenge','naming');}));v.appendChild(n);}
   if(smChapter().id==='ch5'){const extra=el('details',{class:'card sm-panel'});extra.innerHTML='<summary>Extra textbook topics</summary><p>Outside the supplied course objectives—not required just because they are here.</p>';CH5_EXTRA_LESSONS.forEach(u=>extra.appendChild(smButton(esc(u.title),()=>ch5OpenUnit(u.id))));v.appendChild(extra);}
@@ -16115,6 +16144,7 @@ const smStyle=el('style',{id:'study-modes-style'});
 smStyle.textContent=`
  .sm-home{max-width:960px;margin:0 auto}.sm-heading,.sm-section-title{position:static;display:block;background:transparent;border:0;box-shadow:none;padding:0;max-width:100%}.sm-heading{margin:8px 0 20px}.sm-heading h1{font-size:clamp(1.5rem,3vw,2rem);line-height:1.15;margin:6px 0 12px}.sm-heading p{margin:6px 0 12px;max-width:65ch}.sm-heading .sm-scope-note{font-size:.78rem;margin:8px 0;color:#536c73}.sm-eyebrow{font-size:.7rem;letter-spacing:.1em;font-weight:750;color:#386d67}
  .sm-scope{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.82rem;font-weight:650}.sm-scope select,.sm-panel select{min-height:44px;padding:8px 12px;border:1px solid #b7cbce;border-radius:10px;font:inherit;background:#fff;color:#173e47;max-width:100%;min-width:0}.sm-scope select{flex:0 1 390px}
+ .sm-challenge-topic{display:flex;flex-direction:column;gap:6px;margin:14px 0;font-size:.9rem;font-weight:650}.sm-challenge-topic select{box-sizing:border-box;width:100%;max-width:480px;min-width:0;min-height:44px;padding:10px;border:1px solid #adbec6;border-radius:9px;background:white;color:#173e47;font:inherit}.sm-challenge-topic select:focus-visible{outline:3px solid #a67816;outline-offset:3px}
  .sm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.sm-mode{display:grid;grid-template-columns:32px 1fr;text-align:left;gap:7px 12px;padding:20px;min-width:0;border:1px solid #becfd2;border-radius:16px;background:#fff;color:#193f48;font:inherit;cursor:pointer;transition:transform .16s,box-shadow .16s,border-color .16s}.sm-mode strong{font-size:1.18rem}.sm-mode>span:not(.sm-number){grid-column:2;font-size:.88rem;line-height:1.4}.sm-mode .sm-number{grid-row:1/5;border-radius:8px;color:#53757a;font-size:.72rem;font-weight:700;padding-top:5px}.sm-mode .sm-verb{font-weight:650}.sm-mode .sm-open{color:#126e73;font-weight:700;margin-top:5px}.sm-mode[data-study-mode=challenge]{background:#fffdf8}.sm-mode[data-study-mode=readiness]{background:#f4faf8}
  .sm-next{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;margin-bottom:16px;background:#eaf4f1;border:1px solid #c4dbd3;border-radius:12px;font-size:.9rem}.sm-next .btn{margin:0;min-height:44px}.sm-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.sm-links .btn{font-size:.8rem;min-height:44px;margin:0}.sm-context{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin-bottom:14px;font-size:.8rem;color:#4e7079}.sm-context>.btn{margin:0;min-height:40px;padding:8px 12px;font-size:.82rem}.sm-context>span{flex:1;min-width:140px;overflow-wrap:anywhere}.sm-panel{min-width:0;padding:18px!important}.sm-panel h2{font-size:1.06rem;margin:0 0 9px}.sm-panel p,.sm-section-title p{font-size:.88rem;line-height:1.5}.sm-panel summary{cursor:pointer;min-height:32px;font-weight:700}.sm-panel details{margin-top:12px}.sm-panel .btn{white-space:normal;margin:5px 5px 5px 0}.sm-panel textarea{width:100%;min-height:90px}.sm-section-title{margin:20px 0 14px}.sm-section-title h2{font-size:1.2rem;margin:0}.sm-lesson-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sm-lesson-list .btn{margin:0;min-height:54px;text-align:left;white-space:normal}.sm-sheets .card{margin:0}
  [data-paper-practice] select.answerbox{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
@@ -16622,7 +16652,9 @@ render=function(){LE_ENG_PREVIOUS_RENDER.apply(this,arguments);leEngagementMount
 /* Chapter starting/final checks: fixed plans and device-local records only.
  * No DOM, bank mutation, S.drill mutation, ordinary attempt credit or mastery.
  * Existing bank items are samples, not equivalent forms or proven unseen work. */
-const CC_VERSION=1,CC_BLUEPRINT_VERSION='2026-10-08.1',CC_RUN_CAP=30;
+const CC_VERSION=2,CC_BLUEPRINT_VERSION='2026-10-14.2',CC_RUN_CAP=30;
+const CC_PHASES=['starting','middle','final'];
+function ccPhase(phase){return CC_PHASES.includes(phase)?phase:'starting';}
 const CC_AUTO_TYPES=['mc','text','num','multiSelect','blanks','multi'];
 function ccClone(value){return value===undefined?null:JSON.parse(JSON.stringify(value));}
 function ccPick(value,keys){const out={};keys.forEach(key=>{if(value&&Object.prototype.hasOwnProperty.call(value,key))out[key]=ccClone(value[key]);});return out;}
@@ -16645,17 +16677,29 @@ function ccAutoSupported(q){
   return Array.isArray(q.fields)&&q.fields.length>0&&q.fields.every(f=>f&&(['string','number'].includes(typeof f.answer)||(Array.isArray(f.accept)&&f.accept.length))&&(!f.kind||['num','text','select','order'].includes(f.kind))&&(!(q.type==='multi'||f.kind==='num')||Number.isFinite(Number(f.answer))));
 }
 function ccBlueprint(chapter){
-  const ch=CHAPTERS.find(c=>c.id===chapter);if(!ch)return {version:CC_BLUEPRINT_VERSION,chapter,label:'Unavailable chapter',domains:[],available:false};
-  const units=(CHAPTER_LEARNING_UNITS[chapter]||[]).filter(u=>!u.preview);
-  const domains=units.length?units.map(u=>({id:u.id,label:u.title,topics:[u.topic],unitIds:[u.id],poolIds:[...new Set(['guidedIds','practiceIds','coldIds','proofIds'].flatMap(key=>u[key]||[]).concat(QUESTIONS.filter(q=>q.adaptiveSkill===u.id).map(q=>q.id)))]})):ch.topics.map(topic=>({id:topic,label:TOPICS[topic]?.name||topic,topics:[topic],unitIds:[]}));
-  return {version:CC_BLUEPRINT_VERSION,chapter,label:ch.name,available:true,domains,scope:'Current core chapter lessons, or current chapter topics where no lesson map exists.',targetPerDomain:2};
+  const ch=CHAPTERS.find(c=>c.id===chapter),units=CHAPTER_LEARNING_UNITS[chapter]||[];
+  if(!ch){
+    const labels=chapter==='ch6'?['Reaction types and bond breaking','Nucleophiles, electrophiles and curved arrows','Energy diagrams, intermediates and transition states','Rates, catalysts, temperature and concentration','Thermodynamics versus kinetics']:[];
+    return {version:CC_BLUEPRINT_VERSION,chapter,label:chapter==='ch6'?'Chapter 6 — bank not ready':'Unavailable chapter',available:false,domains:labels.map((label,i)=>({id:'ch6-scope-'+(i+1),label,topics:[],unitIds:[],poolIds:[],bankGap:true})),scope:'Chapter 6 headings from the saved official Exam 2 topic list. No complete chapter bank is available.',targetPerDomain:2};
+  }
+  const domains=units.map(u=>({id:u.id,label:u.title,topics:[u.topic],unitIds:[u.id],preview:!!u.preview,poolIds:[...new Set(['guidedIds','practiceIds','coldIds','proofIds'].flatMap(key=>u[key]||[]).concat(QUESTIONS.filter(q=>q.adaptiveSkill===u.id||(!q.adaptiveSkill&&q.topic===u.topic&&units.filter(other=>other.topic===u.topic).length===1)).map(q=>q.id)))]}));
+  // Keep the complete declared topic map visible. Unmapped questions are not
+  // silently assigned to one of several lessons that share a broad topic.
+  (ch.topics||[]).forEach(topic=>{
+    const related=domains.filter(d=>d.topics.includes(topic)),assigned=new Set(related.flatMap(d=>d.poolIds));
+    const extra=QUESTIONS.filter(q=>q.topic===topic&&!assigned.has(q.id)&&(!q.adaptiveSkill||!units.some(u=>u.id===q.adaptiveSkill)));
+    if(!related.length||extra.length)domains.push({id:related.length?'topic:'+topic:topic,label:(related.length?'Additional ':'')+(TOPICS[topic]?.name||topic),topics:[topic],unitIds:[],poolIds:extra.map(q=>q.id)});
+  });
+  return {version:CC_BLUEPRINT_VERSION,chapter,label:ch.name,available:true,domains,scope:'Declared app lessons and topics, including preview or missing-bank areas. This is not a complete instructor syllabus audit.',targetPerDomain:2};
 }
+function ccDomainPool(domain){return domain.preview?[]:QUESTIONS.filter(q=>ccEligible(q)&&domain.topics.includes(q.topic)&&(!domain.poolIds||domain.poolIds.includes(q.id)));}
 function ccStore(){const value=safeStore.get('chapterChecks',{version:CC_VERSION,runs:[]});return {version:CC_VERSION,runs:Array.isArray(value?.runs)?ccClone(value.runs):[]};}
 function ccCompleted(run){return run?.status==='completed'||run?.status==='complete'||!!run?.completedAt;}
 function ccBaseline(chapter,runs=ccStore().runs){return runs.filter(r=>r.chapter===chapter&&r.phase==='starting'&&ccCompleted(r)).sort((a,b)=>(a.completedAt||a.startedAt)-(b.completedAt||b.startedAt))[0]||null;}
 function ccSave(store){
   const rows=[...new Map((store.runs||[]).filter(r=>r&&r.id).map(r=>[r.id,ccClone(r)])).values()].sort((a,b)=>(a.startedAt||0)-(b.startedAt||0));
   const protectedIds=new Set([...new Set(rows.map(r=>r.chapter))].map(ch=>ccBaseline(ch,rows)?.id).filter(Boolean));
+  rows.filter(r=>!ccCompleted(r)).forEach(r=>protectedIds.add(r.id));
   const protectedRows=rows.filter(r=>protectedIds.has(r.id)),recent=rows.filter(r=>!protectedIds.has(r.id)).slice(-Math.max(0,CC_RUN_CAP-protectedRows.length));
   const next={version:CC_VERSION,runs:[...protectedRows,...recent].sort((a,b)=>(a.startedAt||0)-(b.startedAt||0))};safeStore.set('chapterChecks',next);return ccClone(next);
 }
@@ -16666,50 +16710,57 @@ function ccExposure(){
   (state.attempts||[]).forEach(a=>mark(a.id));
   Object.entries(state.qstats||{}).forEach(([id,v])=>{if((v.r||0)+(v.w||0)+(v.gr||0)+(v.gw||0)+(v.dk||0)>0)mark(id);});
   Object.keys(state.questionFlags||{}).forEach(mark);
-  ccStore().runs.forEach(run=>Object.keys(run.responses||{}).forEach(mark));
+  ccStore().runs.forEach(run=>{
+    // Finishing reveals every model/key, including skipped questions.
+    (ccCompleted(run)?run.items||[]:Object.keys(run.responses||{}).map(id=>({id}))).forEach(item=>mark(item.id));
+  });
   Object.entries(state.flightPrep||{}).forEach(([id,v])=>{if(v?.learnedAt)lessons.add(id);});
   safeStore.get('lessonVisits',[]).forEach(row=>{const key=String(row.key||'');Object.values(CHAPTER_LEARNING_UNITS).flat().forEach(u=>{if(key.includes(':'+u.id+':')||key.endsWith(':'+u.id))lessons.add(u.id);});});
   return {ids,families,lessons};
 }
 function ccPlan(chapter,phase='starting'){
-  phase=phase==='final'?'final':'starting';const blueprint=ccBlueprint(chapter),exposure=ccExposure(),baseline=phase==='final'?ccBaseline(chapter):null;
+  phase=ccPhase(phase);const blueprint=ccBlueprint(chapter),exposure=ccExposure(),baseline=phase!=='starting'?ccBaseline(chapter):null;
   const items=[],gaps=[],usedIds=new Set(),usedFamilies=new Set(),baselineIds=new Set((baseline?.items||[]).map(i=>i.id)),baselineFamilies=new Set();
   (baseline?.items||[]).forEach(item=>{const q=ccQuestion(item.id);if(q)ccFamilies(q).forEach(f=>baselineFamilies.add(f));});
-  const priorPlans=ccStore().runs.filter(r=>r.chapter===chapter),plannedCounts={};priorPlans.forEach(r=>(r.items||[]).forEach(i=>{plannedCounts[i.id]=(plannedCounts[i.id]||0)+1;}));
+  const priorPlans=ccStore().runs.filter(r=>r.chapter===chapter),plannedCounts={},familyCounts={},lastPlanned={};priorPlans.forEach((r,index)=>(r.items||[]).forEach(i=>{plannedCounts[i.id]=(plannedCounts[i.id]||0)+1;lastPlanned[i.id]=index+1;(i.families||ccFamilies(ccQuestion(i.id)||{id:i.id})).forEach(f=>familyCounts[f]=(familyCounts[f]||0)+1);}));
   const addGap=(domain,kind,missing,note)=>gaps.push({domain,label:blueprint.domains.find(d=>d.id===domain)?.label||domain,kind,missing,note,message:note});
-  const poolFor=domain=>QUESTIONS.filter(q=>ccEligible(q)&&domain.topics.includes(q.topic)&&(!domain.poolIds||domain.poolIds.includes(q.id)));
+  const poolFor=ccDomainPool;
   const rank=(pool,target)=>pool.slice().sort((a,b)=>{
     const score=q=>{
       const fam=ccFamilies(q),usedFamily=fam.some(f=>usedFamilies.has(f)),baseFamily=fam.some(f=>baselineFamilies.has(f)),seen=exposure.ids.has(q.id),familySeen=fam.some(f=>exposure.families.has(f));
-      return (usedFamily?10000:0)+(baseFamily?5000:0)+(seen?1000:familySeen?700:0)+(q.familiarRepresentation||q.eligibleForUnseenTransfer===false||q.sourceKind==='learner-homework-redraw'?400:0)+Math.abs(ccLevel(q)-target)*50+(plannedCounts[q.id]||0)*5;
-    };return score(a)-score(b)||String(a.id).localeCompare(String(b.id));
+      return [plannedCounts[q.id]||0,seen?1:0,usedFamily?1:0,baseFamily?1:0,familySeen?1:0,Math.max(0,...fam.map(f=>familyCounts[f]||0)),lastPlanned[q.id]||0,q.familiarRepresentation||q.eligibleForUnseenTransfer===false||q.sourceKind==='learner-homework-redraw'?1:0,Math.abs(ccLevel(q)-target)];
+    };const left=score(a),right=score(b);for(let n=0;n<left.length;n++){if(left[n]!==right[n])return left[n]-right[n];}return String(a.id).localeCompare(String(b.id));
   });
   const add=(q,domain,manualReview,target)=>{
     const fam=ccFamilies(q),seenBefore=exposure.ids.has(q.id),seenFamilyBefore=fam.some(f=>exposure.families.has(f)),baselineFamilyOverlap=fam.some(f=>baselineFamilies.has(f)),withinFormFamilyOverlap=fam.some(f=>usedFamilies.has(f)),familiarContent=!!q.familiarRepresentation||q.eligibleForUnseenTransfer===false||q.sourceKind==='learner-homework-redraw';
-    const review=seenBefore||seenFamilyBefore||baselineFamilyOverlap||withinFormFamilyOverlap||familiarContent;
-    const item={id:q.id,domain:domain.id,domainLabel:domain.label,manualReview,type:q.type,difficulty:ccLevel(q),targetDifficulty:target,questionRevision:q.correctedAt||null,itemFingerprint:ccQuestionFingerprint(q),families:fam,seenBefore,seenFamilyBefore,baselineFamilyOverlap,withinFormFamilyOverlap,familiarContent,lessonExposure:domain.unitIds.some(id=>exposure.lessons.has(id)),review,selectionReason:review?'Review or familiar material; not fresh evidence.':'No prior item/family exposure found in retained records; outside familiarity is unknown.'};
+    const plannedBefore=(plannedCounts[q.id]||0)>0,plannedFamilyBefore=fam.some(f=>familyCounts[f]>0),review=seenBefore||seenFamilyBefore||baselineFamilyOverlap||withinFormFamilyOverlap||familiarContent||plannedBefore||plannedFamilyBefore;
+    const item={id:q.id,domain:domain.id,domainLabel:domain.label,manualReview,type:q.type,difficulty:ccLevel(q),targetDifficulty:target,questionRevision:q.correctedAt||null,itemFingerprint:ccQuestionFingerprint(q),families:fam,seenBefore,seenFamilyBefore,plannedBefore,plannedFamilyBefore,baselineFamilyOverlap,withinFormFamilyOverlap,familiarContent,lessonExposure:domain.unitIds.some(id=>exposure.lessons.has(id)),review,selectionReason:review?'Review or familiar/planned material; not fresh evidence.':'No prior item/family exposure or saved plan found in retained records; outside familiarity is unknown.'};
     items.push(item);usedIds.add(q.id);fam.forEach(f=>usedFamilies.add(f));
     if(baselineFamilyOverlap||withinFormFamilyOverlap)addGap(domain.id,'family-overlap',0,'A different item reuses a recorded family; treat this as review, not a distinct transfer check.');
     if(ccLevel(q)!==target)addGap(domain.id,'difficulty-match',0,'The authored target difficulty is unavailable for this slot; forms are not calibrated equivalents.');
   };
   blueprint.domains.forEach(domain=>{
-    const all=poolFor(domain),auto=all.filter(ccAutoSupported),available=auto.filter(q=>!usedIds.has(q.id)&&!baselineIds.has(q.id));
-    // Reserve at least one exact alternative for the final form in tiny banks.
-    const target=auto.length>=2?Math.min(2,Math.floor(auto.length/2),available.length):Math.min(2,available.length);
+    const all=poolFor(domain),auto=all.filter(ccAutoSupported),nonbaseline=auto.filter(q=>!usedIds.has(q.id)&&!baselineIds.has(q.id));
+    const available=nonbaseline.length?nonbaseline:auto.filter(q=>!usedIds.has(q.id));
+    // Reserve room for three stages where possible. Tiny banks remain usable
+    // as explicit review; they never imply three independent fresh forms.
+    const target=Math.min(2,Math.max(1,Math.floor(auto.length/3)),available.length);
     for(let slot=0;slot<target;slot++){
       const desired=slot===0?1:2,pick=rank(available.filter(q=>!usedIds.has(q.id)),desired)[0];if(pick)add(pick,domain,false,desired);
     }
     const count=items.filter(i=>i.domain===domain.id&&!i.manualReview).length;
-    if(count<2)addGap(domain.id,'automatic-coverage',2-count,'Only '+count+' of 2 planned automatic questions can be supplied while keeping an alternative for the other form. This domain is incompletely sampled.');
+    if(count<2)addGap(domain.id,'automatic-coverage',2-count,domain.preview?'Preview area: not included in scored chapter checks. Confirm the required scope with course materials.':'Only '+count+' of 2 planned automatic questions can be supplied while leaving room for rotating stages. This area is incompletely sampled.');
+    if(auto.length&&auto.every(q=>(plannedCounts[q.id]||0)>0||exposure.ids.has(q.id)))addGap(domain.id,'rotation-exhausted',0,'Every supported question has been seen or included in a saved check. This is review; a new run is not fresh evidence.');
     if(all.some(q=>q.production||q.arrowBoard||q.resonanceBoard||q.drawFirst||(q.bondLineFirst||[]).length))addGap(domain.id,'construction-not-automatically-checked',0,'Required drawing or construction is not automatically assessed by this check. A correct short answer does not establish that skill.');
   });
   // Add a small, separately reviewed production sample. Do not replace missing
   // automatic questions or award automatic correctness for paper/self-review.
   let manualCount=0;
-  const manualDomains=blueprint.domains.slice().sort((a,b)=>Number(poolFor(a).some(ccAutoSupported))-Number(poolFor(b).some(ccAutoSupported)));
+  const manualDomainCounts={};priorPlans.forEach(run=>(run.items||[]).filter(item=>item.manualReview).forEach(item=>manualDomainCounts[item.domain]=(manualDomainCounts[item.domain]||0)+1));
+  const manualDomains=blueprint.domains.slice().sort((a,b)=>(manualDomainCounts[a.id]||0)-(manualDomainCounts[b.id]||0)||Number(poolFor(a).some(ccAutoSupported))-Number(poolFor(b).some(ccAutoSupported)));
   manualDomains.forEach(domain=>{
     const authored=poolFor(domain).filter(q=>(q.type==='written'||q.type==='ch4production')&&q.prompt);
-    const pool=authored.filter(q=>!usedIds.has(q.id)&&!baselineIds.has(q.id));
+    const nonbaseline=authored.filter(q=>!usedIds.has(q.id)&&!baselineIds.has(q.id)),pool=nonbaseline.length?nonbaseline:authored.filter(q=>!usedIds.has(q.id));
     const pick=manualCount<3?rank(pool,2)[0]:null;
     if(pick){add(pick,domain,true,2);manualCount++;}
     else if(authored.length)addGap(domain.id,'manual-coverage',1,'This drawing or written skill is not included in the limited paper sample. It remains unassessed, even when the automatic answers are correct.');
@@ -16717,29 +16768,41 @@ function ccPlan(chapter,phase='starting'){
   const limits=['A chapter sample, not a calibrated exam or a grade prediction.','Different question IDs and incomplete family tags do not prove unfamiliarity. Outside exposure is unknown.','Authored difficulty labels do not establish equivalent starting and final forms.','Drawing and written explanations require separate review; they do not raise the automatic score.'];
   if(phase==='final'&&!baseline)limits.push('No completed starting check is linked; there is no measured starting-to-final comparison.');
   if(gaps.length)limits.push('The listed coverage and form differences prevent a whole-chapter readiness claim.');
-  return {chapter,phase,blueprintVersion:blueprint.version,blueprint:ccClone(blueprint),items,gaps,seenCount:items.filter(i=>i.seenBefore).length,reviewCount:items.filter(i=>i.review).length,lessonExposureCount:items.filter(i=>i.lessonExposure).length,baselineRunId:baseline?.id||null,available:items.some(i=>!i.manualReview),limits};
+  return {chapter,phase,blueprintVersion:blueprint.version,blueprint:ccClone(blueprint),items,gaps,seenCount:items.filter(i=>i.seenBefore).length,reviewCount:items.filter(i=>i.review).length,lessonExposureCount:items.filter(i=>i.lessonExposure).length,baselineRunId:baseline?.id||null,available:items.length>0,limits};
 }
 function ccStart(chapter,phase='starting'){
-  phase=phase==='final'?'final':'starting';const pending=ccStore().runs.findLast(r=>r.chapter===chapter&&r.phase===phase&&!ccCompleted(r));if(pending)return pending;
-  const plan=ccPlan(chapter,phase);if(!plan.available)return {available:false,chapter,phase,items:[],gaps:plan.gaps,limits:plan.limits,reason:'No supported automatic questions are available for this chapter check.'};
+  phase=ccPhase(phase);const pending=ccStore().runs.findLast(r=>r.chapter===chapter&&r.phase===phase&&!ccCompleted(r));if(pending)return pending;
+  const plan=ccPlan(chapter,phase);if(!plan.available)return {available:false,chapter,phase,items:[],gaps:plan.gaps,limits:plan.limits,reason:'No supported question formats are available for this chapter check.'};
   const now=Date.now(),id=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?'chapter-check-'+crypto.randomUUID():'chapter-check-'+now+'-'+Math.random().toString(36).slice(2);
   const run={id,version:CC_VERSION,chapter,phase,status:'in-progress',startedAt:now,completedAt:null,updatedAt:now,baselineRunId:plan.baselineRunId,plan,items:ccClone(plan.items),responses:{},currentIndex:0,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};return ccSaveRun(run);
 }
 function ccText(value,field=false){const text=String(value??'').toLowerCase();return field?text.replace(/²/g,'2').replace(/³/g,'3').replace(/°/g,'').replace(/[\s.]/g,''):text.replace(/[\s−]/g,'-').replace(/-+/g,'-').replace(/[^a-z0-9+\-]/g,'');}
-function ccNumber(value){if(value===null||value===undefined||String(value).trim()==='')return null;const n=Number(String(value).trim().replace(/−/g,'-'));return Number.isFinite(n)?n:null;}
+function ccNumber(value){
+  if(value===null||value===undefined||!['number','string'].includes(typeof value))return null;
+  const text=String(value).trim().replace(/−/g,'-');
+  if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(text))return null;
+  const n=Number(text);return Number.isFinite(n)?n:null;
+}
+// Shared by ordinary Practice and chapter checks: consume the whole number,
+// and honor only authored aliases (for example "neutral" for charge zero).
+function ccNumericMatch(field,value){
+  if(value===null||value===undefined||String(value).trim()==='')return false;
+  const number=ccNumber(value);
+  return number!==null&&Math.abs(number-Number(field.answer))<=Number(field.tolerance||0)||(field.accept||[]).some(a=>ccText(value,true)===ccText(a,true));
+}
 function ccGrade(q,value){
   if(!ccAutoSupported(q))return {graded:false,correct:null,feedback:q?.type==='written'?'Written work needs separate review; it has no automatic grade.':'This response format is not automatically checked here.'};
   let correct=false,fields;
   if(q.type==='mc'){const n=ccNumber(value);correct=Number.isInteger(n)&&n===q.answer;}
-  else if(q.type==='num'){const n=ccNumber(value);correct=n!==null&&Math.abs(n-Number(q.answer))<=Number(q.tolerance||0);}
+  else if(q.type==='num')correct=ccNumericMatch(q,value);
   else if(q.type==='text')correct=(q.accept||[q.answer]).some(a=>ccText(value)===ccText(a))&&String(value??'').trim()!=='';
   else if(q.type==='multiSelect'){
     const got=Array.isArray(value)?value.map(ccNumber):[];correct=got.length===q.answer.length&&new Set(got).size===got.length&&got.every(n=>Number.isInteger(n)&&q.answer.includes(n));
   }else{
     const values=Array.isArray(value)?value:[];
     fields=q.fields.map((field,index)=>{
-      const answer=values[index],number=ccNumber(answer),numeric=q.type==='multi'||field.kind==='num';
-      const ok=numeric?number!==null&&Math.abs(number-Number(field.answer))<=Number(field.tolerance||0):String(answer??'').trim()!==''&&(field.accept||[field.answer]).some(a=>ccText(answer,true)===ccText(a,true));
+      const answer=values[index],numeric=q.type==='multi'||field.kind==='num';
+      const ok=numeric?ccNumericMatch(field,answer):String(answer??'').trim()!==''&&(field.accept||[field.answer]).some(a=>ccText(answer,true)===ccText(a,true));
       return {index,label:field.label||'Part '+(index+1),correct:ok,expected:ccClone(field.answer),submitted:ccClone(answer)};
     });correct=values.length===q.fields.length&&fields.every(f=>f.correct);
   }
@@ -16791,12 +16854,60 @@ function ccSummary(run){
   const baseline=run.baselineRunId?ccRun(run.baselineRunId):null;
   return {runId:run.id,chapter:run.chapter,phase:run.phase,complete,auto,manual,domains,confidence,correct:auto.correct,total:auto.total,percent:complete&&auto.total&&!auto.ungraded?Math.round(100*auto.correct/auto.total):null,baselineRunId:baseline?.id||null,comparisonAvailable:!!baseline&&complete&&baseline.plan?.blueprintVersion===run.plan?.blueprintVersion,gaps:ccClone(run.plan?.gaps||[]),seenCount:run.plan?.seenCount||0,reviewCount:run.plan?.reviewCount||0,limits:ccClone(run.plan?.limits||[])};
 }
+// Read-only routing evidence. Practice, source exposure, and cold-check results
+// stay separate; this helper never writes attempts, scores, or learner mastery.
+function ccCoverage(chapter,options={}){
+  const now=Number.isFinite(options.now)?options.now:Date.now(),blueprint=ccBlueprint(chapter),runs=(options.runs||ccStore().runs).filter(r=>r.chapter===chapter&&ccCompleted(r)&&!r.qa&&!r.synthetic&&(r.completedAt||r.startedAt||0)<=now).slice().sort((a,b)=>(a.completedAt||a.startedAt||0)-(b.completedAt||b.startedAt||0));
+  const currentDomains=new Set(blueprint.domains.map(d=>d.id));
+  const attempts=options.attempts||(typeof S==='undefined'?[]:S.attempts)||[];
+  const labels={'not-checked':'Not checked','needs-review':'Needs review','correct-in-sample':'Correct in sample','manual-review-pending':'Manual review pending'};
+  const domains=blueprint.domains.map(domain=>{
+    const pool=ccDomainPool(domain),ids=new Set(pool.map(q=>q.id)),automaticBank=pool.filter(ccAutoSupported).length,manualBank=pool.filter(q=>!ccAutoSupported(q)).length;
+    const practice={attempted:0,distinct:0,lastAt:null,correct:0,helped:0,guessed:0,unverified:0},practiceIds=new Set();
+    attempts.filter(a=>ids.has(a.id)&&!a.qa&&!a.synthetic&&Number.isFinite(a.ts)&&a.ts<=now).forEach(a=>{
+      const q=ccQuestion(a.id);if(typeof adaptiveLearningValidAttempt==='function'&&!adaptiveLearningValidAttempt(a,q))return;
+      practice.attempted++;practiceIds.add(a.id);practice.lastAt=Math.max(practice.lastAt||0,a.ts);if(a.ok)practice.correct++;
+      const outcome=typeof adaptiveLearningOutcome==='function'?adaptiveLearningOutcome(a):'unknown-right';
+      if(/supported|self-review/.test(outcome))practice.helped++;if(/guess|uncertain/.test(outcome))practice.guessed++;if(outcome==='unknown-right')practice.unverified++;
+    });
+    practice.distinct=practiceIds.size;
+    const rows=runs.flatMap(run=>(run.items||[]).filter(item=>item.domain===domain.id||(!currentDomains.has(item.domain)&&ids.has(item.id))).map(item=>({run,item,response:run.responses?.[item.id]||{},grade:run.grades?.[item.id]})));
+    const latestRun=rows.at(-1)?.run,latest=latestRun?rows.filter(row=>row.run.id===latestRun.id):[];
+    const sample={checked:0,correct:0,independentCorrect:0,ungraded:0,manualSubmitted:0},manualRows=latest.filter(row=>row.item.manualReview);
+    latest.forEach(({run,item,response,grade})=>{
+      if(item.manualReview){if(!response.skipped&&(response.value||response.onPaper||response.paper||response.sketch?.paper||response.sketch?.strokes?.length))sample.manualSubmitted++;return;}
+      const current=ccQuestion(item.id),valid=!!current&&item.itemFingerprint===ccQuestionFingerprint(current)&&grade?.graded&&!grade?.contentChanged;
+      if(!valid){sample.ungraded++;return;}sample.checked++;
+      if(grade.correct&&!response.skipped){
+        sample.correct++;
+        if(run.helpUsed==='none'&&!response.externalHelp&&!['guess','unsure'].includes(response.confidence)&&!['guess','unsure'].includes(response.firstConfidence)&&!item.review&&!item.seenBefore&&!item.seenFamilyBefore&&!item.familiarContent)sample.independentCorrect++;
+      }
+    });
+    let status='not-checked',reason=practice.attempted?'Practice is recorded; no current cold-check result is established.':'This area has no completed check yet.';
+    if(latest.length){
+      if(sample.ungraded){status='needs-review';reason='Some saved questions changed or could not be graded. Those answers do not establish current coverage.';}
+      else if(sample.checked&&sample.correct<sample.checked){status='needs-review';reason='At least one scored answer in the latest sample was missed or skipped.';}
+      else if(sample.checked&&sample.independentCorrect<sample.checked){status='needs-review';reason='Correctness alone is not an independent check: familiar material, help, guesses, or unknown help use need another sample.';}
+      else if(manualBank||manualRows.length){status='manual-review-pending';reason='Drawing or explanation is still separate. Self-review does not verify this skill.';}
+      else if(sample.checked){status='correct-in-sample';reason='Correct in the latest recorded independent sample; not proof of complete topic mastery.';}
+      else reason='Saved work is ungraded, changed, skipped manual work, or otherwise not a scored check.';
+    }
+    const bankGap=automaticBank+manualBank===0;
+    if(bankGap)reason=domain.preview?'Preview-only area; no scored check is available.':'No supported check bank exists for this declared area.';
+    return {...ccPick(domain,['id','label','topics','unitIds','preview']),automaticBank,manualBank,bankGap,status,statusLabel:labels[status],reason,practice,sample,lastCheckedAt:latestRun?.completedAt||null};
+  });
+  const counts={total:domains.length,notChecked:0,needsReview:0,correctInSample:0,manualReviewPending:0,bankGaps:0,practiced:0};
+  const countKey={'not-checked':'notChecked','needs-review':'needsReview','correct-in-sample':'correctInSample','manual-review-pending':'manualReviewPending'};
+  domains.forEach(d=>{counts[countKey[d.status]]++;if(d.bankGap)counts.bankGaps++;if(d.practice.attempted)counts.practiced++;});
+  const nextDomain=domains.find(d=>!d.bankGap&&d.status==='needs-review')||domains.find(d=>!d.bankGap&&d.status==='not-checked')||domains.find(d=>!d.bankGap&&d.status==='manual-review-pending')||domains.find(d=>d.bankGap)||null;
+  return {version:CC_BLUEPRINT_VERSION,chapter,label:blueprint.label,available:blueprint.available,scope:blueprint.scope,domains,counts,nextDomain,limits:['Practice is not a cold diagnostic. Exposure and planned questions are not demonstrated understanding.','A sample does not establish complete chapter coverage or predict an exam grade.','Drawing and explanation require human review; self-review remains unverified.']};
+}
 function ccExportSketch(sketch){return ccPick(sketch,['strokes','strokeStyles','text','paper','width','height','version']);}
 function ccExport(){
   const runs=ccStore().runs.map(run=>{
     const row=ccPick(run,['id','version','chapter','phase','status','startedAt','completedAt','updatedAt','baselineRunId','currentIndex','qa','reviewedAt','helpUsed']);
     row.plan=ccPick(run.plan,['chapter','phase','blueprintVersion','blueprint','gaps','seenCount','reviewCount','lessonExposureCount','baselineRunId','available','limits']);
-    row.items=(run.items||[]).map(i=>ccPick(i,['id','domain','domainLabel','manualReview','type','difficulty','targetDifficulty','questionRevision','itemFingerprint','families','seenBefore','seenFamilyBefore','baselineFamilyOverlap','withinFormFamilyOverlap','familiarContent','lessonExposure','review','selectionReason']));
+    row.items=(run.items||[]).map(i=>ccPick(i,['id','domain','domainLabel','manualReview','type','difficulty','targetDifficulty','questionRevision','itemFingerprint','families','seenBefore','seenFamilyBefore','plannedBefore','plannedFamilyBefore','baselineFamilyOverlap','withinFormFamilyOverlap','familiarContent','lessonExposure','review','selectionReason']));
     row.responses=Object.fromEntries(Object.entries(run.responses||{}).map(([id,r])=>{
       const response=ccPick(r,['value','confidence','reasoning','skipped','firstValue','firstCommittedAt','firstConfidence','edited','text','onPaper','paper','submittedAt','committedAt','updatedAt','manualRating','reviewMode','reviewedAt','externalHelp']);
       if(r.commits)response.commits=r.commits.map(c=>ccPick(c,['ts','value','skipped']));if(r.sketch)response.sketch=ccExportSketch(r.sketch);return [id,response];
@@ -16804,18 +16915,18 @@ function ccExport(){
     if(ccCompleted(run))row.grades=Object.fromEntries(Object.entries(run.grades||{}).map(([id,g])=>[id,ccPick(g,['graded','correct','feedback','expected','fields','contentChanged'])]));
     row.summary=ccSummary(run);return row;
   });
-  return {version:CC_VERSION,blueprintVersion:CC_BLUEPRINT_VERSION,storage:'Current device and profile only; no automatic attempt or mastery credit.',cap:CC_RUN_CAP,retention:'First completed starting check per chapter plus recent runs; at most 30 total.',runs,limits:['Uncompleted checks export submitted work without answer keys or correctness.','Self-reviewed drawings remain separate from automatically checked answers.','Prior app exposure is incomplete and does not establish outside freshness.']};
+  return {version:CC_VERSION,blueprintVersion:CC_BLUEPRINT_VERSION,storage:'Current device and profile only; no automatic attempt or mastery credit.',cap:CC_RUN_CAP,retention:'First completed starting check per chapter and unfinished checks are protected; recent completed runs fill a target of 30 records. Protected records may exceed that target.',runs,limits:['Uncompleted checks export submitted work without answer keys or correctness.','Self-reviewed drawings remain separate from automatically checked answers.','Prior app exposure is incomplete and does not establish outside freshness.']};
 }
 
 /* Chapter entry/exit checks. Sealed answers until Finish; distinct from
  * supported lesson gates, practice attempts, and the paper pacing protocol. */
-function ccLabel(phase){return phase==='starting'?'Starting check':'Readiness check';}
+function ccLabel(phase){return phase==='starting'?'Before learning':phase==='middle'?'Mid-chapter check':'Final readiness check';}
 function ccLatest(chapter,phase,status='completed'){
-  return ccStore().runs.filter(r=>r.chapter===chapter&&r.phase===phase&&r.status===status).sort((a,b)=>b.startedAt-a.startedAt)[0]||null;
+  return ccStore().runs.filter(r=>r.chapter===chapter&&r.phase===phase&&(status==='completed'?ccCompleted(r):r.status===status)).sort((a,b)=>b.startedAt-a.startedAt)[0]||null;
 }
 function ccPending(chapter){return ccStore().runs.filter(r=>r.chapter===chapter&&r.status==='in-progress').sort((a,b)=>b.startedAt-a.startedAt)[0]||null;}
-function ccOpen(chapter,phase){courseNavigationSaveWork();smSetChapter(chapter);S.ccPhase=phase;go(phase==='final'?'modeReadiness':'chapterCheck');}
-function ccOpenRun(id){const run=ccRun(id);if(!run)return;courseNavigationSaveWork();smSetChapter(run.chapter);S.ccRunId=id;go(run.status==='completed'?'chapterCheckResults':'chapterCheckRun');}
+function ccOpen(chapter,phase){courseNavigationSaveWork();smSetChapter(chapter);S.ccPhase=ccPhase(phase);go(phase==='final'?'modeReadiness':'chapterCheck');}
+function ccOpenRun(id){const run=ccRun(id);if(!run)return;courseNavigationSaveWork();smSetChapter(run.chapter);S.ccRunId=id;go(ccCompleted(run)?'chapterCheckResults':'chapterCheckRun');}
 function ccItemQuestion(item){return QUESTIONS.find(q=>q.id===item.id);}
 function ccHasValue(value){return Array.isArray(value)?value.some(ccHasValue):value!==null&&value!==undefined&&String(value).trim()!=='';}
 function ccResponse(run,id){return run.responses[id]||(run.responses[id]={value:null,confidence:null,reasoning:'',skipped:false});}
@@ -16840,11 +16951,38 @@ function ccStatusText(run){
   if(!run)return 'Not taken yet';const s=ccSummary(run);
   return s.auto.correct+'/'+s.auto.total+' scored · '+s.manual.total+' manual-review task'+(s.manual.total===1?'':'s');
 }
+function ccLearnDomain(chapter,domain){
+  smSetChapter(chapter);const unit=(CHAPTER_LEARNING_UNITS[chapter]||[]).find(u=>domain.unitIds?.includes(u.id));
+  if(unit)openLearningUnit(chapter,unit.id);else if(domain.topics?.length){S.learnCh=chapter;S.learnTopic=domain.topics[0];go('allLearn');}else smGo('learn');
+}
+function ccJourney(chapter,active=null){
+  const coverage=ccCoverage(chapter),strip=el('section',{class:'cc-journey','aria-label':'Chapter diagnostic journey','data-cc-journey':chapter});
+  strip.appendChild(el('h2',{},'Your chapter checks'));
+  const stages=el('div',{class:'cc-stages'});
+  CC_PHASES.forEach((phase,index)=>{
+    const pending=ccLatest(chapter,phase,'in-progress'),done=ccLatest(chapter,phase),state=pending?'In progress':done?'Result saved':'Not taken';
+    const button=smButton((index+1)+'. '+ccLabel(phase)+' · '+state,()=>ccOpen(chapter,phase),{'data-cc-stage':phase,...(phase==='starting'?{'data-cc-starting':true}:{}),'aria-current':active===phase?'step':'false'});
+    stages.appendChild(button);
+  });strip.appendChild(stages);
+  const c=coverage.counts;
+  strip.appendChild(el('p',{class:'cc-coverage-summary'},c.total+' declared areas · '+c.notChecked+' not checked · '+(c.needsReview+c.manualReviewPending)+' need another check or review'+(c.bankGaps?' · '+c.bankGaps+' bank gaps':'')));
+  if(coverage.nextDomain){const next=coverage.nextDomain;strip.appendChild(el('p',{class:'cc-next-area'},'Next area to check: '+esc(next.label)+(next.bankGap?' · use course problems; the app bank is not ready.':'')));}
+  const details=el('details',{'data-cc-coverage':true});details.appendChild(el('summary',{},'See topic coverage and limits'));
+  details.appendChild(el('p',{class:'muted'},coverage.scope+' Practice history is shown separately from diagnostic results.'));
+  coverage.domains.forEach(domain=>{
+    const row=el('div',{class:'cc-coverage-row','data-cc-domain':domain.id});
+    row.appendChild(el('strong',{},esc(domain.label)));row.appendChild(el('span',{},domain.statusLabel+(domain.bankGap?' · bank gap':'')));
+    row.appendChild(el('p',{},domain.reason));if(domain.practice.attempted)row.appendChild(el('p',{class:'muted'},'Practice: '+domain.practice.correct+'/'+domain.practice.attempted+' recorded correct; this is not a cold-check score.'));
+    if(!domain.bankGap)row.appendChild(smButton('Review this area',()=>ccLearnDomain(chapter,domain)));details.appendChild(row);
+  });
+  if(!CHAPTERS.some(c=>c.id==='ch6'))details.appendChild(el('p',{class:'cc-warning'},'Chapter 6 is in the Exam 2 scope but does not yet have a complete app chapter bank or diagnostics. Use the official Chapter 6 material; do not read this map as full exam coverage.'));
+  strip.appendChild(details);return strip;
+}
 function ccStartPanel(host,chapter,phase){
-  const plan=ccPlan(chapter,phase),pending=ccLatest(chapter,phase,'in-progress'),prior=ccLatest(chapter,phase);
+  const pending=ccLatest(chapter,phase,'in-progress'),plan=pending?.plan||ccPlan(chapter,phase),prior=ccLatest(chapter,phase);
   const auto=plan.items.filter(i=>!i.manualReview).length,manual=plan.items.length-auto;
   const card=el('section',{class:'card cc-panel','data-cc-panel':phase});
-  card.innerHTML='<h2>'+ccLabel(phase)+'</h2><p>'+(phase==='starting'?'Find what to learn first. It is okay not to know an answer.':'Check what you can do after studying. Compare with your starting point.')+'</p>'+
+  card.innerHTML='<h2>'+ccLabel(phase)+'</h2><p>'+(phase==='starting'?'Find what to learn first. It is okay not to know an answer.':phase==='middle'?'Pause after some learning and practice. Find what still needs work before the final check.':'Check what you can do after studying. Then verify full problems on paper.')+'</p>'+
     '<p class="muted">'+auto+' scored questions'+(manual?' + '+manual+' drawing / written tasks':'')+' · no hints · answers after you finish</p>';
   if(prior)card.appendChild(el('p',{},'Last result: '+ccStatusText(prior)));
   if(pending){card.appendChild(smButton('Resume '+ccLabel(phase).toLowerCase(),()=>ccOpenRun(pending.id),{class:'btn','data-cc-resume':pending.id}));}
@@ -16853,7 +16991,7 @@ function ccStartPanel(host,chapter,phase){
   if(prior)card.appendChild(smButton('See last results',()=>ccOpenRun(prior.id),{'data-cc-results':prior.id}));
   card.appendChild(el('p',{class:'cc-caveat'},'Saved on this device/profile; included in Learning evidence downloads. Drawing and written work needs human review. This sample is not an exam grade prediction.'));
   if(phase==='starting'&&!prior)card.appendChild(el('p',{class:'cc-caveat'},'Already studied this chapter? This records your starting point now—not what you knew before.'));
-  if(phase==='final')card.appendChild(el('p',{class:'cc-caveat'},'Different question IDs from your starting check. Previously seen items are labeled; new in the app does not guarantee unfamiliar work.'));
+  card.appendChild(el('p',{class:plan.reviewCount?'cc-warning':'cc-caveat'},plan.reviewCount?plan.reviewCount+' of '+plan.items.length+' tasks are familiar or previously planned. These are review, not fresh evidence.':'This set prioritizes questions not used in saved checks. Outside familiarity is unknown.'));
   if(plan.gaps?.length){
     const areas=new Set(plan.gaps.filter(g=>/coverage|construction/.test(g.kind||'')).map(g=>g.domain));
     card.appendChild(el('p',{class:'cc-warning'},areas.size?'Partial coverage: '+areas.size+' skill areas still need extra checking.':'Some questions are familiar or differ in difficulty. This is a sample, not a full readiness verdict.'));
@@ -16862,17 +17000,17 @@ function ccStartPanel(host,chapter,phase){
   }
   const more=el('details');more.appendChild(el('summary',{},'What this checks'));
   const list=el('ul');ccBlueprint(chapter).domains.forEach(d=>list.appendChild(el('li',{},esc(d.label))));more.appendChild(list);
-  more.appendChild(el('p',{class:'muted'},'The two checks sample the same areas and authored difficulty levels. They are not statistically equivalent tests. Pausing is allowed; any help you use must be reported. No mastery credit is awarded automatically.'));
+  more.appendChild(el('p',{class:'muted'},'The three stages sample declared areas, with different questions when the bank supports it. They are not equivalent tests. Saved unfinished checks stay unchanged. Any help must be reported. No mastery credit is awarded automatically.'));
   card.appendChild(more);host.appendChild(card);
 }
 VIEWS.chapterCheck=v=>{
-  const chapter=smChapter();const header=el('header',{class:'sm-heading'});header.innerHTML='<p class="sm-eyebrow">'+esc(chapter.name)+'</p><h1>Before you learn</h1>';smSelectChapter(header);v.appendChild(header);
-  ccStartPanel(v,chapter.id,'starting');v.appendChild(smButton('Skip for now · go to Learn',()=>smGo('learn')));
+  const chapter=smChapter(),phase=ccPhase(S.ccPhase);const header=el('header',{class:'sm-heading'});header.innerHTML='<p class="sm-eyebrow">'+esc(chapter.name)+'</p><h1>'+ccLabel(phase)+'</h1>';smSelectChapter(header);v.appendChild(header);
+  v.appendChild(ccJourney(chapter.id,phase));ccStartPanel(v,chapter.id,phase);v.appendChild(smButton('Skip for now · go to Learn',()=>smGo('learn')));
 };
 const CC_PREVIOUS_READINESS=VIEWS.modeReadiness;
 VIEWS.modeReadiness=v=>{
   const head=el('header',{class:'sm-heading'});head.innerHTML='<p class="sm-eyebrow">AFTER LEARNING & PRACTICE</p><h1>Readiness check</h1>';smSelectChapter(head);v.appendChild(head);
-  ccStartPanel(v,smChapter().id,'final');
+  v.appendChild(ccJourney(smChapter().id,'final'));ccStartPanel(v,smChapter().id,'final');
   const paper=el('section',{class:'cc-paper'});paper.innerHTML='<h2>Then check full problems on paper</h2><p>A chapter score alone does not test every linked step or exam pacing. Use fresh paper work: untimed first, then a different matched set timed.</p>';
   const old=el('div');CC_PREVIOUS_READINESS(old);old.querySelector('.sm-heading')?.remove();paper.appendChild(old);v.appendChild(paper);
 };
@@ -16905,7 +17043,7 @@ function ccRenderAnswer(host,q,run,item,r){
 }
 VIEWS.chapterCheckRun=v=>{
   const run=ccRun(S.ccRunId);if(!run){ccOpen(smChapter().id,'starting');return;}
-  if(run.status==='completed'){go('chapterCheckResults');return;}
+  if(ccCompleted(run)){go('chapterCheckResults');return;}
   const head=el('header',{class:'sm-heading'});head.innerHTML='<p class="sm-eyebrow">'+esc(CHAPTERS.find(c=>c.id===run.chapter)?.name||run.chapter)+'</p><h1>'+ccLabel(run.phase)+'</h1><p>No hints or feedback until you finish. You can go back and change an answer.</p>';v.appendChild(head);
   const pause=()=>{ccSaveRun(run);ccOpen(run.chapter,run.phase);};v.appendChild(smButton('Save & leave',pause,{'data-cc-pause':true}));
   if(run.currentIndex>=run.items.length){
@@ -16918,6 +17056,7 @@ VIEWS.chapterCheckRun=v=>{
   const item=run.items[run.currentIndex],q=ccItemQuestion(item),r=ccResponse(run,item.id);
   const card=el('section',{class:'card cc-question','data-cc-question':item.id});
   card.appendChild(el('p',{class:'cc-position'},'Question '+(run.currentIndex+1)+' of '+run.items.length+(item.manualReview?' · human review needed':'')));
+  if(item.review)card.appendChild(el('p',{class:'cc-caveat'},'Review item · familiar or previously planned; not fresh evidence.'));
   if(!q){card.appendChild(el('p',{},'This saved question is no longer in the bank. It will remain unassessed.'));card.appendChild(smButton('Skip unavailable question',()=>ccCommit(run,true),{'data-cc-skip':true}));v.appendChild(card);return;}
   const body=el('div',{class:'cc-workspace'}),given=el('div',{class:'cc-given qprompt'},q.prompt),answer=el('div',{class:'cc-answer'});body.append(given,answer);card.appendChild(body);
   ccRenderAnswer(answer,q,run,item,r);
@@ -16935,17 +17074,18 @@ function ccAnswerText(q,r){
 }
 function ccKeyText(q){if(q.type==='mc')return (q.choiceLabels||q.choices)?.[q.answer]??'';if(q.type==='multiSelect')return q.answer.map(i=>(q.choiceLabels||q.choices)[i]).join(', ');if(q.fields)return q.fields.map(f=>f.label+': '+f.answer).join(' · ');return String(q.answer??'');}
 function ccResultTable(run,baseline){
-  const grid=el('div',{class:'cc-domain-list'});
+  const grid=el('div',{class:'cc-domain-list'}),coverage=ccCoverage(run.chapter,{runs:[run]});
   (run.plan.blueprint?.domains||ccBlueprint(run.chapter).domains).forEach(domain=>{
     const tally=r=>{const items=r.items.filter(i=>i.domain===domain.id&&!i.manualReview&&r.grades?.[i.id]?.graded);return {n:items.length,correct:items.filter(i=>!r.responses[i.id]?.skipped&&r.grades?.[i.id]?.correct).length};};
     const now=tally(run),before=baseline?tally(baseline):null,cell=el('section',{class:'cc-domain'});cell.appendChild(el('h3',{},esc(domain.label)));
     cell.appendChild(el('p',{},(before?'Starting '+before.correct+'/'+before.n+' → ':'')+(run.phase==='final'?'Final ':'')+now.correct+'/'+now.n+(now.n?' scored':' · not sampled')));
-    cell.appendChild(el('p',{class:'muted'},!now.n?'Unassessed':now.correct<now.n?'Review this area next':'Correct in this sample—not proof of mastery'));
+    const evidence=coverage.domains.find(d=>d.id===domain.id);
+    cell.appendChild(el('p',{class:'muted'},evidence?evidence.statusLabel+' · '+evidence.reason:!now.n?'Unassessed':'Recorded sample only; current source scope may differ.'));
     if(!now.n||now.correct<now.n)cell.appendChild(smButton('Learn this area',()=>{const unit=(CHAPTER_LEARNING_UNITS[run.chapter]||[]).find(u=>domain.id===u.id||domain.topics.includes(u.topic));smSetChapter(run.chapter);if(unit)openLearningUnit(run.chapter,unit.id);else {S.learnCh=run.chapter;S.learnTopic=domain.topics[0];go('allLearn');}}));grid.appendChild(cell);
   });return grid;
 }
 VIEWS.chapterCheckResults=v=>{
-  const run=ccRun(S.ccRunId);if(!run||run.status!=='completed'){go('chapterCheckRun');return;}
+  const run=ccRun(S.ccRunId);if(!run||!ccCompleted(run)){go('chapterCheckRun');return;}
   const summary=ccSummary(run),baseline=run.baselineRunId?ccRun(run.baselineRunId):null;
   const head=el('section',{class:'card cc-panel','data-cc-results-summary':true});head.innerHTML='<p class="sm-eyebrow">'+esc(CHAPTERS.find(c=>c.id===run.chapter)?.name||run.chapter)+'</p><h1>'+ccLabel(run.phase)+' results</h1><h2>'+summary.auto.correct+' / '+summary.auto.total+' scored answers correct</h2><p>'+summary.manual.total+' drawing / written tasks are separate from that score · '+summary.manual.reviewed+' self-reviewed.</p><p class="muted">'+(run.helpUsed==='none'?'No help reported.':run.helpUsed==='some'?'Help was used: treat this as supported work.':'Help use was not reported; independence is unknown.')+' Different questions can vary in difficulty. This is a learning snapshot, not a predicted exam grade.</p>';
   if(summary.auto.ungraded)head.appendChild(el('p',{class:'cc-warning'},summary.auto.ungraded+' questions could not be scored because their content changed or is unavailable.'));
@@ -16976,26 +17116,23 @@ VIEWS.chapterCheckResults=v=>{
     if(q.why)detail.appendChild(el('div',{class:'why'},q.why));review.appendChild(detail);
   });v.appendChild(review);
 };
-// Final stays in the existing mode; starting is a small entry, not a fifth mode.
+// The same compact journey is visible in the existing modes. No new nav tab.
 STUDY_MODES.readiness.verb='Check what you can do';
 STUDY_MODES.readiness.description='Final chapter check, then fresh paper work: untimed first, then timed.';
 const CC_PREVIOUS_LEARN=VIEWS.modeLearn;
-VIEWS.modeLearn=v=>{CC_PREVIOUS_LEARN(v);const b=el('section',{class:'cc-start-strip'});b.appendChild(el('span',{},'Before you learn · '+(ccLatest(smChapter().id,'starting')?'starting result saved':'find your starting point')));b.appendChild(smButton('Starting check',()=>ccOpen(smChapter().id,'starting'),{'data-cc-starting':true}));v.insertBefore(b,v.children[1]||null);};
-const CC_PREVIOUS_HOME=VIEWS.home;
-VIEWS.home=v=>{
-  CC_PREVIOUS_HOME(v);const host=v.querySelector('.sm-next');if(!host)return;const pending=ccPending(smChapter().id),baseline=ccLatest(smChapter().id,'starting');
-  const b=smButton(pending?'Resume chapter check':'Starting check',()=>pending?ccOpenRun(pending.id):ccOpen(smChapter().id,'starting'),{'data-cc-starting':true});host.appendChild(b);
-  if(pending)host.querySelector('span').textContent='Your chapter check is saved. Other practice is saved separately.';
-  else if(!baseline&&!S.pausedDrill)host.querySelector('span').textContent='Find your starting point, or go straight to Learn.';
-};
+VIEWS.modeLearn=v=>{CC_PREVIOUS_LEARN(v);v.insertBefore(ccJourney(smChapter().id,'starting'),v.children[1]||null);};
+const CC_PREVIOUS_PRACTICE=VIEWS.modePractice;
+VIEWS.modePractice=v=>{CC_PREVIOUS_PRACTICE(v);v.insertBefore(ccJourney(smChapter().id,'middle'),v.children[1]||null);};
 const CC_PREVIOUS_ACTIVITY=smActivity;
 smActivity=function(){
-  if(['chapterCheck','chapterCheckRun','chapterCheckResults'].includes(S.view)){const run=S.view==='chapterCheck'?null:ccRun(S.ccRunId),phase=run?.phase||'starting';return {mode:phase==='starting'?'learn':'readiness',chapter:run?.chapter||smChapter().id,detail:ccLabel(phase)+(S.view==='chapterCheckRun'?' · answers held until finish':'')};}
+  if(['chapterCheck','chapterCheckRun','chapterCheckResults'].includes(S.view)){const run=S.view==='chapterCheck'?null:ccRun(S.ccRunId),phase=run?.phase||ccPhase(S.ccPhase);return {mode:phase==='starting'?'learn':phase==='middle'?'practice':'readiness',chapter:run?.chapter||smChapter().id,detail:ccLabel(phase)+(S.view==='chapterCheckRun'?' · answers held until finish':'')};}
   return CC_PREVIOUS_ACTIVITY();
 };
 const ccStyle=el('style',{id:'chapter-check-style'});ccStyle.textContent=`
+ .cc-journey{padding:12px 14px;background:#edf5f2;border:1px solid #d0dfd8;border-radius:12px;margin:0 0 18px;overflow-wrap:anywhere}.cc-journey h2{font-size:1rem;margin:0 0 8px}.cc-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cc-stages .btn{margin:0!important;font-size:.8rem;min-width:0;white-space:normal;text-align:left;min-height:44px;line-height:1.4}.cc-stages [aria-current=step]{border:2px solid #176b67;background:#dceee8}.cc-journey .btn:focus-visible,.cc-journey summary:focus-visible{outline:3px solid #b17900;outline-offset:3px}.cc-coverage-summary,.cc-next-area{font-size:.82rem;margin:8px 0}.cc-journey summary{font-size:.85rem;cursor:pointer;min-height:32px}.cc-journey details>p{font-size:.8rem}.cc-coverage-row{padding:10px 0;border-top:1px solid #cfdfd7;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:.83rem}.cc-coverage-row strong{flex:1 1 180px}.cc-coverage-row p{flex-basis:100%;margin:0;line-height:1.45}.cc-coverage-row .btn{font-size:.78rem;min-height:44px;margin:0}.cc-coverage-row span{font-weight:600}
  .cc-panel{padding:20px!important}.cc-panel h1{font-size:1.6rem}.cc-panel h2{font-size:1.15rem}.cc-panel p,.cc-panel li{font-size:.9rem;line-height:1.5}.cc-caveat{font-size:.8rem!important;color:#526b71}.cc-warning{color:#865817;font-weight:600}.cc-start-strip{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px;padding:10px 14px;background:#edf5f2;border-radius:12px;font-size:.86rem}.cc-start-strip .btn{margin:0}.sm-next{flex-wrap:wrap}.sm-next>span{flex:1 1 230px}.sm-next .btn{flex:0 1 auto}.cc-question{padding:20px!important}.cc-position{font-size:.82rem;color:#536c73;font-weight:700}.cc-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}.cc-given,.cc-answer{min-width:0}.cc-given .course-structure,.cc-given figure{max-width:100%;margin-inline:0!important}.cc-given img,.cc-given svg{max-width:100%}.cc-given svg{height:auto;max-height:340px}.cc-choices{display:grid;gap:9px}.cc-choice{text-align:left;white-space:normal;border:1px solid #b7cbce;background:white;color:#173e47;padding:12px;border-radius:10px;font:inherit;min-height:48px;cursor:pointer}.cc-choice[aria-pressed=true]{border:2px solid #156e74;background:#e2f2f0;box-shadow:inset 4px 0 #156e74}.cc-choice:focus-visible{outline:3px solid #cc9200;outline-offset:3px}.cc-field{display:flex;flex-direction:column;gap:6px;margin:12px 0;font-size:.9rem}.cc-field input,.cc-field select,.cc-field textarea,.cc-answer textarea{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;border:1px solid #adbec6;border-radius:9px;padding:11px;background:white;color:#173e47}.cc-confidence{max-width:270px}.cc-check-label{display:flex;align-items:center;gap:10px;min-height:44px}.cc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.cc-actions .btn{margin:0}.cc-jump{margin-top:16px}.cc-number-list{display:flex;gap:5px;flex-wrap:wrap}.cc-number-list .btn{font-size:.8rem;margin:0}.cc-domain-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}.cc-domain{padding:14px;border:1px solid #c9d8d9;border-radius:12px;background:#fff}.cc-domain h3{font-size:1rem;margin:0 0 8px}.cc-domain p{font-size:.85rem}.cc-paper>h2{font-size:1.15rem}.cc-panel details{padding:12px 0;border-top:1px solid #d8e3e4}.cc-panel summary,.cc-jump summary{min-height:35px;cursor:pointer;font-weight:650}.cc-panel [data-cc-review] .qprompt{margin-top:15px}.cc-question .course-sketch{margin-top:0}.cc-panel .course-sketch{max-width:700px}.cc-panel .qprompt{overflow-wrap:anywhere}
  @media(max-width:700px){.cc-workspace,.cc-domain-list{grid-template-columns:1fr}.cc-workspace{gap:16px}.cc-question,.cc-panel{padding:14px!important}.cc-question .qprompt{font-size:1rem}.cc-given svg{max-height:250px}.cc-actions .btn{font-size:.85rem;padding:10px;min-height:44px}.sm-next{flex-direction:row}.sm-next>span{flex-basis:100%}.sm-next .btn{font-size:.82rem;padding:9px}.cc-panel h1{font-size:1.4rem}}
+ @media(max-width:600px){.cc-stages{grid-template-columns:1fr}.cc-stages .btn{width:100%;padding:9px 10px}.cc-journey{padding:12px}.cc-coverage-row{display:block}.cc-coverage-row strong,.cc-coverage-row span{display:block}.cc-coverage-row p{margin:5px 0}}
  @media(min-width:350px) and (max-width:600px){.sm-next .btn{width:auto!important;flex:1 1 130px;font-size:.8rem;padding:9px 7px}}
 `;document.head.appendChild(ccStyle);
 
@@ -17310,11 +17447,15 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
 /* Local, transparent study routing. A suggestion is not a diagnosis or a grade.
  * Daily Pulse is device/profile-local; its answers use the existing attempt log.
  * Load after study-modes-ui.js and topic-progress-ui.js. No network or AI calls. */
-const DC_VERSION=1,DC_STORE='dailyStudyCoachV1';
+const DC_VERSION=2,DC_STORE='dailyStudyCoachV1'; // Keep the storage key: existing runs and ink remain valid.
+const DC_SCOPE_SOURCE='https://smccd.instructure.com/courses/73887/modules/items/5586779';
+const DC_COURSE_SCHEDULE=[
+  {id:'ch6-lectures-oct13-15',start:'2026-10-13',end:'2026-10-15',chapter:'ch6',title:'Chapter 6 lectures · Oct 13 and 15',source:'https://smccd.instructure.com/courses/73887/discussion_topics/1367360',verified:'2026-10-14'}
+];
 const DC_ASSESSMENTS=[
   {id:'ch5-a3-quiz',date:'2026-10-15',title:'Chapter 5 quiz · A3 lab',chapters:['ch5'],detail:'10 questions · 40 minutes',source:'https://smccd.instructure.com/courses/73887/discussion_topics/1367360',verified:'2026-10-14',note:'The newer announcement places A3 in lab; the assignment page still says lecture.'},
-  {id:'exam2-a',date:'2026-10-20',title:'Exam 2 · Part A',chapters:['ch4','ch5'],detail:'40 multiple-choice questions · 80 minutes',source:'https://smccd.instructure.com/courses/73887/assignments/2086546',verified:'2026-10-14',note:'Exam scope includes Chapters 4, 5 and some 6. This coach only selects from available banks; it does not cover missing Chapter 6 work.'},
-  {id:'exam2-b',date:'2026-10-22',title:'Exam 2 · Part B',chapters:['ch4','ch5'],detail:'75 minutes · choose 2 of 3 problems',source:'https://smccd.instructure.com/courses/73887/assignments/2086571',verified:'2026-10-14',note:'Exam scope includes Chapters 4, 5 and some 6. Use class material for any scope not yet in the app.'}
+  {id:'exam2-a',date:'2026-10-20',title:'Exam 2 · Part A',chapters:['ch4','ch5','ch6'],rotationStart:'2026-10-16',scopeSource:DC_SCOPE_SOURCE,detail:'40 multiple-choice questions · 80 minutes',source:'https://smccd.instructure.com/courses/73887/assignments/2086546',verified:'2026-10-14',note:'Exam scope includes Chapters 4, 5 and some 6. This coach only selects from available banks; it does not cover missing Chapter 6 work.'},
+  {id:'exam2-b',date:'2026-10-22',title:'Exam 2 · Part B',chapters:['ch4','ch5','ch6'],rotationStart:'2026-10-16',scopeSource:DC_SCOPE_SOURCE,detail:'75 minutes · choose 2 of 3 problems',source:'https://smccd.instructure.com/courses/73887/assignments/2086571',verified:'2026-10-14',note:'Exam scope includes Chapters 4, 5 and some 6. Use class material for any scope not yet in the app.'}
 ];
 function dcDay(now=Date.now()){
   return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now));
@@ -17325,13 +17466,34 @@ function dcCapability(q){
   if(q.requiresDrawing||q.type==='written'||q.type==='ch4production')return /convert|redraw|projection.*wedge|fischer.*zigzag/i.test(q.prompt||'')?'conversion':'construction';
   return ['text','num','blanks'].includes(q.type)?'response':'recognition';
 }
-function dcIsQA(a){return !!(a?.qa||a?.evidence?.actor?.qa||a?.actor?.qa);}
+function dcSkill(q){
+  // Use authored labels, not prompt-text guesses. Most legacy labels describe
+  // a lesson, not a single decision; retain that limit in the routing record.
+  if(q.learningSkill)return {key:'skill:'+q.learningSkill,granularity:'authored-skill'};
+  const step=q.lessonRotationKey||(typeof CH5_ROTATION_KEYS!=='undefined'?CH5_ROTATION_KEYS[q.id]:null);
+  if(step)return {key:'lesson-step:'+step,granularity:'authored-lesson-step'};
+  if(q.adaptiveSkill)return {key:'lesson:'+q.adaptiveSkill,granularity:'authored-lesson'};
+  return {key:'topic:'+q.topic,granularity:'topic-fallback'};
+}
+function dcSkillKey(q){return q.topic+'::'+dcCapability(q)+'::'+dcSkill(q).key;}
+function dcMatchesSkill(q,group){return q.topic===group.topic&&dcCapability(q)===group.capability&&(!group.skillKey||dcSkillKey(q)===group.skillKey);}
+function dcNeedsRepair(group){const row=group.rows[0];return !!row&&(row.scored&&!row.correct||row.uncertain||row.reviewFlag);}
+function dcRepairGroups(evidence,now){
+  return Object.values(evidence.skills||evidence.groups).filter(dcNeedsRepair).sort((a,b)=>{
+    // Recency bands and capped counts prevent a high-volume old failure from
+    // permanently beating a newer gap. These are routing rules, not ability.
+    const ageBand=g=>now-g.latestAt<=3*86400000?0:now-g.latestAt<=7*86400000?1:2;
+    const weight=g=>(['conversion','construction'].includes(g.capability)?3:0)+Math.min(2,g.repeatedMisses)*3+Math.min(3,g.misses);
+    return ageBand(a)-ageBand(b)||weight(b)-weight(a)||b.latestAt-a.latestAt||a.key.localeCompare(b.key);
+  });
+}
+function dcIsQA(a){return !!(a?.qa||a?.synthetic||a?.evidence?.actor?.qa||a?.actor?.qa);}
 function dcEligible(q){return !!q&&!q.preview&&q.adaptiveEligible!==false&&!['CH4-20260923-33','CH4-L11-20260924-28'].includes(q.id);}
 function dcChapter(q,chapters){return chapters.find(ch=>ch.topics.includes(q.topic))?.id||q.courseRoute||null;}
 function dcEvidence(attempts,questions,now=Date.now()){
-  const bank=new Map(questions.map(q=>[q.id,q])),latest=new Map(),counts={},history={},groups={};
+  const bank=new Map(questions.map(q=>[q.id,q])),latest=new Map(),counts={},history={},groups={},skills={};
   for(const a of attempts||[]){
-    const q=bank.get(a?.id);if(!dcEligible(q)||dcIsQA(a)||!Number.isFinite(a.ts)||a.ts>now)continue;
+    const q=bank.get(a?.id);if(!dcEligible(q)||dcIsQA(a)||!Number.isFinite(a.ts)||a.ts<=0||a.ts>now)continue;
     counts[a.id]=(counts[a.id]||0)+1;
     if(a.ts<now-30*86400000||q.correctedAt&&a.questionRevision!==q.correctedAt)continue;
     if((q.production?.kind==='chair'||a.drawing?.kind==='chair')&&(a.drawing?.kind!=='chair'||a.drawing.geometryVersion!==2))continue;
@@ -17339,8 +17501,9 @@ function dcEvidence(attempts,questions,now=Date.now()){
     if(!latest.has(a.id)||a.ts>=latest.get(a.id).ts)latest.set(a.id,a);
   }
   for(const [id,a] of latest){
-    const q=bank.get(id),capability=dcCapability(q),key=q.topic+'::'+capability;
-    const group=groups[key]||(groups[key]={key,topic:q.topic,capability,rows:[],misses:0,correct:0,recordedClean:0,selfReviewed:0,unknown:0,repeatedMisses:0,latestAt:0});
+    const q=bank.get(id),capability=dcCapability(q),key=q.topic+'::'+capability,skill=dcSkill(q),skillKey=dcSkillKey(q);
+    const makeGroup=groupKey=>({key:groupKey,topic:q.topic,capability,rows:[],misses:0,correct:0,recordedClean:0,selfReviewed:0,unknown:0,repeatedMisses:0,latestAt:0});
+    const group=groups[key]||(groups[key]=makeGroup(key)),skillGroup=skills[skillKey]||(skills[skillKey]={...makeGroup(skillKey),skillKey,skill:skill.key,granularity:skill.granularity});
     const manual=!!a.sr||a.drawing?.kind==='freehand-self-review'||q.requiresDrawing||q.type==='written';
     const scored=[true,false,0,1].includes(a.ok),correct=a.ok===true||a.ok===1;
     const helped=Number(a.h)>0||!!a.hf||!!a.rf||a.transfer?.help===true||a.transfer?.phase==='guided'||a.coursePhase==='guided'||a.evidence?.externalHelp?.value===true||a.evidence?.recordedHelp?.used===true||a.drawing?.checks>1||a.drawing?.clean===false||a.drawing?.firstTry===false;
@@ -17348,78 +17511,118 @@ function dcEvidence(attempts,questions,now=Date.now()){
     const knownHints=Number.isFinite(a.h)&&a.h>=0;
     const clean=scored&&correct&&knownHints&&!manual&&!helped&&!uncertain;
     const repeatMiss=(history[id]||[]).filter(r=>[false,0].includes(r.ok)).length>=2&&!correct;
-    const row={id,ts:a.ts,correct,scored,manual,helped,uncertain,knownHints,clean,repeated:(counts[id]||0)>1,repeatMiss};
-    group.rows.push(row);group.latestAt=Math.max(group.latestAt,a.ts);
-    if(scored&&!correct)group.misses++;if(scored&&correct)group.correct++;
-    if(clean)group.recordedClean++;if(manual)group.selfReviewed++;
-    if(!knownHints||!scored)group.unknown++;if(repeatMiss)group.repeatedMisses++;
+    const row={id,ts:a.ts,correct,scored,manual,helped,uncertain,reviewFlag:!!a.rf,knownHints,clean,repeated:(counts[id]||0)>1,repeatMiss,skillKey};
+    for(const target of [group,skillGroup]){
+      target.rows.push(row);target.latestAt=Math.max(target.latestAt,a.ts);
+      if(scored&&!correct)target.misses++;if(scored&&correct)target.correct++;
+      if(clean)target.recordedClean++;if(manual)target.selfReviewed++;
+      if(!knownHints||!scored)target.unknown++;if(repeatMiss)target.repeatedMisses++;
+    }
   }
-  for(const g of Object.values(groups))g.rows.sort((a,b)=>b.ts-a.ts);
-  return {groups,counts,latest:[...latest.values()].map(a=>({id:a.id,ts:a.ts}))};
+  for(const g of [...Object.values(groups),...Object.values(skills)])g.rows.sort((a,b)=>b.ts-a.ts);
+  return {groups,skills,counts,latest:[...latest.values()].map(a=>({id:a.id,ts:a.ts}))};
 }
-function dcContext({now=Date.now(),settings={},chapters=[]}={}){
-  const day=dcDay(now),assessment=DC_ASSESSMENTS.find(a=>a.date>=day)||null;
-  const override=chapters.some(ch=>ch.id===settings.focus)?settings.focus:null;
-  const chapter=override||assessment?.chapters.at(-1)||chapters.find(ch=>ch.id==='ch5')?.id||chapters[0]?.id||null;
-  return {day,assessment,chapter,override:!!override,minutes:[10,25,45].includes(Number(settings.minutes))?Number(settings.minutes):25};
+function dcChapterChoices(chapters=[]){
+  const result=chapters.slice();
+  for(const id of [...new Set(DC_ASSESSMENTS.flatMap(a=>a.chapters))])if(!result.some(ch=>ch.id===id))result.push({id,name:'Chapter '+id.replace('ch','')+' · class material',topics:[]});
+  return result;
 }
-function dcRecommend({questions=[],attempts=[],chapters=[],settings={},now=Date.now()}={}){
-  const context=dcContext({now,settings,chapters}),pool=questions.filter(q=>dcEligible(q)&&dcChapter(q,chapters)===context.chapter),evidence=dcEvidence(attempts,pool,now);
-  if(!pool.length)return {...context,kind:'material',topic:null,title:'Open your class material',why:'No practice bank is loaded for this focus. A missing bank is not evidence that you are ready.'};
-  // A later success on a different item in the SAME capability can advance the
-  // next activity. Old item misses remain in the ledger, not a permanent loop.
-  const groups=Object.values(evidence.groups),repair=groups.filter(g=>g.rows[0]&&(!g.rows[0].correct&&g.rows[0].scored||g.rows[0].uncertain)).sort((a,b)=>{
-    const weight=g=>(g.capability==='conversion'||g.capability==='construction'?8:0)+g.repeatedMisses*5+g.misses*2;
-    return weight(b)-weight(a)||b.latestAt-a.latestAt;
-  })[0];
-  if(repair)return {...context,kind:'repair',topic:repair.topic,capability:repair.capability,questionId:repair.rows[0].id,title:'Fix one missed step',why:(repair.repeatedMisses?'More than one retained miss appears on this skill. ':'A recent retained answer needs another look. ')+(repair.selfReviewed?'Drawing results here are self-reported, not an automatic chemistry grade. ':'')+'Correct recognition answers do not settle a separate drawing or conversion skill.'};
-  const uncertain=groups.find(g=>g.selfReviewed||g.unknown||g.rows.some(r=>r.helped));
-  if(uncertain)return {...context,kind:'practice',topic:uncertain.topic,capability:uncertain.capability,title:'Work a full problem',why:'This skill has self-reviewed, helped, or incomplete evidence. Work a regular problem; it is not a timed readiness claim. A small bank may repeat an item.'};
+function dcDaysBetween(start,end){return Math.round((Date.parse(end+'T12:00:00Z')-Date.parse(start+'T12:00:00Z'))/86400000);}
+function dcContext({now=Date.now(),day=dcDay(now),settings={},chapters=[]}={}){
+  const assessment=DC_ASSESSMENTS.find(a=>a.date>=day)||null,course=DC_COURSE_SCHEDULE.find(s=>s.start<=day&&day<=s.end)||null;
+  const override=dcChapterChoices(chapters).some(ch=>ch.id===settings.focus)?settings.focus:null;
+  const near=assessment&&dcDaysBetween(day,assessment.date)<=7?assessment:null;
+  const rotation=near?.rotationStart&&day>=near.rotationStart?dcDaysBetween(near.rotationStart,day)%near.chapters.length:0;
+  // No evergreen "current Chapter 5": dates expire, and unknown scope stays unknown.
+  const chapter=override||(near?.chapters.length===1?near.chapters[0]:near&&day>=near.rotationStart?near.chapters[rotation]:course?.chapter)||null;
+  const topic=chapter&&chapters.find(ch=>ch.id===chapter)?.topics.includes(settings.topic)?settings.topic:null;
+  const reason=override?'Your selected chapter'+(topic?' and topic':'')+' set this focus.':near?.chapters.length===1?'The Chapter 5 A3 quiz is '+(near.date===day?'today.':'next on '+near.date+'.'):near&&chapter?'Exam 2 covers Chapters 4, 5 and some 6. Auto rotates the main chapter each day.':course?'The saved course schedule places Chapter 6 lectures on Oct 13 and 15.':'No current course schedule is saved for this day. The saved plan ends Oct 22. Choose a chapter; no new deadline is inferred.';
+  const reviewChapters=override||topic||!near?[chapter].filter(Boolean):near.chapters.slice();
+  const sources=[...(near?[{kind:'assessment',id:near.id,date:near.date,url:near.source,verified:near.verified},...(near.scopeSource?[{kind:'scope',url:near.scopeSource,verified:near.verified}]:[])]:[]),...(course?[{kind:'course-schedule',id:course.id,start:course.start,end:course.end,url:course.source,verified:course.verified}]:[])];
+  return {day,assessment,course,chapter,topic,override:!!override,reason,reviewChapters,sources,minutes:[10,25,45].includes(Number(settings.minutes))?Number(settings.minutes):25};
+}
+function dcRecommend({questions=[],attempts=[],chapters=[],settings={},coverage=null,now=Date.now()}={}){
+  const context=dcContext({now,settings,chapters}),pool=questions.filter(q=>context.chapter&&dcEligible(q)&&dcChapter(q,chapters)===context.chapter&&(!context.topic||q.topic===context.topic)),evidence=dcEvidence(attempts,pool,now);
+  if(!pool.length)return {...context,kind:'material',title:context.chapter?'Open your class material':'Choose your study focus',why:context.chapter?'No practice bank is loaded for this focus. A missing bank is not evidence that you are ready.':'The saved schedule has ended. Choose a chapter below; the app will not guess what your course is teaching now.'};
+  // A later same-skill, same-capability success can advance the activity. An
+  // unrelated success elsewhere in a broad topic must not erase the gap.
+  const groups=Object.values(evidence.skills),repair=dcRepairGroups(evidence,now)[0];
+  if(repair){
+    const stale=now-repair.latestAt>7*86400000;
+    return {...context,kind:stale?'practice':'repair',topic:repair.topic,capability:repair.capability,skillKey:repair.skillKey,granularity:repair.granularity,questionId:repair.rows[0].id,title:stale?'Recheck an older gap':'Fix one missed step',why:(stale?'The last signal for this skill is over a week old. Try a problem before assuming the same gap remains. ':repair.repeatedMisses?'More than one retained miss appears on this skill. ':'A recent retained answer or review flag needs another look. ')+(repair.selfReviewed?'Drawing results here are self-reported, not an automatic chemistry grade. ':'')+(repair.granularity==='topic-fallback'?'This bank only labels the broader topic, so the exact missed decision is unknown. ':'')+'Correct recognition answers do not settle a separate drawing or conversion skill.'};
+  }
+  // Cold coverage stays open until a diagnostic. That must not trap the coach
+  // on the first lesson while normal practice is accumulating elsewhere.
+  const coverageDomains=(coverage?.chapter===context.chapter?(coverage.domains||[coverage.nextDomain]):[]).filter(d=>d&&!d.bankGap&&['not-checked','needs-review'].includes(d.status)&&d.topics?.some(t=>pool.some(q=>q.topic===t)));
+  const practiceCount=d=>d.practice?.distinct??d.practice?.attempted??groups.filter(g=>d.topics.includes(g.topic)).reduce((n,g)=>n+g.rows.length,0);
+  const practiceAt=d=>d.practice?.lastAt??Math.max(0,...groups.filter(g=>d.topics.includes(g.topic)).map(g=>g.latestAt));
+  coverageDomains.sort((a,b)=>practiceCount(a)-practiceCount(b)||practiceAt(a)-practiceAt(b)||Number(a.status!=='needs-review')-Number(b.status!=='needs-review'));
+  if(!context.topic&&coverageDomains.length&&coverageDomains.every(d=>practiceCount(d)>=2))return {...context,kind:'diagnostic',topic:null,title:'Check what stuck so far',why:'You have practiced at least two distinct questions in each available area still awaiting a check. Try the mid-chapter check now. Practice did not mark those areas complete, and this is not a final readiness claim.'};
+  const coverageDomain=coverageDomains[0],coverageTopic=coverageDomain?.topics?.find(t=>pool.some(q=>q.topic===t));
+  if(coverageTopic&&coverageDomain.status==='not-checked')return {...context,kind:'probe',topic:coverageTopic,title:'Check one unmeasured skill',why:'Your completed chapter checks have not sampled '+coverageDomain.label+' yet. Try a problem here, then use the chapter check to measure it. Practice and page views do not mark a diagnostic domain complete.'};
+  if(coverageTopic&&coverageDomain.status==='needs-review')return {...context,kind:'practice',topic:coverageTopic,title:'Revisit a chapter-check gap',why:'A completed chapter check flagged '+coverageDomain.label+'. Work a regular problem, then check a new example. This is a sampled gap, not a claim about the whole chapter.'};
+  // Earlier support stays in the ledger. A later clean answer may advance
+  // routing; it still does not certify mastery or independence.
+  const uncertain=groups.filter(g=>g.rows[0]&&(g.rows[0].manual||!g.rows[0].knownHints||!g.rows[0].scored||g.rows[0].helped)).sort((a,b)=>b.latestAt-a.latestAt)[0];
+  if(uncertain)return {...context,kind:'practice',topic:uncertain.topic,capability:uncertain.capability,skillKey:uncertain.skillKey,granularity:uncertain.granularity,title:'Work a full problem',why:'The latest answer on this skill has self-reviewed, helped, or incomplete evidence. Work a regular problem; it is not a timed readiness claim. A small bank may repeat an item.'};
   const topics=[...new Set(pool.map(q=>q.topic))],unseen=topics.find(t=>!groups.some(g=>g.topic===t));
   if(unseen)return {...context,kind:'probe',topic:unseen,title:'Check one unmeasured skill',why:'There is no recent usable app answer for this skill. That means unknown—not that you did not study it.'};
   const next=[...groups].sort((a,b)=>a.latestAt-b.latestAt)[0];
-  return {...context,kind:'practice',topic:next?.topic,capability:next?.capability,title:'Work a full problem',why:'Recent structured answers are available. Keep the linked parts together; use a new example when available. A small bank may repeat an item. App correctness alone does not establish paper readiness.'};
+  return {...context,kind:'practice',topic:next?.topic,capability:next?.capability,skillKey:next?.skillKey,granularity:next?.granularity,title:'Work a full problem',why:'Recent structured answers are available. Keep the linked parts together; use a new example when available. A small bank may repeat an item. App correctness alone does not establish paper readiness.'};
 }
-function dcPulsePlan({questions=[],attempts=[],chapters=[],settings={},day=dcDay(),profile='learner',previousIds=[],now=Date.now()}={}){
-  const context=dcContext({now,settings,chapters}),evidence=dcEvidence(attempts,questions,now),byId=new Map(questions.map(q=>[q.id,q]));
+function dcPulsePlan({questions=[],attempts=[],chapters=[],settings={},now=Date.now(),day=dcDay(now),profile='learner',previousIds=[]}={}){
+  const context=dcContext({now,day,settings,chapters}),evidence=dcEvidence(attempts,questions,now);
   const quick=questions.filter(q=>dcEligible(q)&&!q.requiresDrawing&&!q.arrowBoard&&!q.resonanceBoard&&['mc','text','num'].includes(q.type)&&(q.diff??q.difficulty??2)<=2&&(!q.opticalVisualBank||q.opticalVisualRole==='warm-up')&&(!q.visualStereoBank||q.visualPracticeRole==='warm-up'));
   // Explicit short-drawing list: do not silently turn a five-item check into a long worksheet.
   const shortDrawingIds=['CH5-F03','CH5-F09','CH5-F21'];
   const drawings=questions.filter(q=>dcEligible(q)&&(q.dailyPulseEligible===true||shortDrawingIds.includes(q.id))&&(q.requiresDrawing||q.type==='written'||q.type==='ch4production'));
   const cleanIds=new Set(Object.values(evidence.groups).flatMap(g=>g.rows.filter(r=>r.clean).map(r=>r.id)));
-  const knownTopics=new Set(Object.values(evidence.groups).filter(g=>g.recordedClean>=2).map(g=>g.topic));
-  const repairGroups=Object.values(evidence.groups).filter(g=>g.rows[0]&&(!g.rows[0].correct&&g.rows[0].scored||g.rows[0].uncertain));
-  const repairTopics=new Set(repairGroups.map(g=>g.topic));
-  const focus=quick.filter(q=>dcChapter(q,chapters)===context.chapter),familiar=quick.filter(q=>knownTopics.has(q.topic)||cleanIds.has(q.id));
+  const knownSkills=new Set(Object.values(evidence.skills).filter(g=>g.recordedClean>=2&&!dcNeedsRepair(g)).map(g=>g.skillKey));
+  const repairGroups=dcRepairGroups(evidence,now);
+  const inFocus=q=>!!context.chapter&&dcChapter(q,chapters)===context.chapter&&(!context.topic||q.topic===context.topic);
+  const focus=quick.filter(inFocus),familiar=focus.filter(q=>knownSkills.has(dcSkillKey(q))||cleanIds.has(q.id));
+  const review=quick.filter(q=>!context.override&&!context.topic&&dcChapter(q,chapters)!==context.chapter&&context.reviewChapters.includes(dcChapter(q,chapters)));
   const old=new Set(previousIds),used=new Set(),selected=[],notes=[];
   function pick(candidates,role,fallback){
     let available=candidates.filter(q=>!used.has(q.id));
-    if(!available.length){available=(fallback||quick).filter(q=>!used.has(q.id));notes.push(role+': no unused matching item; another short available skill was used.');}
+    if(!available.length)available=(fallback||[]).filter(q=>!used.has(q.id));
     if(!available.length)return;
-    available.sort((a,b)=>Number(old.has(a.id))-Number(old.has(b.id))||((evidence.counts[a.id]||0)-(evidence.counts[b.id]||0))||dcHash(day+'|'+profile+'|'+a.id)-dcHash(day+'|'+profile+'|'+b.id));
-    const q=available[0];used.add(q.id);selected.push({id:q.id,role,manual:q.requiresDrawing||q.type==='written',capability:dcCapability(q),previouslyAttempted:!!evidence.counts[q.id]});
+    // Spread a chapter mix over available topics before repeating one. This
+    // only ranks the role's already-scoped candidates: a pin, drawing slot,
+    // or matching repair can never escape its legitimate pool for variety.
+    const selectedTopicCount=topic=>selected.filter(item=>item.topic===topic).length;
+    available.sort((a,b)=>selectedTopicCount(a.topic)-selectedTopicCount(b.topic)||Number(old.has(a.id))-Number(old.has(b.id))||((evidence.counts[a.id]||0)-(evidence.counts[b.id]||0))||dcHash(day+'|'+profile+'|'+a.id)-dcHash(day+'|'+profile+'|'+b.id));
+    const q=available[0],manual=!!(q.requiresDrawing||q.type==='written');used.add(q.id);selected.push({id:q.id,role:role+(/drawing/.test(role)&&manual?' · self-reviewed':''),chapter:dcChapter(q,chapters),topic:q.topic,manual,capability:dcCapability(q),skillKey:dcSkillKey(q),granularity:dcSkill(q).granularity,previouslyAttempted:!!evidence.counts[q.id]});
   }
-  pick(familiar,'familiar skill',quick);pick(familiar,'familiar skill',quick);
-  pick(focus,'current focus',quick);
-  const focusDrawings=drawings.filter(q=>dcChapter(q,chapters)===context.chapter),repairDrawings=focusDrawings.filter(q=>repairGroups.some(g=>g.topic===q.topic&&g.capability===dcCapability(q)));
-  if(focusDrawings.length)pick(repairDrawings.length?repairDrawings:focusDrawings,repairDrawings.length?'drawing repair · self-reviewed':'short drawing · self-reviewed',focusDrawings);
-  else {pick(focus,'current focus',quick);notes.push('No eligible short construction item is loaded for this focus. This set does not check drawing.');}
-  const quickRepairs=focus.filter(q=>repairGroups.some(g=>g.topic===q.topic&&g.capability===dcCapability(q)));
-  pick(quickRepairs.length?quickRepairs:focus,quickRepairs.length?'repair check':'focus probe',focus.length?focus:quick);
-  if(repairTopics.size&&!quickRepairs.length)notes.push('No short automatic item matches the missed capability. The last item is a focus probe, not proof that a drawing gap is repaired.');
-  if(!familiar.length)notes.push('No familiar-skill answers are recorded yet; the first two items are foundation probes, not established strengths.');
-  if(!repairTopics.size)notes.push('No recent repair target is recorded; the last item is another focus probe.');
-  return {version:DC_VERSION,day,chapter:context.chapter,ids:selected.map(x=>x.id),roles:selected,notes,createdAt:now,runId:null,status:'ready',log:[],snapshot:null,qa:false};
+  pick(familiar.length?familiar:focus,familiar.length?'familiar focus skill':'focus foundation',focus);
+  pick(focus,'current focus');
+  const focusDrawings=drawings.filter(inFocus),drawingGap=repairGroups.find(g=>focusDrawings.some(q=>dcMatchesSkill(q,g))),repairDrawings=drawingGap?focusDrawings.filter(q=>dcMatchesSkill(q,drawingGap)):[];
+  if(focusDrawings.length)pick(repairDrawings.length?repairDrawings:focusDrawings,repairDrawings.length?'drawing repair':'short drawing',focusDrawings);
+  else {pick(focus,'current focus');notes.push('No eligible short construction item is loaded for this focus. This set does not check drawing.');}
+  const quickGap=repairGroups.find(g=>focus.some(q=>!used.has(q.id)&&dcMatchesSkill(q,g))),quickRepairs=quickGap?focus.filter(q=>!used.has(q.id)&&dcMatchesSkill(q,quickGap)):[];
+  pick(quickRepairs.length?quickRepairs:focus,quickRepairs.length?'repair check':'focus probe',focus);
+  // One review slot at most, within the current exam scope. A pinned topic or
+  // chapter remains exclusive. Missing pools produce a shorter set, not drift.
+  if(review.length)pick(review,'exam-scope review');else pick(focus,'focus probe');
+  if(repairGroups.some(g=>chapters.find(ch=>ch.id===context.chapter)?.topics.includes(g.topic)&&(!context.topic||g.topic===context.topic))&&!quickRepairs.length)notes.push('No unused short automatic item matches the flagged skill and capability. A focus probe is not proof that the gap is repaired.');
+  if(!familiar.length)notes.push('No familiar-skill answers are recorded for this focus; foundation probes are not established strengths.');
+  const scopeChapters=context.override?[context.chapter].filter(Boolean):context.reviewChapters;
+  const missingChapters=scopeChapters.filter(id=>!questions.some(q=>dcEligible(q)&&dcChapter(q,chapters)===id));
+  if(missingChapters.length)notes.push('Missing app bank: '+missingChapters.map(id=>'Chapter '+id.replace('ch','')).join(', ')+'. Use class material; this Pulse does not cover it.');
+  if(selected.length<5)notes.push('Only '+selected.length+' matching short task'+(selected.length===1?' is':'s are')+' available. No unrelated questions were added to fill five.');
+  const scope={chapter:context.chapter,topic:context.topic,reviewChapters:context.reviewChapters,assessmentId:context.assessment?.id||null,missingChapters,reason:context.reason,sources:context.sources,selection:{focus:settings.focus||'auto',topic:context.topic||'all'}};
+  return {version:DC_VERSION,day,chapter:context.chapter,topic:context.topic,scope,ids:selected.map(x=>x.id),roles:selected,notes,createdAt:now,runId:null,status:'ready',log:[],snapshot:null,qa:false};
 }
-if(typeof module!=='undefined'&&module.exports)module.exports={dcDay,dcHash,dcCapability,dcEvidence,dcContext,dcRecommend,dcPulsePlan,DC_ASSESSMENTS};
+function dcDailyPlan({records=[],...input}={}){const day=input.day||dcDay(input.now);return records.filter(r=>r.day===day).at(-1)||dcPulsePlan({...input,day,previousIds:records.at(-1)?.ids||input.previousIds||[]});}
+if(typeof module!=='undefined'&&module.exports)module.exports={dcDay,dcHash,dcCapability,dcSkill,dcSkillKey,dcMatchesSkill,dcEvidence,dcContext,dcRecommend,dcPulsePlan,dcDailyPlan,dcChapterChoices,DC_ASSESSMENTS,DC_COURSE_SCHEDULE};
 
 // This public hook must stay at script scope: the built app runs in strict mode.
 // Function declarations inside the browser-only block are intentionally private.
 function dcExport(){
   const saved=safeStore.get(DC_STORE,{}),data={settings:saved.settings||{},records:saved.records||[]},cutoff=Date.now()-30*86400000;
-  return {version:DC_VERSION,scope:'Current device/profile. Selection is not learning evidence; drawings are self-reviewed.',settings:{focus:data.settings.focus||'auto',minutes:data.settings.minutes||25},
+  return {version:DC_VERSION,scope:'Current device/profile. Selection is not learning evidence; drawings are self-reviewed.',settings:{focus:data.settings.focus||'auto',topic:data.settings.topic||'all',minutes:data.settings.minutes||25},
     modelExposure:safeStore.get('dailyCoachModelViews',[]).filter(r=>(r.ts||0)>=cutoff).map(r=>({id:r.id,day:r.day,ts:r.ts,chapter:r.chapter,capability:r.capability,tier:'exposure',qa:!!r.qa})),
-    rounds:data.records.filter(r=>(r.createdAt||0)>=cutoff).map(r=>({day:r.day,chapter:r.chapter,ids:r.ids,roles:r.roles,notes:r.notes,createdAt:r.createdAt,updatedAt:r.updatedAt,runId:r.runId,status:r.status,qa:!!r.qa,
+    rounds:data.records.filter(r=>(r.createdAt||0)>=cutoff).map(r=>({version:r.version||1,day:r.day,chapter:r.chapter,topic:r.topic||null,selectionScope:r.scope||null,ids:r.ids,roles:r.roles,notes:r.notes,createdAt:r.createdAt,updatedAt:r.updatedAt,runId:r.runId,status:r.status,qa:!!r.qa,
       outcomes:(r.log||[]).map(a=>({id:a.id,ok:a.ok,sr:a.sr,g:a.g,h:a.h,dk:a.dk,rf:a.rf}))}))};
 }
 // Explicit chapter choices in Learn/Practice must also guide the Home coach.
@@ -17427,7 +17630,7 @@ function dcExport(){
 function dcChooseFocus(chapter){
   if(!CHAPTERS.some(ch=>ch.id===chapter))return;
   const saved=safeStore.get(DC_STORE,{});
-  safeStore.set(DC_STORE,{...saved,settings:{...(saved.settings||{}),focus:chapter}});
+  safeStore.set(DC_STORE,{...saved,settings:{...(saved.settings||{}),focus:chapter,topic:saved.settings?.focus===chapter&&CHAPTERS.find(ch=>ch.id===chapter)?.topics.includes(saved.settings?.topic)?saved.settings.topic:'all'}});
 }
 
 if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
@@ -17435,7 +17638,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   function dcRead(){const saved=safeStore.get(DC_STORE,{});return {settings:saved.settings||{},records:saved.records||[]};}
   function dcWrite(data){safeStore.set(DC_STORE,{...data,records:data.records.slice(-30)});}
   function dcCurrentPlan(day=dcDay()){return dcRead().records.filter(r=>r.day===day).at(-1)||null;}
-  function dcInputs(){return {questions:QUESTIONS,attempts:S.attempts||[],chapters:CHAPTERS,settings:dcRead().settings};}
+  function dcInputs(){const settings=dcRead().settings,context=dcContext({settings,chapters:CHAPTERS});return {questions:QUESTIONS,attempts:S.attempts||[],chapters:CHAPTERS,settings,coverage:typeof ccCoverage==='function'&&context.chapter?ccCoverage(context.chapter):null};}
   function dcIsPulse(D){return smRunContext(D)?.kind==='daily-pulse';}
   function dcRecord(D,idx){
     if(!dcIsPulse(D))return;
@@ -17445,7 +17648,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     // than combining one queue with another queue's progress or drawing ink.
     let record=data.records.find(r=>r.day===context.day&&r.runId===D.runId);
     if(!record)record=data.records.find(r=>r.day===context.day&&!r.runId&&JSON.stringify(r.ids)===JSON.stringify(ids));
-    if(!record){record={version:DC_VERSION,day:context.day,chapter:context.chapter,ids,roles:context.roles||[],notes:['Resumed from a saved run; the original selection details may be unavailable on this device. Other same-day local sets are retained separately.'],createdAt:Date.now()};data.records.push(record);}
+    if(!record){record={version:DC_VERSION,day:context.day,chapter:context.chapter,topic:context.topic||null,scope:context.scope||null,ids,roles:context.roles||[],notes:['Resumed from a saved run; the original selection details may be unavailable on this device. Other same-day local sets are retained separately.'],createdAt:Date.now()};data.records.push(record);}
     record.ids=ids;record.chapter=context.chapter;record.roles=context.roles||record.roles||[];
     record.runId=D.runId;record.log=JSON.parse(JSON.stringify(D.log||[]));record.status=idx>=D.queue.length?'done':'started';record.updatedAt=Date.now();record.qa=!!QA_MODE;
     record.snapshot={ids:D.queue.map(q=>q.id),i:Math.min(idx,D.queue.length),right:D.right,wrong:D.wrong,topic:D.topic,cold:D.cold,scopeName:D.scopeName,runId:D.runId,log:record.log,studyContext:context};
@@ -17459,13 +17662,14 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   function dcStartPulse(day=dcDay()){
     const data=dcRead();let record=data.records.filter(r=>r.day===day).at(-1);
     if(!record){
-      record=dcPulsePlan({...dcInputs(),day,profile:typeof PROFILE==='string'?PROFILE:'learner',previousIds:data.records.at(-1)?.ids||[]});
+      record=dcDailyPlan({...dcInputs(),records:data.records,day,profile:typeof PROFILE==='string'?PROFILE:'learner'});
+      if(!record.ids.length){alert('No matching short tasks are loaded for this focus. Use your class material or choose another focus. No daily answers were changed.');return;}
       record.qa=!!QA_MODE;data.records.push(record);dcWrite(data);
     }
     const queue=record.ids.map(id=>QUESTIONS.find(q=>q.id===id));
     if(!queue.length||queue.some(q=>!q)){alert('This saved set uses a question that is no longer available. Your saved answers were kept. Use Practice today; a new Daily Pulse will be available tomorrow.');return;}
     parkCurrentDrill();
-    const context={mode:'practice',kind:'daily-pulse',chapter:record.chapter,day:record.day,roles:record.roles};
+    const context={mode:'practice',kind:'daily-pulse',chapter:record.chapter,topic:record.topic||null,scope:record.scope||null,day:record.day,roles:record.roles};
     const p=record.snapshot||{};
     S.drill={...p,queue,i:p.i||0,right:p.right||0,wrong:p.wrong||0,topic:'__daily_pulse',cold:true,answered:false,log:p.log||[],runId:record.runId||makeRunId('daily-pulse'),scopeName:'Daily Pulse · '+record.day,studyContext:context,sketchDrafts:p.sketchDrafts||{},reasoningDrafts:p.reasoningDrafts||{}};
     const contexts=safeStore.get('studyRunContexts',{});contexts[S.drill.runId]=context;safeStore.set('studyRunContexts',Object.fromEntries(Object.entries(contexts).slice(-100)));
@@ -17482,21 +17686,26 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   }
   function dcOpenRegular(rec){
     courseNavigationSaveWork();smSetChapter(rec.chapter);
-    if(rec.chapter==='ch5'&&rec.kind!=='probe'&&rec.minutes>10&&(!rec.capability||rec.capability==='recognition')){
+    if(rec.chapter==='ch5'&&!rec.skillKey&&rec.kind!=='probe'&&rec.minutes>10&&(!rec.capability||rec.capability==='recognition')){
       if(rec.topic==='stereoRelations'&&typeof smStartVisualStereo==='function'){smStartVisualStereo('pairs');return;}
       if(rec.topic==='stereoOptical'&&typeof smStartOpticalVisual==='function'){smStartOpticalVisual();return;}
     }
     // Full authored items only; do not add a hidden explain-every-step demand.
     const pool=QUESTIONS.filter(q=>dcEligible(q)&&dcChapter(q,CHAPTERS)===rec.chapter&&q.topic===rec.topic&&(q.diff??2)>=2&&q.id!==rec.questionId);
     if(pool.length&&typeof startAdaptiveLearning==='function'){
-      const candidates=rec.capability?pool.filter(q=>dcCapability(q)===rec.capability):pool;
-      if(!candidates.length&&['conversion','construction'].includes(rec.capability)){smGo('practice');return;}
+      const candidates=rec.capability?pool.filter(q=>dcMatchesSkill(q,rec)):pool;
+      if(!candidates.length&&(rec.skillKey||['conversion','construction'].includes(rec.capability))){smGo('practice');return;}
       if(startAdaptiveLearning({chapter:rec.chapter,poolIds:(candidates.length?candidates:pool).map(q=>q.id),total:rec.kind==='probe'||rec.minutes===10?1:3,label:'Practice · '+(TOPICS[rec.topic]?.name||rec.topic),rotationKey:'daily-coach-'+rec.chapter+'-'+rec.topic}))smTagRun('practice','coach-regular-problem',rec.chapter);
     }else smGo('practice');
   }
   function dcGoRecommendation(rec){
     if(rec.kind==='repair')dcOpenLearn(rec);
-    else if(rec.kind==='material'){smSetChapter(rec.chapter);smGo('practice');}
+    else if(rec.kind==='diagnostic'&&typeof ccOpen==='function')ccOpen(rec.chapter,'middle');
+    else if(rec.kind==='material'){
+      if(!rec.chapter){const details=document.querySelector('.dc-details');if(details)details.open=true;document.querySelector('[data-dc-focus]')?.focus();}
+      else if(CHAPTERS.some(ch=>ch.id===rec.chapter)){smSetChapter(rec.chapter);smGo('practice');}
+      else window.open(rec.assessment?.scopeSource||rec.assessment?.source||rec.course?.source||DC_SCOPE_SOURCE,'_blank','noopener');
+    }
     else dcOpenRegular(rec);
   }
   function dcSourceDetails(host,rec){
@@ -17505,12 +17714,19 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     details.appendChild(dcText('p',{class:'muted'},'Local rules use retained answers—not clicks or time on screen. No recorded help is not proof of independent work. Your choice always overrides this suggestion.'));
     const settings=dcRead().settings,controls=el('div',{class:'dc-controls'});
     const focusLabel=el('label');focusLabel.appendChild(dcText('span',{},'Study focus'));
-    const focus=el('select',{'aria-label':'Coach study focus','data-dc-focus':true});focus.appendChild(dcText('option',{value:'auto'},'Auto · nearest saved assessment'));
-    CHAPTERS.forEach(ch=>focus.appendChild(dcText('option',{value:ch.id},ch.name)));focus.value=settings.focus||'auto';
-    focus.onchange=()=>{const data=dcRead();data.settings.focus=focus.value;dcWrite(data);if(focus.value!=='auto')smSetChapter(focus.value);render();};focusLabel.appendChild(focus);controls.appendChild(focusLabel);
+    const focus=el('select',{'aria-label':'Coach study focus','data-dc-focus':true});focus.appendChild(dcText('option',{value:'auto'},'Auto · saved course schedule'));
+    dcChapterChoices(CHAPTERS).forEach(ch=>focus.appendChild(dcText('option',{value:ch.id},ch.name)));focus.value=settings.focus||'auto';
+    focus.onchange=()=>{const data=dcRead();data.settings.focus=focus.value;data.settings.topic='all';dcWrite(data);if(CHAPTERS.some(ch=>ch.id===focus.value))smSetChapter(focus.value);render();};focusLabel.appendChild(focus);controls.appendChild(focusLabel);
+    const topicLabel=el('label');topicLabel.appendChild(dcText('span',{},'Topic · optional'));
+    const topic=el('select',{'aria-label':'Daily study topic','data-dc-topic':true});topic.appendChild(dcText('option',{value:'all'},'Chapter mix'));
+    (CHAPTERS.find(ch=>ch.id===rec.chapter)?.topics||[]).filter(t=>QUESTIONS.some(q=>q.topic===t&&dcEligible(q))).forEach(t=>topic.appendChild(dcText('option',{value:t},TOPICS[t]?.name||t)));
+    topic.value=dcContext({settings,chapters:CHAPTERS}).topic||'all';topic.disabled=topic.options.length<2;
+    topic.onchange=()=>{const data=dcRead();data.settings.focus=rec.chapter;data.settings.topic=topic.value;dcWrite(data);render();};topicLabel.appendChild(topic);controls.appendChild(topicLabel);
     const timeLabel=el('label');timeLabel.appendChild(dcText('span',{},'Time available'));
     const time=el('select',{'aria-label':'Time available','data-dc-minutes':true});[10,25,45].forEach(n=>time.appendChild(dcText('option',{value:String(n)},n+' minutes')));time.value=String(rec.minutes);
     time.onchange=()=>{const data=dcRead();data.settings.minutes=Number(time.value);dcWrite(data);render();};timeLabel.appendChild(time);controls.appendChild(timeLabel);details.appendChild(controls);
+    details.appendChild(dcText('p',{'data-dc-change-note':true},dcCurrentPlan()?'Today’s Daily Pulse stays the same, including your answers and drawings. Focus changes apply to the next new daily set; regular practice changes now.':'Your chapter and topic choices guide the next new Daily Pulse. A selected topic stays topic-only.'));
+    if(rec.course)details.appendChild(dcText('p',{},'Saved course schedule · '+rec.course.title));
     if(rec.assessment){details.appendChild(dcText('p',{},rec.assessment.title+' · '+rec.assessment.date+' · '+rec.assessment.detail));details.appendChild(dcText('p',{},rec.assessment.note));details.appendChild(el('a',{href:rec.assessment.source,target:'_blank',rel:'noopener'},'Canvas source · checked Oct 14, 2026'));}
     else details.appendChild(dcText('p',{},'No future confirmed assessment is saved here. Choose a chapter; this is ordinary practice, not a newly inferred deadline.'));
     details.appendChild(dcText('p',{class:'muted'},'Dates do not update automatically. Daily sets and coach choices are saved on this device/profile; attempts keep their existing sync behavior.'));
@@ -17524,15 +17740,21 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     const mode=rec.kind==='repair'?'Learn':'Practice',topic=TOPICS[rec.topic]?.name;
     card.appendChild(dcText('p',{class:'dc-objective'},[mode,topic||CHAPTERS.find(ch=>ch.id===rec.chapter)?.name,rec.minutes+' minutes available'].filter(Boolean).join(' · ')));
     if(rec.assessment)card.appendChild(dcText('p',{class:'dc-agenda'},'Next saved assessment · '+rec.assessment.title+' · '+rec.assessment.date));
-    const label=rec.kind==='repair'?'Open one worked example →':rec.kind==='material'?'Open class practice →':rec.kind==='probe'?'Try a first problem →':'Start regular practice →';
+    const label=rec.kind==='repair'?'Open one worked example →':rec.kind==='diagnostic'?'Open mid-chapter check →':rec.kind==='material'?(rec.chapter?'Open class practice →':'Choose a chapter →'):rec.kind==='probe'?'Try a first problem →':'Start regular practice →';
     card.appendChild(smButton(label,()=>dcGoRecommendation(rec),{class:'btn','data-focus-primary':true,'data-dc-start':true}));
     if(S.pausedDrill)card.appendChild(smButton('Resume saved work',()=>resumeDrill(),{class:'btn ghost','data-dc-resume':true}));
     dcSourceDetails(card,rec);host.appendChild(card);
-    const pulse=el('section',{class:'dc-pulse','data-daily-pulse':true}),today=dcCurrentPlan();
+    const pulse=el('section',{class:'dc-pulse','data-daily-pulse':true}),today=dcCurrentPlan(),plan=today||dcDailyPlan({...dcInputs(),records:dcRead().records,profile:typeof PROFILE==='string'?PROFILE:'learner'});
     const text=el('div');text.appendChild(dcText('h2',{},'Daily Pulse'));
-    text.appendChild(dcText('p',{},today?.status==='done'?'Finished today. A different set tomorrow.':'Optional · 5 short tasks, including one drawing when available.'));
+    text.appendChild(dcText('p',{},today?.status==='done'?'Finished today. A different set tomorrow.':'Optional · '+plan.ids.length+' short task'+(plan.ids.length===1?'':'s')+(plan.roles?.some(r=>r.manual)?', including one self-reviewed drawing.':'.')));
+    const scope=plan.scope,scopeName=[dcChapterChoices(CHAPTERS).find(ch=>ch.id===plan.chapter)?.name||'Choose a chapter',scope?.topic?TOPICS[scope.topic]?.name||scope.topic:'chapter mix'].join(' · ');
+    text.appendChild(dcText('p',{'data-dc-pulse-scope':true},scopeName+(plan.roles?.some(r=>r.role==='exam-scope review')?' · 1 Exam 2 review task':'')));
+    text.appendChild(dcText('p',{class:'muted','data-dc-pulse-reason':true},scope?.reason||'Saved earlier Daily Pulse. Its original selection rule was not recorded; today’s set is preserved.'));
+    if(scope?.missingChapters?.length)text.appendChild(dcText('p',{'data-dc-pulse-gap':true},'Not covered here: '+scope.missingChapters.map(id=>'Chapter '+id.replace('ch','')).join(', ')+'. Use class material.'));
+    if(plan.ids.length<5)text.appendChild(dcText('p',{class:'muted'},'This focus has a small short-task bank. No unrelated questions were added.'));
+    if(today)text.appendChild(dcText('p',{class:'muted','data-dc-pulse-retained':true},'Saved for today. Focus changes apply to the next new daily set.'));
     text.appendChild(dcText('p',{class:'muted'},'A quick pulse—not your main study block or a readiness grade.'));
-    pulse.appendChild(text);pulse.appendChild(smButton(today?.status==='done'?'View today’s check':today?'Continue Daily Pulse':'Start Daily Pulse',()=>dcStartPulse(),{'data-dc-pulse-start':true}));host.appendChild(pulse);
+    pulse.appendChild(text);if(plan.ids.length)pulse.appendChild(smButton(today?.status==='done'?'View today’s check':today?'Continue Daily Pulse':'Start Daily Pulse',()=>dcStartPulse(),{'data-dc-pulse-start':true}));else pulse.appendChild(smButton(rec.chapter?'Open class practice':'Choose a chapter',()=>dcGoRecommendation({...rec,kind:'material'}),{'data-dc-pulse-material':true}));host.appendChild(pulse);
   }
   const dcPreviousHome=VIEWS.home;
   VIEWS.home=function(v){
@@ -17554,8 +17776,8 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     const drawing=el('div');drawing.innerHTML=typeof q.model==='function'?q.model():q.model;model.appendChild(drawing);card.appendChild(model);
     const more=el('details');more.appendChild(dcText('summary',{},'More · what to check'));
     (q.rubric||[]).forEach(rule=>more.appendChild(dcText('p',{},rule)));if(q.why){const p=el('p');p.innerHTML=q.why;more.appendChild(p);}card.appendChild(more);
-    card.appendChild(dcText('p',{class:'muted'},'Seeing this answer is exposure, not a correct attempt. Your next problem uses a different item; freehand drawings remain self-reviewed.'));
-    const hasDifferent=QUESTIONS.some(item=>dcEligible(item)&&item.topic===rec.topic&&dcCapability(item)===rec.capability&&item.id!==q.id);
+    card.appendChild(dcText('p',{class:'muted'},'Seeing this answer is exposure, not a correct attempt. Freehand drawings remain self-reviewed.'));
+    const hasDifferent=QUESTIONS.some(item=>dcEligible(item)&&dcMatchesSkill(item,rec)&&item.id!==q.id&&(item.diff??2)>=2);
     if(!hasDifferent)card.appendChild(dcText('p',{class:'muted'},'No different matching drawing is loaded in this bank yet. Choose a class worksheet problem for the next attempt.'));
     card.appendChild(smButton(hasDifferent?'Now try a different drawing →':'Open class problems →',()=>dcOpenRegular({...rec,minutes:10,kind:'practice'}),{class:'btn','data-dc-repair-try':true}));
     card.appendChild(smButton('Back to study desk',()=>go('home')));v.appendChild(card);
