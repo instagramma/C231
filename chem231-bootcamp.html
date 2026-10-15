@@ -6,7 +6,10 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.118 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.119 (LOCAL ONLY)
+  v3.119 (2026-10-15): ONE SAVED-WORK MENU.
+  Continue or delete individual drafts, with clear storage scope and preserved
+  answer history. Synced deletion markers prevent stale draft resurrection.
   v3.118 (2026-10-14): WHOLE-APP QA + MORE PRECISE COACHING.
   Skill-specific repair evidence, strict numeric grading, bounded chemistry
   corrections, complete evaluated image inventory, and narrow-screen repairs.
@@ -1748,7 +1751,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.118 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.119 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -1896,7 +1899,7 @@ async function cloudPush(now){
   if (!now){ clearTimeout(_pushT); _pushT = setTimeout(()=>cloudPush(true), 2500); return; }
   try {
     const body = JSON.stringify({ profile: SB_PROFILE,
-      data: {practiceSelections:S.practiceSelections||[], doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, flightRuns:S.flightRuns, flightPrep:S.flightPrep, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, questionFlags:S.questionFlags, pausedDrill:S.pausedDrill, parkedDrills:S.parkedDrills, parkedResolved:S.parkedResolved, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null, firstSeen:S.firstSeen||Date.now(), lastSeen:Date.now()},
+      data: {savedWorkDeleted:S.savedWorkDeleted||[], practiceSelections:S.practiceSelections||[], doneDays:S.doneDays, qstats:S.qstats, legacyQstats:S.legacyQstats, missed:S.missed, molDone:S.molDone, bondDone:S.bondDone, resDone:S.resDone, resRuns:S.resRuns, flightRuns:S.flightRuns, flightPrep:S.flightPrep, visits:S.visits, fcMastery:S.fcMastery, lastEval:S.lastEval, diags:S.diags, nextQuiz:S.nextQuiz, wrLog:S.wrLog, attempts:S.attempts, questionFlags:S.questionFlags, pausedDrill:S.pausedDrill, parkedDrills:S.parkedDrills, parkedResolved:S.parkedResolved, pausedMastery:S.pausedMastery, masteryDays:S.masteryDays, pinHash:S.pinHash||null, firstSeen:S.firstSeen||Date.now(), lastSeen:Date.now()},
       updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL+"/rest/v1/progress", {method:"POST", headers:{...sbHeaders(),"Prefer":"resolution=merge-duplicates"}, body});
     cloudState = r.ok ? "synced" : "offline";
@@ -5646,7 +5649,7 @@ VIEWS.home = (v) => {
       rc.innerHTML='<span class="tag coral">⏸ Continue</span><h3 style="margin:6px 0">'+(p.scopeName||"Round")+' · '+p.i+'/'+p.ids.length+' done</h3><p class="muted" style="margin:0 0 8px">'+p.right+' right · '+p.wrong+' wrong · saved.</p>';
       const rr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
       rr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeDrill()},"▶ Resume round"));
-      rr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedDrill=null;safeStore.set("pausedDrill",null);render();}},"discard"));
+      rr.appendChild(el("button",{class:"btn ghost small",onclick:()=>swDelete(swKey('drill',S.pausedDrill))},"Delete draft"));
       rc.appendChild(rr); v.appendChild(rc);
     }
     // v3.14: paused MASTERY run — same guarantee, separate card (a mastery run and a drill
@@ -5657,7 +5660,7 @@ VIEWS.home = (v) => {
       mc.innerHTML='<span class="tag coral">⏸ Continue</span><h3 style="margin:6px 0">⚖️ Formal-charge mastery · '+pm.i+'/'+pm.names.length+' done</h3><p class="muted" style="margin:0 0 8px">'+(pm.clean===false?'Already not-clean; finish for practice or discard.':'Still clean · saved at species '+(pm.i+1)+'.')+'</p>';
       const mr=el("div",{style:"display:flex;gap:8px;flex-wrap:wrap"});
       mr.appendChild(el("button",{class:"btn teal",onclick:()=>resumeMastery()},"▶ Resume mastery check"));
-      mr.appendChild(el("button",{class:"btn ghost small",onclick:()=>{S.pausedMastery=null;safeStore.set("pausedMastery",null);render();}},"discard"));
+      mr.appendChild(el("button",{class:"btn ghost small",onclick:()=>swDelete(swKey('mastery',S.pausedMastery))},"Delete draft"));
       mc.appendChild(mr); v.appendChild(mc);
     }
     // v3.25: one optional planner card ABOVE the unchanged Cover/Review tiles.
@@ -15804,7 +15807,7 @@ VIEWS.learningEvidence=function(v){
  * Never labels time as attention or infers which answer caused lost points.
  * Device-local, profile-scoped, included in the learning-evidence export. */
 function lpRows(){return safeStore.get('paperPracticeSessions',[]);}
-function lpActive(){return lpRows().findLast(r=>!r.endedAt);}
+function lpActive(){const rows=lpRows().filter(r=>!r.endedAt&&!r.cancelledAt);return rows.find(r=>r.id===S.paperPracticeId)||rows.at(-1);}
 function lpStore(row){const rows=lpRows(),i=rows.findIndex(r=>r.id===row.id);if(i<0)rows.push(row);else rows[i]=row;safeStore.set('paperPracticeSessions',rows.slice(-100));}
 function lpPhase(row){return row?.phase==='untimed'?'untimed':'timed';}
 function lpSessionLabel(row){
@@ -16699,7 +16702,10 @@ function ccBaseline(chapter,runs=ccStore().runs){return runs.filter(r=>r.chapter
 function ccSave(store){
   const rows=[...new Map((store.runs||[]).filter(r=>r&&r.id).map(r=>[r.id,ccClone(r)])).values()].sort((a,b)=>(a.startedAt||0)-(b.startedAt||0));
   const protectedIds=new Set([...new Set(rows.map(r=>r.chapter))].map(ch=>ccBaseline(ch,rows)?.id).filter(Boolean));
-  rows.filter(r=>!ccCompleted(r)).forEach(r=>protectedIds.add(r.id));
+  rows.filter(r=>r.status==='in-progress').forEach(r=>protectedIds.add(r.id));
+  const exposure=new Set(safeStore.get('cancelledCheckExposure',[]));
+  rows.filter(r=>r.status==='cancelled').forEach(r=>Object.keys(r.responses||{}).forEach(id=>exposure.add(id)));
+  safeStore.set('cancelledCheckExposure',[...exposure]);
   const protectedRows=rows.filter(r=>protectedIds.has(r.id)),recent=rows.filter(r=>!protectedIds.has(r.id)).slice(-Math.max(0,CC_RUN_CAP-protectedRows.length));
   const next={version:CC_VERSION,runs:[...protectedRows,...recent].sort((a,b)=>(a.startedAt||0)-(b.startedAt||0))};safeStore.set('chapterChecks',next);return ccClone(next);
 }
@@ -16710,6 +16716,7 @@ function ccExposure(){
   (state.attempts||[]).forEach(a=>mark(a.id));
   Object.entries(state.qstats||{}).forEach(([id,v])=>{if((v.r||0)+(v.w||0)+(v.gr||0)+(v.gw||0)+(v.dk||0)>0)mark(id);});
   Object.keys(state.questionFlags||{}).forEach(mark);
+  safeStore.get('cancelledCheckExposure',[]).forEach(mark);
   ccStore().runs.forEach(run=>{
     // Finishing reveals every model/key, including skipped questions.
     (ccCompleted(run)?run.items||[]:Object.keys(run.responses||{}).map(id=>({id}))).forEach(item=>mark(item.id));
@@ -16771,7 +16778,7 @@ function ccPlan(chapter,phase='starting'){
   return {chapter,phase,blueprintVersion:blueprint.version,blueprint:ccClone(blueprint),items,gaps,seenCount:items.filter(i=>i.seenBefore).length,reviewCount:items.filter(i=>i.review).length,lessonExposureCount:items.filter(i=>i.lessonExposure).length,baselineRunId:baseline?.id||null,available:items.length>0,limits};
 }
 function ccStart(chapter,phase='starting'){
-  phase=ccPhase(phase);const pending=ccStore().runs.findLast(r=>r.chapter===chapter&&r.phase===phase&&!ccCompleted(r));if(pending)return pending;
+  phase=ccPhase(phase);const pending=ccStore().runs.findLast(r=>r.chapter===chapter&&r.phase===phase&&r.status==='in-progress');if(pending)return pending;
   const plan=ccPlan(chapter,phase);if(!plan.available)return {available:false,chapter,phase,items:[],gaps:plan.gaps,limits:plan.limits,reason:'No supported question formats are available for this chapter check.'};
   const now=Date.now(),id=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?'chapter-check-'+crypto.randomUUID():'chapter-check-'+now+'-'+Math.random().toString(36).slice(2);
   const run={id,version:CC_VERSION,chapter,phase,status:'in-progress',startedAt:now,completedAt:null,updatedAt:now,baselineRunId:plan.baselineRunId,plan,items:ccClone(plan.items),responses:{},currentIndex:0,qa:typeof QA_MODE!=='undefined'&&!!QA_MODE};return ccSaveRun(run);
@@ -16905,7 +16912,7 @@ function ccCoverage(chapter,options={}){
 function ccExportSketch(sketch){return ccPick(sketch,['strokes','strokeStyles','text','paper','width','height','version']);}
 function ccExport(){
   const runs=ccStore().runs.map(run=>{
-    const row=ccPick(run,['id','version','chapter','phase','status','startedAt','completedAt','updatedAt','baselineRunId','currentIndex','qa','reviewedAt','helpUsed']);
+    const row=ccPick(run,['id','version','chapter','phase','status','startedAt','completedAt','cancelledAt','updatedAt','baselineRunId','currentIndex','qa','reviewedAt','helpUsed']);
     row.plan=ccPick(run.plan,['chapter','phase','blueprintVersion','blueprint','gaps','seenCount','reviewCount','lessonExposureCount','baselineRunId','available','limits']);
     row.items=(run.items||[]).map(i=>ccPick(i,['id','domain','domainLabel','manualReview','type','difficulty','targetDifficulty','questionRevision','itemFingerprint','families','seenBefore','seenFamilyBefore','plannedBefore','plannedFamilyBefore','baselineFamilyOverlap','withinFormFamilyOverlap','familiarContent','lessonExposure','review','selectionReason']));
     row.responses=Object.fromEntries(Object.entries(run.responses||{}).map(([id,r])=>{
@@ -16926,7 +16933,7 @@ function ccLatest(chapter,phase,status='completed'){
 }
 function ccPending(chapter){return ccStore().runs.filter(r=>r.chapter===chapter&&r.status==='in-progress').sort((a,b)=>b.startedAt-a.startedAt)[0]||null;}
 function ccOpen(chapter,phase){courseNavigationSaveWork();smSetChapter(chapter);S.ccPhase=ccPhase(phase);go(phase==='final'?'modeReadiness':'chapterCheck');}
-function ccOpenRun(id){const run=ccRun(id);if(!run)return;courseNavigationSaveWork();smSetChapter(run.chapter);S.ccRunId=id;go(ccCompleted(run)?'chapterCheckResults':'chapterCheckRun');}
+function ccOpenRun(id){const run=ccRun(id);if(!run||run.status==='cancelled')return;courseNavigationSaveWork();smSetChapter(run.chapter);S.ccRunId=id;go(ccCompleted(run)?'chapterCheckResults':'chapterCheckRun');}
 function ccItemQuestion(item){return QUESTIONS.find(q=>q.id===item.id);}
 function ccHasValue(value){return Array.isArray(value)?value.some(ccHasValue):value!==null&&value!==undefined&&String(value).trim()!=='';}
 function ccResponse(run,id){return run.responses[id]||(run.responses[id]={value:null,confidence:null,reasoning:'',skipped:false});}
@@ -17042,7 +17049,7 @@ function ccRenderAnswer(host,q,run,item,r){
   }
 }
 VIEWS.chapterCheckRun=v=>{
-  const run=ccRun(S.ccRunId);if(!run){ccOpen(smChapter().id,'starting');return;}
+  const run=ccRun(S.ccRunId);if(!run||run.status==='cancelled'){ccOpen(smChapter().id,'starting');return;}
   if(ccCompleted(run)){go('chapterCheckResults');return;}
   const head=el('header',{class:'sm-heading'});head.innerHTML='<p class="sm-eyebrow">'+esc(CHAPTERS.find(c=>c.id===run.chapter)?.name||run.chapter)+'</p><h1>'+ccLabel(run.phase)+'</h1><p>No hints or feedback until you finish. You can go back and change an answer.</p>';v.appendChild(head);
   const pause=()=>{ccSaveRun(run);ccOpen(run.chapter,run.phase);};v.appendChild(smButton('Save & leave',pause,{'data-cc-pause':true}));
@@ -17541,8 +17548,9 @@ function dcContext({now=Date.now(),day=dcDay(now),settings={},chapters=[]}={}){
   const sources=[...(near?[{kind:'assessment',id:near.id,date:near.date,url:near.source,verified:near.verified},...(near.scopeSource?[{kind:'scope',url:near.scopeSource,verified:near.verified}]:[])]:[]),...(course?[{kind:'course-schedule',id:course.id,start:course.start,end:course.end,url:course.source,verified:course.verified}]:[])];
   return {day,assessment,course,chapter,topic,override:!!override,reason,reviewChapters,sources,minutes:[10,25,45].includes(Number(settings.minutes))?Number(settings.minutes):25};
 }
-function dcRecommend({questions=[],attempts=[],chapters=[],settings={},coverage=null,now=Date.now()}={}){
+function dcRecommend({questions=[],attempts=[],chapters=[],settings={},coverage=null,workflowNote='',now=Date.now()}={}){
   const context=dcContext({now,settings,chapters}),pool=questions.filter(q=>context.chapter&&dcEligible(q)&&dcChapter(q,chapters)===context.chapter&&(!context.topic||q.topic===context.topic)),evidence=dcEvidence(attempts,pool,now);
+  context.workflowNote=workflowNote; // Context only; never used to grade or lower readiness.
   if(!pool.length)return {...context,kind:'material',title:context.chapter?'Open your class material':'Choose your study focus',why:context.chapter?'No practice bank is loaded for this focus. A missing bank is not evidence that you are ready.':'The saved schedule has ended. Choose a chapter below; the app will not guess what your course is teaching now.'};
   // A later same-skill, same-capability success can advance the activity. An
   // unrelated success elsewhere in a broad topic must not erase the gap.
@@ -17638,7 +17646,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   function dcRead(){const saved=safeStore.get(DC_STORE,{});return {settings:saved.settings||{},records:saved.records||[]};}
   function dcWrite(data){safeStore.set(DC_STORE,{...data,records:data.records.slice(-30)});}
   function dcCurrentPlan(day=dcDay()){return dcRead().records.filter(r=>r.day===day).at(-1)||null;}
-  function dcInputs(){const settings=dcRead().settings,context=dcContext({settings,chapters:CHAPTERS});return {questions:QUESTIONS,attempts:S.attempts||[],chapters:CHAPTERS,settings,coverage:typeof ccCoverage==='function'&&context.chapter?ccCoverage(context.chapter):null};}
+  function dcInputs(){const settings=dcRead().settings,context=dcContext({settings,chapters:CHAPTERS});return {questions:QUESTIONS,attempts:S.attempts||[],chapters:CHAPTERS,settings,workflowNote:typeof swWorkflowNote==='function'?swWorkflowNote(context.chapter):'',coverage:typeof ccCoverage==='function'&&context.chapter?ccCoverage(context.chapter):null};}
   function dcIsPulse(D){return smRunContext(D)?.kind==='daily-pulse';}
   function dcRecord(D,idx){
     if(!dcIsPulse(D))return;
@@ -17661,6 +17669,8 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   logAttempt=function(q,ok,guessed,D,dk,answer){const event=dcPreviousAttempt.apply(this,arguments);if(dcIsPulse(D)&&event.evidence)event.evidence.studyContext={...smRunContext(D),roles:undefined};return event;};
   function dcStartPulse(day=dcDay()){
     const data=dcRead();let record=data.records.filter(r=>r.day===day).at(-1);
+    const continuing=!!record?.snapshot&&record.status!=='done';
+    if(record?.status==='cancelled'){S.savedWorkRecordKey=swActivity().events.filter(e=>e.action==='delete'&&e.runId===record.runId).at(-1)?.recordKey||'drill:'+record.runId;go('savedWorkRecord');return;}
     if(!record){
       record=dcDailyPlan({...dcInputs(),records:data.records,day,profile:typeof PROFILE==='string'?PROFILE:'learner'});
       if(!record.ids.length){alert('No matching short tasks are loaded for this focus. Use your class material or choose another focus. No daily answers were changed.');return;}
@@ -17674,6 +17684,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     S.drill={...p,queue,i:p.i||0,right:p.right||0,wrong:p.wrong||0,topic:'__daily_pulse',cold:true,answered:false,log:p.log||[],runId:record.runId||makeRunId('daily-pulse'),scopeName:'Daily Pulse · '+record.day,studyContext:context,sketchDrafts:p.sketchDrafts||{},reasoningDrafts:p.reasoningDrafts||{}};
     const contexts=safeStore.get('studyRunContexts',{});contexts[S.drill.runId]=context;safeStore.set('studyRunContexts',Object.fromEntries(Object.entries(contexts).slice(-100)));
     snapshotDrill(S.drill.i);save();go('drill');
+    if(continuing&&S.pausedDrill)swRecordResume('drill',S.pausedDrill,'daily-pulse-shortcut');
   }
   function dcOpenLearn(rec){
     courseNavigationSaveWork();smSetChapter(rec.chapter);S.learnCh=rec.chapter;
@@ -17743,10 +17754,10 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     const label=rec.kind==='repair'?'Open one worked example →':rec.kind==='diagnostic'?'Open mid-chapter check →':rec.kind==='material'?(rec.chapter?'Open class practice →':'Choose a chapter →'):rec.kind==='probe'?'Try a first problem →':'Start regular practice →';
     card.appendChild(smButton(label,()=>dcGoRecommendation(rec),{class:'btn','data-focus-primary':true,'data-dc-start':true}));
     if(S.pausedDrill)card.appendChild(smButton('Resume saved work',()=>resumeDrill(),{class:'btn ghost','data-dc-resume':true}));
-    dcSourceDetails(card,rec);host.appendChild(card);
+    dcSourceDetails(card,rec);if(rec.workflowNote){const note=el('details',{class:'dc-details'});note.appendChild(dcText('summary',{},'Your saved-work pattern'));note.appendChild(dcText('p',{'data-sw-coach-note':true},rec.workflowNote));note.appendChild(smButton('See activity & answers',()=>go('savedWorkActivity'),{class:'btn ghost'}));card.appendChild(note);}host.appendChild(card);
     const pulse=el('section',{class:'dc-pulse','data-daily-pulse':true}),today=dcCurrentPlan(),plan=today||dcDailyPlan({...dcInputs(),records:dcRead().records,profile:typeof PROFILE==='string'?PROFILE:'learner'});
     const text=el('div');text.appendChild(dcText('h2',{},'Daily Pulse'));
-    text.appendChild(dcText('p',{},today?.status==='done'?'Finished today. A different set tomorrow.':'Optional · '+plan.ids.length+' short task'+(plan.ids.length===1?'':'s')+(plan.roles?.some(r=>r.manual)?', including one self-reviewed drawing.':'.')));
+    text.appendChild(dcText('p',{},today?.status==='cancelled'?'Deleted for today. Your recorded answers remain in Session activity; a new set comes tomorrow.':today?.status==='done'?'Finished today. A different set tomorrow.':'Optional · '+plan.ids.length+' short task'+(plan.ids.length===1?'':'s')+(plan.roles?.some(r=>r.manual)?', including one self-reviewed drawing.':'.')));
     const scope=plan.scope,scopeName=[dcChapterChoices(CHAPTERS).find(ch=>ch.id===plan.chapter)?.name||'Choose a chapter',scope?.topic?TOPICS[scope.topic]?.name||scope.topic:'chapter mix'].join(' · ');
     text.appendChild(dcText('p',{'data-dc-pulse-scope':true},scopeName+(plan.roles?.some(r=>r.role==='exam-scope review')?' · 1 Exam 2 review task':'')));
     text.appendChild(dcText('p',{class:'muted','data-dc-pulse-reason':true},scope?.reason||'Saved earlier Daily Pulse. Its original selection rule was not recorded; today’s set is preserved.'));
@@ -17754,7 +17765,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     if(plan.ids.length<5)text.appendChild(dcText('p',{class:'muted'},'This focus has a small short-task bank. No unrelated questions were added.'));
     if(today)text.appendChild(dcText('p',{class:'muted','data-dc-pulse-retained':true},'Saved for today. Focus changes apply to the next new daily set.'));
     text.appendChild(dcText('p',{class:'muted'},'A quick pulse—not your main study block or a readiness grade.'));
-    pulse.appendChild(text);if(plan.ids.length)pulse.appendChild(smButton(today?.status==='done'?'View today’s check':today?'Continue Daily Pulse':'Start Daily Pulse',()=>dcStartPulse(),{'data-dc-pulse-start':true}));else pulse.appendChild(smButton(rec.chapter?'Open class practice':'Choose a chapter',()=>dcGoRecommendation({...rec,kind:'material'}),{'data-dc-pulse-material':true}));host.appendChild(pulse);
+    pulse.appendChild(text);if(plan.ids.length)pulse.appendChild(smButton(today?.status==='cancelled'?'View saved answers':today?.status==='done'?'View today’s check':today?'Continue Daily Pulse':'Start Daily Pulse',()=>dcStartPulse(),{'data-dc-pulse-start':true}));else pulse.appendChild(smButton(rec.chapter?'Open class practice':'Choose a chapter',()=>dcGoRecommendation({...rec,kind:'material'}),{'data-dc-pulse-material':true}));host.appendChild(pulse);
   }
   const dcPreviousHome=VIEWS.home;
   VIEWS.home=function(v){
@@ -17812,6 +17823,354 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
     @media(max-width:600px){.dc-next{padding:14px}.dc-next h2{font-size:1.15rem}.dc-pulse{align-items:flex-start;flex-direction:column;padding:12px}.dc-pulse>.btn{max-width:100%;margin:4px 0 0}.dc-controls{gap:8px}.dc-next p{font-size:.82rem}.dc-next .btn{font-size:.86rem}.dc-next .dc-details p{font-size:.78rem}.dc-repair h1{font-size:1.2rem}.dc-repair{padding:14px!important}}
   `;document.head.appendChild(style);
 }
+
+/* Saved work is navigation/draft management, not a new assessment.
+ * Keep submitted evidence and exposure even when the editable session is deleted.
+ * Cloud tombstones are profile-scoped; device-local work stays device-local. */
+S.savedWorkDeleted=safeStore.get('savedWorkDeleted',[]);
+function swText(tag,attrs,text){const node=el(tag,attrs||{});node.textContent=String(text??'');return node;}
+function swKey(kind,work){
+  if(!work)return '';
+  const legacy=kind==='mastery'?[work.names,work.ts]:[work.ids||work.queue?.map(q=>q.id),work.topic,work.scopeName,work.focusStartedAt||0];
+  return kind+':'+(work.savedWorkId||work.runId||'legacy-'+leFingerprint(legacy));
+}
+function swDeleted(kind,work){return (S.savedWorkDeleted||[]).includes(swKey(kind,work));}
+function swIdentifyDrill(work){if(work&&!work.runId){work.savedWorkId=work.savedWorkId||swKey('drill',work).slice(6);work.runId=work.savedWorkId;}return work;}
+function swPrune(){
+  swIdentifyDrill(S.pausedDrill);(S.parkedDrills||[]).forEach(swIdentifyDrill);
+  if(swDeleted('drill',S.pausedDrill))S.pausedDrill=null;
+  S.parkedDrills=(S.parkedDrills||[]).filter(p=>!swDeleted('drill',p));
+  if(swDeleted('mastery',S.pausedMastery))S.pausedMastery=null;
+  if(swDeleted('drill',S.drill)){S.drill=null;if(S.view==='drill')S.view='savedWork';}
+  if(swDeleted('mastery',S.mastery)){S.mastery=null;if(S.view==='mastery')S.view='savedWork';}
+  const daily=safeStore.get(DC_STORE,{});let changed=false;
+  (daily.records||[]).forEach(r=>{if(r.runId&&r.status!=='cancelled'&&swDeleted('drill',r.snapshot||r)){r.status='cancelled';r.snapshot=null;r.cancelledSyncSeenAt=Date.now();changed=true;}});
+  if(changed)safeStore.set(DC_STORE,daily);
+}
+const SW_PREVIOUS_MERGE=mergeRemote;
+mergeRemote=function(remote){
+  if(!remote)return;
+  S.savedWorkDeleted=[...new Set([...(S.savedWorkDeleted||[]),...(Array.isArray(remote.savedWorkDeleted)?remote.savedWorkDeleted:[])])];
+  swPrune();
+  const incoming={...remote,pausedDrill:swDeleted('drill',remote.pausedDrill)?null:swIdentifyDrill(leClone(remote.pausedDrill)),
+    pausedMastery:swDeleted('mastery',remote.pausedMastery)?null:remote.pausedMastery,
+    parkedDrills:(remote.parkedDrills||[]).filter(p=>!swDeleted('drill',p)).map(p=>swIdentifyDrill(leClone(p)))};
+  SW_PREVIOUS_MERGE(incoming);swPrune();safeStore.set('savedWorkDeleted',S.savedWorkDeleted);
+};
+const SW_PREVIOUS_SAVE=save;
+save=function(){swPrune();safeStore.set('savedWorkDeleted',S.savedWorkDeleted);return SW_PREVIOUS_SAVE();};
+const SW_PREVIOUS_SNAPSHOT=snapshotDrill;
+snapshotDrill=function(index){
+  const D=S.drill;if(D&&!D.runId&&!D.savedWorkId)D.savedWorkId='draft-'+makeRunId('saved');
+  SW_PREVIOUS_SNAPSHOT(index);
+  if(S.pausedDrill&&D?.savedWorkId){S.pausedDrill.savedWorkId=D.savedWorkId;safeStore.set('pausedDrill',S.pausedDrill);}
+};
+const SW_PREVIOUS_RESUME=resumeDrill;
+resumeDrill=function(){const p=S.pausedDrill;if(!p||swDeleted('drill',p))return;
+  if(!swCanResume('drill',p))return;
+  const id=p.savedWorkId||(!p.runId?swKey('drill',p).slice(6):null);
+  SW_PREVIOUS_RESUME();if(S.drill&&id)S.drill.savedWorkId=id;
+  if(S.drill&&S.view==='drill')swRecordResume('drill',p);
+};
+const SW_PREVIOUS_MASTERY_SNAPSHOT=snapshotMastery;
+function swMasteryCapture(M){
+  if(!M||S.view!=='mastery')return;
+  const bonds=document.getElementById('m_b'),pairs=document.getElementById('m_l'),charge=document.getElementById('m_f');
+  if(!bonds||!pairs||!charge||Number(bonds.closest('.card')?.dataset.savedMasteryIndex)!==M.i)return;
+  M.currentAnswers={index:M.i,bonds:bonds.value,lonePairs:pairs.value,formalCharge:charge.value};
+}
+snapshotMastery=function(index){
+  const M=S.mastery;if(M&&!M.savedWorkId)M.savedWorkId=makeRunId('mastery');
+  swMasteryCapture(M);
+  if(M?._swPendingCheck&&M._swPendingCheck.index===M.i){
+    const result=M._swPendingCheck;delete M._swPendingCheck;
+    M.currentChecked=result;M.answerHistory=(M.answerHistory||[]).concat(result);
+  }
+  SW_PREVIOUS_MASTERY_SNAPSHOT(index);
+  if(S.pausedMastery&&M){
+    S.pausedMastery.savedWorkId=M.savedWorkId;
+    ['currentAnswers','currentChecked','answerHistory'].forEach(key=>{if(M[key]!==undefined)S.pausedMastery[key]=leClone(M[key]);});
+    safeStore.set('pausedMastery',S.pausedMastery);
+  }
+  if(M){const state=swActivity(),key=swKey('mastery',M),record=state.records[key];if(record){record.snapshotUpdatedAt=Date.now();record.evidence=swBuildEvidence({kind:'mastery',work:{...M,names:M.queue.map(s=>s.name)}});safeStore.set('savedWorkActivity',state);}}
+};
+const SW_PREVIOUS_MASTERY_RESUME=resumeMastery;
+let swMasteryRestore=null;
+resumeMastery=function(){const p=S.pausedMastery;if(!p||swDeleted('mastery',p))return;
+  if(!swCanResume('mastery',p))return;
+  const id=p.savedWorkId||swKey('mastery',p).slice(8);swMasteryRestore={...leClone(p),savedWorkId:id};
+  try{SW_PREVIOUS_MASTERY_RESUME();}finally{swMasteryRestore=null;}
+  if(S.mastery?.savedWorkId===id&&typeof swRecordResume==='function')swRecordResume('mastery',p);
+};
+const SW_PREVIOUS_MASTERY_VIEW=VIEWS.mastery;
+VIEWS.mastery=function(v){
+  const M=S.mastery;
+  if(M&&swMasteryRestore){
+    ['savedWorkId','currentAnswers','currentChecked','answerHistory'].forEach(key=>{if(swMasteryRestore[key]!==undefined)M[key]=leClone(swMasteryRestore[key]);});
+  }
+  SW_PREVIOUS_MASTERY_VIEW(v);
+  if(!M||M.i>=M.queue.length)return;
+  const bonds=v.querySelector('#m_b'),pairs=v.querySelector('#m_l'),charge=v.querySelector('#m_f'),card=bonds?.closest('.card');
+  if(!card||!pairs||!charge)return;card.dataset.savedMasteryIndex=String(M.i);
+  const saved=M.currentAnswers?.index===M.i?M.currentAnswers:null;
+  if(saved){bonds.value=saved.bonds??'';pairs.value=saved.lonePairs??'';charge.value=saved.formalCharge??'';}
+  const check=[...card.querySelectorAll('button')].find(button=>button.textContent.trim()==='Check all three');
+  const checked=M.currentChecked?.index===M.i?M.currentChecked:null;
+  if(checked&&check){
+    [bonds,pairs,charge].forEach(input=>input.readOnly=true);
+    const feedback=check.nextElementSibling,sp=M.queue[M.i];
+    check.replaceWith(el('button',{class:'btn gold',onclick:()=>{M.i++;snapshotMastery(M.i);render();}},'Next →'));
+    if(feedback){feedback.replaceChildren(swText('p',{style:'font-weight:700;color:'+(checked.ok?'var(--ok)':'var(--coral)')},checked.ok?'✓ All three inputs right.':'✗ Correct: '+sp.bonds+' bond(s), '+sp.lp+' LP, FC '+(sp.fc>0?'+':'')+sp.fc+'.'));
+      if(!checked.ok)feedback.appendChild(swText('p',{class:'muted'},'FC = '+VALENCE[sp.atom]+' − '+(2*sp.lp)+' (lone-pair electrons) − '+sp.bonds+' (bonds) = '+sp.fc));}
+  }
+  [bonds,pairs,charge].forEach(input=>input.addEventListener('input',()=>{swMasteryCapture(M);snapshotMastery(M.i);save();}));
+  if(check&&!checked)check.addEventListener('click',()=>{
+    swMasteryCapture(M);const sp=M.queue[M.i],values=[bonds,pairs,charge].map(input=>parseInt(input.value,10));
+    if(values.some(Number.isNaN))return;
+    [bonds,pairs,charge].forEach(input=>input.readOnly=true);
+    M._swPendingCheck={index:M.i,species:sp.name,atom:sp.atom,ts:Date.now(),raw:leClone(M.currentAnswers),
+      values:{bonds:values[0],lonePairs:values[1],formalCharge:values[2]},expected:{bonds:sp.bonds,lonePairs:sp.lp,formalCharge:sp.fc},
+      ok:values[0]===sp.bonds&&values[1]===sp.lp&&values[2]===sp.fc,kind:'checked-formal-charge-response',qa:!!QA_MODE};
+  },true);
+};
+function swChapter(work){return work.studyContext?.chapter||work.learnReturn?.chapter||work.learningAdaptive?.chapter||CHAPTERS.find(c=>c.topics.includes(work.topic))?.id||null;}
+function swCanResume(kind,p){
+  const list=kind==='mastery'?p.names:p.ids,valid=Array.isArray(list)&&list.length&&Number.isInteger(p.i)&&p.i>=0&&p.i<list.length&&list.every(id=>kind==='mastery'?MASTERY_FC.some(s=>s.name===id):QUESTIONS.some(q=>q.id===id));
+  if(!valid)alert('This session uses a question that changed or is no longer available. Your saved answers and draft were kept. You can download your learning evidence or delete the draft from Saved work.');
+  return !!valid;
+}
+// Workflow evidence is separate from scored answers. Latest snapshots for 100
+// sessions and 1000 actions are retained locally; no fabricated older actions.
+function swActivity(){const a=safeStore.get('savedWorkActivity',{});return {version:1,events:Array.isArray(a.events)?a.events:[],records:a.records||{}};}
+function swRunAttempts(runId){return runId?(S.attempts||[]).filter(a=>a.evidence?.runId===runId||a.runId===runId||a.u===runId):[];}
+function swBuildEvidence(row){
+  const w=row.work||{},out={status:'recorded-work; drafts are unsubmitted and ungraded',kind:row.kind,runId:w.runId||null};
+  if(row.kind==='drill'){
+    out.work=leClone(lePick(w,['ids','i','log','runId','studyContext','navAnswerDrafts','reasoningDrafts','sketchDrafts','arrowDrafts','ch4Drafts','ch4Evidence','hintState','cold','transferCoach','bondBuildEvidence','resLabEvidence','writtenArrowPassed','structureBuilt','bondStructuresBuilt','guessedRight','hinted','reviewFlaggedRight']));
+    out.submittedAnswers=swRunAttempts(w.runId).map(leAttemptExport);
+  }else if(row.kind==='mastery')out.work=leClone(lePick(w,['names','i','clean','answerHistory','currentAnswers','currentChecked']));
+  else if(row.kind==='worksheet'){
+    out.work=leClone(lePick(w,['values','notes','sketchDrafts','ch4Drafts','ch4Evidence','keyViewed','reviews','lastAttempt']));
+    out.submittedAnswers=(S.worksheetState.attempts||[]).filter(a=>a.question===wsKey({id:row.sheet},{id:row.item})).map(a=>lePick(a,['id','ts','question','kind','keyViewedBefore','values','notes','checks','drawing','drawingReview']));
+  }else if(row.kind==='check')out.work=leClone(lePick(w,['id','chapter','phase','status','currentIndex','responses','items','startedAt','qa']));
+  else if(row.kind==='arrow')out.work=leClone(lePick(w,['key','task','ts','phase','arrows','ink','productInk','claims','log','hints','rejected','patternClaimed','rankClaimed','reasonClaimed']));
+  else if(row.kind==='paper')out.work=leClone(w);
+  else if(row.kind==='lesson')out.work={lessonKey:row.lessonKey,position:safeStore.get('lessonStepPositions',{})[row.lessonKey],checks:Object.values(safeStore.get('lessonCheckProgress',{})).filter(p=>p.lessonKey===row.lessonKey).map(p=>lePick(p,['id','lessonKey','step','phase','answerCount','passed','selected','confidence','events','updatedAt']))};
+  return out;
+}
+function swRecord(action,row,source='saved-work-menu'){
+  const state=swActivity(),ts=Date.now(),event={id:makeRunId('saved-work-'+action),ts,action,sessionKey:row.key,kind:row.kind,title:row.title,chapter:row.chapter||null,runId:row.work?.runId||null,source,actor:leActor(),tier:'observed-workflow',progress:row.detail||null};
+  event.recordKey=action==='delete'?event.id:row.key;
+  state.events=[...state.events,event].slice(-1000);
+  state.records[event.recordKey]={...event,evidence:swBuildEvidence(row)};
+  state.records=Object.fromEntries(Object.entries(state.records).sort((a,b)=>b[1].ts-a[1].ts).slice(0,100));
+  safeStore.set('savedWorkActivity',state);
+  // Never discard a draft unless its evidence was actually retained.
+  return swActivity().events.some(e=>e.id===event.id);
+}
+function swRecordResume(kind,p,source=S.swContinueSource||'resume-shortcut'){
+  const row=swItems().find(r=>r.key===swKey(kind,p))||{key:swKey(kind,p),kind,title:kind==='mastery'?'Formal-charge mastery check':p.scopeName||'Saved practice',chapter:swChapter(p),work:p};
+  if(!swRecord('continue',row,source))S.savedWorkNotice='The session opened, but activity could not be saved. Export your work before clearing browser storage.';
+}
+function swDeleteBlocked(key){const state=swActivity(),last=state.events.filter(e=>e.sessionKey===key&&e.action==='delete').at(-1);if(last){last.action='delete-blocked';if(state.records[last.recordKey])state.records[last.recordKey].action='delete-blocked';}safeStore.set('savedWorkActivity',state);alert('The deletion could not be saved. Your draft was kept.');}
+function swAnalysis(now=Date.now()){
+  const events=swActivity().events.filter(e=>e.actor?.role==='owner'&&!e.actor.qa&&e.ts<=now&&e.ts>=now-7*86400000),continues=events.filter(e=>e.action==='continue'),deletes=events.filter(e=>e.action==='delete');
+  const byChapter={};events.forEach(e=>{const k=e.chapter||'unassigned',r=byChapter[k]||(byChapter[k]={continued:0,deleted:0});if(e.action==='continue')r.continued++;if(e.action==='delete')r.deleted++;});
+  const sessions=[...new Set(continues.map(e=>e.sessionKey))];
+  const returnedThenAnswered=sessions.filter(key=>{const rows=continues.filter(e=>e.sessionKey===key),first=Math.min(...rows.map(e=>e.ts));return rows.some(e=>swRunAttempts(e.runId).some(a=>a.ts>first&&a.ts<=now&&a.evidence?.actor?.role==='owner'&&!a.evidence.actor.qa));}).length;
+  return {tier:'observed-workflow',windowDays:7,continued:continues.length,deleted:deletes.length,distinctContinuedSessions:sessions.length,returnedThenAnswered,byChapter,
+    limits:'Actions are not scores or causes. Deleting does not mean wrong, and continuing does not establish understanding. Later-answer linking requires a recorded practice run ID; other activity types are not inferred. Only this browser/profile’s retained actions since v3.119 are available. QA, auditor and future-dated events are excluded.'};
+}
+function swWorkflowNote(chapter){const x=swAnalysis().byChapter[chapter];if(!x)return '';
+  return 'Saved-work activity, last 7 days: '+x.continued+' continue action'+(x.continued===1?'':'s')+' and '+x.deleted+' deletion'+(x.deleted===1?'':'s')+'. '+(x.deleted>=2?'If a full session feels too long, you can choose 10 minutes or continue a saved draft. The app does not know why you deleted it.':'This is workflow context, not a readiness score.');}
+function swEvidenceExport(){const state=leClone(swActivity());Object.values(state.records).forEach(r=>{if(r.runId){const merged=[...(r.evidence.submittedAnswers||[]),...swRunAttempts(r.runId).map(leAttemptExport)];r.evidence.submittedAnswers=[...new Map(merged.map(a=>[a.evidence?.eventId||leFingerprint(a),a])).values()];}});return {...state,analysis:swAnalysis(),storage:'Current device/profile only. Included in the learning-evidence download; not automatically sent to Claude.',retention:{actions:1000,latestSessionSnapshots:100},limits:'Each session record is the latest action snapshot, not a complete edit history. Submitted practice answers also remain in the main attempts ledger. Draft responses and drawings are not graded. Older actions before v3.119 were not captured.'};}
+function swWorksheetHasWork(work){
+  return !!(work&&(work.values?.some(v=>String(v??'').trim())||work.notes?.trim()||
+    Object.values(work.sketchDrafts||{}).some(d=>d?.strokes?.length||d?.paper)||
+    Object.values(work.ch4Drafts||{}).some(d=>Object.values(d.slots||{}).some(Boolean)||Object.values(d.placements||{}).some(Boolean)||d.result)));
+}
+function swItems(){
+  const rows=[],seen=new Set();
+  const add=row=>{if(!seen.has(row.key)){seen.add(row.key);rows.push(row);}};
+  const drill=p=>{if(!p||!Array.isArray(p.ids)||p.i>=p.ids.length||swDeleted('drill',p))return;
+    const context=p.studyContext||safeStore.get('studyRunContexts',{})[p.runId]||{};
+    const type=context.mode==='pulse'||context.kind==='daily-pulse'||context.mode==='daily-pulse'?'Daily Pulse':context.mode==='challenge'?'Challenge':p.cold?'No-hint practice':'Practice';
+    add({key:swKey('drill',p),kind:'drill',group:'practice',title:p.scopeName||TOPICS[p.topic]?.name||'Saved practice',type,chapter:swChapter(p),ts:p.ts,
+      detail:Math.min(p.i||0,p.ids.length)+' of '+p.ids.length+' questions finished',sync:true,work:p});};
+  drill(S.pausedDrill);(S.parkedDrills||[]).forEach(drill);
+  const m=S.pausedMastery;if(m?.names?.length&&m.i<m.names.length&&!swDeleted('mastery',m))add({key:swKey('mastery',m),kind:'mastery',group:'checks',title:'Formal-charge mastery check',type:'No-hint check',chapter:'ch1',ts:m.ts,detail:(m.i||0)+' of '+m.names.length+' species finished',sync:true,work:m});
+  ccStore().runs.filter(r=>r.status==='in-progress').forEach(r=>add({key:'check:'+r.id,kind:'check',group:'checks',title:ccLabel(r.phase),type:'Chapter check',chapter:r.chapter,ts:r.updatedAt||r.startedAt,detail:Object.values(r.responses||{}).filter(x=>x.firstCommittedAt).length+' of '+r.items.length+' tasks submitted',work:r}));
+  WS_SHEETS.forEach(sheet=>sheet.items.forEach(item=>{
+    const key=wsKey(sheet,item),work=S.worksheetState.work[key];if(!swWorksheetHasWork(work))return;
+    const drawn=Object.values(work.sketchDrafts||{}).some(d=>d?.strokes?.length||d?.paper);
+    add({key:'worksheet:'+key,kind:'worksheet',group:'worksheets',title:item.label,type:sheet.title,chapter:sheet.chapter,ts:work.updatedAt,
+      detail:[work.values?.filter(x=>String(x??'').trim()).length?work.values.filter(x=>String(x??'').trim()).length+' filled answers':null,drawn?'Drawing saved':null,work.notes?.trim()?'Written work saved':null].filter(Boolean).join(' · ')||'Builder work saved',sheet:sheet.id,item:item.id,work});
+  }));
+  if(S.arrowLab)add({key:'arrow:'+S.arrowLab.ts,kind:'arrow',group:'tools',title:alMolecule(S.arrowLab.key)?.name||'Saved arrow drawing',type:'Arrow Lab',ts:S.arrowLab.ts,detail:'Continue the saved drawing',work:S.arrowLab});
+  lpRows().filter(r=>!r.endedAt&&!r.cancelledAt).forEach(r=>add({key:'paper:'+r.id,kind:'paper',group:'tools',title:r.title||'Paper practice',type:lpPhase(r)==='untimed'?'Untimed paper practice':'Timed paper practice',ts:r.events?.at(-1)?.ts||r.startedAt,detail:'Clock keeps running while you are away.',work:r}));
+  const positions=safeStore.get('lessonStepPositions',{}),checks=safeStore.get('lessonCheckProgress',{});
+  Object.entries(positions).forEach(([key,step])=>{
+    const [chapter,...parts]=key.split(':'),unit=parts.join(':'),lesson=(CHAPTER_LEARNING_UNITS[chapter]||[]).find(u=>u.id===unit);if(!lesson)return;
+    const saved=Object.values(checks).filter(p=>p.lessonKey===key),ts=Math.max(0,...saved.map(p=>p.updatedAt||0));
+    add({key:'lesson:'+key,kind:'lesson',group:'lessons',title:lesson.title,type:'Lesson bookmark',chapter,ts,detail:'Step '+((Number(step)||0)+1)+' · reading position, not a score',lessonKey:key,unit});
+  });
+  return rows.sort((a,b)=>(b.ts||0)-(a.ts||0)||a.title.localeCompare(b.title));
+}
+function swCapture(){
+  if(S.view==='drill')courseNavigationSaveWork();
+  if(S.view==='mastery'&&S.mastery){snapshotMastery(S.mastery.i);S.mastery=null;save();}
+  lcStop();
+}
+function swOpen(){swCapture();S.savedWorkFilter='all';S.savedWorkNotice='';go('savedWork');}
+function swContinue(key){
+  const row=swItems().find(r=>r.key===key);if(!row)return;
+  if(['drill','mastery'].includes(row.kind)&&!swCanResume(row.kind,row.work))return;
+  swCapture();S.savedWorkNotice='';
+  S.swContinueSource='saved-work-menu';
+  try{
+  if(row.kind==='drill'){
+    const p=row.work;
+    if(S.pausedDrill&&swKey('drill',S.pausedDrill)!==key)parkCurrentDrill();
+    S.parkedDrills=(S.parkedDrills||[]).filter(x=>swKey('drill',x)!==key);
+    if(p.runId)S.parkedResolved=[...new Set([...(S.parkedResolved||[]),p.runId])];
+    S.pausedDrill=p;save();resumeDrill();
+  }else if(row.kind==='mastery')resumeMastery();
+  else if(row.kind==='check')ccOpenRun(row.work.id);
+  else if(row.kind==='worksheet')wsOpen(row.sheet,row.item);
+  else if(row.kind==='arrow')go('arrowlab');
+  else if(row.kind==='paper'){S.paperPracticeId=row.work.id;go('paperPractice');}
+  else if(row.kind==='lesson')openLearningUnit(row.chapter,row.unit);
+  if(!['drill','mastery'].includes(row.kind))swRecord('continue',row);
+  }finally{S.swContinueSource=null;}
+}
+function swDelete(key){
+  const row=swItems().find(r=>r.key===key);if(!row)return;
+  const details=row.kind==='lesson'?'Remove this reading bookmark? Recorded lesson-check answers stay saved.':
+    row.kind==='paper'?'Cancel this unfinished clock? Its earlier timing checkpoints stay in your history.':
+    row.kind==='check'?'Delete this unfinished check? It will not get a score. Previously submitted responses and seen-question history stay recorded.':
+    'Remove this session from Saved work? Its answers and a copy of its current draft/drawings stay in Session activity. This does not erase learning history.';
+  if(!confirm(row.title+'\n\n'+details))return;
+  // Re-resolve after confirmation; never delete a different session selected later.
+  if(!swItems().some(r=>r.key===key))return;
+  if(!swRecord('delete',row)){alert('The history copy could not be saved, so nothing was deleted. Download your learning evidence before clearing space.');return;}
+  if(row.kind==='drill'||row.kind==='mastery'){
+    const markers=[...new Set([...(S.savedWorkDeleted||[]),key])];safeStore.set('savedWorkDeleted',markers);
+    if(!safeStore.get('savedWorkDeleted',[]).includes(key)){swDeleteBlocked(key);return;}
+    S.savedWorkDeleted=markers;swPrune();save();
+    if(row.kind==='drill'){const daily=safeStore.get(DC_STORE,{});(daily.records||[]).filter(r=>r.runId&&r.runId===row.work.runId).forEach(r=>{r.status='cancelled';r.cancelledAt=Date.now();r.snapshot=null;});safeStore.set(DC_STORE,daily);}
+  }else if(row.kind==='check'){
+    const store=ccStore(),run=store.runs.find(r=>r.id===row.work.id);if(run?.status!=='in-progress')return;
+    run.status='cancelled';run.cancelledAt=Date.now();run.updatedAt=run.cancelledAt;
+    // Responses remain historical evidence, never a completed score.
+    ccSave(store);if(ccRun(run.id)&&ccRun(run.id).status!=='cancelled'){swDeleteBlocked(key);return;}if(S.ccRunId===run.id)S.ccRunId=null;
+  }else if(row.kind==='worksheet'){
+    const old=row.work;S.worksheetState.work[wsKey({id:row.sheet},{id:row.item})]={values:[],sketchDrafts:{},ch4Drafts:{},ch4Evidence:{},
+      keyViewed:!!old.keyViewed,reviews:old.reviews||[],lastAttempt:old.lastAttempt||null};wsSave();
+    const stored=safeStore.get('worksheetState',{}).work?.[wsKey({id:row.sheet},{id:row.item})];if(!stored||swWorksheetHasWork(stored)){S.worksheetState.work[wsKey({id:row.sheet},{id:row.item})]=old;swDeleteBlocked(key);return;}
+  }else if(row.kind==='arrow'){S.arrowLab=null;alSave();if(safeStore.get('arrowLab','missing')!==null){S.arrowLab=row.work;swDeleteBlocked(key);return;}}
+  else if(row.kind==='paper'){lpStore({...row.work,cancelledAt:Date.now(),status:'cancelled'});if(!lpRows().find(r=>r.id===row.work.id)?.cancelledAt){swDeleteBlocked(key);return;}if(S.paperPracticeId===row.work.id)S.paperPracticeId=null;}
+  else if(row.kind==='lesson'){
+    lcStop();const positions=safeStore.get('lessonStepPositions',{});delete positions[row.lessonKey];safeStore.set('lessonStepPositions',positions);
+    if(Object.hasOwn(safeStore.get('lessonStepPositions',{}),row.lessonKey)){swDeleteBlocked(key);return;}
+    // Removing a bookmark must not reset the lesson's recorded checks.
+  }
+  S.savedWorkNotice=(row.kind==='lesson'?'Bookmark removed.':row.kind==='paper'?'Unfinished clock cancelled.':'Draft deleted.')+' Recorded answers and history were kept.';render();
+}
+VIEWS.savedWork=v=>{
+  const page=el('div',{class:'sw-page','data-saved-work':true}),all=swItems(),filter=S.savedWorkFilter||'all',rows=all.filter(r=>filter==='all'||r.group===filter);
+  page.appendChild(smButton('← Study desk',()=>go('home'),{class:'btn ghost'}));
+  page.appendChild(swText('h1',{},'Saved work'));
+  page.appendChild(swText('p',{class:'sw-intro'},'Pick up where you stopped, or delete a draft you no longer need.'));
+  page.appendChild(swText('p',{class:'sw-note'},'Recorded answers and scores stay in your history. “This device” work is only available in this browser and profile.'));
+  page.appendChild(smButton('Session activity & saved answers',()=>go('savedWorkActivity'),{class:'btn ghost','data-sw-activity':true}));
+  if(QA_MODE)page.appendChild(swText('p',{class:'sw-note'},'Preview only · changes here are not saved.'));
+  const label=el('label',{class:'sw-filter'});label.appendChild(swText('span',{},'Show'));
+  const select=el('select',{'aria-label':'Saved work activity'});
+  [['all','All saved work'],['practice','Practice, Pulse & Challenge'],['checks','Chapter & mastery checks'],['worksheets','Worksheets'],['tools','Drawing lab & paper clocks'],['lessons','Lesson bookmarks']].forEach(([value,title])=>{const n=all.filter(r=>value==='all'||r.group===value).length;select.appendChild(swText('option',{value},title+' ('+n+')'));});
+  select.value=filter;select.onchange=()=>{S.savedWorkFilter=select.value;render();};label.appendChild(select);page.appendChild(label);
+  page.appendChild(swText('p',{role:'status','aria-live':'polite',class:'sw-status'},S.savedWorkNotice||''));
+  if(!rows.length){const empty=el('section',{class:'sw-empty'});empty.appendChild(swText('h2',{},all.length?'Nothing saved in this category':'No unfinished work yet'));empty.appendChild(swText('p',{},all.length?'Choose All saved work to see your other activities.':'Your saved practice, checks, worksheet drafts and lesson bookmarks will appear here.'));page.appendChild(empty);}
+  rows.forEach(row=>{
+    const card=el('article',{class:'sw-card','data-sw-key':row.key}),copy=el('div',{class:'sw-copy'});
+    const chapter=CHAPTERS.find(c=>c.id===row.chapter)?.name?.split('—')[0]?.trim();
+    copy.appendChild(swText('p',{class:'sw-type'},[chapter,row.type].filter(Boolean).join(' · ')));
+    copy.appendChild(swText('h2',{},row.title));copy.appendChild(swText('p',{class:'sw-detail'},row.detail));
+    const timestamp=Number(row.ts)>0?' · Last saved '+new Date(row.ts).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+    copy.appendChild(swText('p',{class:'sw-meta'},(row.sync?'Sync-enabled':'This device')+timestamp));card.appendChild(copy);
+    const actions=el('div',{class:'sw-actions'});
+    actions.appendChild(smButton('Continue',()=>swContinue(row.key),{class:'btn','data-sw-continue':row.key,'aria-label':'Continue '+row.title}));
+    actions.appendChild(smButton(row.kind==='lesson'?'Remove bookmark':'Delete',()=>swDelete(row.key),{class:'btn ghost sw-delete','data-sw-delete':row.key,'aria-label':(row.kind==='lesson'?'Remove bookmark ':'Delete ')+row.title}));card.appendChild(actions);page.appendChild(card);
+  });
+  const history=el('details',{class:'sw-history'});history.appendChild(swText('summary',{},'Looking for finished work?'));
+  history.appendChild(swText('p',{},'Completed results stay separate from unfinished drafts. Deleting a draft does not reset what you have already tried.'));
+  history.appendChild(smButton('Answers & learning history',()=>go('learningEvidence')));
+  history.appendChild(smButton('Worksheet checks & drawings',()=>go('worksheets')));
+  const finished=ccStore().runs.filter(ccCompleted).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
+  finished.forEach(r=>history.appendChild(smButton((CHAPTERS.find(c=>c.id===r.chapter)?.name||r.chapter)+' · '+ccLabel(r.phase)+' · '+new Date(r.completedAt||r.startedAt).toLocaleDateString(),()=>ccOpenRun(r.id),{'data-sw-result':r.id})));
+  history.appendChild(smButton('Finished paper sessions',()=>go('paperPractice')));page.appendChild(history);v.appendChild(page);
+};
+NAV_GROUP.savedWork='more';
+NAV_GROUP.savedWorkActivity='more';NAV_GROUP.savedWorkRecord='more';
+VIEWS.savedWorkActivity=v=>{
+  const page=el('section',{class:'sw-page'}),out=swEvidenceExport(),s=out.analysis;
+  page.appendChild(smButton('← Saved work',swOpen,{class:'btn ghost'}));page.appendChild(swText('h1',{},'Session activity'));
+  page.appendChild(swText('p',{},'Continue and delete actions are tracked here, separately from your scores.'));
+  page.appendChild(swText('p',{'data-sw-analysis':true},'Last 7 days · '+s.continued+' continues · '+s.deleted+' deletions · '+s.returnedThenAnswered+' resumed practice sessions with a later submitted answer.'));
+  const limits=el('details');limits.appendChild(swText('summary',{},'What this means'));limits.appendChild(swText('p',{},s.limits));limits.appendChild(swText('p',{},out.limits+' Latest 1,000 actions and 100 session snapshots are retained. Export periodically to keep older records.'));page.appendChild(limits);
+  page.appendChild(smButton('Download answers & activity',leDownload,{class:'btn ghost'}));
+  if(!out.events.length)page.appendChild(swText('p',{},'No recorded actions yet. Tracking starts with this update.'));
+  out.events.slice().reverse().forEach(e=>{const card=el('article',{class:'sw-card'}),copy=el('div',{class:'sw-copy'});
+    copy.appendChild(swText('h2',{},(e.action==='delete'?'Deleted · ':e.action==='delete-blocked'?'Deletion not saved · ':'Continued · ')+e.title));copy.appendChild(swText('p',{class:'sw-meta'},new Date(e.ts).toLocaleString()+(e.actor?.qa?' · QA, not learner evidence':'')));card.appendChild(copy);
+    const recordKey=e.recordKey||e.sessionKey;if(out.records[recordKey])card.appendChild(smButton('View saved answers',()=>{S.savedWorkRecordKey=recordKey;go('savedWorkRecord');},{class:'btn ghost'}));page.appendChild(card);});v.appendChild(page);
+};
+function swAnswerText(host,label,value){
+  if(value===undefined||value===null)return;
+  const detail=el('details');detail.appendChild(swText('summary',{},label));
+  const pre=swText('pre',{class:'sw-answer-text'},typeof value==='string'?value:JSON.stringify(value,null,2));detail.appendChild(pre);host.appendChild(detail);
+}
+VIEWS.savedWorkRecord=v=>{
+  const r=swEvidenceExport().records[S.savedWorkRecordKey],page=el('section',{class:'sw-page'});page.appendChild(smButton('← Session activity',()=>go('savedWorkActivity'),{class:'btn ghost'}));
+  if(!r){page.appendChild(swText('p',{},'This snapshot is no longer retained. Check an earlier evidence download or the submitted-answer history.'));v.appendChild(page);return;}
+  page.appendChild(swText('h1',{},r.title));page.appendChild(swText('p',{},'Read-only history · latest retained snapshot from '+new Date(r.snapshotUpdatedAt||r.ts).toLocaleString()+'. Drafts are not submitted answers or scores.'));
+  const evidence=r.evidence||{},work=evidence.work||{};
+  (evidence.submittedAnswers||[]).forEach((a,i)=>{const card=el('article',{class:'sw-card'}),copy=el('div',{class:'sw-copy'});copy.appendChild(swText('h2',{},a.id||'Submitted answer '+(i+1)));swAnswerText(copy,'Submitted answer',a.evidence?.submittedResponse??a.values??a.answer??a.a);swAnswerText(copy,'Recorded result',lePick(a,['ok','h','notes','checks','ts']));card.appendChild(copy);page.appendChild(card);});
+  swAnswerText(page,'Typed draft answers',work.navAnswerDrafts||work.currentAnswers||work.values);
+  swAnswerText(page,'Written notes & reasoning',work.reasoningDrafts||work.notes);
+  swAnswerText(page,'Checked formal-charge answers',work.answerHistory);
+  swAnswerText(page,'Chapter-check responses (not a completed score)',work.responses);
+  swAnswerText(page,'Lesson checks',work.checks);
+  swAnswerText(page,'Earlier session results',work.log);
+  if(r.kind==='paper')swAnswerText(page,'Clock and checkpoints',work);
+  const drawings=[...Object.entries(work.sketchDrafts||{}),...Object.entries(work.responses||{}).filter(([,x])=>x.sketch).map(([id,x])=>[id,x.sketch])];
+  drawings.forEach(([id,sketch])=>{const detail=el('details');detail.appendChild(swText('summary',{},'Saved drawing · '+id));detail.addEventListener('toggle',()=>{if(detail.open&&!detail.dataset.drawn){detail.dataset.drawn='true';renderCourseSketch(detail,{id},{sketchDrafts:{}},true,sketch);}});page.appendChild(detail);});
+  if(work.arrows||work.ch4Drafts||work.arrowDrafts)page.appendChild(swText('p',{},'Structured drawing/arrow data is also retained in the download. It is not automatically regraded here.'));
+  page.appendChild(smButton('Download full evidence',leDownload,{class:'btn ghost'}));v.appendChild(page);
+};
+const SW_PREVIOUS_EXPORT=leBuildExport;
+leBuildExport=function(){const out=SW_PREVIOUS_EXPORT();out.savedWorkLifecycle=swEvidenceExport();out.summary.savedWorkWorkflow=out.savedWorkLifecycle.analysis;out.scope.savedWorkLifecycle=out.savedWorkLifecycle.storage;return out;};
+const SW_PREVIOUS_EVIDENCE_VIEW=VIEWS.learningEvidence;
+VIEWS.learningEvidence=function(v){SW_PREVIOUS_EVIDENCE_VIEW(v);const card=el('section',{class:'card'}),s=swAnalysis();card.appendChild(swText('h2',{},'Saved-work workflow'));card.appendChild(swText('p',{},'Last 7 days: '+s.continued+' continues, '+s.deleted+' deletions. These do not change your score or readiness.'));card.appendChild(smButton('Session activity & saved answers',()=>go('savedWorkActivity')));v.appendChild(card);};
+const SW_PREVIOUS_RENDER=render;
+render=function(){
+  SW_PREVIOUS_RENDER();if(!PROFILE)return;
+  let entry=document.getElementById('saved-work-open');
+  if(!entry){entry=swText('button',{id:'saved-work-open',type:'button',class:'header-saved-work',onclick:swOpen},'Saved work');document.querySelector('.header-actions')?.insertBefore(entry,document.querySelector('.header-actions .header-more'));}
+  entry.onclick=swOpen;
+  const count=swItems().length;entry.textContent='Saved work'+(count?' ('+count+')':'');entry.setAttribute('aria-label','Saved work'+(count?', '+count+' items':''));entry.setAttribute('aria-current',S.view==='savedWork'?'page':'false');
+  const v=document.getElementById('view');
+  if(S.view==='home'){
+    const root=v.querySelector('.dc-start')||v.querySelector('.sm-home')||v,heading=root.querySelector('.sm-heading');
+    const link=smButton('Saved work'+(count?' · '+count:''),swOpen,{class:'btn ghost sw-home-entry','data-sw-home':true});
+    if(heading)heading.appendChild(link);else root.prepend(link);
+  }
+  if(S.view==='more'){const card=el('section',{class:'card'});card.appendChild(swText('h2',{},'Saved work'));card.appendChild(swText('p',{},'Continue a session or delete an unfinished draft.'));card.appendChild(smButton('Open saved work'+(count?' · '+count:''),swOpen,{class:'btn','data-sw-tools':true}));v.prepend(card);}
+};
+const swStyle=el('style',{id:'saved-work-style'});swStyle.textContent=`
+  .sw-page{max-width:940px;margin:auto;min-width:0}.sw-page h1{font-size:1.8rem;margin:22px 0 8px}.sw-intro{margin:0 0 10px;line-height:1.5}.sw-note,.sw-meta{font-size:.8rem;color:#53666a;line-height:1.45}.sw-filter{display:flex;align-items:center;gap:12px;margin:22px 0 0;font-size:.85rem;font-weight:650}.sw-filter select{font:inherit;min-height:44px;max-width:100%;min-width:0;border:1px solid #bdcecb;border-radius:9px;background:#fff;color:#23444a;padding:8px 12px}.sw-status{font-size:.85rem;line-height:1.45;color:#225b48}.sw-status:empty{display:none}.sw-card{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px;border:1px solid #d7e1de;background:#fff;border-radius:13px;margin:12px 0;min-width:0}.sw-copy{min-width:0}.sw-type{font-size:.72rem;color:#45675f;font-weight:650;margin:0 0 6px}.sw-card h2{font-size:1.08rem;margin:0 0 8px;line-height:1.4;overflow-wrap:anywhere}.sw-detail{font-size:.85rem;line-height:1.5;margin:0 0 7px}.sw-meta{font-size:.74rem;margin:0}.sw-actions{display:flex;gap:8px;flex-shrink:0}.sw-page .btn{min-height:44px;white-space:normal;overflow-wrap:anywhere;max-width:100%;margin:0}.sw-delete{color:#924137!important;border-color:#dac3be!important;background:#fff!important}.sw-empty{padding:28px 20px;border:1px dashed #bfcfc9;border-radius:13px;margin-top:16px;background:#f6f9f7}.sw-empty h2{font-size:1.1rem}.sw-history{margin:28px 0;border-top:1px solid #d7e1de;padding-top:8px}.sw-history summary{cursor:pointer;padding:14px 0;min-height:44px;box-sizing:border-box;font-weight:650}.sw-history .btn{margin:6px 8px 6px 0}.sw-home-entry{font-size:.82rem!important;min-height:44px!important;margin-top:10px!important}.sw-page button:focus-visible,.sw-page select:focus-visible,.sw-page summary:focus-visible,#saved-work-open:focus-visible{outline:3px solid #b8820d;outline-offset:3px}#saved-work-open{white-space:nowrap}
+  @media(max-width:620px){.sw-card{align-items:stretch;flex-direction:column;gap:12px;padding:15px}.sw-actions{justify-content:flex-start}.sw-actions .btn{font-size:.85rem}.sw-page h1{font-size:1.5rem}.sw-filter{align-items:flex-start;flex-direction:column;gap:5px}.sw-filter select{width:100%}.header-actions{flex-wrap:wrap}#saved-work-open{font-size:.72rem;padding:8px}.sw-home-entry{margin-top:6px!important}}
+  .header-saved-work{display:grid;place-items:center;min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #aeb9bf;border-radius:10px;background:#fff;color:var(--ink);font-size:.8rem;font-weight:800;cursor:pointer}.sw-answer-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85rem;background:#f3f6f5;padding:12px;border-radius:8px}.sw-page details{min-width:0;margin:12px 0}.sw-page summary{cursor:pointer;min-height:44px;line-height:1.5;padding:10px 0;box-sizing:border-box}
+`;document.head.appendChild(swStyle);
+swPrune();
 
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
