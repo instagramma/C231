@@ -6,7 +6,8 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.122 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.123 (LOCAL ONLY)
+  v3.123 (2026-10-16): ROTATING EXAM A + B, MASTER BANK, ORIGINAL CHALLENGES.
   v3.122 (2026-10-16): CHAPTER 6, COVERED SO FAR.
   Original visual lessons and rotating practice, with partial-coverage checks.
   v3.121 (2026-10-16): EXAM LIBRARY ALONGSIDE CHAPTERS.
@@ -1756,7 +1757,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.122 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.123 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -2243,7 +2244,7 @@ function buildReadinessDiagnostic(scopeTopics,type,needScore){
     take(byIds(["dr-02"]),"blank-page contributors, ranking, and hybrid",true);
     take(byIds(["rz-39"]),"explain the hybrid from experimental evidence");
   }else{
-    const eligible=QUESTIONS.filter(q=>scopeTopics.includes(q.topic)&&q.type!=="written"&&itemDifficulty(q)>=2);
+    const eligible=QUESTIONS.filter(q=>!q.examOnly&&scopeTopics.includes(q.topic)&&q.type!=="written"&&itemDifficulty(q)>=2);
     scopeTopics.forEach(k=>{
       if(picked.length>=8)return;
       take(eligible.filter(q=>q.topic===k),"homework-level "+(TOPICS[k]?.name||k),true);
@@ -2252,7 +2253,7 @@ function buildReadinessDiagnostic(scopeTopics,type,needScore){
       const q=take(eligible,"homework-level transfer");
       if(!q)break;
     }
-    const written=QUESTIONS.filter(q=>scopeTopics.includes(q.topic)&&q.type==="written"&&itemDifficulty(q)>=2);
+    const written=QUESTIONS.filter(q=>!q.examOnly&&scopeTopics.includes(q.topic)&&q.type==="written"&&itemDifficulty(q)>=2);
     while(picked.length<10){const q=take(written,"blank-page production",picked.filter(x=>x.type==="written").length===0);if(!q)break;}
     while(picked.length<10){const q=take(eligible,"homework-level transfer");if(!q)break;}
   }
@@ -6022,7 +6023,7 @@ function distinctAdaptivePicks(pool,n,avoidIds){
 }
 function buildAdaptiveQueue(plan){
   const out=[], used=[], total=plan.total||ADAPTIVE_TOTAL, topics=plan.topics||[];
-  const scoped=QUESTIONS.filter(q=>topics.includes(q.topic)&&q.type!=="written");
+  const scoped=QUESTIONS.filter(q=>!q.examOnly&&topics.includes(q.topic)&&q.type!=="written");
   const rotated=excludeRecentRounds(scoped,total);
   // With ten slots across three selected topics, seed three distinct items per topic.
   // The remaining slot follows the ordinary need score; future slots can still branch.
@@ -6056,14 +6057,14 @@ function adaptiveBranch(D,q,attempt){
   else if(slow){signal="slow-right";count=1;label="same level + spaced retrieval";}
   else {signal="clean-right";count=3;label="harder transfer";}
   const slots=Math.max(0,(D.assignmentTotal||ADAPTIVE_TOTAL)-(D.i+1)), take=Math.min(count,slots), answered=D.queue.slice(0,D.i+1).map(x=>x.id);
-  let pool=QUESTIONS.filter(x=>x.type!=="written"&&x.id!==q.id&&x.topic===q.topic);
+  let pool=QUESTIONS.filter(x=>!x.examOnly&&x.type!=="written"&&x.id!==q.id&&x.topic===q.topic);
   const fam=CONCEPT_FAMILY[q.id];
   if(signal==="clean-right")pool=pool.filter(x=>exposureType(x)!=="exact"&&itemDifficulty(x)>=itemDifficulty(q));
   else if(signal==="guessed-right"||signal==="hinted-right"||signal==="slow-right")pool=pool.filter(x=>Math.abs(itemDifficulty(x)-itemDifficulty(q))<=1);
   else if(signal==="confident-wrong"&&fam){const same=pool.filter(x=>CONCEPT_FAMILY[x.id]===fam);if(same.length)pool=same;}
   else if(signal==="dont-know"||signal==="unclear-wording")pool=pool.filter(x=>itemDifficulty(x)<=itemDifficulty(q));
   else if(signal==="visual-context"||signal==="review-flag")pool=pool.filter(x=>x.structureHtml||x.visual||x.arrowBoard||x.bondLineFirst||/(course-structure|exam-bondline|exam-chem|course-molecule|<svg)/.test(String(x.prompt||"")));
-  if(pool.length<take)pool=QUESTIONS.filter(x=>x.type!=="written"&&x.id!==q.id&&(D.assignmentTopics||[]).includes(x.topic));
+  if(pool.length<take)pool=QUESTIONS.filter(x=>!x.examOnly&&x.type!=="written"&&x.id!==q.id&&(D.assignmentTopics||[]).includes(x.topic));
   const picks=distinctAdaptivePicks(pool,take,answered.concat(D.queue.slice(D.i+1).map(x=>x.id)));
   if(picks.length)D.queue.splice(D.i+1,picks.length,...picks);
   if(signal==="slow-right"){
@@ -6402,7 +6403,7 @@ const FOCUS_SETS=[
    blurb:"The five numbers and the ladder that produces them — 109.5 · 120 · 180 · 107 · 104.5, Ciesla's table row by row, and the H₂O-vs-SO₂ trap. Served easiest-first, all in one run.",
    match:q=>String(q.id).startsWith("vs-")},
 ];
-function focusPool(st){ return QUESTIONS.filter(q=>st.match(q)&&(st.includeWritten||q.type!=="written")); }
+function focusPool(st){ return QUESTIONS.filter(q=>!q.examOnly&&st.match(q)&&(st.includeWritten||q.type!=="written")); }
 function focusSeen(st){ return focusPool(st).filter(q=>((S.qstats[q.id]?.r)||0)+((S.qstats[q.id]?.w)||0)>0).length; }
 function latestCleanAttempt(id){ const a=(S.attempts||[]).slice().reverse().find(x=>x.id===id); return !!(a&&a.ok&&!a.g&&!a.dk&&!a.rf&&!a.sr&&!(a.h>0)); }
 function latestFlightRun(setId){ return (S.flightRuns||[]).slice().reverse().find(x=>x.setId===setId)||null; }
@@ -6450,8 +6451,8 @@ function startFocusDrill(setId){
 }
 function startDrill(topic){
   let pool;
-  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>ids.includes(q.id)&&q.type!=="written"); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
-  else pool = QUESTIONS.filter(q=>q.topic===topic&&q.type!=="written"); // v3.0: written items live in diagnostics, not short drills
+  if (topic==="__missed"){ const ids=[...new Set(S.missed)]; pool=QUESTIONS.filter(q=>!q.examOnly&&ids.includes(q.id)&&q.type!=="written"); if(!pool.length){ alert("No missed questions yet — go earn some."); return; } }
+  else pool = QUESTIONS.filter(q=>!q.examOnly&&q.topic===topic&&q.type!=="written"); // v3.0: written items live in diagnostics, not short drills
   // v2.13: adaptive selection — randomize, then surface by NEED so a session targets
   // what you're weakest on. Tier 3 = you've missed it OR only ever guessed it right (v3.0 shaky),
   // tier 2 = never seen, tier 1 = seen and right. Shuffle first so pick within a tier is random.
@@ -9596,7 +9597,7 @@ function coursePulseEvidence(){
 function courseReviewPool(){
   const base=['rz-27','rz-36','EXACT-AB8-20260911-34','EXACT-AB8-20260911-45','AB3-arw07','SIM-AB8-20260911-23'].map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
   const pulse=coursePulseEvidence();
-  const related=QUESTIONS.filter(q=>pulse.topics.includes(q.topic)&&(q.sourceAssetUids?.length||q.arrowBoard||q.requiresDrawing||q.bondLineFirst||/<svg|course-structure|exam-bondline/.test(String(q.prompt))));
+  const related=QUESTIONS.filter(q=>!q.examOnly&&pulse.topics.includes(q.topic)&&(q.sourceAssetUids?.length||q.arrowBoard||q.requiresDrawing||q.bondLineFirst||/<svg|course-structure|exam-bondline/.test(String(q.prompt))));
   return [...new Map([...base,...related].map(q=>[q.id,q])).values()];
 }
 function courseRepairQuestions(){
@@ -12151,7 +12152,7 @@ function updateCourseNavigation(){
     const exams=el('button',{id:'cn-exams',class:'cn-header-button',type:'button',onclick:()=>courseNavigationGo('exams')},'Exams');
     action.insertBefore(exams,document.getElementById('cn-open'));
   }
-  const exams=document.getElementById('cn-exams');if(exams){if(['examOverview','examPrep'].includes(S.view))exams.setAttribute('aria-current','page');else exams.removeAttribute('aria-current');}
+  const exams=document.getElementById('cn-exams');if(exams){if(['examOverview','examPrep','examAPractice','examARun','examAResults','masterBank','masterBankQuestion'].includes(S.view))exams.setAttribute('aria-current','page');else exams.removeAttribute('aria-current');}
   const atHome=S.view==='home';document.getElementById('cn-quiz-home').hidden=atHome;
   const small=document.querySelector('.app-title-copy small');
   if(small){
@@ -13920,6 +13921,294 @@ addStructureZoom=function(root){
 const ch6Style=el('style',{id:'ch6-prep-style'});ch6Style.textContent='.ch6-scope-note{border-left:3px solid #ad792e;padding:10px 12px;background:#fff8e9;color:#735223;font-size:.86rem;line-height:1.5;overflow-wrap:anywhere}[data-ch6-library] .btn,[data-ch6-lesson] .btn,[data-ch6-result] .btn{white-space:normal;max-width:100%}[data-ch6-lesson] table{max-width:100%;border-collapse:collapse;font-size:.86rem}[data-ch6-lesson] th,[data-ch6-lesson] td{padding:6px;border:1px solid #c8d7dc;overflow-wrap:anywhere}';document.head.appendChild(ch6Style);
 ch6Style.textContent+='.ch6-diagram-zoom{max-width:100%;min-width:0;margin:8px 0 14px;font-size:.82rem}.ch6-diagram-zoom>summary{cursor:pointer;min-height:44px;box-sizing:border-box;padding:12px 0;font-weight:650}.ch6-diagram-viewport{overflow-x:auto;max-width:100%;padding:6px 0;overscroll-behavior-x:contain}.ch6-diagram-viewport:focus-visible{outline:3px solid #217a99;outline-offset:2px}';
 const ch6Linked=new URLSearchParams(location.search);if(ch6Linked.get('chapter')==='ch6'||ch6Unit(ch6Linked.get('lesson'))){S.view='allLearn';S.learnCh='ch6';S.learnUnit=ch6Unit(ch6Linked.get('lesson'))?.id||null;S.learnTopic=null;S.ch6LessonStep=0;}
+
+/* Original Exam 2 questions, aligned to the supplied 2026-10-16 topic list
+ * and practice packet. Not transcriptions, predictions, or instructor keys.
+ * These items are exam-only; Challenge has a separate original expansion.
+ */
+const E2_MC_SOURCE='Original app practice. Style/scope: instructor Exam 2 topic list (pp. 2–4) and practice packet (naming, projections, relationships, energy profiles). Authored 2026-10-16; not an instructor question.';
+function e2Figure(body,label,w=420,h=200){return '<figure style="margin:12px 0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+label+'" style="display:block;width:100%;max-width:520px;color:var(--text,#193d45)"><title>'+label+'</title>'+body+'</svg></figure>';}
+function e2Text(x,y,text,size=20){return '<text x="'+x+'" y="'+y+'" text-anchor="middle" fill="currentColor" font-family="system-ui,sans-serif" font-size="'+size+'">'+text+'</text>';}
+function e2Line(x,y,a,b){return '<line x1="'+x+'" y1="'+y+'" x2="'+a+'" y2="'+b+'" stroke="currentColor" stroke-width="2.5"/>';}
+function e2Fischer(){return e2Figure(e2Line(210,45,210,158)+e2Line(140,100,280,100)+e2Text(210,30,'CH₂CH₃')+e2Text(210,185,'CH₃')+e2Text(115,107,'HO')+e2Text(305,107,'H'),'Fischer: ethyl above, methyl below, OH left and H right.');}
+function e2Alkene(){return e2Figure(e2Line(170,96,250,96)+e2Line(170,104,250,104)+e2Line(170,100,120,55)+e2Line(170,100,120,145)+e2Line(250,100,300,55)+e2Line(250,100,300,145)+e2Text(97,45,'Cl')+e2Text(90,172,'CH₃')+e2Text(320,45,'CH₂CH₃')+e2Text(320,172,'OH'),'Alkene: left carbon Cl above and methyl below; right carbon ethyl above and OH below.');}
+function e2Profile(){return e2Figure('<path d="M45 140 L78 140 C100 140 105 60 130 60 C155 60 160 160 200 160 C230 160 235 100 260 100 C285 100 300 210 325 210 L365 210" fill="none" stroke="currentColor" stroke-width="3"/>'+e2Line(30,225,385,225)+e2Line(30,225,30,28)+e2Text(78,125,'R: 0',15)+e2Text(130,43,'TS₁: +40',15)+e2Text(200,185,'I: −10',15)+e2Text(276,85,'TS₂: +20',15)+e2Text(352,195,'P: −35',15)+e2Text(210,254,'Reaction coordinate',16)+e2Text(220,20,'Free energy (kJ/mol)',16),'Two-step free-energy profile. R 0; TS1 +40; I −10; TS2 +20; P −35 kJ/mol.',420,270);}
+function e2MC(n,chapter,topic,skill,prompt,choices,answer,why,extra={}){
+  topic=({naming:'alkanes',newman:'conform',cycloalkanes:'conform',stereoMeso:'stereoSymmetry',stereoChirality:'chirality',optical:'stereoOptical'})[topic]||topic;
+  return {id:'E2-MC'+String(n).padStart(2,'0'),chapter,topic,type:'mc',diff:2,difficulty:2,examOnly:true,examId:'exam2',examPart:'A',adaptiveEligible:false,readinessEligible:false,learningSkill:'exam2-'+skill,learningCapability:'application',transferFamily:'exam2-'+skill,sourceKind:'original-practice',source:E2_MC_SOURCE,sourceAlignment:{document:'Exam 2 topic list',pages:chapter===4?[2,3]:chapter===5?[3]:[3,4],style:'Original single-best-answer application'},prompt,choices,answer,why,hints:['Identify the exact target first. Compare the given structure or values, then apply the rule.'],askedFor:skill,correctedAt:'2026-10-16-exam2-v1',...extra};
+}
+const EXAM2_MC_QUESTIONS=[
+  e2MC(1,4,'naming','branched-parent-name','Choose the IUPAC name for <b>CH₃–CH(CH₃)–CH₂–CH(CH₂CH₃)–CH₂–CH₃</b>.',['4-ethyl-2-methylhexane','2-ethyl-4-methylhexane','2,4-dimethylheptane','4-ethyl-5-methylhexane'],0,'The longest continuous chain has six carbons. Numbering gives 2,4 instead of 3,5. List ethyl before methyl: 4-ethyl-2-methylhexane.'),
+  e2MC(2,4,'naming','alphabetical-locant-tie','A hexane parent has one ethyl and one methyl substituent. The two numbering directions give <b>ethyl 3 / methyl 4</b> or <b>ethyl 4 / methyl 3</b>. Which name is correct?',['4-ethyl-3-methylhexane','3-ethyl-4-methylhexane','3-methyl-4-ethylhexane','Both numbering directions give equally preferred names'],1,'Both directions give the same locant set, 3,4. Break this remaining tie by giving the alphabetically earlier substituent, ethyl, the lower locant. This rule comes after comparing the locant sets.'),
+  e2MC(3,4,'alkanes','carbon-degree-count','In <b>CH₃–C(CH₃)₂–CH₂–CH(CH₃)–CH₃</b>, how many quaternary and tertiary carbons are there?',['2 quaternary; 0 tertiary','0 quaternary; 2 tertiary','1 quaternary; 1 tertiary','1 quaternary; 2 tertiary'],2,'Count carbon neighbors, not hydrogen atoms. C(CH₃)₂ has four carbon neighbors, so it is quaternary. CH(CH₃) has three, so it is tertiary. There is one of each.'),
+  e2MC(4,4,'newman','gauche-to-anti-turn','Look down C2 → C3 of butane. The front CH₃ is at 12 o’clock and the back CH₃ is at 2 o’clock; all other groups are H. Rotate only the <b>back carbon 120° clockwise</b>. What results?',['Anti-staggered; lower energy than the starting gauche form','Gauche-staggered; unchanged energy','Eclipsed; higher energy','A different constitutional isomer'],0,'The back methyl moves from 2 to 6 o’clock. It is now 180° from the front methyl at 12: anti-staggered. Anti butane is lower in energy than gauche. Rotation changes conformation, not connectivity.'),
+  e2MC(5,4,'chair','cis13-flip-preserves-face','A chair of <b>cis-1-ethyl-3-methylcyclohexane</b> has both substituents axial and up. Which statement describes its ring flip?',['Both become equatorial and down','One stays axial; one becomes equatorial','Both become equatorial and up','The compound becomes trans'],2,'A ring flip switches axial ↔ equatorial but preserves up/down. Both groups stay up, so the compound stays cis. The flipped diequatorial chair avoids the two axial substituents.'),
+  e2MC(6,4,'chair','trans12-equatorial-choice','For <b>trans-1,2-dimethylcyclohexane</b>, compare its two chair conformations. Which pair is possible?',['One axial/one equatorial in both chairs','Both equatorial in one; both axial in the other','Both up in one; both down in the other','A ring flip converts one stereocenter from R to S'],1,'For 1,2 substitution, trans permits a diequatorial chair and its diaxial ring flip. Up/down and absolute configuration are preserved; the diequatorial chair is more stable.'),
+  e2MC(7,4,'cycloalkanes','combustion-stability-same-products','Two hydrocarbon isomers A and B burn to the same products under the same conditions. Their molar combustion enthalpies are <b>A: −3600</b> and <b>B: −3575 kJ/mol</b>. Which is more stable?',['A, because it releases more heat','They must be equally stable because they are isomers','Not enough information even though products and conditions match','B, because it starts at lower enthalpy'],3,'B releases 25 kJ/mol less heat to reach the same products. It therefore starts 25 kJ/mol lower in enthalpy and is the more stable isomer in this comparison. Compare magnitudes carefully; more negative combustion does not mean a more stable reactant.'),
+  e2MC(8,4,'alkanes','formula-versus-constitution','Which pair has the <b>same molecular formula but different connectivity</b>?',['Hexane and cyclohexane','Pentane and 2-methylbutane','Butane anti and butane gauche','Cyclopentane and pentane'],1,'Pentane and 2-methylbutane are both C₅H₁₂ but connect the carbons differently: constitutional isomers. Anti/gauche are conformations of one compound. Closing one ring removes two H relative to the saturated acyclic formula.'),
+  e2MC(9,5,'fischer','fischer-single-oh','Assign the configuration at the intersection.'+e2Fischer(),['R','S','Achiral: ethyl and methyl are identical','Cannot assign unless OH is a wedge'],1,'Priorities: OH 1, ethyl 2, methyl 3, H 4. On the page, left → top → bottom is clockwise. H is horizontal in the Fischer and points toward you, so reverse: S. Priority 1 does not have to lie on a wedge.'),
+  e2MC(10,5,'stereoRS','cip-first-point-difference','At a tetrahedral carbon, rank these groups from highest to lowest CIP priority: <b>–CH₂OH, –CH₂CH₃, –CH₃, –H</b>.',['–CH₂CH₃ > –CH₂OH > –CH₃ > –H','–CH₃ > –CH₂CH₃ > –CH₂OH > –H','–CH₂OH > –CH₂CH₃ > –CH₃ > –H','–H > –CH₂OH > –CH₂CH₃ > –CH₃'],2,'The first three start with carbon. Compare their next attached atoms, sorted high to low and excluding the stereocenter: [O,H,H], [C,H,H], [H,H,H]. Oxygen beats carbon, which beats hydrogen. Directly attached H is last.'),
+  e2MC(11,5,'stereoMeso','stereoisomer-count-symmetry','How many distinct configurational stereoisomers does <b>2,3-dibromobutane</b> have, and why?',['4: two centers always give exactly 2²','2: all molecules with identical ends are meso','1: all forms have a symmetry plane','3: one meso form plus an enantiomeric pair'],3,'2² = 4 is the maximum for two tetrahedral centers. Here (2R,3S) and (2S,3R) represent the same meso compound because the ends match. RR and SS remain a separate enantiomeric pair.'),
+  e2MC(12,5,'stereoRelations','partial-center-inversion','What is the relationship between <b>(2R,3R)-pentane-2,3-diol</b> and <b>(2R,3S)-pentane-2,3-diol</b>?',['Diastereomers','Enantiomers','Identical','Constitutional isomers'],0,'Connections match. C2 stays R while C3 changes. They are stereoisomers but not mirror images: diastereomers. The unlike ends of this molecule do not create a meso equivalence.'),
+  e2MC(13,5,'stereoChirality','identical-arms-optical','A tetrahedral carbon is bonded to <b>CH₃, CH₂CH₂CH₃, CH₂OH and CH₂OH</b>. There are no other stereogenic elements. What is expected for the pure compound’s optical rotation?',['Positive because one bond can be drawn as a wedge','Negative because it contains oxygen','Zero: the two CH₂OH groups are identical','A nonzero value, but the sign is unknown'],2,'The two CH₂OH arms are identical, so this carbon is not a stereocenter. With no other source of chirality, the compound is achiral and has zero rotation. Wedges show a view; they do not create four different groups.'),
+  e2MC(14,5,'optical','rotation-to-composition','Pure S has specific rotation <b>+50</b>. A mixture containing only its R and S enantiomers has specific rotation <b>−30</b> under the same conditions. What is its composition?',['60% R and 40% S','80% R and 20% S','30% R and 70% S','20% R and 80% S'],1,'Pure R is −50 under the same conditions. ee = 30/50 × 100 = 60%, favoring R. The two percentages sum to 100 and differ by 60: R = (100+60)/2 = 80%; S = 20%. R/S alone does not predict the rotation sign; the given S value establishes it.',{audit:{kind:'rotation-composition',pure:50,mix:-30,major:80,minor:20}}),
+  e2MC(15,5,'stereoAlkenes','ez-hetero-priorities','Assign E, Z or neither to this alkene.'+e2Alkene(),['Z','Neither: no H is attached to the double bond','Neither: OH prevents E/Z assignment','E'],3,'Each alkene carbon has two different substituents. On the left, Cl outranks C of CH₃. On the right, O of OH outranks C of ethyl. The higher-priority groups are opposite: E. No alkene H is required.'),
+  e2MC(16,5,'stereoRelations','diastereomer-without-centers','Which statement about <b>(E)-but-2-ene and (Z)-but-2-ene</b> is correct?',['They are enantiomers because E and Z are opposites','They are diastereomers even though neither has a tetrahedral stereocenter','They are identical because rotation about C=C is free','They are constitutional isomers'],1,'E/Z forms have the same connections but different fixed arrangements around C=C. They are not mirror images, so they are diastereomers. Diastereomerism does not require two tetrahedral stereocenters.'),
+  e2MC(17,6,'energyProfiles','two-step-local-barriers','Use the given profile. Which description is correct?'+e2Profile(),['Two transition states; one intermediate; ΔG = −35 kJ/mol; local barriers 40 then 30 kJ/mol','Two intermediates; one transition state; ΔG = +35 kJ/mol','Two transition states; one intermediate; local barriers 40 then 20 kJ/mol','One concerted step; ΔG = −35 kJ/mol'],0,'Each peak is a transition state; the valley between them is one intermediate. ΔG = −35 − 0 = −35. Measure each barrier from the state immediately before its peak: 40 − 0 = 40, then 20 − (−10) = 30 kJ/mol.',{audit:{kind:'profile',levels:[0,40,-10,20,-35],barriers:[40,30],delta:-35}}),
+  e2MC(18,6,'reactionRates','catalyst-two-directions','At fixed temperature, a catalyst is added to a reversible reaction. Which statement is correct?',['It lowers product free energy and increases K','It lowers only the forward barrier','It provides a faster pathway in both directions without changing K','It makes every endergonic reaction exergonic'],2,'A catalyst changes the pathway, not the free energies of the starting and ending states. Both directions approach the same equilibrium faster. ΔG° and K at the given temperature do not change.'),
+  e2MC(19,6,'reactionTypes','homolysis-electron-count','The C–Br bond in CH₃Br breaks <b>homolytically</b>. Which products and arrows represent that step?',['CH₃⁺ + Br⁻; one full-headed arrow to Br','CH₃· + Br·; one single-headed arrow from the bond to each atom','CH₃⁻ + Br⁺; one full-headed arrow to C','CH₃· + Br⁻; two full-headed arrows'],1,'Homolysis shares the two bond electrons equally: one electron goes to each atom, making two radicals. Two fishhook (single-headed) arrows show those two separate electrons.'),
+  e2MC(20,6,'reactionTypes','heterolysis-selected-bond','Consider <b>CH₃O–H</b>. The O–H bond breaks and both bond electrons go to oxygen. What is formed?',['CH₃· + ·OH','CH₃O· + H·','CH₃O⁺ + H⁻','CH₃O⁻ + H⁺'],3,'Only the indicated O–H bond breaks. Oxygen takes its electron pair, leaving methoxide (CH₃O⁻) and H⁺. This is formal heterolytic cleavage; this question does not claim that isolated ions form readily under ordinary conditions.'),
+  e2MC(21,6,'reactionTypes','classify-net-not-step','Classify the <b>net transformation</b>: CH₃CH₂Br + OH⁻ → CH₃CH₂OH + Br⁻. No mechanism is specified.',['Substitution','Elimination','Addition','Rearrangement'],0,'OH replaces Br on the carbon skeleton: substitution. The net class alone does not tell you whether the actual mechanism has one step or multiple steps.'),
+  e2MC(22,6,'transitionStates','partial-bonds-charge','For the <b>single concerted step</b> HO⁻ + CH₃Br → CH₃OH + Br⁻, which transition-state drawing feature is required?',['A complete C–O bond and a complete C–Br bond, with five full bonds to carbon','An isolated CH₃⁺ intermediate between two peaks','Partial O–C and C–Br bonds, brackets with ‡, overall charge −1','A full O–Br bond and a broken C–H bond'],2,'Show the O–C bond forming while C–Br breaks: both are partial bonds in this one transition state. Brackets with ‡ mark a transition state, not an isolable intermediate. Charge is conserved: the overall assembly has charge −1.'),
+  e2MC(23,6,'reactionControl','select-path-versus-final-state','From the same reactant, pathway A has a <b>40 kJ/mol barrier</b> and gives a product at <b>−10 kJ/mol</b>; pathway B has a <b>65 kJ/mol barrier</b> and gives a product at <b>−30 kJ/mol</b>. Assume comparable prefactors. Which is favored under kinetic control, then under thermodynamic control with equilibration?',['B, then A','A, then B','A, then A','B, then B'],1,'A forms faster because its barrier is lower: kinetic control. B is more stable because its final free energy is lower: thermodynamic control, if products can equilibrate. Temperature alone does not guarantee either regime.'),
+  e2MC(24,6,'reactionRates','temperature-not-catalysis','A reaction becomes faster when temperature rises. For an ordinary activated reaction whose pathway is unchanged, which explanation is best?',['The activation barrier must become zero','The equilibrium must shift toward products','The catalyst concentration must rise','A larger fraction of collisions can overcome the activation barrier'],3,'Higher temperature gives a larger fraction of particles enough energy to cross the barrier (and may increase collision frequency). It does not by itself remove or lower that pathway’s activation barrier. Rate and equilibrium are separate questions.')
+];
+EXAM2_MC_QUESTIONS.find(q=>q.id==='E2-MC05').sourceModelIds=['stimulus-cis13-ethyl-methyl-up'];
+if(typeof QUESTIONS!=='undefined')QUESTIONS.push(...EXAM2_MC_QUESTIONS);
+
+/* Original linked Part B problems, 2026-10-16. These are not copied questions.
+ * Style/scope: supplied Exam 2 topic list pp.2–4; practice packet Q2–10;
+ * existing Chapter 4/5 tutorials and reviewed Chapter 6 lecture-aligned bank.
+ * All are manual/self-reviewed. Do not send exam-only tasks to chapter checks,
+ * daily pulse or ordinary adaptive chapter lessons. Raw PDFs remain private. */
+const EXAM2_WRITTEN_SOURCE={kind:'original-practice',label:'Original instructor-style Part B practice',createdAt:'2026-10-16',alignment:'Supplied Exam 2 topic list and practice packet; original structures, numbers and linked tasks.'};
+function ex2WText(x,y,t,size=18){return ch4Label(x,y,t,size);}
+function ex2WGraph(numbered=false){
+  const pts=[[45,125],[110,85],[175,125],[240,85],[305,125],[370,85],[435,125],[110,20],[175,190],[235,225],[305,190]];
+  const edges=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[1,7],[2,8],[8,9],[4,10]];
+  let body=edges.map(([a,b])=>ch4Line(...pts[a],...pts[b])).join('');
+  const labelOffsets=[[-8,20],[-16,-12],[-17,20],[0,-14],[-17,20],[0,-14],[8,20]];
+  if(numbered)pts.slice(0,7).forEach(([x,y],i)=>body+=ex2WText(x+labelOffsets[i][0],y+labelOffsets[i][1],String(i+1),15));
+  return ch4Figure(numbered?'One accepted seven-carbon parent numbering':'Given carbon graph · every end and corner is carbon',body,485,265);
+}
+function ex2WChairPair(){return ch4QPChair('A',{groups:[{carbon:1,site:'a',label:'Et'},{carbon:3,site:'a',label:'Me'}],title:'Chair A · both up and axial'})+ch4QPChair('B',{groups:[{carbon:1,site:'e',label:'Et'},{carbon:3,site:'e',label:'Me'}],title:'Chair B · both up and equatorial'});}
+function ex2WCyclic(n,branch,title){
+  const pts=Array.from({length:n},(_,i)=>{const a=(-90+i*360/n)*Math.PI/180;return [210+70*Math.cos(a),140+70*Math.sin(a)];});
+  let body=pts.map((p,i)=>ch4Line(...p,...pts[(i+1)%n])).join('');
+  if(branch)body+=ch4Line(...pts[0],210,30)+(branch===2?ch4Line(210,30,255,12):'');
+  return ch4Figure(title,body,420,240);
+}
+function ex2W24Fischer(sides,label){
+  let body=ch4Line(150,45,150,112)+ch4Line(150,142,150,220)+ex2WText(150,30,'CH₃')+ex2WText(150,135,'CH₂')+ex2WText(150,246,'CH₃');
+  [82,180].forEach((y,i)=>{body+=ch4Line(85,y,215,y)+ex2WText(58,y+6,sides[i]==='left'?'Cl':'H')+ex2WText(242,y+6,sides[i]==='right'?'Cl':'H')+ex2WText(170,y-13,'C'+(i?4:2),13);});
+  return ch4Figure(label,body,300,270);
+}
+function ex2WAlkene(ez,config,numbered=false){
+  const pts=[[45,ez==='E'?55:155],[105,105],[170,105],[230,150],[290,105],[350,150]];
+  let body=pts.slice(0,-1).map((p,i)=>ch4Line(...p,...pts[i+1])).join('')+ch4Line(108,113,167,113);
+  body+=ch5FBond(pts[4],[290,42],config==='R'?'hash':'wedge')+ex2WText(290,29,'Br',20);
+  if(numbered)pts.forEach(([x,y],i)=>body+=ex2WText(x,y+(i===4?22:i%2?-14:21),String(i+1),13));
+  return ch4Figure('(2'+ez+',5'+config+')-5-bromohex-2-ene',body,395,195);
+}
+function ex2WCatalysis(){
+  const y=g=>285-2.6*g;
+  let body=ch4Line(55,340,555,340)+ch4Line(55,340,55,45)+ex2WText(285,370,'Reaction progress',17)+ex2WText(270,25,'Relative G / kJ mol⁻¹',18);
+  const paths=[{x:[90,280,520],g:[0,75,-20],color:'#9b4e16'},{x:[90,190,300,410,520],g:[0,40,10,32,-20],color:'#176c89'}];
+  paths.forEach(p=>{let d='M '+p.x[0]+' '+y(p.g[0]);for(let i=1;i<p.x.length;i++){const mid=(p.x[i-1]+p.x[i])/2;d+=' C '+mid+' '+y(p.g[i-1])+' '+mid+' '+y(p.g[i])+' '+p.x[i]+' '+y(p.g[i]);}body+='<path d="'+d+'" fill="none" stroke="'+p.color+'" stroke-width="3.5"/>';});
+  body+=ex2WText(90,y(0)+20,'R 0',15)+ex2WText(280,y(75)-14,'TS 75 · no catalyst',17)+ex2WText(178,y(40)-16,'TS1 40',16)+ex2WText(300,y(10)+22,'I 10',16)+ex2WText(420,y(32)-15,'TS2 32',16)+ex2WText(520,y(-20)-15,'P −20',16);
+  return ch4Figure('Two routes on one energy scale · blue is catalyzed',body,600,395);
+}
+function ex2WTSWater(){
+  let body=ch4Line(175,115,119,70)+ch4Line(175,115,100,145)+ch4Line(175,115,175,185)+ex2WText(102,62,'CH₃')+ex2WText(73,151,'CH₃')+ex2WText(175,211,'CH₃');
+  body+='<circle cx="175" cy="115" r="12" fill="white" stroke="none"/>'+ex2WText(175,121,'C')+ch4Line(199,114,312,114,'stroke-dasharray="5 6"')+ex2WText(336,121,'O')+ch4Line(352,109,394,74)+ch4Line(352,125,394,161)+ex2WText(409,70,'H')+ex2WText(409,180,'H');
+  body+=ex2WText(175,88,'δ+')+ex2WText(336,88,'δ+')+'<path d="M 57 35 H 43 V 231 H 57 M 440 35 H 454 V 231 H 440" fill="none"/>'+ex2WText(475,43,'‡',25)+ex2WText(477,70,'+',18)+ex2WText(260,263,'C···O is forming; Cl⁻ is not bonded here.',16);
+  return ch4Figure('TS2 · attack of water on the carbocation · schematic',body,510,290);
+}
+function ex2W(n,chapter,topic,family,alignment,extra){return {id:'EX2-WB'+String(n).padStart(2,'0'),chapter,courseRoute:'ch'+chapter,topic,type:'written',diff:3,difficulty:3,requiresDrawing:true,reviewMode:'self-reviewed-paper',learningCapability:'construction',adaptiveSkill:family,learningSkill:family,stimulusFamily:family,transferFamily:family,sourceKind:'original-practice',source:EXAM2_WRITTEN_SOURCE.label+'. '+EXAM2_WRITTEN_SOURCE.alignment,provenance:{...EXAM2_WRITTEN_SOURCE},sourceAlignment:alignment,scopeStatus:'exam2-official-topic-alignment',examOnly:true,examId:'exam2',examPart:'B',adaptiveEligible:false,readinessEligible:false,eligibleForUnseenTransfer:false,why:'Work all linked parts before comparing. The rubric is for self-review, not an automatic drawing grade.',...extra};}
+const EXAM2_WRITTEN_QUESTIONS=[
+  ex2W(1,4,'alkanes','exam2-parent-degree-linked','Official topic list: alkane names, structures and carbon degrees; practice Q8.',{
+    prompt:'For the carbon graph below:<ol type="a"><li>Choose and number the parent. Explain the equal-length-chain tie-break.</li><li>Give the complete name.</li><li>Count primary, secondary, tertiary and quaternary carbons.</li><li>Give the molecular formula and check the total hydrogens from your carbon-degree counts.</li></ol>'+ex2WGraph(),
+    model:ex2WGraph(true)+'<p><b>(a–b)</b> The longest path has seven carbons. Among seven-carbon paths, choose the one with three substituents instead of two. The locants 2,3,5 beat 3,5,6. Name: <b>3-ethyl-2,5-dimethylheptane</b>; ethyl is alphabetized before methyl, ignoring di.</p><p><b>(c)</b> 5 primary, 3 secondary, 3 tertiary, 0 quaternary carbons.</p><p><b>(d)</b> C₁₁H₂₄. Hydrogen check: 5(3) + 3(2) + 3(1) + 0(0) = 24. This is an acyclic saturated hydrocarbon, so CₙH₂ₙ₊₂ agrees.</p>',
+    rubric:['Seven-carbon parent and more-substituents tie-break','Lowest locants 2,3,5 rather than 3,5,6','Name 3-ethyl-2,5-dimethylheptane','Carbon degrees 5 primary, 3 secondary, 3 tertiary, 0 quaternary','C11H24 with explicit hydrogen check'],
+    audit:{kind:'tree',edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[1,7],[2,8],[8,9],[4,10]],carbons:11,hydrogens:24,degrees:[5,3,3,0],longest:7}
+  }),
+  ex2W(2,4,'conform','exam2-pentane-three-newmans','Official topic list: Newman conformations, anti/gauche and strain; practice Q2 staggered views and stability.',{
+    prompt:'Consider pentane, CH₃–CH₂–CH₂–CH₂–CH₃, looking <b>C2 → C3</b>.<ol type="a"><li>Draw all three staggered Newman arrangements, keeping the front carbon fixed with its CH₃ at 12 o’clock.</li><li>Rank them using the simple steric model: the largest front/back groups prefer anti. Ignore other interactions.</li><li>Explain why none is a constitutional isomer of another.</li><li>Rotate an anti arrangement by 60° about this bond. Is the resulting arrangement staggered or eclipsed, and does torsional strain rise or fall?</li></ol>',
+    model:ch4Newman(['CH₃','H','H'],['H','CH₂CH₃','H'],'staggered','Anti · front CH₃ at 12; rear ethyl at 6')+ch4Newman(['CH₃','H','H'],['CH₂CH₃','H','H'],'staggered','Gauche · rear ethyl at 2')+ch4Newman(['CH₃','H','H'],['H','H','CH₂CH₃'],'staggered','Gauche · rear ethyl at 10')+'<p>Front C2 bears CH₃/H/H; rear C3 bears CH₂CH₃/H/H. Anti is lowest in the stated simple steric model; the two gauche views tie in that model. Bond connections are unchanged, so these are conformations, not constitutional isomers. A 60° rotation from anti gives an eclipsed arrangement, increasing torsional strain.</p>',
+    rubric:['C2 front with CH3/H/H and C3 rear with ethyl/H/H','Rear ethyl at 6, 2 and 10 o’clock in the three staggered views','Anti below the two equivalent gauche arrangements under the stated model','Same connectivity explained','60° from anti is eclipsed and raises torsional strain'],audit:{kind:'newman',front:['CH3','H','H'],rear:['ethyl','H','H'],antiAngle:180,gaucheAngles:[60,300]}
+  }),
+  ex2W(3,4,'chair','exam2-cis13-chair-energy','Official topic list: cis/trans, ring flips, axial/equatorial and stability; practice Q5 paired chairs.',{
+    sourceModelIds:['stimulus-cis13-ethyl-methyl-up'],
+    prompt:'For <b>cis-1-ethyl-3-methylcyclohexane</b>, take both groups as up. Chair A has C1 axial up.<ol type="a"><li>Draw and number both chairs. Label each group axial/equatorial and up/down.</li><li>Circle the more stable chair.</li><li>In a simple additive axial-penalty model, use ethyl = 7.5 kJ/mol and methyl = 7.0 kJ/mol to estimate the energy difference.</li><li>Explain why a ring flip does not turn cis into trans.</li></ol>'+ch4Ring([{carbon:1,up:true,label:'Et'},{carbon:3,up:true,label:'Me'}],'Given cis-1,3 connectivity; both groups up'),
+    model:ex2WChairPair()+'<p>Chair A: C1 Et axial up; C3 Me axial up. Chair B: both equatorial up. <b>B is favored.</b> In the supplied additive model, A costs 7.5 + 7.0 = <b>14.5 kJ/mol</b> relative to B. This is a simplified estimate, not a measured energy. A flip changes axial ↔ equatorial but preserves each group’s up/down face and carbon attachment.</p>',
+    rubric:['Same numbered ring and substituent attachment in both chairs','Chair A both axial/up; B both equatorial/up','B identified as more stable','14.5 kJ/mol in the supplied additive model','Up/down and cis preserved during flip'],audit:{kind:'chair',carbons:[1,3],up:[true,true],A:['a','a'],B:['e','e'],penalties:[7.5,7],difference:14.5}
+  }),
+  ex2W(4,4,'alkanes','exam2-ring-isomers-strain','Official topic list: formulas, constitutional isomers, strain and heat of combustion.',{
+    prompt:'Draw <b>cyclohexane, methylcyclopentane and ethylcyclobutane</b>.<ol type="a"><li>Count carbons and write the molecular formula of each.</li><li>Explain why they are constitutional isomers, not just three rotations of one drawing.</li><li>Compare the angle strain of a cyclohexane chair with that of a four-membered cyclobutane ring.</li><li>If two isomers give the same combustion products but A releases more heat per mole than B under the same conditions, which reactant lies higher in enthalpy? Explain without confusing “more heat released” with the sign of ΔH.</li></ol>',
+    model:ex2WCyclic(6,0,'Cyclohexane connectivity')+ex2WCyclic(5,1,'Methylcyclopentane connectivity')+ex2WCyclic(4,2,'Ethylcyclobutane connectivity')+'<p>All have six carbons and formula <b>C₆H₁₂</b> (one saturated ring). Their ring sizes/attachments differ, so their carbon graphs differ. A cyclohexane chair has approximately tetrahedral angles with little angle strain; cyclobutane has substantial angle strain from its much smaller internal angles. It also puckers, so the flat polygon is only a connectivity sketch.</p><p>If A releases more heat to the same final products, A starts at higher enthalpy. Its combustion ΔH is more negative. “Larger amount of heat released” does not mean a more positive signed ΔH.</p>',
+    rubric:['Correct six-, five- and four-membered ring graphs with stated substituents','C6H12 for every structure','Different connectivity, not a rotated duplicate','Chair near tetrahedral angles versus strained four-membered ring','A higher enthalpy and more negative combustion ΔH'],audit:{kind:'formula',carbons:6,rings:1,hydrogens:12}
+  }),
+  ex2W(5,5,'fischer','exam2-asymmetric-fischer-linked','Official topic list: R/S, absolute names, projections and stereoisomer relationships; practice Q3–4.',{
+    prompt:'Use the given Fischer projection of <b>2,3-dibromohexane</b>.<ol type="a"><li>Assign priorities and R/S at C2 and C3.</li><li>Draw an equivalent bond-line zigzag and include the configurations in the name.</li><li>Draw its mirror image and label the relationship.</li><li>If only C2 is inverted, what is the new configuration pair and its relationship to the original?</li></ol>'+ch5TPFischer({top:'CH₃',bottom:'CH₂CH₂CH₃',group:'Br',sides:['left','right']},'Given Fischer · CH₃ top; propyl bottom'),
+    model:ch5TPZigzag({n:6,group:'Br',sides:['left','right'],configs:['R','R']},['wedge','wedge'],'One valid (2R,3R) zigzag')+'<p>C2: Br &gt; route through C3 &gt; CH₃ &gt; H. C3: Br &gt; route through C2 &gt; propyl &gt; H, because [Br,C,H] beats [C,H,H]. H is horizontal in both Fischer crosses, so reverse the apparent turn. Original: <b>(2R,3R)-2,3-dibromohexane</b>.</p>'+ch5TPFischer({top:'CH₃',bottom:'CH₂CH₂CH₃',group:'Br',sides:['right','left']},'Mirror: (2S,3S)')+'<p>The mirror is (2S,3S), an enantiomer. Inverting only C2 gives (2S,3R), a diastereomer of the original. The different terminal groups prevent the symmetry collapse seen in a meso example with identical ends.</p>',
+    rubric:['CIP priority lists compare the two carbon routes correctly','Original C2 R and C3 R','Zigzag retains both configurations and six-carbon connectivity','Mirror C2 S/C3 S labeled enantiomer','Only-C2 inversion S,R labeled diastereomer'],audit:{kind:'fischer',sides:['left','right'],priority2:['down','up'],configs:['R','R'],mirror:['S','S'],oneInverted:['S','R']}
+  }),
+  ex2W(6,5,'stereoSymmetry','exam2-symmetric24-enumeration','Official topic list: meso, chirality and relationships; practice Q3 chiral/achiral stereoisomers.',{
+    prompt:'For <b>2,4-dichloropentane</b>, CH₃–CH(Cl)–CH₂–CH(Cl)–CH₃:<ol type="a"><li>Mark every stereocenter and state the initial 2ⁿ upper bound.</li><li>Draw every distinct stereoisomer as a Fischer or wedge–dash drawing and label configurations.</li><li>Identify the meso form and the enantiomeric pair.</li><li>Explain why R,S and S,R are not two extra distinct molecules here.</li></ol>',
+    model:ex2W24Fischer(['left','right'],'(2R,4R)')+ex2W24Fischer(['right','left'],'(2S,4S)')+ex2W24Fischer(['left','left'],'(2R,4S) · meso')+'<p>C2 and C4 are stereocenters; C3 is CH₂. The initial upper bound is 2² = 4, but there are <b>three distinct stereoisomers</b>. R,R and S,S are enantiomers. R,S and S,R describe the same meso compound because reversing the identical-ended chain exchanges C2 and C4. The meso form is achiral even though it contains stereocenters. Meso versus either R,R or S,S is a diastereomeric relationship.</p>',
+    rubric:['Only C2 and C4 starred','Upper bound 4 distinguished from actual total 3','RR and SS both drawn and labeled enantiomers','RS/SR drawn once as the meso compound','Identical ends and exchange symmetry, not merely opposite labels, explain identity'],audit:{kind:'meso',centers:2,upperBound:4,distinct:3,pair:['RR','SS'],meso:['RS','SR']}
+  }),
+  ex2W(7,5,'stereoOptical','exam2-ee-specific-observed-linked','Official topic list: rotation and enantiomeric excess; practice Q7 mixture calculation and Wiley-style rotation practice.',{
+    requiresDrawing:false,learningCapability:'calculation',prompt:'For a model compound Q, pure <b>(S)-Q has [α] = +48°</b>. A sample containing only the R and S enantiomers has <b>[α]mix = −30°</b> under the same solvent, temperature and wavelength. Assume rotation is linear in enantiomer composition.<ol type="a"><li>Give [α] of pure (R)-Q.</li><li>Calculate percent ee and identify the excess enantiomer.</li><li>Calculate the R and S percentages.</li><li>Using αobs = [α]lc, find the observed angle for l = 0.50 dm and c = 0.20 g/mL, in the matching concentration convention.</li><li>Can you conclude that every R compound rotates light negatively? Explain.</li></ol>',
+    model:'<p><b>(a)</b> −48°: enantiomers have equal and opposite specific rotations under identical conditions.</p><p><b>(b)</b> ee = |−30 / −48| × 100 = <b>62.5% ee in R</b>.</p><p><b>(c)</b> R = (100 + 62.5)/2 = <b>81.25%</b>; S = (100 − 62.5)/2 = <b>18.75%</b>. Check: 0.8125(−48) + 0.1875(+48) = −30°.</p><p><b>(d)</b> αobs = (−30)(0.50)(0.20) = <b>−3.0°</b>. The mixture’s specific rotation and observed angle are different quantities.</p><p><b>(e)</b> No. R/S describes configuration, not the measured sign of optical rotation.</p>',
+    rubric:['Pure R specific rotation −48°','62.5% ee, R excess','81.25% R and 18.75% S; sum 100 and difference 62.5','Observed angle −3.0° using supplied l and c','No general link between R/S and +/−'],audit:{kind:'rotation',pureS:48,mix:-30,ee:62.5,majorR:81.25,minorS:18.75,length:0.5,concentration:0.2,observed:-3}
+  }),
+  ex2W(8,5,'stereoAlkenes','exam2-alkene-center-four-isomers','Official topic list: stereoisomer relationships and R/S; practice Q1 E/Z plus Q3 relationships.',{
+    prompt:'Consider <b>5-bromohex-2-ene</b>, CH₃–CH=CH–CH₂–CH(Br)–CH₃.<ol type="a"><li>Draw all distinct E/Z and R/S combinations, using wedges/dashes at C5.</li><li>Group the drawings into enantiomeric pairs.</li><li>Give one diastereomer of the E,5R form.</li><li>Does a 1:1 mixture of the E,5R and E,5S forms rotate plane-polarized light? Explain.</li></ol>',
+    model:ex2WAlkene('E','R',true)+ex2WAlkene('E','S')+ex2WAlkene('Z','R')+ex2WAlkene('Z','S')+'<p>Four distinct configurations: E,5R; E,5S; Z,5R; Z,5S. Enantiomer pairs are <b>E,R ↔ E,S</b> and <b>Z,R ↔ Z,S</b>; a mirror reflection does not change E to Z. Either Z form is a diastereomer of E,R. At C5: Br &gt; the longer chain &gt; CH₃ &gt; H. The equal E,R/E,S mixture is racemic and has zero net optical rotation.</p>',
+    rubric:['All four E/Z × R/S combinations and same six-carbon connectivity','Br at C5 with valid R/S wedges/dashes','Enantiomer pairs keep E/Z but invert R/S','Either Z form identified as a diastereomer of E,R','1:1 E,R/E,S racemate optically inactive'],audit:{kind:'alkene-center',combinations:['ER','ES','ZR','ZS'],enantiomers:[['ER','ES'],['ZR','ZS']]}
+  }),
+  ex2W(9,6,'energyProfiles','exam2-three-step-forward-reverse','Official topic list: energy profiles, intermediates and transition states; practice Q9.',{
+    prompt:'A stipulated three-step mechanism has these relative free energies, in kJ/mol: <b>R 0; TS1 65; I1 −10; TS2 35; I2 −35; TS3 −15; P −60</b>.<ol type="a"><li>Draw and label the full profile, including both axes.</li><li>Calculate each forward activation free-energy barrier from its own preceding minimum.</li><li>Calculate overall ΔG and the barrier for the first step starting in reverse from P.</li><li>Which forward step has the largest local barrier? Explain why a barrier is not simply a peak’s height above zero.</li></ol>',
+    model:ch6KProfile([0,65,-10,35,-35,-15,-60],['R','TS1','I1','TS2','I2','TS3','P'],{title:'Three-step profile',barriers:[[0,1],[2,3],[4,5]],delta:true})+'<p>Forward barriers: 65 − 0 = <b>65</b>; 35 − (−10) = <b>45</b>; −15 − (−35) = <b>20 kJ/mol</b>. Overall ΔG = −60 − 0 = <b>−60 kJ/mol</b> (exergonic). The first reverse barrier is TS3 − P = −15 − (−60) = <b>45 kJ/mol</b>. Step 1 has the largest local forward barrier. Measure each barrier from that step’s starting minimum. These local heights alone need not completely determine an observed multistep rate under every condition.</p>',
+    rubric:['Three peaks, two intermediate valleys, labeled G and reaction progress','Correct level ordering and numerical labels','Forward barriers 65, 45, 20 kJ/mol','Overall ΔG −60 and first reverse barrier 45 kJ/mol','Distinguishes local barrier from absolute peak energy'],audit:{kind:'profile',levels:[0,65,-10,35,-35,-15,-60],forward:[65,45,20],reverseFirst:45,delta:-60}
+  }),
+  ex2W(10,6,'reactionRates','exam2-catalyst-pathway-both-directions','Official topic list: catalysts, rates and corresponding energy profiles.',{
+    prompt:'At one temperature, an uncatalyzed one-step route has relative G levels <b>R 0, TS 75, P −20 kJ/mol</b>. A catalyzed route has <b>R 0, TS1 40, I 10, TS2 32, P −20 kJ/mol</b>.<ol type="a"><li>Draw both routes on one set of axes or two identically scaled axes.</li><li>List the forward and reverse local barriers for each route.</li><li>Explain what is unchanged about ΔG and equilibrium when catalyst is added.</li><li>Must the catalyst be consumed overall? Does an intermediate being formed mean the catalyst cannot speed the reaction?</li></ol>',
+    model:ex2WCatalysis()+'<p>Uncatalyzed: forward <b>75</b>, reverse <b>95 kJ/mol</b>. Catalyzed forward: <b>40</b> and <b>22</b>. Reverse starting at P: <b>52</b>, then <b>30 kJ/mol</b>. All are peak minus the immediately preceding minimum in that direction.</p><p>Both routes have ΔG = <b>−20 kJ/mol</b>. A catalyst changes the route and rate, not the thermodynamic equilibrium constant or product/reactant free-energy difference. It is regenerated overall, although it may participate in steps. A lower-barrier pathway may have an intermediate.</p>',
+    rubric:['One-peak and two-peak routes with correct labeled levels','Uncatalyzed barriers 75 forward and 95 reverse','Catalyzed forward 40, 22 and reverse 52, 30 kJ/mol','Same endpoints/ΔG and no equilibrium-constant change','Catalyst regenerated overall; intermediate compatible with catalysis'],audit:{kind:'catalysis',uncat:[0,75,-20],cat:[0,40,10,32,-20],forward:[40,22],reverse:[52,30],uncatForward:75,uncatReverse:95,delta:-20}
+  }),
+  ex2W(11,6,'reactionControl','exam2-control-conditions-linked','Official topic list: kinetics versus thermodynamics and reaction control.',{
+    prompt:'Two competing one-step pathways begin at <b>R = 0</b>. Path P has a transition state at <b>50</b> and product at <b>−15 kJ/mol</b>; path Q has a transition state at <b>80</b> and product at <b>−35 kJ/mol</b>. Assume comparable prefactors.<ol type="a"><li>Draw both pathways and label the kinetic and thermodynamic products.</li><li>Which product is favored by initial formation under kinetic control?</li><li>What must be possible for thermodynamic control to favor the other product?</li><li>Correct: “Heating always guarantees the thermodynamic product.”</li></ol>',
+    model:ch6KCompeting({peak:50,end:-15},{peak:80,end:-35},['P','Q'])+'<p><b>P is kinetic</b>: its barrier from R is lower (50 rather than 80 kJ/mol), so it forms faster under the stated assumptions. <b>Q is thermodynamic</b>: its product free energy is lower (−35 rather than −15).</p><p>Thermodynamic control requires reversible access/interconversion and enough time to approach equilibrium under the conditions. Heating may make reverse steps accessible, but does not guarantee reversibility, adequate time, or survival without side reactions. An irreversible trap can preserve the kinetic product.</p>',
+    rubric:['Both pathways begin at the same R and have correct peaks/endpoints','P kinetic from lower formation barrier','Q thermodynamic from lower product G','Reversible access/interconversion and sufficient time required','Heating alone rejected as a guarantee'],audit:{kind:'control',P:{peak:50,end:-15},Q:{peak:80,end:-35},kinetic:'P',thermodynamic:'Q'}
+  }),
+  ex2W(12,6,'transitionStates','exam2-cleavage-attack-intermediates','Official topic list: polar bonds, heterolysis, stepwise reactions, intermediates and transition states; practice Q9–10.',{
+    prompt:'Use this <b>stipulated</b> three-step mechanism; no mechanism prediction is needed:<p>1. (CH₃)₃C–Cl → (CH₃)₃C⁺ + Cl⁻<br>2. (CH₃)₃C⁺ + H₂O → (CH₃)₃C–OH₂⁺<br>3. (CH₃)₃C–OH₂⁺ + H₂O → (CH₃)₃C–OH + H₃O⁺</p><ol type="a"><li>Assign δ+ / δ− to the C–Cl bond. Draw the electron-flow arrow for step 1 and name the cleavage type.</li><li>Draw TS2 only, showing the partial bond, charge development, brackets and ‡. Omit spectator Cl⁻ from the TS2 drawing.</li><li>Draw both intermediates with formal charges.</li><li>Sketch a qualitative profile with the correct number of peaks/valleys. Can you identify the rate-determining step from the given mechanism alone?</li></ol>',
+    model:'<p><b>(a)</b> Cδ+–Clδ−. A full two-electron curved arrow starts at the C–Cl bond and ends at Cl, giving carbocation + chloride. This is heterolytic cleavage, not homolysis.</p>'+ex2WTSWater()+'<p><b>(b)</b> The C···O bond is forming. Water still has its two O–H bonds; positive charge is transferred from carbon toward oxygen. The reacting TS2 unit has total charge +1. The C–Cl bond is already broken; do not draw Cl as a covalently attached leaving group in TS2.</p><p><b>(c)</b> I1 is (CH₃)₃C⁺ with a positively charged three-bond carbon. I2 is (CH₃)₃C–OH₂⁺ with positively charged three-bond oxygen. Cl⁻ remains a spectator after step1.</p>'+ch6KProfile([0,45,10,55,15,40,-10],['R','TS1','I1','TS2','I2','TS3','P'],{qualitative:true,title:'Three peaks and two valleys; illustrative heights only'})+'<p><b>(d)</b> Three elementary steps give three transition-state peaks and two intermediate valleys. The mechanism alone supplies no barrier heights, overall ΔG, or rate-determining-step assignment. The illustrated heights are only one possible topology, not predicted energetics.</p>',
+    rubric:['Cδ+/Clδ− and a full curved arrow from bond to Cl','Heterolysis products carbocation plus chloride with correct charges','TS2 partial C–O with two O–H bonds, brackets/‡ and overall +1','Both intermediates correct; no C–Cl bond in TS2','Three peaks/two valleys and no unsupported rate or ΔG assignment'],audit:{kind:'mechanism',steps:3,intermediates:2,ts2Forming:'C-O',ts2BrokenAlready:'C-Cl',ts2Charge:1,rateKnown:false}
+  })
+];
+QUESTIONS.push(...EXAM2_WRITTEN_QUESTIONS);
+
+/* BEGIN CHALLENGE EXPANSION · 2026-10-16. New authored tasks, not
+ * transcribed instructor/Wiley questions. Alignments describe the tested skill;
+ * they never assert that an instructor will use these exact forms or weights. */
+const CHALLENGE_EXPANSION_REFS={
+  ch4:'https://openstax.org/books/organic-chemistry/pages/4-8-conformations-of-disubstituted-cyclohexanes',
+  ch5:'https://openstax.org/books/organic-chemistry/pages/5-5-sequence-rules-for-specifying-configuration',
+  ez:'https://openstax.org/books/organic-chemistry/pages/7-5-alkene-stereochemistry-and-the-e-z-designation',
+  ch6:'https://openstax.org/books/organic-chemistry/pages/6-10-describing-a-reaction-intermediates'
+};
+function cxFigure(label,body,width=500,height=230){return '<figure style="margin:12px 0;max-width:620px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+ch5FEscape(label)+'" style="display:block;max-width:100%;width:100%;height:auto;color:#173e47"><title>'+ch5FEscape(label)+'</title>'+body+'</svg></figure>';}
+function cxText(x,y,text,size=18,anchor='middle'){return '<text x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" font-family="system-ui,sans-serif" font-size="'+size+'" fill="currentColor">'+ch5FEscape(text)+'</text>';}
+function cxLine(x1,y1,x2,y2,extra=''){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="currentColor" stroke-width="2.5" '+extra+'/>';}
+function cxTable(headers,rows){return '<div style="overflow-x:auto;max-width:100%;margin:12px 0"><table style="border-collapse:collapse;width:100%;font-size:.9rem"><thead><tr>'+headers.map(h=>'<th style="padding:9px;border-bottom:2px solid #adc9c7;text-align:left">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(value=>'<td style="padding:9px;border-bottom:1px solid #d7e5e3">'+esc(String(value))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
+function cxEnergy(labels,values){
+  const min=Math.min(...values)-15,max=Math.max(...values)+15,width=540,height=260,x=i=>65+i*410/(values.length-1),y=value=>210-(value-min)/(max-min)*160;
+  let body=cxLine(45,220,515,220)+cxLine(45,220,45,35)+cxText(105,24,'G (kJ/mol)',16)+cxText(282,252,'Reaction coordinate',16);
+  body+='<polyline points="'+values.map((value,i)=>x(i)+','+y(value)).join(' ')+'" fill="none" stroke="#176d78" stroke-width="3" stroke-linejoin="round"/>';
+  values.forEach((value,i)=>{body+=cxText(x(i),y(value)-10,labels[i],16)+cxText(x(i),y(value)+24,String(value),15);});
+  return cxFigure('Schematic free-energy profile in kJ/mol: '+labels.map((label,i)=>label+' '+values[i]).join(', ')+'. Lines connect levels; curve shape is schematic.',body,width,height);
+}
+function cxQuestion(n,chapter,topic,unit,target,prompt,correct,wrong,why,extra={}){
+  const choices=[correct,...wrong],answer=n%4;for(let i=0;i<answer;i++)choices.unshift(choices.pop());
+  return {id:'CX-20261016-'+String(n).padStart(2,'0'),chapter:Number(chapter.slice(2)),courseRoute:chapter,topic,type:'mc',diff:3,difficulty:3,adaptiveSkill:unit,learningSkill:'challenge-'+target,challengeEligible:true,challengeBank:'2026-10-16',challengeDemand:target.replace(/-/g,' '),transferFamily:'cx-'+target,prompt,choices,answer,why,hints:['Work one decision at a time. Use the specific givens before applying the rule.'],sourceKind:'original-practice',source:'Original app application problem. Aligned with the supplied Exam 2 topic list / practice formats and covered course concepts; not a copied instructor or Wiley question.',sourceAlignment:{material:'Exam 2 topic list + course lectures',chapter,target},sourceUrl:CHALLENGE_EXPANSION_REFS[chapter],scopeStatus:'course-objectives',eligibleForUnseenTransfer:true,challengeAudit:{expected:correct,target},...extra};
+}
+const CHALLENGE_EXPANSION_QUESTIONS=[
+  cxQuestion(1,'ch4','alkanes','ch4-name-draw','parent-chain-branch-location',
+    'Choose the correct IUPAC name. The branch in parentheses is attached to the preceding CH.'+cxFigure('Condensed structure CH3CH2CH(CH2CH3)CH2CH2CH3',cxText(250,75,'CH₃CH₂CH(CH₂CH₃)CH₂CH₂CH₃',24),500,120),
+    '3-Ethylhexane',['4-Ethylhexane','3-Propylpentane','2-Ethylhexane'],
+    'The longest continuous path has six carbons, so the parent is hexane. The remaining two-carbon branch is ethyl. Number from the nearer end: its attachment is C3, not C4. A branched path cannot be counted twice.',{sourceAlignment:{material:'Exam 2 topic list / practice Q8 naming',chapter:'ch4',target:'Find parent, then lowest substituent locant'}}),
+  cxQuestion(2,'ch4','alkanes','ch4-quiz-parent-attachment','substituent-attachment-carbon',
+    'R is the rest of a molecule. Identify the attached four-carbon substituent <b>and</b> its point of attachment.'+cxFigure('R bonded to CH2 bonded to CH with two CH3 groups',cxText(250,70,'R—CH₂—CH(CH₃)₂',26),500,120),
+    'Isobutyl; R attaches through the CH₂ carbon',['sec-Butyl; R attaches through the branched CH carbon','tert-Butyl; R attaches through a carbon bonded to three CH₃ groups','n-Butyl; the substituent has an unbranched four-carbon chain'],
+    'The branch is isobutyl: attachment occurs through CH₂, then the next CH branches to two methyl groups. sec-Butyl attaches through CH, tert-butyl through the carbon joined to three methyl groups, and n-butyl is unbranched. Track the actual attachment bond, not just the four-carbon total.'),
+  cxQuestion(3,'ch4','alkanes','ch4-carbon-map','degree-count-whole-structure',
+    'Count the carbon atoms of each degree in <b>2,2,4-trimethylpentane</b>.'+cxFigure('CH3 bonded to C with two CH3 branches, then CH2, then CH with one CH3 branch, then CH3',cxText(250,70,'CH₃C(CH₃)₂CH₂CH(CH₃)CH₃',23),500,120),
+    '5 primary, 1 secondary, 1 tertiary, 1 quaternary',['4 primary, 2 secondary, 1 tertiary, 1 quaternary','5 primary, 2 secondary, 1 tertiary, 0 quaternary','3 primary, 3 secondary, 2 tertiary, 0 quaternary'],
+    'Count carbon neighbors, not hydrogens: five CH₃ carbons each have one carbon neighbor. The CH₂ has two, the CH has three, and the central C has four. The total is 8 carbons: 5 + 1 + 1 + 1.',{challengeAudit:{expected:'5 primary, 1 secondary, 1 tertiary, 1 quaternary',target:'degree-count-whole-structure',degreeCounts:[5,1,1,1]}}),
+  cxQuestion(4,'ch4','alkanes','ch4-isomers','formula-does-not-prove-ring',
+    'An unknown hydrocarbon has formula <b>C₆H₁₂</b>. A classmate concludes, “It must be a cycloalkane.” Which correction is justified by the formula alone?',
+    'It could be a saturated one-ring compound or an acyclic compound with one C=C bond',['It must be an acyclic alkane','It must contain two rings','It must contain an oxygen atom'],
+    'An acyclic saturated six-carbon alkane would be C₆H₁₄. Two fewer hydrogens give one degree of unsaturation: one ring or one double bond. The formula does not tell you which. You need structural evidence.'),
+  cxQuestion(5,'ch4','conform','ch4-newman-view','reverse-newman-view-connectivity',
+    'For <b>CH₃–CH(Br)–CH₂–CH₃</b>, you first look down C2→C3. You then walk around the model and look down <b>C3→C2</b>, without rotating any bonds. Which description is correct?',
+    'C3 is now in front with CH₃, H and H; the molecule has not changed configuration',['C2 is still in front because the numbering cannot change','C3 is now in front with Br, CH₃ and H','Reversing the viewing direction converts the molecule into its enantiomer'],
+    'The arrow names the near carbon first. Looking C3→C2 puts C3 in front; its three groups away from the viewing bond are CH₃, H and H. C2 is behind with Br, CH₃ and H. Changing your viewpoint changes the drawing, not the bonds or absolute configuration.'),
+  cxQuestion(6,'ch4','conform','ch4-conformer-energy','rotation-profile-global-extrema',
+    'The table gives a schematic butane rotation profile. Which conclusion matches <b>both</b> energy and shape?'+cxTable(['CH₃–CH₃ angle','Relative energy (kJ/mol)'],[['0°',20],['60°',4],['120°',16],['180°',0],['240°',16],['300°',4]]),
+    '0° is the highest eclipsed form; 180° is the lowest anti form',['60° is the highest because the methyl groups are close','120° is the lowest anti form','0° and 180° are equal because they are on the same line'],
+    'The highest point is the 0° CH₃–CH₃ eclipsed conformation. At 180°, the largest groups are opposite and the bonds are staggered, giving the anti minimum. The 60°/300° forms are local gauche minima, not the global minimum.'),
+  cxQuestion(7,'ch4','chair','ch4-chair-flip','cis14-bulky-axial-cost',
+    'Compare chairs of <b>cis-1-tert-butyl-4-methylcyclohexane</b>. Use an axial penalty of 22 kJ/mol for tert-butyl and 7 kJ/mol for methyl; ignore other energy differences.'+cxTable(['Chair','C1 tert-butyl','C4 methyl'],[['A','axial up','equatorial up'],['B','equatorial up','axial up']])+'Which conclusion follows?',
+    'Both are cis; B is favored by about 15 kJ/mol',['Both are cis and equally stable because each has one axial group','A is favored by 15 kJ/mol because methyl is equatorial','The ring flip changes cis into trans'],
+    'Up/up stays cis in both chairs. Count the cost of the specific axial group, not just how many groups are axial. A costs 22 and B costs 7 kJ/mol in the stated model. B is lower by 22 − 7 = 15 kJ/mol because the bulkier tert-butyl group is equatorial.',{challengeAudit:{expected:'Both are cis; B is favored by about 15 kJ/mol',target:'cis14-bulky-axial-cost',axialCosts:[22,7],difference:15}}),
+  cxQuestion(8,'ch4','alkanes','ch4-combustion-stability','combustion-stability-not-rate',
+    'Two constitutional isomers with the same formula burn completely to the <b>same quantities and states</b> of CO₂ and H₂O.'+cxTable(['Isomer','ΔH of combustion (kJ/mol)'],[['A','−4160'],['B','−4130']])+'Which conclusion follows?',
+    'B is lower in enthalpy by 30 kJ/mol; these data alone do not rank reaction rates',['A is lower in enthalpy by 30 kJ/mol and must react faster','B must have a lower activation barrier because it releases less heat','A and B must be enantiomers because their formulas match'],
+    'With the same combustion products, the isomer releasing more heat started higher in enthalpy. A releases 30 kJ/mol more, so B starts 30 kJ/mol lower. Energy difference is thermodynamic information, not an activation barrier or a rate measurement.',{challengeAudit:{expected:'B is lower in enthalpy by 30 kJ/mol; these data alone do not rank reaction rates',target:'combustion-stability-not-rate',enthalpyDifference:30}}),
+  cxQuestion(9,'ch5','stereoRS','ch5-rs','cip-carbon-tie-multiple-bond',
+    'Rank these groups attached to the same stereocenter, highest priority first: <b>–CHO, –CH₂OH, –CH₂CH₃, –CH₃</b>. All attach through carbon.',
+    '–CHO > –CH₂OH > –CH₂CH₃ > –CH₃',['–CH₂OH > –CHO > –CH₂CH₃ > –CH₃','–CH₂CH₃ > –CHO > –CH₂OH > –CH₃','–CH₃ > –CH₂CH₃ > –CH₂OH > –CHO'],
+    'The first attached atoms tie as carbon. Compare their next atoms, highest first, excluding the stereocenter: CHO gives [O,O,H] because C=O is duplicated for CIP; CH₂OH gives [O,H,H]; ethyl gives [C,H,H]; methyl gives [H,H,H]. Stop at the first difference.'),
+  cxQuestion(10,'ch5','stereoRS','ch5-rs','lowest-priority-in-plane',
+    'Assign R or S. This is a wedge–dash drawing, <b>not a Fischer projection</b>. OH and H lie in the page; ethyl points toward you and methyl points away.'+cxFigure('At central carbon: OH upper right in the plane, H upper left in the plane, CH2CH3 solid wedge lower right toward viewer, CH3 hashed wedge lower left away.',cxLine(250,115,315,55)+cxLine(250,115,185,55)+'<polygon points="250,115 320,165 305,183" fill="currentColor"/>'+[1,2,3,4,5,6].map(i=>cxLine(250-i*11-i*1.3,115+i*10-i*1.3,250-i*11+i*1.3,115+i*10+i*1.3)).join('')+cxText(336,43,'OH',22)+cxText(164,43,'H',22)+cxText(360,207,'CH₂CH₃',22)+cxText(157,207,'CH₃',22)),
+    'S',['R','Not a stereocenter','Cannot assign unless priority 1 is on a wedge'],
+    'Priorities are OH (1), ethyl (2), methyl (3), H (4). H is in the page, so the visible 1→2→3 turn is not enough. As a bookkeeping move, swap H with the dashed methyl so H is away. The swapped drawing is R; one swap reverses configuration, so the original is S. The highest-priority group does not need a wedge.',{challengeAudit:{expected:'S',target:'lowest-priority-in-plane',vectors:[[1,1,0],[1,-1,1],[-1,-1,-1],[-1,1,0]],priorities:['OH','ethyl','methyl','H']}}),
+  cxQuestion(11,'ch5','fischer','ch5-fischer','fischer-rotation-equivalence',
+    'A Fischer projection has CHO at the top, CH₂OH at the bottom, OH on the left, and H on the right. Which new Fischer projection is the <b>same stereoisomer</b>?',
+    'Top CH₂OH; bottom CHO; left H; right OH',['Top H; bottom OH; left CHO; right CH₂OH','Top CHO; bottom CH₂OH; left H; right OH','Top OH; bottom H; left CH₂OH; right CHO'],
+    'The correct choice is a 180° turn of the whole Fischer drawing: top/bottom and left/right exchange together. That makes two swaps and retains configuration. A 90° turn swaps the meaning of toward/away; swapping just left and right inverts the center.'),
+  cxQuestion(12,'ch5','stereoSymmetry','ch5-symmetry','opposite-labels-no-meso-guarantee',
+    'A student labels <b>(2R,3S)-2-bromo-3-chlorobutane</b> “meso because one center is R and one is S.” Compare it with (2S,3R)-2-bromo-3-chlorobutane. What is correct?',
+    'They are a distinct enantiomeric pair; unlike Br and Cl prevent the symmetry needed for meso',['They are identical because every RS molecule is meso','They are diastereomers because both configurations changed','They are constitutional isomers because Br and Cl differ'],
+    'R/S labels alone do not establish meso. Here CH₃–CH(Br)–CH(Cl)–CH₃ has unlike substituents at the two centers. A symmetry operation cannot exchange Br with Cl and preserve the molecule. Inverting both centers gives a different mirror image: RS and SR are enantiomers, not one meso compound.'),
+  cxQuestion(13,'ch5','stereoRelations','ch5-relationships','rs-needs-same-connectivity',
+    'Compare <b>(R)-2-bromobutane</b> and <b>(S)-2-chlorobutane</b>. A student calls them enantiomers because one is R and the other S. What is wrong?',
+    'They have different formulas, so they are not isomers of each other',['R and S always mean identical molecules','They must be diastereomers because the halogens differ','Enantiomers must both have the R label'],
+    'Check the atoms and connections before the R/S labels. Replacing Br with Cl changes the molecular formula. These are different compounds, not an enantiomeric or diastereomeric pair. Opposite labels establish enantiomers only in the appropriate same-connectivity comparison.'),
+  cxQuestion(14,'ch5','stereoAlkenes','ch5-ez','ez-priority-not-largest-label',
+    'Assign E, Z, or neither to this alkene.'+cxFigure('Left alkene carbon: Br above, Cl below. Right alkene carbon: CH3 above, CH2CH3 below.',cxLine(205,102,295,102)+cxLine(205,114,295,114)+cxLine(205,108,145,52)+cxLine(205,108,145,165)+cxLine(295,108,355,52)+cxLine(295,108,355,165)+cxText(128,42,'Br',24)+cxText(128,192,'Cl',24)+cxText(382,42,'CH₃',24)+cxText(390,192,'CH₂CH₃',23)),
+    'E: Br and ethyl are the higher-priority groups and are on opposite sides',['Z: the two carbon-containing groups are on the same carbon','Z: Br and methyl are both drawn above','Neither: there are no H atoms on the double bond'],
+    'On the left, Br outranks Cl by atomic number. On the right, ethyl outranks methyl at the next-atom comparison: [C,H,H] beats [H,H,H]. Those two winning groups are opposite, so E. A hydrogen is not required for E/Z.',{sourceUrl:CHALLENGE_EXPANSION_REFS.ez}),
+  cxQuestion(15,'ch5','stereoOptical','ch5-optical','optical-rotation-mix-after-addition',
+    'Pure (+) enantiomer has specific rotation +80° under fixed conditions. A sample containing only its two enantiomers has specific rotation −16°. Add an <b>equal mass of the pure (+) enantiomer</b>. What is the new specific rotation? Assume unchanged measurement conditions and no reaction.',
+    '+32°',['+16°','−32°','0°'],
+    'First, −16/80 = −0.20: the original sample has 20% excess (−), so it is 40% (+) and 60% (−). For 1 mass unit of sample plus 1 of pure (+), the totals are 1.4 (+) and 0.6 (−). The new fractions are 70% and 30%, giving 40% excess (+): 0.40 × 80 = +32°.',{challengeAudit:{expected:'+32°',target:'optical-rotation-mix-after-addition',originalPlus:0.4,finalPlus:0.7,rotation:32}}),
+  cxQuestion(16,'ch5','stereoOptical','ch5-optical','achiral-separation-optical-fractions',
+    'A mixture contains equal amounts of (2R,3R)- and (2S,3S)-2,3-dibromobutane, plus meso-2,3-dibromobutane. An <b>achiral</b> chromatography column resolves the meso form from the enantiomer pair but does not resolve the pair. What is collected?',
+    'Two fractions; neither is optically active',['Three fractions; the two chiral fractions are optically active','Two fractions; both are optically active','One fraction because all stereoisomers have identical properties'],
+    'The meso compound is achiral and forms one inactive fraction. RR and SS remain together in equal amounts, a racemic mixture whose rotations cancel. Individual RR and SS molecules are chiral, but the combined fraction is inactive. The stated separation gives two fractions, neither active.'),
+  cxQuestion(17,'ch6','reactionTypes','ch6-reactions','classify-reaction-track-atoms',
+    'Compare these net changes (conditions omitted):'+cxTable(['Reaction','Net change'],[['A','CH₃CH₂Br → CH₂=CH₂ + HBr'],['B','CH₂=CH₂ + HBr → CH₃CH₂Br']])+'Which statement is correct?',
+    'A is elimination; B is addition. Atoms are conserved in both',['A is substitution because Br disappears from the organic product','A and B are both rearrangements','A is addition; B is elimination'],
+    'A removes H and Br from neighboring carbons while forming a π bond; H and Br still appear in HBr, so they were not destroyed. B adds H and Br across the double bond. Classify the net bond changes, not whether a symbol disappeared from the largest structure.'),
+  cxQuestion(18,'ch6','reactionTypes','ch6-reactions','cleavage-products-charge-electrons',
+    'Start with a neutral C–Br bond. Which pair correctly matches the bond-cleavage description to the products?',
+    'Homolytic: C• + Br•. Heterolytic with both electrons going to Br: C⁺ + Br⁻',['Homolytic: C⁺ + Br⁻. Heterolytic: C• + Br•','Homolytic: C⁺ + Br⁺. Heterolytic: C⁻ + Br⁻','Both processes must give two neutral closed-shell products'],
+    'Homolytic cleavage splits the bonding pair: one electron stays with each atom, producing radicals. Heterolytic cleavage gives the pair to one atom. If Br receives both, Br becomes negative and carbon positive. Total charge remains zero in either case.'),
+  cxQuestion(19,'ch6','reactionEnthalpy','ch6-enthalpy','bond-ledger-enthalpy-rate-distinction',
+    'For CH₄ + Cl₂ → CH₃Cl + HCl, estimate ΔH using the supplied average bond energies.'+cxTable(['Bond','Energy (kJ/mol)'],[['C–H',413],['Cl–Cl',243],['C–Cl',339],['H–Cl',431]])+'Which paired conclusion follows?',
+    'ΔH ≈ −114 kJ/mol; the rate cannot be found from this value alone',['ΔH ≈ +114 kJ/mol; the reaction must be fast','ΔH ≈ −1426 kJ/mol; every bond releases energy when broken','ΔH ≈ −114 kJ/mol; the activation barrier must also be −114'],
+    'Break one C–H and one Cl–Cl: 413 + 243 = 656. Form one C–Cl and one H–Cl: 339 + 431 = 770. ΔH ≈ 656 − 770 = −114 kJ/mol. That says exothermic, not barrier-free or fast. Unchanged C–H bonds cancel.',{challengeAudit:{expected:'ΔH ≈ −114 kJ/mol; the rate cannot be found from this value alone',target:'bond-ledger-enthalpy-rate-distinction',broken:[413,243],formed:[339,431],enthalpy:-114}}),
+  cxQuestion(20,'ch6','freeEnergy','ch6-free-energy','entropy-temperature-unit-threshold',
+    'A reaction has ΔH° = +30 kJ/mol and ΔS° = +100 J/(mol·K). Treat both as temperature-independent over this range. Which comparison is correct?',
+    'ΔG° is +5 kJ/mol at 250 K and −10 kJ/mol at 400 K',['ΔG° is −24,970 kJ/mol at 250 K and −39,970 kJ/mol at 400 K','ΔG° is negative at both temperatures because entropy increases','ΔG° is positive at both temperatures because enthalpy increases'],
+    'Convert entropy first: 100 J/(mol·K) = 0.100 kJ/(mol·K). At 250 K, ΔG° = 30 − 250(0.100) = +5. At 400 K, it is 30 − 400(0.100) = −10. The sign changes at 300 K. This describes thermodynamic favorability, not a guaranteed reaction rate.',{challengeAudit:{expected:'ΔG° is +5 kJ/mol at 250 K and −10 kJ/mol at 400 K',target:'entropy-temperature-unit-threshold',enthalpy:30,entropyJ:100,temperatures:[250,400],freeEnergies:[5,-10]}}),
+  cxQuestion(21,'ch6','energyProfiles','ch6-energy','local-barrier-versus-absolute-peak',
+    'Use this two-step profile. Which statement correctly compares the <b>local forward barriers</b> and the overall ΔG?'+cxEnergy(['R','TS1','I','TS2','P'],[0,50,-20,40,-35]),
+    'Step 2 has the larger local barrier (60 kJ/mol); overall ΔG = −35 kJ/mol',['Step 1 has the larger local barrier because TS1 is the highest absolute peak','Step 2 has a 40 kJ/mol local barrier; overall ΔG = +35 kJ/mol','The intermediate is a transition state because its energy is negative'],
+    'Measure each local rise from that step’s starting minimum. Step 1: 50 − 0 = 50. Step 2: 40 − (−20) = 60 kJ/mol. Overall ΔG uses the endpoints: −35 − 0 = −35. This comparison of local barriers alone is not a full kinetic mechanism analysis.',{challengeAudit:{expected:'Step 2 has the larger local barrier (60 kJ/mol); overall ΔG = −35 kJ/mol',target:'local-barrier-versus-absolute-peak',energies:[0,50,-20,40,-35],barriers:[50,60],overall:-35}}),
+  cxQuestion(22,'ch6','reactionRates','ch6-rates','catalyst-forward-reverse-equilibrium',
+    'The same reversible reaction has R at 0 and P at −20 kJ/mol on a standard free-energy scale. Its uncatalyzed transition state is +80; a catalyst provides a one-step pathway with a transition state at +45. What changes?',
+    'Forward and reverse barriers both decrease by 35 kJ/mol; ΔG° and K stay unchanged',['Only the forward barrier decreases, so K must increase','The reverse barrier becomes 25 kJ/mol, so K decreases','The catalyst lowers the product energy to −55 kJ/mol'],
+    'Forward: 80→45, a decrease of 35. Reverse: 80 − (−20) = 100, versus 45 − (−20) = 65, also a decrease of 35. The reactant/product levels do not move, so ΔG° stays −20 and K is unchanged at the same temperature. The catalyst speeds equilibration; it does not shift the equilibrium.',{challengeAudit:{expected:'Forward and reverse barriers both decrease by 35 kJ/mol; ΔG° and K stay unchanged',target:'catalyst-forward-reverse-equilibrium',forward:[80,45],reverse:[100,65],deltaG:-20}}),
+  cxQuestion(23,'ch6','reactionRates','ch6-rates','rate-law-concentration-two-changes',
+    'Experiment gives the rate law <b>rate = k[A]²[B]</b>. Temperature and k are unchanged. You double [A] and halve [B]. What happens to the initial rate?',
+    'It doubles',['It stays the same','It quadruples','It falls to one-half'],
+    'Apply the measured exponents: doubling A contributes 2² = 4; halving B contributes 1/2. The combined factor is 4 × 1/2 = 2. Do not guess rate orders from a balanced equation; the rate law is explicitly supplied here.',{challengeAudit:{expected:'It doubles',target:'rate-law-concentration-two-changes',factor:2}}),
+  cxQuestion(24,'ch6','reactionControl','ch6-control','infer-control-from-product-data',
+    'At one fixed temperature, R forms two isomeric products, P and Q. Initially, before appreciable reverse reaction, P forms <b>nine times faster</b> than Q. When reversible interconversion is allowed to reach equilibrium, the product ratio is <b>P:Q = 1:4</b>. Which interpretation is supported?',
+    'P is kinetically favored; Q is thermodynamically favored at this temperature',['Q is kinetically favored because its equilibrium amount is larger','P must remain the major product because it formed faster initially','P and Q must be enantiomers because their formula is the same'],
+    'Use the initial formation rates to identify the faster product: P. Use the measured equilibrium ratio to identify the favored final product: Q. Initial speed and equilibrium preference answer different questions. The given reversible equilibration matters; merely waiting does not guarantee that any reaction can equilibrate.')
+];
+// Conservative cross-bank familiarity: related application tasks share a family
+// even when they use another representation or demand an additional decision.
+const CX_RELATED_FAMILIES={3:'exam2-carbon-degree-count',8:'exam2-combustion-stability-same-products',9:'exam2-cip-first-point-difference',18:'exam2-homolysis-electron-count',21:'exam2-two-step-local-barriers',22:'exam2-catalyst-two-directions',24:'exam2-select-path-versus-final-state'};
+CHALLENGE_EXPANSION_QUESTIONS.forEach((q,index)=>{if(CX_RELATED_FAMILIES[index+1])q.transferFamily=CX_RELATED_FAMILIES[index+1];});
+QUESTIONS.push(...CHALLENGE_EXPANSION_QUESTIONS);
+/* END CHALLENGE EXPANSION */
 
 /* BEGIN ARROW LAB (resonance you draw), 2026-10-02 */
 /* Resonance engine, 2026-10-02. Pure, deterministic electron bookkeeping for the
@@ -17162,12 +17451,12 @@ function ccBlueprint(chapter){
   if(!ch){
     return {version:CC_BLUEPRINT_VERSION,chapter,label:'Unavailable chapter',available:false,domains:[],scope:'This chapter is not registered in the app. No chapter coverage or readiness can be inferred.',targetPerDomain:2};
   }
-  const domains=units.map(u=>({id:u.id,label:u.title,topics:[u.topic],unitIds:[u.id],preview:!!u.preview,poolIds:[...new Set(['guidedIds','practiceIds','coldIds','proofIds'].flatMap(key=>u[key]||[]).concat(QUESTIONS.filter(q=>q.adaptiveSkill===u.id||(!q.adaptiveSkill&&q.topic===u.topic&&units.filter(other=>other.topic===u.topic).length===1)).map(q=>q.id)))]}));
+  const domains=units.map(u=>({id:u.id,label:u.title,topics:[u.topic],unitIds:[u.id],preview:!!u.preview,poolIds:[...new Set(['guidedIds','practiceIds','coldIds','proofIds'].flatMap(key=>u[key]||[]).concat(QUESTIONS.filter(q=>!q.examOnly&&(q.adaptiveSkill===u.id||(!q.adaptiveSkill&&q.topic===u.topic&&units.filter(other=>other.topic===u.topic).length===1))).map(q=>q.id)))]}));
   // Keep the complete declared topic map visible. Unmapped questions are not
   // silently assigned to one of several lessons that share a broad topic.
   (ch.topics||[]).forEach(topic=>{
     const related=domains.filter(d=>d.topics.includes(topic)),assigned=new Set(related.flatMap(d=>d.poolIds));
-    const extra=QUESTIONS.filter(q=>q.topic===topic&&!assigned.has(q.id)&&(!q.adaptiveSkill||!units.some(u=>u.id===q.adaptiveSkill)));
+    const extra=QUESTIONS.filter(q=>!q.examOnly&&q.topic===topic&&!assigned.has(q.id)&&(!q.adaptiveSkill||!units.some(u=>u.id===q.adaptiveSkill)));
     if(!related.length||extra.length)domains.push({id:related.length?'topic:'+topic:topic,label:(related.length?'Additional ':'')+(TOPICS[topic]?.name||topic),topics:[topic],unitIds:[],poolIds:extra.map(q=>q.id)});
   });
   if(chapter==='ch6'&&typeof CH6_SCOPE_GAPS!=='undefined')domains.push(...CH6_SCOPE_GAPS.map(d=>({...d})));
@@ -17195,6 +17484,7 @@ function ccExposure(){
   Object.entries(state.qstats||{}).forEach(([id,v])=>{if((v.r||0)+(v.w||0)+(v.gr||0)+(v.gw||0)+(v.dk||0)>0)mark(id);});
   Object.keys(state.questionFlags||{}).forEach(mark);
   safeStore.get('cancelledCheckExposure',[]).forEach(mark);
+  safeStore.get('bankPreviewExposure',[]).forEach(mark);
   ccStore().runs.forEach(run=>{
     // Finishing reveals every model/key, including skipped questions.
     (ccCompleted(run)?run.items||[]:Object.keys(run.responses||{}).map(id=>({id}))).forEach(item=>mark(item.id));
@@ -18742,7 +19032,7 @@ const EXAM_PREP={
     ],
     practiceNote:'The instructor’s packet has 10 linked problems. Its key is for checking after an attempt; familiar questions are review, not fresh readiness evidence.',
     writtenPractice:{
-      title:'Part B · written practice',
+      title:'Instructor packet · written problems',
       description:'Draw, explain and finish every linked part before checking.',
       groups:[
         {label:'Newman views + stability',questions:'Q2'},
@@ -18847,6 +19137,10 @@ function renderExamPrep(v){
     const format=el('section',{class:'ep-grid ep-format','aria-label':'Exam format'});
     exam.format.forEach(part=>{const box=el('div');box.appendChild(epText('h2',{},part.title));box.appendChild(epText('p',{},part.detail));format.appendChild(box);});root.appendChild(format);
   }
+  if(exam.id==='exam2'&&typeof epPartACard==='function'&&typeof renderExamBPracticeCard==='function'){
+    const routes=el('div',{class:'ep-grid ep-practice-routes','data-exam-practice-routes':true});routes.append(epPartACard(),renderExamBPracticeCard());root.appendChild(routes);
+    root.appendChild(epExamAnalysisCard());root.appendChild(epMasterBankCard());
+  }
   const questions=(exam.sources||[]).filter(source=>source.kind==='questions'),keys=(exam.sources||[]).filter(source=>source.kind==='key');
   if(questions.length){
     const practice=el('section',{class:'card ep-practice','data-exam-official-practice':true});practice.appendChild(epText('h2',{},exam.writtenPractice?.title||'Work the instructor’s problems'));
@@ -18896,6 +19190,142 @@ function installExamPrep(){
   const previous=render;render=function(){previous();updateExamPrepEntry();};updateCourseNavigation();updateExamPrepEntry();
 }
 installExamPrep();
+
+/* Exam 2 Part B practice uses intact authored questions already in the bank.
+ * It is neither the instructor's private packet nor an official timed mock.
+ * Selecting a set is navigation; self-review is not an independently graded result. */
+const EXAM_B_SCOPE='exam2-part-b';
+const EXAM_B_CHAPTERS=['ch4','ch5','ch6'];
+const EXAM_B_CH6_TOPICS=['reactionTypes','energyProfiles','reactionRates','reactionControl','transitionStates'];
+function epBChapter(q){return CHAPTERS.find(c=>EXAM_B_CHAPTERS.includes(c.id)&&c.topics.includes(q.topic))?.id||null;}
+function epBPool(){
+  return QUESTIONS.filter(q=>{
+    const chapter=epBChapter(q);
+    return chapter&&!q.preview&&!q.unavailable&&q.type==='written'&&typeof q.prompt==='string'&&q.prompt.trim()&&typeof q.model==='string'&&q.model.trim()&&q.rubric?.length&&(chapter!=='ch6'||EXAM_B_CH6_TOPICS.includes(q.topic));
+  });
+}
+function epBIsRun(D){return smRunContext(D)?.kind===EXAM_B_SCOPE;}
+function epBUnfinished(){
+  return [S.drill,S.pausedDrill,...(S.parkedDrills||[])].find(D=>epBIsRun(D)&&(D.i||0)<(D.queue||D.ids||[]).length)||null;
+}
+function epBFamily(q){return q.stimulusFamily||q.transferFamily||q.family||q.variantFamily||q.learningSkill||q.adaptiveSkill||q.topic;}
+function epBFamilies(q){return [...new Set(['written:'+epBFamily(q),...(typeof ccFamilies==='function'?ccFamilies(q):['id:'+q.id])])];}
+function epBSkill(q){return q.learningSkill||q.adaptiveSkill||q.topic;}
+function epBRecordedAttempts(){
+  const bank=new Map(epBPool().map(q=>[q.id,q])),now=Date.now();
+  return (S.attempts||[]).filter(a=>bank.has(a.id)&&adaptiveLearningRecordedAttempt(a,now));
+}
+function epBPlan(){
+  const pool=epBPool(),byId=new Map(pool.map(q=>[q.id,q])),rows=epBRecordedAttempts();
+  const plans=(S.practiceSelections||[]).filter(x=>x.scope===EXAM_B_SCOPE),previous=plans.at(-1)?.plannedIds||[];
+  const lastFamilies=new Set(previous.map(id=>byId.get(id)).filter(Boolean).flatMap(epBFamilies));
+  const attempted=new Set(rows.map(a=>a.id)),planned=new Set(plans.flatMap(x=>x.plannedIds||[]));
+  const exposure=typeof ccExposure==='function'?ccExposure():{ids:new Set(),families:new Set()};
+  const relatedExposure=q=>epBFamilies(q).some(f=>exposure.families.has(f));
+  const previousFamily=q=>epBFamilies(q).some(f=>lastFamilies.has(f));
+  const known=q=>attempted.has(q.id)||planned.has(q.id)||exposure.ids.has(q.id)||relatedExposure(q);
+  const repairSkills=new Set(epBAnalysis().skills.filter(skill=>skill.needsWork>0).map(skill=>skill.id));
+  const seenCount=id=>rows.filter(a=>a.id===id).length+plans.filter(p=>p.plannedIds?.includes(id)).length;
+  const lastUsed=id=>Math.max(0,...rows.filter(a=>a.id===id).map(a=>a.ts||0),...plans.filter(p=>p.plannedIds?.includes(id)).map(p=>p.ts||0));
+  const rank=new Map(pool.map(q=>[q.id,Math.random()]));
+  const compare=(a,b)=>Number(previous.includes(a.id))-Number(previous.includes(b.id))||Number(previousFamily(a))-Number(previousFamily(b))||Number(repairSkills.has(epBSkill(b)))-Number(repairSkills.has(epBSkill(a)))||seenCount(a.id)-seenCount(b.id)||Number(known(a))-Number(known(b))||lastUsed(a.id)-lastUsed(b.id)||rank.get(a.id)-rank.get(b.id);
+  const picked=EXAM_B_CHAPTERS.map(chapter=>pool.filter(q=>epBChapter(q)===chapter).sort(compare)[0]).filter(Boolean);
+  // Mix chapter order too. Force a changed chapter sequence when random order
+  // happens to reproduce the preceding three-slot sequence.
+  const mixed=shuffle(picked),oldOrder=previous.map(id=>byId.get(id)).filter(Boolean).map(epBChapter);
+  if(mixed.length>1&&mixed.every((q,i)=>epBChapter(q)===oldOrder[i]))mixed.push(mixed.shift());
+  const ids=mixed.map(q=>q.id);
+  return {ids,available:pool.length,byChapter:Object.fromEntries(EXAM_B_CHAPTERS.map(ch=>[ch,pool.filter(q=>epBChapter(q)===ch).length])),knownCount:mixed.filter(known).length,relatedExposureCount:mixed.filter(relatedExposure).length,previousFamilyCount:mixed.filter(previousFamily).length,missingChapters:EXAM_B_CHAPTERS.filter(ch=>!picked.some(q=>epBChapter(q)===ch))};
+}
+function epBAnalysis(){
+  const pool=epBPool(),byId=new Map(pool.map(q=>[q.id,q])),rows=epBRecordedAttempts(),latest=new Map();
+  rows.filter(a=>adaptiveLearningValidAttempt(a,byId.get(a.id),Date.now())).forEach(a=>{if(!latest.has(a.id)||a.ts>=latest.get(a.id).ts)latest.set(a.id,a);});
+  const needs=a=>[false,0].includes(a.ok)||a.g||a.dk||a.rf||Number(a.h)>0||['guess','unsure'].includes(a.evidence?.confidence?.value);
+  const skills=new Map();
+  pool.forEach(q=>{const key=epBSkill(q);if(!skills.has(key))skills.set(key,{id:key,topic:q.topic,label:TOPICS[q.topic]?.name||q.topic,available:0,attempted:0,selfReviewed:0,needsWork:0});const s=skills.get(key);s.available++;const a=latest.get(q.id);if(a){s.attempted++;if(a.sr)s.selfReviewed++;if(needs(a))s.needsWork++;}});
+  const attemptedIds=new Set(rows.map(a=>a.id)),needsWork=[...latest.values()].filter(needs).length;
+  return {available:pool.length,attempted:attemptedIds.size,notAttempted:pool.length-attemptedIds.size,selfReviewed:[...latest.values()].filter(a=>a.sr).length,independentReviewPending:attemptedIds.size,needsWork,skills:[...skills.values()],nextAction:needsWork?'Rework a marked step, then have fresh written work checked independently.':attemptedIds.size?'Try different written problems; self-checks still need independent review.':'Start a three-task written set. Draw and explain before opening each model.',limit:'Self-review records what you marked, not a verified Part B grade.'};
+}
+function startExamBPractice(options={}){
+  if(!courseNavigationAllowed())return;
+  const unfinished=epBUnfinished();
+  if(unfinished&&!options.newSet){
+    if(unfinished===S.drill)go('drill');else if(unfinished===S.pausedDrill)resumeDrill();else resumeParkedDrill(unfinished.runId);
+    return;
+  }
+  const plan=epBPlan(),byId=new Map(epBPool().map(q=>[q.id,q])),queue=plan.ids.map(id=>byId.get(id));
+  if(!queue.length||queue.some(q=>!q))return;
+  parkCurrentDrill();
+  S.drill={queue,i:0,right:0,wrong:0,topic:'__exam2-part-b',scopeTopics:[...new Set(queue.map(q=>q.topic))],answered:false,log:[],runId:makeRunId(EXAM_B_SCOPE),scopeName:'Exam 2 · Part B written practice',cold:false,sketchDrafts:{},reasoningDrafts:{},studyContext:{mode:'practice',kind:EXAM_B_SCOPE,chapter:'exam2',selection:plan}};
+  const contexts=safeStore.get('studyRunContexts',{});contexts[S.drill.runId]=S.drill.studyContext;safeStore.set('studyRunContexts',Object.fromEntries(Object.entries(contexts).slice(-100)));
+  S.practiceSelections=[...(S.practiceSelections||[]),{runId:S.drill.runId,scope:EXAM_B_SCOPE,ts:Date.now(),plannedIds:[...plan.ids],purpose:'planned-written-practice-not-performance'}].slice(-30);
+  snapshotDrill(0);save();go('drill');
+}
+function renderExamBPracticeCard(){
+  const analysis=epBAnalysis(),saved=epBUnfinished(),card=el('section',{class:'card ep-practice','data-exam-b-practice':true});
+  card.appendChild(epText('h2',{},'Part B · draw and explain'));
+  card.appendChild(epText('p',{},'Three written tasks: one from each exam chapter. Keep every linked part together; compare with the model after your attempt.'));
+  card.appendChild(epButton(saved?'Continue my Part B set':'Start Part B practice',()=>startExamBPractice(),{class:'btn','data-exam-b-start':true}));
+  if(saved)card.appendChild(epButton('Different set · save this one',()=>startExamBPractice({newSet:true}),{'data-exam-b-new':true}));
+  card.appendChild(epText('p',{class:'muted','data-exam-b-pool':true},analysis.available+' eligible written/drawing tasks in the master bank. Source documents and captured pages are counted separately.'));
+  card.appendChild(epText('p',{class:'ep-readiness','data-exam-b-limit':true},'Self-reviewed practice—not an automatically graded Part B score or the official choose-2-of-3, 75-minute mock.'));
+  const details=el('details');details.appendChild(epText('summary',{},'What the app knows about my written work'));
+  details.appendChild(epText('p',{},analysis.attempted+' tasks attempted · '+analysis.notAttempted+' not attempted · '+analysis.needsWork+' with a recorded miss, uncertainty or help.'));
+  details.appendChild(epText('p',{},analysis.nextAction));details.appendChild(epText('p',{class:'muted'},analysis.limit));card.appendChild(details);return card;
+}
+function epBDecorateRun(){
+  if(S.view!=='drill'||!epBIsRun(S.drill))return;
+  const D=S.drill,v=document.getElementById('view');if(!v||v.querySelector('[data-exam-b-context]'))return;
+  const box=el('section',{class:'ep-b-context','data-exam-b-context':true});
+  box.appendChild(epButton('← Save & return to Exam 2',()=>openExamPrep('exam2'),{class:'btn ghost'}));
+  const plan=smRunContext(D)?.selection;
+  const detail=plan?.knownCount?'Some tasks or related examples were previously viewed, attempted or selected. Treat those as review.':'Questions and chapter order rotate. Outside familiarity is unknown.';
+  box.appendChild(epText('p',{},'Part B practice · draw and explain. Self-reviewed, not automatically graded. '+detail));v.prepend(box);
+  // Persist an unfinished explanation as it is written, just like drawing ink.
+  // Reuse the app's answer-draft schema so navigation/reload/delete retain it.
+  if(D.reviewIdx==null&&!D.answered&&D.i<D.queue.length){
+    v.querySelectorAll('textarea.answerbox,#wgk,#wdk').forEach(control=>{
+      if(control.dataset.examBAutosave)return;control.dataset.examBAutosave='true';
+      const persist=()=>{courseNavigationCaptureAnswer();snapshotDrill(D.i);save();};
+      control.addEventListener(control.type==='checkbox'?'change':'input',persist);
+    });
+  }
+}
+function renderExamBResult(v,D){
+  const card=el('section',{class:'card ep-practice','data-exam-b-result':true});
+  card.appendChild(epText('h1',{},'Written set complete'));
+  card.appendChild(epText('p',{},(D.log||[]).length+' written tasks recorded. Your drawings, explanations and self-checks stay with this session.'));
+  card.appendChild(epText('p',{'data-exam-b-result-limit':true},'This is self-reviewed practice, not an exam grade. Have different written work checked independently before judging Part B readiness.'));
+  const actions=el('div',{class:'ep-actions'});actions.appendChild(epButton('Different Part B set',()=>startExamBPractice({newSet:true}),{class:'btn'}));actions.appendChild(epButton('Back to Exam 2 · A and B',()=>openExamPrep('exam2')));card.appendChild(actions);
+  const reviews=el('details');reviews.appendChild(epText('summary',{},'Review my answers and rubric checks'));
+  (D.log||[]).forEach((row,i)=>reviews.appendChild(epButton((i+1)+'. '+(TOPICS[row.topic||row.t||QUESTIONS.find(q=>q.id===row.id)?.topic]?.name||row.id)+' · '+(row.ok?'marked all points':'marked a missing point'),()=>{D.reviewIdx=i;render();},{'data-exam-b-review':String(i)})));card.appendChild(reviews);v.appendChild(card);
+}
+// Record the complete written response at submission for every chapter. The
+// legacy generic renderer shortened some Chapter 6 round notes to 400 chars;
+// no written reasoning should be lost just because it belongs to Part B.
+const EXAM_B_PREVIOUS_LOG_ATTEMPT=logAttempt;
+logAttempt=function(q,ok,guessed,D,dk,ans){
+  const attempt=EXAM_B_PREVIOUS_LOG_ATTEMPT(q,ok,guessed,D,dk,ans);
+  if(epBIsRun(D)&&q.type==='written'){
+    const response=document.querySelector('#view textarea.answerbox');
+    attempt.reasoning=response?.value?.trim()||D.sketchDrafts?.[q.id]?.text||'';attempt.reasoningKind='written';attempt.sr=1;
+    if(attempt.evidence)attempt.evidence.reasoningReview={status:'awaiting-independent-review',reviewer:null};
+  }
+  return attempt;
+};
+const EXAM_B_PREVIOUS_SNAPSHOT=snapshotDrill;
+snapshotDrill=function(index){
+  const D=S.drill;
+  if(epBIsRun(D))for(const row of D.log||[]){const attempt=[...(S.attempts||[])].reverse().find(a=>a.u===D.runId&&a.id===row.id);if(attempt?.reasoningKind==='written')row.note=attempt.reasoning;}
+  EXAM_B_PREVIOUS_SNAPSHOT(index);
+};
+const EXAM_B_PREVIOUS_DRILL=VIEWS.drill;
+VIEWS.drill=function(v){const D=S.drill;if(epBIsRun(D)&&D.i>=D.queue.length&&D.reviewIdx==null){renderExamBResult(v,D);return;}EXAM_B_PREVIOUS_DRILL(v);};
+const EXAM_B_PREVIOUS_RENDER=render;
+render=function(){EXAM_B_PREVIOUS_RENDER();epBDecorateRun();};
+const epBStyle=el('style',{id:'exam-b-practice-style'});
+epBStyle.textContent='.ep-b-context{padding:12px 14px;border:1px solid #c9d9d3;border-radius:12px;background:#eef5f2;margin-bottom:14px}.ep-b-context p{font-size:.86rem;line-height:1.45;margin:8px 0 0}.ep-b-context .btn,[data-exam-b-practice] .btn,[data-exam-b-result] .btn{max-width:100%;white-space:normal;overflow-wrap:anywhere}[data-exam-b-practice] summary,[data-exam-b-result] summary{cursor:pointer;min-height:44px;padding:12px 0;box-sizing:border-box}';
+document.head.appendChild(epBStyle);
 
 /* Saved work is navigation/draft management, not a new assessment.
  * Keep submitted evidence and exposure even when the editable session is deleted.
@@ -19245,6 +19675,220 @@ const swStyle=el('style',{id:'saved-work-style'});swStyle.textContent=`
 `;document.head.appendChild(swStyle);
 swPrune();
 
+/* BEGIN EXAM PRACTICE TAIL */
+const MASTER_SOURCE_SUMMARY={"sourceDocuments":66,"indexedPages":573,"captureRecords":19,"capturedQuestionGroups":8,"completeRenderedStates":10,"partialOrUnknownStates":119,"chadsQuestionGroups":0};
+/* BEGIN EXAM A PRACTICE — source-aware MC sampling, 2026-10-16.
+ * Uses the existing sealed check ledger, response controls and grader. Nothing
+ * here awards ordinary attempt/mastery credit or claims instructor weighting. */
+const EXAM_A_CHAPTER='exam2-part-a',EXAM_A_VERSION='2026-10-16.1';
+const EXAM_A_MIX={short:{count:10,minutes:null,quotas:{ch4:3,ch5:4,ch6:3}},timed:{count:40,minutes:80,quotas:{ch4:12,ch5:16,ch6:12}}};
+function examAMode(mode){return mode==='timed'?'timed':'short';}
+function examAIsRun(run){return run?.chapter===EXAM_A_CHAPTER&&run.examPart==='A';}
+function examATitle(mode){return mode==='timed'?'Part A · 40-question pacing simulation':'Part A · 10-question practice';}
+function examAChapter(q){return ['ch4','ch5','ch6'].find(id=>CHAPTERS.find(c=>c.id===id)?.topics.includes(q.topic))||null;}
+function examAPool(){
+  const previews=new Set(['ch4','ch5','ch6'].flatMap(id=>(CHAPTER_LEARNING_UNITS[id]||[]).filter(u=>u.preview).map(u=>u.id)));
+  return QUESTIONS.filter(q=>examAChapter(q)&&q.type==='mc'&&(q.examOnly?q.examId==='exam2'&&q.examPart==='A'&&!q.preview:ccEligible(q))&&ccAutoSupported(q)&&!previews.has(q.adaptiveSkill));
+}
+function examARuns(){return ccStore().runs.filter(examAIsRun);}
+function examARandom(seed){let state=seed>>>0;return ()=>{state+=0x6D2B79F5;let t=state;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;};}
+function examAPlan(mode='short',seed=Math.floor(Math.random()*4294967296)){
+  mode=examAMode(mode);const spec=EXAM_A_MIX[mode],pool=examAPool(),exposure=ccExposure(),random=examARandom(seed),counts={},familyCounts={},topicCounts={},last={};
+  // Every retained check plan counts, not only completed Part A runs. Reserving
+  // an item elsewhere must not make the same item look newly discovered here.
+  ccStore().runs.forEach((run,idx)=>(run.items||[]).forEach(item=>{counts[item.id]=(counts[item.id]||0)+1;last[item.id]=idx+1;const q=ccQuestion(item.id);if(q){topicCounts[q.topic]=(topicCounts[q.topic]||0)+1;ccFamilies(q).forEach(f=>familyCounts[f]=(familyCounts[f]||0)+1);}}));
+  const weakTopics=new Set(epAAnalysis().coverage.filter(t=>t.needsReview).map(t=>t.topic));
+  const used=new Set(),usedFamilies=new Set(),selectedTopics={},items=[],gaps=[],tie=new Map(pool.map(q=>[q.id,random()]));
+  const rank=(left,right)=>{const score=q=>[counts[q.id]||0,exposure.ids.has(q.id)?1:0,(selectedTopics[q.topic]||0),ccFamilies(q).some(f=>usedFamilies.has(f))?1:0,ccFamilies(q).some(f=>exposure.families.has(f))?1:0,Math.max(0,...ccFamilies(q).map(f=>familyCounts[f]||0)),weakTopics.has(q.topic)?0:1,topicCounts[q.topic]||0,last[q.id]||0,tie.get(q.id)];const a=score(left),b=score(right);for(let n=0;n<a.length;n++)if(a[n]!==b[n])return a[n]-b[n];return 0;};
+  const add=q=>{
+    const families=ccFamilies(q),seenBefore=exposure.ids.has(q.id),seenFamilyBefore=families.some(f=>exposure.families.has(f)),plannedBefore=!!counts[q.id],plannedFamilyBefore=families.some(f=>familyCounts[f]>0),withinFormFamilyOverlap=families.some(f=>usedFamilies.has(f));
+    const familiarContent=!!q.familiarRepresentation||q.eligibleForUnseenTransfer===false||q.sourceKind==='learner-homework-redraw';
+    const source=ccPick(q,['sourceKind','source','sourceModelIds','sourceAssetUids','sourceVariant','sourceAlignment','sourceUrl','correctedAt']);
+    const review=seenBefore||seenFamilyBefore||plannedBefore||plannedFamilyBefore||withinFormFamilyOverlap||familiarContent;
+    items.push({id:q.id,chapter:examAChapter(q),domain:q.topic,domainLabel:TOPICS[q.topic]?.name||q.topic,type:'mc',manualReview:false,itemFingerprint:ccQuestionFingerprint(q),families,seenBefore,seenFamilyBefore,plannedBefore,plannedFamilyBefore,withinFormFamilyOverlap,familiarContent,review,source,selectionReason:review?'Familiar or previously planned material; not fresh evidence.':'No retained app exposure found. Outside familiarity is unknown.'});
+    used.add(q.id);families.forEach(f=>usedFamilies.add(f));selectedTopics[q.topic]=(selectedTopics[q.topic]||0)+1;
+  };
+  Object.entries(spec.quotas).forEach(([chapter,total])=>{
+    const chapterPool=pool.filter(q=>examAChapter(q)===chapter);
+    for(let n=0;n<total;n++){const next=chapterPool.filter(q=>!used.has(q.id)).sort(rank)[0];if(next)add(next);}
+    const obtained=items.filter(i=>i.chapter===chapter).length;if(obtained<total)gaps.push({kind:'bank-shortage',chapter,message:'Only '+obtained+' of '+total+' planned '+chapter.replace('ch','Chapter ')+' multiple-choice questions are available.'});
+  });
+  // Randomized order changes the sequence, not the saved form. A started form
+  // is immutable and is always resumed from its persisted IDs/response record.
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}
+  const topics=[...new Set(pool.map(q=>q.topic))],domains=topics.map(id=>({id,label:TOPICS[id]?.name||id})),unsampled=topics.filter(t=>!items.some(i=>i.domain===t));
+  return {version:EXAM_A_VERSION,chapter:EXAM_A_CHAPTER,phase:'practice',mode,seed,items,count:items.length,requested:spec.count,minutes:spec.minutes,available:items.length===spec.count,reviewCount:items.filter(i=>i.review).length,seenCount:items.filter(i=>i.seenBefore).length,gaps,unsampledTopics:unsampled,blueprint:{version:EXAM_A_VERSION,label:'Exam 2 · Part A practice mix',domains},blueprintVersion:EXAM_A_VERSION,quotas:ccClone(spec.quotas),limits:['App-designed chapter balance, not instructor question weights.','Current bank coverage is partial; a high score is not a full-exam readiness result.','Different IDs can share a source or diagram. Known relatives remain familiar; outside familiarity is unknown.','Part B drawing and linked written work must be practiced separately.']};
+}
+function examAStart(mode='short'){
+  if(!courseNavigationAllowed())return null;mode=examAMode(mode);
+  const pending=examARuns().findLast(r=>r.status==='in-progress'&&r.examMode===mode);if(pending){ccOpenRun(pending.id);return pending;}
+  const plan=examAPlan(mode);if(!plan.available){S.examAMode=mode;go('examAPractice');return null;}
+  courseNavigationSaveWork();const now=Date.now(),run={id:makeRunId('exam2-a-'+mode),runId:null,version:CC_VERSION,chapter:EXAM_A_CHAPTER,phase:'practice',examPart:'A',examMode:mode,status:'in-progress',startedAt:now,completedAt:null,updatedAt:now,deadlineAt:plan.minutes?now+plan.minutes*60000:null,timeLimitSec:plan.minutes?plan.minutes*60:null,items:ccClone(plan.items),plan,responses:{},currentIndex:0,qa:!!QA_MODE};run.runId=run.id;
+  const saved=ccSaveRun(run);ccOpenRun(saved.id);return saved;
+}
+function openExamAPractice(mode='short'){if(!courseNavigationAllowed())return;courseNavigationSaveWork();S.examAMode=examAMode(mode);go('examAPractice');}
+function examAExpired(run,now=Date.now()){return !!run?.deadlineAt&&now>=run.deadlineAt&&!ccCompleted(run);}
+function examAClock(run,now=Date.now()){
+  if(!run.deadlineAt)return 'Untimed · save and continue whenever you need.';
+  const seconds=Math.max(0,Math.ceil((run.deadlineAt-now)/1000));return seconds?'Time left '+Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')+' · clock keeps running if you leave':'80 minutes reached · saved answers are locked. Finish to see feedback.';
+}
+function examAFinish(id){
+  const run=ccRun(id);if(!examAIsRun(run)||run.status!=='in-progress')return;
+  run.items.forEach(item=>{if(!run.responses[item.id])run.responses[item.id]={value:null,skipped:true};});
+  run.elapsedSec=Math.max(0,Math.round((Date.now()-run.startedAt)/1000));run.timeExpired=examAExpired(run);run.status='completed';run.completedAt=Date.now();ccSaveRun(run);S.ccRunId=id;go('examAResults');
+}
+function epAAnalysis(){
+  const pool=examAPool(),seen=ccExposure(),runs=examARuns().filter(r=>ccCompleted(r)&&!r.qa&&!r.synthetic&&(r.completedAt||0)<=Date.now()).sort((a,b)=>(a.completedAt||0)-(b.completedAt||0)),rows=runs.flatMap(run=>run.items.map(item=>({run,item,q:ccQuestion(item.id),r:run.responses[item.id]||{},grade:run.grades?.[item.id]}))),latest=new Map();
+  rows.forEach(row=>{if(row.q&&row.item.itemFingerprint===ccQuestionFingerprint(row.q)&&row.grade?.graded)latest.set(row.item.id,row);});
+  const current=[...latest.values()],correct=current.filter(x=>x.grade.correct&&!x.r.skipped),uncertain=current.filter(x=>x.r.confidence!=='sure'||x.r.firstConfidence!=='sure'),helped=current.filter(x=>x.run.helpUsed!=='none'||x.r.externalHelp),familiar=current.filter(x=>x.item.review);
+  const topics=[...new Set(pool.map(q=>q.topic))],coverage=topics.map(topic=>{const sample=current.filter(x=>x.q.topic===topic);return {topic,label:TOPICS[topic]?.name||topic,available:pool.filter(q=>q.topic===topic).length,checked:sample.length,correct:sample.filter(x=>x.grade.correct&&!x.r.skipped).length,needsReview:sample.some(x=>!x.grade.correct||x.r.skipped||x.r.confidence!=='sure'||x.r.firstConfidence!=='sure'||x.r.externalHelp||x.run.helpUsed!=='none'||x.item.review)};});
+  const next=coverage.find(c=>c.checked&&c.needsReview)||coverage.find(c=>!c.checked)||null;
+  return {part:'A',available:pool.length,seen:pool.filter(q=>seen.ids.has(q.id)).length,runs:runs.length,checked:current.length,correct:correct.length,uncertain:uncertain.length,helpedOrUnknown:helped.length,familiar:familiar.length,coverage,nextAction:next?'Practice '+next.label+' on a different example.':'Use a different Part A set, then do Part B written work.',limits:'Latest scored answer per item; confidence/help/familiarity stay separate. No full-exam readiness or grade prediction. Private captures not yet reviewed into QUESTIONS are not included.'};
+}
+function epPartACard(){
+  const card=el('section',{class:'card ep-practice','data-exam-part-a':true});card.appendChild(epText('h2',{},'Part A · multiple-choice practice'));
+  card.appendChild(epText('p',{},'Mix Chapters 4, 5 and covered Chapter 6. Try the questions first; feedback comes at the end.'));
+  card.appendChild(epButton('Start 10-question practice',()=>openExamAPractice('short'),{class:'btn','data-exam-a-short':true}));
+  card.appendChild(epButton('40 questions · 80-minute pacing',()=>openExamAPractice('timed'),{'data-exam-a-timed':true}));
+  card.appendChild(epText('p',{class:'muted'},examAPool().length+' eligible multiple-choice items. Saved runs keep your exact questions and answers. This is an app practice mix—not the instructor’s exam.'));return card;
+}
+VIEWS.examAPractice=v=>{
+  const mode=examAMode(S.examAMode),spec=EXAM_A_MIX[mode],pending=examARuns().findLast(r=>r.status==='in-progress'&&r.examMode===mode),plan=pending?.plan||examAPlan(mode);
+  const card=el('section',{class:'card cc-panel ea-root','data-exam-a-setup':mode});card.appendChild(epButton('← Exam 2',()=>openExamPrep('exam2')));card.appendChild(epText('h1',{},examATitle(mode)));
+  card.appendChild(epText('p',{},mode==='timed'?'40 multiple-choice questions. No hints or feedback until you finish. The 80-minute clock keeps running when you leave; answers lock when time ends.':'10 multiple-choice questions. Take your time. Save and leave whenever needed; feedback comes after all ten.'));
+  card.appendChild(epText('p',{class:'cc-caveat'},'App-designed balance: '+Object.entries(spec.quotas).map(([id,n])=>n+' from '+id.replace('ch','Chapter ')).join(' · ')+'. These are practice weights, not official exam weights.'));
+  card.appendChild(epText('p',{class:'cc-caveat'},plan.reviewCount+' of '+plan.items.length+' proposed items have known related, familiar, or previously planned material. Outside familiarity is unknown.'));
+  if(plan.gaps.length)plan.gaps.forEach(g=>card.appendChild(epText('p',{class:'cc-warning'},g.message)));
+  card.appendChild(epText('p',{class:'cc-caveat'},'Selected Chapter 6 only. This does not test the whole course or replace Part B drawings and linked written problems.'));
+  if(pending||plan.available)card.appendChild(epButton(pending?'Continue saved Part A set':'Begin '+spec.count+' questions',()=>examAStart(mode),{class:'btn','data-exam-a-begin':true}));
+  if(pending)card.appendChild(epText('p',{},Object.values(pending.responses).filter(r=>r.firstCommittedAt).length+' saved answers · '+examAClock(pending)));
+  card.appendChild(epButton('Saved work',swOpen));const history=examARuns().filter(ccCompleted).slice(-5).reverse();if(history.length){const detail=el('details');detail.appendChild(epText('summary',{},'Recent Part A results'));history.forEach(run=>detail.appendChild(epButton(examATitle(run.examMode)+' · '+new Date(run.completedAt).toLocaleDateString(),()=>ccOpenRun(run.id))));card.appendChild(detail);}v.appendChild(card);
+};
+let examATimer=null;
+function examAWatchClock(id){
+  if(examATimer)clearInterval(examATimer);examATimer=setInterval(()=>{const run=ccRun(id);if(S.view!=='examARun'||S.ccRunId!==id||!run||ccCompleted(run)){clearInterval(examATimer);examATimer=null;return;}const label=document.querySelector('[data-exam-a-clock]');if(label)label.textContent=examAClock(run);if(examAExpired(run)&&!document.querySelector('[data-exam-a-expired]'))render();},1000);
+}
+VIEWS.examARun=v=>{
+  const run=ccRun(S.ccRunId);if(!examAIsRun(run)||run.status==='cancelled'){openExamAPractice();return;}if(ccCompleted(run)){go('examAResults');return;}
+  const expired=examAExpired(run),head=el('header',{class:'sm-heading ea-root'});head.appendChild(epText('h1',{},examATitle(run.examMode)));head.appendChild(epText('p',{'data-exam-a-clock':true},examAClock(run)));head.appendChild(epText('p',{class:'cc-caveat'},(QA_MODE?'Preview only · answers disappear when this page reloads.':'Answers are saved on this device.')+' No hints or feedback until Finish.'));v.appendChild(head);
+  v.appendChild(epButton('Save & leave',()=>{ccSaveRun(run);openExamAPractice(run.examMode);},{'data-exam-a-pause':true}));
+  if(run.deadlineAt)examAWatchClock(run.id);
+  if(expired||run.currentIndex>=run.items.length){
+    const box=el('section',{class:'card cc-panel ea-root',...(expired?{'data-exam-a-expired':true}:{})}),unanswered=run.items.filter(i=>!ccHasValue(run.responses[i.id]?.value)||run.responses[i.id]?.skipped).length;
+    box.appendChild(epText('h2',{},expired?'Time is up':'Ready to finish?'));box.appendChild(epText('p',{},unanswered+' unanswered or skipped questions count as incorrect.'));
+    if(!expired)ccQuestionNavigation(box,run);
+    const label=el('label',{class:'cc-field'});label.appendChild(epText('span',{},'Did you use outside help or notes?'));const select=el('select',{'aria-label':'Part A help used'});[['','Not reported'],['none','No outside help'],['some','I used outside help']].forEach(([value,text])=>select.appendChild(epText('option',{value},text)));select.value=run.helpUsed||'';select.onchange=()=>{run.helpUsed=select.value||null;ccSaveRun(run);};label.appendChild(select);box.appendChild(label);box.appendChild(epButton('Finish & see feedback',()=>examAFinish(run.id),{class:'btn','data-exam-a-finish':true}));v.appendChild(box);return;
+  }
+  const item=run.items[run.currentIndex],q=ccQuestion(item.id),r=ccResponse(run,item.id);const card=el('section',{class:'card cc-question ea-root','data-exam-a-question':item.id});card.appendChild(epText('p',{class:'cc-position'},'Question '+(run.currentIndex+1)+' of '+run.items.length+' · '+item.chapter.replace('ch','Chapter ')));
+  if(item.review)card.appendChild(epText('p',{class:'cc-caveat'},'Familiar or related material · practice, not fresh evidence.'));
+  if(!q||ccQuestionFingerprint(q)!==item.itemFingerprint){card.appendChild(epText('p',{class:'cc-warning'},'This saved item changed or is unavailable. It cannot be scored against a new version.'));card.appendChild(epButton('Continue',()=>ccCommit(run,true)));v.appendChild(card);return;}
+  const body=el('div',{class:'cc-workspace'}),given=el('div',{class:'cc-given qprompt'},q.prompt),answer=el('div',{class:'cc-answer'});body.append(given,answer);card.appendChild(body);ccRenderAnswer(answer,q,run,item,r);
+  const confidence=el('label',{class:'cc-field'});confidence.appendChild(epText('span',{},'Confidence · optional'));const select=el('select',{'aria-label':'Confidence'});[['','Not reported'],['sure','Sure'],['unsure','Unsure'],['guess','Guessing']].forEach(([value,text])=>select.appendChild(epText('option',{value},text)));select.value=r.confidence||'';select.onchange=()=>{r.confidence=select.value||null;ccPersistResponse(run,r);};confidence.appendChild(select);answer.appendChild(confidence);
+  const detail=el('details');detail.appendChild(epText('summary',{},'My reasoning · optional'));const note=el('textarea',{'aria-label':'My reasoning',rows:3});note.value=r.reasoning||'';note.oninput=()=>{r.reasoning=note.value;ccPersistResponse(run,r);};detail.appendChild(note);answer.appendChild(detail);
+  const actions=el('div',{class:'cc-actions'}),error=epText('p',{role:'status',class:'cc-warning'},'');if(run.currentIndex>0)actions.appendChild(epButton('Back',()=>{run.currentIndex--;ccSaveRun(run);render();}));
+  actions.appendChild(epButton('Save answer & next',()=>{if(!ccHasValue(r.value)){error.textContent='Choose an answer, or use “I don’t know yet.”';return;}ccCommit(run);},{class:'btn','data-exam-a-next':true}));actions.appendChild(epButton('I don’t know yet · skip',()=>ccCommit(run,true),{'data-exam-a-skip':true}));card.append(actions,error);ccQuestionNavigation(card,run);v.appendChild(card);
+};
+VIEWS.examAResults=v=>{
+  const run=ccRun(S.ccRunId);if(!examAIsRun(run)||!ccCompleted(run)){openExamAPractice();return;}const summary=ccSummary(run),head=el('section',{class:'card cc-panel ea-root','data-exam-a-results':true});head.appendChild(epText('h1',{},examATitle(run.examMode)+' · results'));head.appendChild(epText('h2',{},summary.auto.correct+' / '+summary.auto.total+' scored answers correct'));
+  head.appendChild(epText('p',{},(run.helpUsed==='none'?'No outside help reported.':run.helpUsed==='some'?'Outside help was used.':'Outside help use is unknown.')+' '+summary.confidence.guess+' marked as guesses. '+run.items.filter(i=>i.review).length+' familiar/related items.'));
+  if(run.deadlineAt)head.appendChild(epText('p',{},run.timeExpired?'The 80-minute limit was reached. Unanswered questions count as incorrect.':'Finished within the 80-minute window.'));
+  if(summary.auto.ungraded)head.appendChild(epText('p',{class:'cc-warning'},summary.auto.ungraded+' changed or unavailable items were not scored.'));
+  head.appendChild(epText('p',{class:'cc-caveat'},'This is a practice result, not a predicted exam grade. Unreported confidence/help and familiar items do not establish independent readiness. Part B needs separate written work.'));
+  head.appendChild(epButton('Back to Exam 2',()=>openExamPrep('exam2'),{class:'btn'}));head.appendChild(epButton('Different Part A set',()=>openExamAPractice(run.examMode)));v.appendChild(head);
+  const table=el('section',{class:'card cc-panel ea-root'});table.appendChild(epText('h2',{},'What to practice next'));
+  summary.domains.filter(d=>d.total||d.ungraded).forEach(d=>table.appendChild(epText('p',{},d.label+' · '+d.correct+'/'+d.total+' correct'+(d.ungraded?' · '+d.ungraded+' unscored':''))));v.appendChild(table);
+  const review=el('section',{class:'card cc-panel ea-root'});review.appendChild(epText('h2',{},'Review each answer'));
+  run.items.forEach((item,index)=>{const q=ccQuestion(item.id),r=run.responses[item.id]||{},grade=run.grades?.[item.id],detail=el('details',{'data-exam-a-review':item.id});detail.appendChild(epText('summary',{},(index+1)+' · '+(!grade?.graded?'Unscored':grade.correct&&!r.skipped?'Correct':'Needs review')+' · '+item.domainLabel));if(!q)return;
+    if(grade?.contentChanged)detail.appendChild(epText('p',{class:'cc-warning'},'Current wording changed; it was not used to rescore your saved answer.'));
+    detail.appendChild(el('div',{class:'qprompt'},q.prompt));detail.appendChild(epText('p',{},'Your answer: '+ccAnswerText(q,r)));if(r.reasoning)detail.appendChild(epText('p',{},'Your reasoning: '+r.reasoning));detail.appendChild(el('p',{},'<b>Answer:</b> '+ccKeyText(q)));if(q.why)detail.appendChild(el('div',{class:'why'},q.why));
+    const source=el('details');source.appendChild(epText('summary',{},'Source & familiarity'));source.appendChild(epText('p',{},q.source||'App bank item. A detailed source note has not been recorded for this item.'));source.appendChild(epText('p',{},item.selectionReason));source.appendChild(epText('p',{class:'muted'},item.id));detail.appendChild(source);review.appendChild(detail);
+  });v.appendChild(review);
+};
+const EXAM_A_OPEN_CHECK=ccOpenRun;
+ccOpenRun=function(id){const run=ccRun(id);if(!examAIsRun(run))return EXAM_A_OPEN_CHECK(id);if(run.status==='cancelled')return;courseNavigationSaveWork();S.ccRunId=id;go(ccCompleted(run)?'examAResults':'examARun');};
+const EXAM_A_PERSIST_RESPONSE=ccPersistResponse,EXAM_A_COMMIT=ccCommit;
+ccPersistResponse=function(run,response){if(examAIsRun(run)&&examAExpired(run)){render();return;}return EXAM_A_PERSIST_RESPONSE(run,response);};
+ccCommit=function(run,skip=false){if(examAIsRun(run)&&examAExpired(run)){render();return;}return EXAM_A_COMMIT(run,skip);};
+const EXAM_A_SW_ITEMS=swItems;
+swItems=function(){return EXAM_A_SW_ITEMS().map(row=>examAIsRun(row.work)?{...row,title:examATitle(row.work.examMode),type:'Exam 2 · Part A',chapter:null,detail:row.detail+(row.work.deadlineAt?' · clock continues':'')}:row);};
+const EXAM_A_SW_VIEW=VIEWS.savedWork;
+VIEWS.savedWork=function(v){EXAM_A_SW_VIEW(v);v.querySelectorAll('[data-sw-result]').forEach(button=>{const run=ccRun(button.dataset.swResult);if(examAIsRun(run))button.textContent=examATitle(run.examMode)+' · '+new Date(run.completedAt||run.startedAt).toLocaleDateString();});};
+const EXAM_A_EXPORT=ccExport;
+ccExport=function(){const result=EXAM_A_EXPORT();result.runs.forEach(row=>{const run=ccRun(row.id);if(!examAIsRun(run))return;Object.assign(row,ccPick(run,['examPart','examMode','deadlineAt','timeLimitSec','elapsedSec','timeExpired']));Object.assign(row.plan,ccPick(run.plan,['mode','seed','quotas','unsampledTopics']));row.items.forEach(item=>{const saved=run.items.find(i=>i.id===item.id);Object.assign(item,ccPick(saved,['chapter','source']));});});return result;};
+const EXAM_A_ACTIVITY=smActivity;
+smActivity=function(){if(['examAPractice','examARun','examAResults'].includes(S.view))return {mode:'practice',chapter:null,detail:'Exam 2 · Part A multiple choice'};return EXAM_A_ACTIVITY();};
+NAV_GROUP.examAPractice='more';NAV_GROUP.examARun='more';NAV_GROUP.examAResults='more';
+const examAStyle=el('style',{id:'exam-a-style'});examAStyle.textContent='.ea-root{max-width:1000px;margin-inline:auto;min-width:0}.ea-root .btn{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere;margin:4px 6px 4px 0}.ea-root h1{font-size:1.6rem;line-height:1.25}.ea-root [data-exam-a-clock]{font-weight:650}.ea-root details{margin:10px 0}.ea-root summary{min-height:44px;cursor:pointer}.ea-root .qprompt{overflow-wrap:anywhere}.ea-root .qprompt img,.ea-root .qprompt svg{max-width:100%;height:auto}.ea-root p{overflow-wrap:anywhere}@media(max-width:600px){.ea-root h1{font-size:1.35rem}}';document.head.appendChild(examAStyle);
+/* END EXAM A PRACTICE */
+
+/* Searchable app bank and an explicit, private-on-this-Mac source index.
+ * Source documents/capture views are never counted as scored questions.
+ */
+function mbChapter(q){return CHAPTERS.find(c=>c.topics.includes(q.topic));}
+function mbText(html){const div=document.createElement('div');div.innerHTML=html||'';return (div.textContent||'').replace(/\s+/g,' ').trim();}
+function mbOriginal(q){return q.sourceKind==='original-practice';}
+function mbQuestionRows(filter={}){
+  const a=new Set(examAPool().map(q=>q.id)),b=new Set(epBPool().map(q=>q.id)),needle=String(filter.search||'').trim().toLowerCase();
+  return QUESTIONS.filter(q=>(!filter.chapter||mbChapter(q)?.id===filter.chapter)&&(!filter.part||(filter.part==='A'?a:b).has(q.id))&&(!filter.source||(filter.source==='original'?mbOriginal(q):!mbOriginal(q)))&&(!needle||(q.id+' '+mbText(q.prompt)+' '+(TOPICS[q.topic]?.name||'')+' '+(q.source||'')).toLowerCase().includes(needle)));
+}
+function openMasterBank(id){
+  if(!courseNavigationAllowed())return;courseNavigationSaveWork();S.masterBankQuestion=id&&QUESTIONS.some(q=>q.id===id)?id:null;go(id?'masterBankQuestion':'masterBank');epFocusHeading();
+}
+function mbRecordExposure(id){const ids=safeStore.get('bankPreviewExposure',[]);if(!ids.includes(id))safeStore.set('bankPreviewExposure',[...ids,id]);}
+function epExamAnalysisCard(){
+  const a=epAAnalysis(),b=epBAnalysis(),box=el('details',{class:'ep-details','data-exam-analysis':true});box.appendChild(epText('summary',{},'My A + B practice signals'));
+  box.appendChild(epText('p',{},a.checked?'Part A: '+a.correct+' / '+a.checked+' latest scored answers correct. '+a.uncertain+' uncertain or unreported confidence; '+a.helpedOrUnknown+' helped or help not reported.':'Part A: no completed scored set recorded yet.'));
+  box.appendChild(epText('p',{},'Part A next: '+a.nextAction));
+  box.appendChild(epText('p',{},b.attempted?'Part B: '+b.attempted+' written tasks attempted; '+b.needsWork+' with a recorded difficulty or help. These still need independent review.':'Part B: no written attempts recorded yet.'));
+  box.appendChild(epText('p',{},'Part B next: '+b.nextAction));
+  box.appendChild(epText('p',{class:'muted'},'These signals guide different examples. They are not added into one exam score. Browsing, repeated items and self-checks do not prove readiness.'));
+  return box;
+}
+function epMasterBankCard(){
+  const card=el('section',{class:'ep-details','data-master-bank-entry':true});
+  card.appendChild(epButton('Master bank · questions & sources',()=>openMasterBank(),{'data-open-master-bank':true}));
+  card.appendChild(epText('p',{class:'muted'},QUESTIONS.length+' app tasks across all chapters. Exam 2 uses '+examAPool().length+' Part A choices and '+epBPool().length+' written tasks. Exact course sources are kept separately.'));return card;
+}
+VIEWS.masterBank=v=>{
+  const root=el('section',{class:'ep-root mb-root'});root.appendChild(epButton('← Exam 2',()=>openExamPrep('exam2')));root.appendChild(epText('h1',{},'Master bank'));
+  root.appendChild(epText('p',{},'Find a practice question, or open the original course material. They are separate collections.'));
+  const sources=el('details',{'data-private-bank':true});sources.appendChild(epText('summary',{},'Original material · private library on this Mac'));
+  if(typeof MASTER_SOURCE_SUMMARY!=='undefined'){
+    const s=MASTER_SOURCE_SUMMARY;sources.appendChild(epText('p',{},s.sourceDocuments+' documents · '+s.indexedPages+' indexed pages · '+s.captureRecords+' Wiley source records in '+s.capturedQuestionGroups+' groups. These are not counts of scored app questions.'));
+    sources.appendChild(epText('p',{},s.completeRenderedStates+' complete rendered views; '+s.partialOrUnknownStates+' partial or unverified views. A complete view does not prove locked parts were captured. Chad’s: '+s.chadsQuestionGroups+' captured groups.'));
+  }
+  if(location.protocol==='file:')sources.appendChild(epText('a',{class:'btn ghost',href:'../Master%20Bank/index.html',target:'_blank',rel:'noopener noreferrer','data-private-bank-link':true},'Open private source library'));
+  else sources.appendChild(epText('p',{},'Open the app’s iCloud copy on your Mac to access the private source library. Private PDFs, captures and learner answers are not uploaded with this app.'));
+  sources.appendChild(epText('p',{class:'muted'},'Captured question parts stay grouped with their original diagrams and saved views. Unreviewed captures are reference material, not answer keys. This is a dated local inventory, not a live Canvas/Wiley sync.'));root.appendChild(sources);
+  const filters=el('div',{class:'mb-filters'}),state=S.masterBankFilter||{chapter:'',part:'',source:'',search:''};S.masterBankFilter=state;
+  const selector=(label,key,options)=>{const wrap=el('label');wrap.appendChild(epText('span',{},label));const select=el('select',{'aria-label':label});options.forEach(([value,text])=>select.appendChild(epText('option',{value},text)));select.value=state[key]||'';select.onchange=()=>{state[key]=select.value;draw();};wrap.appendChild(select);filters.appendChild(wrap);};
+  selector('Chapter','chapter',[['','All chapters'],...CHAPTERS.map(c=>[c.id,c.name])]);selector('Exam format','part',[['','All app tasks'],['A','Exam 2 · Part A'],['B','Exam 2 · Part B']]);selector('Source label','source',[['','All source labels'],['original','Original practice'],['other','Other / not labeled original']]);
+  const search=el('input',{type:'search','aria-label':'Search questions',placeholder:'Search a topic, term or question ID'});search.value=state.search||'';search.oninput=()=>{state.search=search.value;draw();};filters.appendChild(search);root.appendChild(filters);
+  const count=epText('p',{'aria-live':'polite','data-bank-count':true},''),list=el('div',{'data-bank-list':true});root.append(count,list);let limit=20;
+  function draw(){const rows=mbQuestionRows(state);count.textContent=rows.length+' matching tasks · showing '+Math.min(limit,rows.length)+'.';list.replaceChildren();rows.slice(0,limit).forEach(q=>{
+    const card=el('article',{class:'card mb-result'});card.appendChild(epText('p',{class:'muted'},(mbChapter(q)?.name||'Chapter unknown')+' · '+(q.type==='written'?'Written / drawing':q.type==='mc'?'Multiple choice':q.type)+' · '+q.id));card.appendChild(epText('p',{},mbText(q.prompt).slice(0,220)+(mbText(q.prompt).length>220?'…':'')));
+    card.appendChild(epText('p',{class:'muted'},mbOriginal(q)?'Original app practice · not an instructor question':q.sourceKind||'Item-level source label not recorded'));
+    card.appendChild(epButton('Open question',()=>openMasterBank(q.id),{'data-bank-open':q.id}));list.appendChild(card);
+  });if(rows.length>limit)list.appendChild(epButton('Show 20 more',()=>{limit+=20;draw();}));if(!rows.length)list.appendChild(epText('p',{},'No match. Try a broader filter.'));}draw();v.appendChild(root);
+};
+VIEWS.masterBankQuestion=v=>{
+  const q=QUESTIONS.find(q=>q.id===S.masterBankQuestion),root=el('section',{class:'ep-root mb-root'});root.appendChild(epButton('← Master bank',()=>openMasterBank()));if(!q){root.appendChild(epText('p',{},'Question not found.'));v.appendChild(root);return;}
+  mbRecordExposure(q.id);root.appendChild(epText('h1',{},'Question preview'));root.appendChild(epText('p',{class:'muted'},q.id+' · '+(TOPICS[q.topic]?.name||q.topic)+' · preview counts as familiarity, not performance.'));
+  root.appendChild(el('div',{class:'card qprompt'},q.prompt));if(q.choices){const choices=el('ol',{type:'A'});q.choices.forEach(c=>choices.appendChild(el('li',{},c)));root.appendChild(choices);}
+  if(q.template)root.appendChild(el('div',{class:'qprompt'},q.template.replace(/\{\{(\d+)\}\}/g,(_,n)=>'<span class="muted">[ '+epText('span',{},q.fields?.[Number(n)]?.label||'answer').innerHTML+' ]</span>')));
+  if(q.fields){const parts=el('ol');q.fields.forEach(f=>parts.appendChild(epText('li',{},f.label+(f.choices?' · '+f.choices.join(' / '):''))));root.appendChild(parts);}
+  root.appendChild(epButton('Try this question',()=>{courseNavigationSaveWork();beginCourseDrill([q],null,'practice','Master bank · familiar single-question practice');},{class:'btn','data-bank-try':true}));
+  const detail=el('details');detail.appendChild(epText('summary',{},'Source and answer · open after trying'));
+  detail.appendChild(epText('p',{},q.source||'Detailed item-level source not recorded.'));
+  if(q.type==='written')detail.appendChild(el('div',{class:'qprompt'},q.model));else if(ccAutoSupported(q))detail.appendChild(el('p',{},'<b>Answer:</b> '+ccKeyText(q)));
+  if(q.why)detail.appendChild(el('div',{},q.why));if(q.rubric){const ul=el('ul');q.rubric.forEach(r=>ul.appendChild(epText('li',{},r)));detail.appendChild(ul);}root.appendChild(detail);v.appendChild(root);
+};
+NAV_GROUP.masterBank='more';NAV_GROUP.masterBankQuestion='more';
+const EXAM_SIGNAL_EXPORT=leBuildExport;
+leBuildExport=function(){const out=EXAM_SIGNAL_EXPORT();out.examPractice={examId:'exam2',partA:epAAnalysis(),partB:epBAnalysis(),previewExposure:safeStore.get('bankPreviewExposure',[]),limit:'Part A scored responses and Part B self-review are separate evidence. No combined exam-grade prediction.'};return out;};
+const mbStyle=el('style',{id:'exam-master-bank-style'});mbStyle.textContent='.mb-root{overflow-wrap:anywhere}.mb-root details{margin:16px 0}.mb-root>ol{padding-inline-start:28px;margin-inline:0}.mb-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mb-filters label{display:flex;flex-direction:column;gap:6px}.mb-filters select,.mb-filters input{min-width:0;max-width:100%;min-height:44px;padding:9px;font:inherit;border:1px solid #abc2bb;border-radius:8px;background:white;color:inherit}.mb-filters input{grid-column:1/-1;width:100%;box-sizing:border-box}.mb-result{padding:16px;margin:12px 0}.mb-result p{margin:6px 0}.mb-root li{margin:10px 0}.ep-practice-routes{align-items:start}.ep-practice-routes .ep-practice{height:100%;box-sizing:border-box}.ep-practice-routes .btn{margin:6px 6px 0 0}@media(max-width:600px){.mb-filters{grid-template-columns:1fr}}';document.head.appendChild(mbStyle);
+
+/* END EXAM PRACTICE TAIL */
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
    unless ?qa is present, so learner sessions and their evidence can never use it. */
@@ -19253,6 +19897,10 @@ if(QA_MODE){
   const qaQuestion=qaQuestionId&&QUESTIONS.find(q=>q.id===qaQuestionId);
   if(qaQuestion){ S.drill={queue:[qaQuestion],i:0,right:0,wrong:0,topic:"__qa",answered:false,log:[],runId:"qa-visual"}; S.view="drill"; }
 }
+const linkedBankId=new URLSearchParams(location.search).get('bankQuestion');
+const linkedExamId=new URLSearchParams(location.search).get('exam');
+if(PROFILE&&linkedExamId&&epExam(linkedExamId)){S.examPrepId=linkedExamId;S.view='examPrep';}
+if(PROFILE&&linkedBankId&&QUESTIONS.some(q=>q.id===linkedBankId)){S.masterBankQuestion=linkedBankId;S.view='masterBankQuestion';}
 if(!PROFILE){ renderWhoami(); renderSyncDot(); lockScreen(); } else { render(); cloudPull(); courseContextRuntimeStart(); } // Course clock/feed stop when the page closes; QA never starts live refresh.
 /* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
 (function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
