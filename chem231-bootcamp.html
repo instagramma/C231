@@ -6,7 +6,9 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.123 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.124 (LOCAL ONLY)
+  v3.124 (2026-10-17): SPARK — OPTIONAL FIVE-DECISION PLAY PRACTICE.
+  Supported practice, separate from readiness. Local-only until published.
   v3.123 (2026-10-16): ROTATING EXAM A + B, MASTER BANK, ORIGINAL CHALLENGES.
   v3.122 (2026-10-16): CHAPTER 6, COVERED SO FAR.
   Original visual lessons and rotating practice, with partial-coverage checks.
@@ -1757,7 +1759,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.123 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.124 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -16647,9 +16649,9 @@ setInterval(()=>{const r=lpActive(),clock=document.querySelector('[data-paper-cl
  * Keep original worksheet wording/parts, keys and attempt ledgers untouched.
  * Legacy no-hint/repeated drills are practice, NOT fresh paper readiness. */
 const STUDY_MODES={
-  learn:{title:'Learn',verb:'Understand one step',description:'Break down a missed decision. See an example, then try one.',view:'modeLearn',icon:'01'},
-  practice:{title:'Practice',verb:'Work the real problem',description:'Original class wording and linked parts. Optional short warm-up.',view:'modePractice',icon:'02'},
-  challenge:{title:'Challenge',verb:'Add an extra demand',description:'Extra demands, clearly labeled before you start.',view:'modeChallenge',icon:'03'},
+  learn:{title:'Learn',verb:'One step',description:'One example. Your turn.',view:'modeLearn',icon:'01'},
+  practice:{title:'Practice',verb:'Class problems',description:'Original linked worksheets.',view:'modePractice',icon:'02'},
+  challenge:{title:'Challenge',verb:'Extra step',description:'Extra: explain one wrong turn.',view:'modeChallenge',icon:'03'},
   readiness:{title:'Readiness check',verb:'Try fresh work on paper',description:'Fresh paper work: untimed first, then a different matched set timed.',view:'modeReadiness',icon:'04'}
 };
 function smChapter(){
@@ -16682,7 +16684,6 @@ function smSelectChapter(host){
 }
 function smHeading(v,mode){
   const m=STUDY_MODES[mode],h=el('header',{class:'sm-heading'});
-  h.appendChild(el('p',{class:'sm-eyebrow'},'CHEM 231 · '+esc(smChapter().name.split(' — ')[0])));
   h.appendChild(el('h1',{},m.title));h.appendChild(el('p',{},m.description));smSelectChapter(h);v.appendChild(h);
 }
 const SM_PREVIOUS_HOME=VIEWS.home;
@@ -16698,7 +16699,7 @@ VIEWS.home=v=>{
   const grid=el('div',{class:'sm-grid'});
   Object.entries(STUDY_MODES).forEach(([key,m])=>{
     const b=smButton('',()=>smGo(key),{class:'sm-mode','data-study-mode':key});
-    b.innerHTML='<span class="sm-number" aria-hidden="true">'+m.icon+'</span><strong>'+m.title+'</strong><span class="sm-verb">'+m.verb+'</span><span>'+m.description+'</span><span class="sm-open" aria-hidden="true">Open →</span>';grid.appendChild(b);
+    b.innerHTML='<span class="sm-number" aria-hidden="true">'+m.icon+'</span><strong>'+m.title+'</strong><span class="sm-verb">'+m.verb+'</span><span>'+m.description+'</span><span class="sm-open" aria-hidden="true">→</span>';grid.appendChild(b);
   });root.appendChild(grid);
   const links=el('div',{class:'sm-links'});links.appendChild(smButton('Chapter 4 review',()=>{smSetChapter('ch4');smGo('practice');},{'data-study-ch4-review':true}));links.appendChild(smButton('Plan & dates',()=>smGo('prepPlan'),{'data-focus-plan':true}));root.appendChild(links);v.appendChild(root);
 };
@@ -16767,41 +16768,41 @@ function smOpticalVisualCard(){
   warm.appendChild(smButton('Start optical warm-up',()=>smStartOpticalVisual('warmup'),{'data-optical-visual-warmup':true}));card.appendChild(warm);return card;
 }
 function smWorksheetCard(sheet){
-  const c=el('section',{class:'card sm-panel','data-ws-sheet':sheet.id});c.appendChild(el('h2',{},esc(sheet.title)));
+  const title=sheet.title.replace(/^Chapter\s+\d+\s*·\s*/,''),c=el('section',{class:'card sm-panel','data-ws-sheet':sheet.id});c.appendChild(el('h2',{},esc(title)));
   const last=S.worksheetState.lastQuestion,continueItem=last?.sheet===sheet.id?sheet.items.find(i=>i.id===last.item):null;
   const first=continueItem||sheet.items.find(i=>!i.unavailable&&!S.worksheetState.work[wsKey(sheet,i)]?.lastAttempt)||sheet.items.find(i=>!i.unavailable);
   const tried=sheet.items.filter(i=>S.worksheetState.work[wsKey(sheet,i)]?.lastAttempt).length;
-  c.appendChild(el('p',{class:'muted'},sheet.items.length+' complete questions · '+tried+' attempted'));
+  c.appendChild(el('p',{class:'muted'},sheet.items.length+' questions'+(tried?' · '+tried+' attempted':'')));
   if(first)c.appendChild(smButton((continueItem?'Continue':'Start')+' worksheet →',()=>wsOpen(sheet.id,first.id),{class:'btn','data-study-worksheet':sheet.id}));
   const choose=el('details');choose.appendChild(el('summary',{},'Choose a question'));
   sheet.items.forEach(item=>{const w=S.worksheetState.work[wsKey(sheet,item)];choose.appendChild(smButton(esc(item.label)+(item.unavailable?' · missing source':w?.keyViewed?' · key seen':w?.lastAttempt?' · attempted':''),()=>wsOpen(sheet.id,item.id),{class:'ws-question-link'}));});c.appendChild(choose);return c;
 }
 function smCh6PracticeCard(){
   const card=el('section',{class:'card sm-panel','data-ch6-practice-bank':true});
-  card.innerHTML='<h2>Chapter 6 — covered-so-far problems</h2><p>Original examples aligned with your lecture topics. Read a diagram, make a calculation, or draw and explain when asked.</p>';
+  card.innerHTML='<h2>Covered-so-far problems</h2><p>Original practice for the lecture topics covered so far.</p>';
   card.appendChild(ch6ScopeCard());
   const label=el('label',{class:'cc-field'});label.appendChild(el('span',{},'Choose a lesson to practice'));
   const select=el('select',{'aria-label':'Chapter 6 practice lesson'});CH6_LESSONS.forEach(u=>select.appendChild(el('option',{value:u.id},u.title)));label.appendChild(select);card.appendChild(label);
   card.appendChild(smButton('Start a short lesson set',()=>{startCh6Lesson(select.value);smTagRun('practice','ch6-lesson','ch6');},{class:'btn','data-ch6-start-topic':true}));
   card.appendChild(smButton('Mix the covered topics',()=>{if(startCh6Adaptive())smTagRun('practice','ch6-mixed','ch6');},{'data-ch6-start-mixed':true}));
-  card.appendChild(el('p',{class:'muted'},'The lesson set rotates matching examples; repeats remain review. Mixed practice samples all eight lessons. This is not a copy of assigned homework or a full written exam problem.'));
+  card.appendChild(el('p',{class:'muted'},'Mixed practice samples eight lessons. Repeats are review—not a full written exam problem or assigned homework.'));
   return card;
 }
 VIEWS.modePractice=v=>{
   smHeading(v,'practice');
-  const warm=el('details',{class:'card sm-panel','data-study-warmup-panel':true});warm.innerHTML='<summary>Optional warm-up · up to 3 quick questions</summary><p>Isolated skills to get started. Skip this and open a full problem below whenever you want.</p>';
+  const warm=el('details',{class:'card sm-panel','data-study-warmup-panel':true});warm.innerHTML='<summary>Optional warm-up · up to 3 quick questions</summary><p>Try a few single skills before a full problem.</p>';
   const pool=smWarmupPool(),topics=[...new Set(pool.map(q=>q.topic))];
   if(pool.length){const select=el('select',{'aria-label':'Warm-up skill'});select.appendChild(el('option',{value:''},'Mix of foundation skills'));topics.forEach(t=>select.appendChild(el('option',{value:t},esc(TOPICS[t]?.name||t))));warm.appendChild(select);warm.appendChild(smButton('Start warm-up',()=>smStartWarmup(select.value),{'data-study-warmup':true}));}
   else warm.appendChild(el('p',{},'Use a Learn lesson for a small first attempt. No short-question bank is available here yet.'));
-  v.appendChild(warm);
   if(smChapter().id==='ch6'&&typeof CH6_LESSONS!=='undefined')v.appendChild(smCh6PracticeCard());
-  const h=el('header',{class:'sm-section-title'});h.innerHTML='<h2>'+(smChapter().id==='ch6'?'Instructor worksheets':'Regular problems')+'</h2><p>Class worksheet wording and linked parts stay together. No extra explanation is required unless the original problem asks for it.</p>';v.appendChild(h);
+  const h=el('header',{class:'sm-section-title'});h.innerHTML='<h2>Class worksheets</h2><p>Do only what the problem asks.</p>';v.appendChild(h);
   const sheets=WS_SHEETS.filter(s=>s.chapter===smChapter().id),grid=el('div',{class:'sm-grid sm-sheets'});sheets.forEach(s=>grid.appendChild(smWorksheetCard(s)));v.appendChild(grid);
-  if(!sheets.length)v.appendChild(el('p',{class:'card'},'No original worksheet is loaded for this chapter yet. '+(smChapter().id==='ch6'?'The original app examples above cover selected lecture skills':'Isolated practice is available above')+'; '+(smChapter().id==='ch6'?'they are':'it is')+' not a replacement for a full paper problem.'));
+  if(!sheets.length)v.appendChild(el('p',{class:'card'},'No class worksheet is loaded for this chapter yet. '+(smChapter().id==='ch6'?'Use the selected lecture examples above or your class material.':'The warm-up below checks single skills, not full paper problems.')));
+  v.appendChild(warm);
   if(smChapter().id==='ch5'){
     const skills=el('details',{class:'card sm-panel','data-study-skill-banks':true});
-    skills.appendChild(el('summary',{},'Practice by skill · original app problems'));
-    skills.appendChild(el('p',{},'Choose a skill for different examples. These are original problems modeled on class tasks, not copies of your assigned worksheets.'));
+    skills.appendChild(el('summary',{},'Practice one skill'));
+    skills.appendChild(el('p',{},'Original class-style examples, not copies of assigned worksheets.'));
     if(typeof smTransferPracticeCard==='function')skills.appendChild(smTransferPracticeCard());
     if(typeof CH5_VISUAL_STEREO_QUESTIONS!=='undefined')skills.appendChild(smVisualStereoCard());
     if(typeof CH5_CHAIR_PAIR_QUESTIONS!=='undefined')skills.appendChild(smChairPairCard());
@@ -16820,7 +16821,7 @@ function smChallengePool(topic=''){return adaptiveLearningPool({chapter:smChapte
 VIEWS.modeChallenge=v=>{
   smHeading(v,'challenge');
   if(smChapter().id==='ch6'&&typeof ch6ScopeCard==='function')v.appendChild(ch6ScopeCard());
-  const c=el('section',{class:'card sm-panel'});c.innerHTML='<h2>Choose a topic to stretch</h2><p><b>Added demand:</b> answer the question, then explain why one tempting wrong answer fails. Your explanation is self-reviewed, not automatically graded.</p><p class="muted">This reuses the practice bank with an extra step. It is not a separate bank of new problems.</p>';
+  const c=el('section',{class:'card sm-panel'});c.innerHTML='<h2>Choose a topic</h2><p><b>Extra step:</b> explain why one tempting wrong answer fails. You review that explanation; the app does not grade it.</p><p class="muted">Uses the practice bank. Repeats are review.</p>';
   const pool=smChallengePool();
   if(pool.length){
     const chapter=smChapter(),topics=[...new Set(pool.map(q=>q.topic))],saved=safeStore.get('studyChallengeTopics',{});
@@ -16836,7 +16837,7 @@ VIEWS.modeChallenge=v=>{
     },{class:'btn','data-challenge-start':true});
     const update=()=>{const size=smChallengePool(select.value).length,n=Math.min(3,size);count.textContent=size+' existing question'+(size===1?'':'s')+' available · '+n+' in this round.'+(size<3?' Small topic bank; repeats are possible.':' Questions rotate when alternatives are available.');start.textContent='Start '+n+' challenge question'+(n===1?'':'s');};
     select.onchange=()=>{safeStore.set('studyChallengeTopics',{...safeStore.get('studyChallengeTopics',{}),[chapter.id]:select.value});update();};update();c.appendChild(start);
-    c.appendChild(el('p',{class:'muted'},'Full drawing and linked-part problems are under Practice → Practice by skill. They are not included in this short-answer challenge.'));
+    c.appendChild(el('p',{class:'muted'},'For drawing and linked-part problems, use Practice → Practice one skill. This challenge uses short answers.'));
   }
   else c.appendChild(el('p',{},'This chapter has no eligible stretch set yet. Choose another chapter or work a full Practice problem.'));v.appendChild(c);
   if(smChapter().id==='ch4'){const n=el('details',{class:'card sm-panel'});n.innerHTML='<summary>Extra naming difficulty</summary><p>Competing parent chains and bicyclic numbering. Bicyclic work is supplemental unless assigned.</p>';n.appendChild(smButton('Open naming challenge',()=>{startNamingTier('challenge');smTagRun('challenge','naming');}));v.appendChild(n);}
@@ -16919,6 +16920,7 @@ smStyle.textContent=`
  .sm-next{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;margin-bottom:16px;background:#eaf4f1;border:1px solid #c4dbd3;border-radius:12px;font-size:.9rem}.sm-next .btn{margin:0;min-height:44px}.sm-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.sm-links .btn{font-size:.8rem;min-height:44px;margin:0}.sm-context{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin-bottom:14px;font-size:.8rem;color:#4e7079}.sm-context>.btn{margin:0;min-height:40px;padding:8px 12px;font-size:.82rem}.sm-context>span{flex:1;min-width:140px;overflow-wrap:anywhere}.sm-panel{min-width:0;padding:18px!important}.sm-panel h2{font-size:1.06rem;margin:0 0 9px}.sm-panel p,.sm-section-title p{font-size:.88rem;line-height:1.5}.sm-panel summary{cursor:pointer;min-height:32px;font-weight:700}.sm-panel details{margin-top:12px}.sm-panel .btn{white-space:normal;margin:5px 5px 5px 0}.sm-panel textarea{width:100%;min-height:90px}.sm-section-title{margin:20px 0 14px}.sm-section-title h2{font-size:1.2rem;margin:0}.sm-lesson-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sm-lesson-list .btn{margin:0;min-height:54px;text-align:left;white-space:normal}.sm-sheets .card{margin:0}
  [data-paper-practice] select.answerbox{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
  #nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}#nav>button{min-width:0;min-height:64px;padding:10px 5px}#nav .nav-label{white-space:normal;line-height:1.15}#nav .nav-purpose{font-size:.65rem}.sm-mode:focus-visible,.sm-scope select:focus-visible{outline:3px solid #cc9200;outline-offset:3px}.header-more{width:auto!important;min-width:44px;padding:8px 12px!important;font-size:.8rem!important}
+ .sm-sheets [data-study-worksheet]{display:flex;justify-content:center;width:100%;box-sizing:border-box;min-height:44px;margin:12px 0 4px}
  @media(hover:hover){.sm-mode:hover{transform:translateY(-2px);box-shadow:0 5px 15px #163f4810;border-color:#438f90}}
  @media(max-width:600px){.sm-grid,.sm-lesson-list{grid-template-columns:1fr}.sm-heading{margin-top:2px}.sm-heading h1{font-size:1.45rem}.sm-mode{padding:13px;gap:5px 9px}.sm-mode strong{font-size:1.06rem}.sm-mode>span:not(.sm-number){font-size:.8rem}.sm-mode .sm-verb,.sm-mode .sm-open{display:none}.sm-next{align-items:flex-start;flex-direction:column;padding:12px}.sm-scope{gap:5px}.sm-scope select{width:100%}.sm-panel{padding:14px!important}#nav .nav-purpose{display:none}#nav .nav-label{font-size:.72rem;overflow-wrap:normal;word-break:normal}#nav>button{min-height:58px}.sm-context>span{font-size:.74rem}.sm-links{gap:4px}.sm-links .btn{width:auto}
  body:has(.sm-home)>header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:8px 12px}body:has(.sm-home)>header .app-title{font-size:1rem;margin:0}body:has(.sm-home)>header .app-title-copy small,body:has(.sm-home)>header .countdown{display:none}body:has(.sm-home)>header .header-actions{gap:5px;flex-wrap:nowrap}body:has(.sm-home)>header #cq-preview-note{grid-column:1/-1;font-size:.65rem!important}body:has(.sm-home)>header .cn-header-button{font-size:.72rem;padding:6px 8px}body:has(.sm-home)>header .header-more{padding:6px 8px!important;font-size:.72rem!important}}
@@ -17731,9 +17733,9 @@ function ccLearnDomain(chapter,domain){
   smSetChapter(chapter);const unit=(CHAPTER_LEARNING_UNITS[chapter]||[]).find(u=>domain.unitIds?.includes(u.id));
   if(unit)openLearningUnit(chapter,unit.id);else if(domain.topics?.length){S.learnCh=chapter;S.learnTopic=domain.topics[0];go('allLearn');}else smGo('learn');
 }
-function ccJourney(chapter,active=null){
-  const coverage=ccCoverage(chapter),strip=el('section',{class:'cc-journey','aria-label':'Chapter diagnostic journey','data-cc-journey':chapter});
-  strip.appendChild(el('h2',{},'Your chapter checks'));
+function ccJourney(chapter,active=null,collapsed=false){
+  const coverage=ccCoverage(chapter),strip=el(collapsed?'details':'section',{class:'cc-journey','aria-label':'Chapter diagnostic journey','data-cc-journey':chapter,...(collapsed?{'data-cc-journey-fold':true}:{})});
+  strip.appendChild(el(collapsed?'summary':'h2',{},collapsed?'Chapter checks & progress':'Chapter checks'));
   const stages=el('div',{class:'cc-stages'});
   CC_PHASES.forEach((phase,index)=>{
     const pending=ccLatest(chapter,phase,'in-progress'),done=ccLatest(chapter,phase),state=pending?'In progress':done?'Result saved':'Not taken';
@@ -17742,10 +17744,11 @@ function ccJourney(chapter,active=null){
   });strip.appendChild(stages);
   const c=coverage.counts;
   const excluded=coverage.domains.filter(d=>d.laterDeckTopic).length;
-  strip.appendChild(el('p',{class:'cc-coverage-summary'},(c.total-excluded)+' '+(excluded?'covered':'declared')+' areas · '+Math.max(0,c.notChecked-excluded)+' not checked · '+(c.needsReview+c.manualReviewPending)+' need another check or review'+(c.bankGaps>excluded?' · '+(c.bankGaps-excluded)+' bank gaps':'')+(excluded?' · '+excluded+' later deck areas excluded':'')));
-  if(coverage.nextDomain){const next=coverage.nextDomain;strip.appendChild(el('p',{class:'cc-next-area'},'Next area to check: '+esc(next.label)+(next.bankGap?' · use course problems; the app bank is not ready.':'')));}
+  strip.appendChild(el('p',{class:'cc-coverage-summary'},(c.total-excluded)+' areas in this path · '+Math.max(0,c.notChecked-excluded)+' not checked · '+(c.needsReview+c.manualReviewPending)+' awaiting review'+(c.bankGaps>excluded?' · '+(c.bankGaps-excluded)+' app coverage gaps':'')+(excluded?' · '+excluded+' later topics excluded':'')));
+  strip.appendChild(el('p',{class:'cc-caveat'},'These are check records—not a count of what you know or an exam prediction.'));
+  if(coverage.nextDomain){const next=coverage.nextDomain;strip.appendChild(el('p',{class:'cc-next-area'},'Suggested check: '+esc(next.label)+(next.bankGap?' · use class problems.':'')));}
   const details=el('details',{'data-cc-coverage':true});details.appendChild(el('summary',{},'See topic coverage and limits'));
-  details.appendChild(el('p',{class:'muted'},coverage.scope+' Practice history is shown separately from diagnostic results.'));
+  details.appendChild(el('p',{class:'muted'},coverage.scope+' Practice and check results stay separate.'));
   coverage.domains.forEach(domain=>{
     const row=el('div',{class:'cc-coverage-row','data-cc-domain':domain.id});
     row.appendChild(el('strong',{},esc(domain.label)));row.appendChild(el('span',{},domain.laterDeckTopic?'Excluded from this path':domain.statusLabel+(domain.bankGap?' · bank gap':'')));
@@ -17895,13 +17898,14 @@ VIEWS.chapterCheckResults=v=>{
     if(q.why)detail.appendChild(el('div',{class:'why'},q.why));review.appendChild(detail);
   });v.appendChild(review);
 };
-// The same compact journey is visible in the existing modes. No new nav tab.
+// Checks stay available without pushing lessons or full problems below the fold.
+// Readiness and check setup keep their expanded journey. No scoring changes.
 STUDY_MODES.readiness.verb='Check what you can do';
 STUDY_MODES.readiness.description='Final chapter check, then fresh paper work: untimed first, then timed.';
 const CC_PREVIOUS_LEARN=VIEWS.modeLearn;
-VIEWS.modeLearn=v=>{CC_PREVIOUS_LEARN(v);v.insertBefore(ccJourney(smChapter().id,'starting'),v.children[1]||null);};
+VIEWS.modeLearn=v=>{CC_PREVIOUS_LEARN(v);v.appendChild(ccJourney(smChapter().id,'starting',true));};
 const CC_PREVIOUS_PRACTICE=VIEWS.modePractice;
-VIEWS.modePractice=v=>{CC_PREVIOUS_PRACTICE(v);v.insertBefore(ccJourney(smChapter().id,'middle'),v.children[1]||null);};
+VIEWS.modePractice=v=>{CC_PREVIOUS_PRACTICE(v);v.appendChild(ccJourney(smChapter().id,'middle',true));};
 const CC_PREVIOUS_ACTIVITY=smActivity;
 smActivity=function(){
   if(['chapterCheck','chapterCheckRun','chapterCheckResults'].includes(S.view)){const run=S.view==='chapterCheck'?null:ccRun(S.ccRunId),phase=run?.phase||ccPhase(S.ccPhase);return {mode:phase==='starting'?'learn':phase==='middle'?'practice':'readiness',chapter:run?.chapter||smChapter().id,detail:ccLabel(phase)+(S.view==='chapterCheckRun'?' · answers held until finish':'')};}
@@ -17910,6 +17914,7 @@ smActivity=function(){
 const ccStyle=el('style',{id:'chapter-check-style'});ccStyle.textContent=`
  .cc-journey{padding:12px 14px;background:#edf5f2;border:1px solid #d0dfd8;border-radius:12px;margin:0 0 18px;overflow-wrap:anywhere}.cc-journey h2{font-size:1rem;margin:0 0 8px}.cc-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cc-stages .btn{margin:0!important;font-size:.8rem;min-width:0;white-space:normal;text-align:left;min-height:44px;line-height:1.4}.cc-stages [aria-current=step]{border:2px solid #176b67;background:#dceee8}.cc-journey .btn:focus-visible,.cc-journey summary:focus-visible{outline:3px solid #b17900;outline-offset:3px}.cc-coverage-summary,.cc-next-area{font-size:.82rem;margin:8px 0}.cc-journey summary{font-size:.85rem;cursor:pointer;min-height:32px}.cc-journey details>p{font-size:.8rem}.cc-coverage-row{padding:10px 0;border-top:1px solid #cfdfd7;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:.83rem}.cc-coverage-row strong{flex:1 1 180px}.cc-coverage-row p{flex-basis:100%;margin:0;line-height:1.45}.cc-coverage-row .btn{font-size:.78rem;min-height:44px;margin:0}.cc-coverage-row span{font-weight:600}
  .cc-panel{padding:20px!important}.cc-panel h1{font-size:1.6rem}.cc-panel h2{font-size:1.15rem}.cc-panel p,.cc-panel li{font-size:.9rem;line-height:1.5}.cc-caveat{font-size:.8rem!important;color:#526b71}.cc-warning{color:#865817;font-weight:600}.cc-start-strip{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px;padding:10px 14px;background:#edf5f2;border-radius:12px;font-size:.86rem}.cc-start-strip .btn{margin:0}.sm-next{flex-wrap:wrap}.sm-next>span{flex:1 1 230px}.sm-next .btn{flex:0 1 auto}.cc-question{padding:20px!important}.cc-position{font-size:.82rem;color:#536c73;font-weight:700}.cc-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}.cc-given,.cc-answer{min-width:0}.cc-given .course-structure,.cc-given figure{max-width:100%;margin-inline:0!important}.cc-given img,.cc-given svg{max-width:100%}.cc-given svg{height:auto;max-height:340px}.cc-choices{display:grid;gap:9px}.cc-choice{text-align:left;white-space:normal;border:1px solid #b7cbce;background:white;color:#173e47;padding:12px;border-radius:10px;font:inherit;min-height:48px;cursor:pointer}.cc-choice[aria-pressed=true]{border:2px solid #156e74;background:#e2f2f0;box-shadow:inset 4px 0 #156e74}.cc-choice:focus-visible{outline:3px solid #cc9200;outline-offset:3px}.cc-field{display:flex;flex-direction:column;gap:6px;margin:12px 0;font-size:.9rem}.cc-field input,.cc-field select,.cc-field textarea,.cc-answer textarea{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;border:1px solid #adbec6;border-radius:9px;padding:11px;background:white;color:#173e47}.cc-confidence{max-width:270px}.cc-check-label{display:flex;align-items:center;gap:10px;min-height:44px}.cc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.cc-actions .btn{margin:0}.cc-jump{margin-top:16px}.cc-number-list{display:flex;gap:5px;flex-wrap:wrap}.cc-number-list .btn{font-size:.8rem;margin:0}.cc-domain-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}.cc-domain{padding:14px;border:1px solid #c9d8d9;border-radius:12px;background:#fff}.cc-domain h3{font-size:1rem;margin:0 0 8px}.cc-domain p{font-size:.85rem}.cc-paper>h2{font-size:1.15rem}.cc-panel details{padding:12px 0;border-top:1px solid #d8e3e4}.cc-panel summary,.cc-jump summary{min-height:35px;cursor:pointer;font-weight:650}.cc-panel [data-cc-review] .qprompt{margin-top:15px}.cc-question .course-sketch{margin-top:0}.cc-panel .course-sketch{max-width:700px}.cc-panel .qprompt{overflow-wrap:anywhere}
+ .cc-journey[data-cc-journey-fold]>summary{min-height:44px;box-sizing:border-box;padding:11px 0;font-weight:700}.cc-journey[data-cc-journey-fold][open]>summary{margin-bottom:12px}
  @media(max-width:700px){.cc-workspace,.cc-domain-list{grid-template-columns:1fr}.cc-workspace{gap:16px}.cc-question,.cc-panel{padding:14px!important}.cc-question .qprompt{font-size:1rem}.cc-given svg{max-height:250px}.cc-actions .btn{font-size:.85rem;padding:10px;min-height:44px}.sm-next{flex-direction:row}.sm-next>span{flex-basis:100%}.sm-next .btn{font-size:.82rem;padding:9px}.cc-panel h1{font-size:1.4rem}}
  @media(max-width:600px){.cc-stages{grid-template-columns:1fr}.cc-stages .btn{width:100%;padding:9px 10px}.cc-journey{padding:12px}.cc-coverage-row{display:block}.cc-coverage-row strong,.cc-coverage-row span{display:block}.cc-coverage-row p{margin:5px 0}}
  @media(min-width:350px) and (max-width:600px){.sm-next .btn{width:auto!important;flex:1 1 130px;font-size:.8rem;padding:9px 7px}}
@@ -19889,6 +19894,304 @@ leBuildExport=function(){const out=EXAM_SIGNAL_EXPORT();out.examPractice={examId
 const mbStyle=el('style',{id:'exam-master-bank-style'});mbStyle.textContent='.mb-root{overflow-wrap:anywhere}.mb-root details{margin:16px 0}.mb-root>ol{padding-inline-start:28px;margin-inline:0}.mb-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mb-filters label{display:flex;flex-direction:column;gap:6px}.mb-filters select,.mb-filters input{min-width:0;max-width:100%;min-height:44px;padding:9px;font:inherit;border:1px solid #abc2bb;border-radius:8px;background:white;color:inherit}.mb-filters input{grid-column:1/-1;width:100%;box-sizing:border-box}.mb-result{padding:16px;margin:12px 0}.mb-result p{margin:6px 0}.mb-root li{margin:10px 0}.ep-practice-routes{align-items:start}.ep-practice-routes .ep-practice{height:100%;box-sizing:border-box}.ep-practice-routes .btn{margin:6px 6px 0 0}@media(max-width:600px){.mb-filters{grid-template-columns:1fr}}';document.head.appendChild(mbStyle);
 
 /* END EXAM PRACTICE TAIL */
+/* BEGIN SPARK TAIL */
+/* Spark · optional short practice, 2026-10-17.
+ * A curated view of EXISTING guided/practice questions, not a new answer bank.
+ * Render the original prompt, all figures/givens, choices and key unchanged.
+ * cue is a short title, hint is opt-in help, why is post-answer feedback.
+ * Full source feedback must remain available. These cards do not cover a chapter.
+ * No examOnly questions or lesson coldIds are included. Repeats remain familiar
+ * practice; completion/points must not count as readiness or unseen transfer.
+ */
+const SPARK_CARDS = Object.freeze([
+  {questionId:'CH4-20260919-10',chapterId:'ch4',cue:'Same molecule or not?',
+    hint:'Trace which carbons connect. A drawing can turn without changing the molecule.',
+    why:'Both drawings are 3-methylhexane. The bonds connect the same atoms; only the drawing changed.'},
+  {questionId:'CH4-L11-20260924-01',chapterId:'ch4',cue:'Read the ring faces',
+    hint:'Compare up/down, not left/right on the page.',
+    why:'Both groups point up, so they are cis. The groups do not have to be identical.'},
+  {questionId:'CH4-L11-20260924-03',chapterId:'ch4',cue:'Keep track through a flip',
+    hint:'Axial directions alternate around the ring. A flip keeps each group up or down.',
+    why:'C1 and C3 are axial-up in A. After the flip, both groups are equatorial-up. They stay cis.'},
+  {questionId:'CH4-L11-20260924-09',chapterId:'ch4',cue:'Compare starting stability',
+    hint:'Both end at the same products. Which one has the smaller energy drop?',
+    why:'B releases less heat to reach the same products, so B starts lower in energy. This compares stability, not speed.'},
+  {questionId:'CH4-L11-20260924-16',chapterId:'ch4',cue:'Why bend the ring?',
+    hint:'Puckering changes how neighboring bonds line up.',
+    why:'Puckering reduces eclipsing: torsional strain. Some angle strain remains, so the ring is not strain-free.'},
+  {questionId:'CH4-L11-20260924-21',chapterId:'ch4',cue:'Find the two close contacts',
+    hint:'Start at C1. Look two ring carbons away in each direction.',
+    why:'The axial H atoms on C3 and C5 crowd the axial methyl. Those are its two 1,3-diaxial contacts.'},
+
+  {questionId:'CH5-F01',chapterId:'ch5',cue:'Check the connections',
+    hint:'First compare formulas. Then check which carbon is bonded to which.',
+    why:'Both are C₄H₁₀, but one is branched. Same formula with different connections means constitutional isomers.'},
+  {questionId:'CH5-F02',chapterId:'ch5',cue:'Compare the two shapes',
+    hint:'The connections stay the same. Compare which group points toward you.',
+    why:'This single stereocenter is inverted. The structures are mirror images that do not fit together: enantiomers.'},
+  {questionId:'CH5-F07',chapterId:'ch5',cue:'Find a stereocenter',
+    hint:'Compare all four complete groups, not just their first atoms.',
+    why:'Br, H, methyl and ethyl are four different groups. Methyl and ethyl differ even though both start with carbon.'},
+  {questionId:'CH5-F08',chapterId:'ch5',cue:'Look for a repeated group',
+    hint:'At carbon 3, trace the chain in both directions.',
+    why:'Carbon 3 has OH, H, ethyl and ethyl. The repeated ethyl group means it is not a stereocenter.'},
+  {questionId:'CH5-F13',chapterId:'ch5',cue:'Put priorities in order',
+    hint:'Different directly attached elements? Compare their atomic numbers.',
+    why:'Atomic numbers give Br 35 > Cl 17 > F 9 > H 1. This ranks the groups; it does not yet give R or S.'},
+  {questionId:'CH5-F19',chapterId:'ch5',cue:'Read a Fischer cross',
+    hint:'A Fischer projection has a fixed front/back convention.',
+    why:'Horizontal bonds point toward you. Vertical bonds point away. The group names do not change that convention.'},
+
+  {questionId:'CH6-T03',chapterId:'ch6',cue:'Name the net change',
+    hint:'Compare what is attached to the carbon before and after.',
+    why:'OH replaces Br on the same carbon. Replacing one attached group with another is substitution.'},
+  {questionId:'CH6-T13',chapterId:'ch6',cue:'Choose the matching bond',
+    hint:'Identify the two atoms in the bond, then check what else they are attached to.',
+    why:'It is an alcohol O–H bond: that O is also bonded to carbon. Use the alcohol O–H entry, not C–O or water O–H.'},
+  {questionId:'CH6-T23',chapterId:'ch6',cue:'Keep the signs straight',
+    hint:'Write the sign of each term in ΔH − TΔS separately.',
+    why:'A negative ΔH minus a positive TΔS stays negative in the stated range. This says nothing about reaction speed.'},
+  {questionId:'CH6-T33',chapterId:'ch6',cue:'What balances at equilibrium?',
+    hint:'Dynamic equilibrium means reactions keep happening in both directions.',
+    why:'The forward and reverse rates match. The concentrations stay steady, but do not have to be equal.'},
+  {questionId:'CH6-K02',chapterId:'ch6',cue:'Change the rate',
+    hint:'Apply each exponent first, then multiply the two effects.',
+    why:'Halving A gives ×½. Doubling B gives ×4 because B is squared. Together: ½ × 4 = 2 times the rate.'},
+  {questionId:'CH6-K11',chapterId:'ch6',cue:'Measure the climb',
+    hint:'Start at the reactant level, not at zero on the axis.',
+    why:'The forward barrier is peak minus reactant: 70 − 10 = 60 kJ/mol.'},
+  {questionId:'CH6-K15',chapterId:'ch6',cue:'Compare all three climbs',
+    hint:'Measure each peak from the valley immediately before it.',
+    why:'The rises are 65, 50 and 60 kJ/mol. Step 1 has the largest local barrier, even though peak 2 is highest on the page.'},
+  {questionId:'CH6-K32',chapterId:'ch6',cue:'Track the changing bonds',
+    hint:'Which group enters, and which group leaves?',
+    why:'C–Cl forms as C–Br breaks. The dotted lines show partial bonds, not a stable carbon with five complete bonds.'}
+].map(card=>Object.freeze(card)));
+
+/* Spark: optional five-decision play practice, not a readiness instrument.
+ * Reuses curated practice items without changing QUESTIONS or core attempts.
+ * Profile/device-local; only displayed items become exposure. No cloud calls.
+ */
+const SPARK_VERSION='2026-10-17.1',SPARK_CAP=40;
+function sparkAllowed(){return !!leActor().profile&&courseNavigationAllowed();}
+function sparkState(){
+  if(!leActor().profile)return {version:1,runs:[],exposure:[]};
+  const data=safeStore.get('sparkPractice',{version:1,runs:[],exposure:[]});
+  return data?.version===1&&Array.isArray(data.runs)&&Array.isArray(data.exposure)?data:{version:1,runs:[],exposure:[]};
+}
+function sparkRun(id=S.sparkRunId){return sparkState().runs.find(r=>r.id===id&&r.actor?.profile===leActor().profile)||null;}
+function sparkSaveRun(run){
+  if(!run||!sparkAllowed()||run.actor?.profile!==leActor().profile)return;
+  const state=sparkState();run.updatedAt=Date.now();
+  const runs=state.runs.filter(r=>r.id!==run.id).concat(run);
+  // Never drop an unfinished round to make room for completed history.
+  state.runs=runs.filter(r=>r.status==='active').concat(runs.filter(r=>r.status!=='active').slice(-SPARK_CAP));
+  safeStore.set('sparkPractice',state);
+}
+function sparkEvent(run,kind,extra={}){run.events=(run.events||[]).concat({kind,ts:Date.now(),...extra}).slice(-120);}
+function sparkCard(id){return SPARK_CARDS.find(c=>c.questionId===id);}
+function sparkQuestion(id){return QUESTIONS.find(q=>q.id===id);}
+function sparkFingerprint(q){return leFingerprint({question:leQuestionMetadata(q),card:sparkCard(q.id)});}
+function sparkCurrent(run=sparkRun()){return run?.items?.[run.index]||null;}
+function sparkIsCurrent(item){const q=sparkQuestion(item?.id);return !!q&&q.type==='mc'&&sparkFingerprint(q)===item.fingerprint;}
+function sparkPlan(scope){
+  const state=sparkState(),pool=SPARK_CARDS.filter(c=>(scope==='mix'||c.chapterId===scope)&&sparkQuestion(c.questionId)?.type==='mc'),counts={},last={};
+  state.runs.forEach(r=>r.items.filter(i=>i.shownAt).forEach(i=>{counts[i.id]=(counts[i.id]||0)+1;last[i.id]=i.shownAt;}));
+  const tie=Object.fromEntries(pool.map(c=>[c.questionId,Math.random()])),picked=[],chapters={},topics={};
+  while(picked.length<5){
+    const rest=pool.filter(c=>!picked.includes(c));if(!rest.length)break;
+    const score=c=>[chapters[c.chapterId]||0,counts[c.questionId]||0,topics[sparkQuestion(c.questionId).topic]||0,last[c.questionId]||0,tie[c.questionId]];
+    rest.sort((a,b)=>{const x=score(a),y=score(b);for(let i=0;i<x.length;i++)if(x[i]!==y[i])return x[i]-y[i];return 0;});
+    const c=rest[0];picked.push(c);chapters[c.chapterId]=(chapters[c.chapterId]||0)+1;const topic=sparkQuestion(c.questionId).topic;topics[topic]=(topics[topic]||0)+1;
+  }
+  const known=ccExposure();
+  return picked.map(c=>{const q=sparkQuestion(c.questionId);return {id:q.id,chapter:c.chapterId,fingerprint:sparkFingerprint(q),seenBefore:known.ids.has(q.id),relatedSeenBefore:ccFamilies(q).some(f=>known.families.has(f)),shownAt:null,attempts:[],hintAt:null,clueShownAt:null,revealAt:null,resolvedAt:null,outcome:null,foregroundMs:0};});
+}
+function sparkStart(scope=smChapter().id){
+  if(!sparkAllowed())return null;
+  sparkFlushClock();courseNavigationSaveWork();scope=['ch4','ch5','ch6','mix'].includes(scope)?scope:'ch5';
+  let run=sparkState().runs.findLast(r=>r.status==='active'&&r.scope===scope);
+  if(!run){
+    const items=sparkPlan(scope);if(!items.length){S.sparkScope=scope;go('sparkHome');return null;}
+    run={id:makeRunId('spark'),version:SPARK_VERSION,actor:leActor(),scope,startedAt:Date.now(),updatedAt:Date.now(),completedAt:null,status:'active',index:0,items,events:[]};sparkEvent(run,'start');
+  }else sparkEvent(run,'resume');
+  S.sparkRunId=run.id;sparkSaveRun(run);go('sparkRun');return sparkRun(run.id);
+}
+function sparkShow(run){
+  const item=sparkCurrent(run);if(!item||item.shownAt)return;
+  item.shownAt=Date.now();sparkEvent(run,'question-shown',{question:item.id});sparkSaveRun(run);
+  const state=sparkState();if(!state.exposure.includes(item.id)){state.exposure.push(item.id);safeStore.set('sparkPractice',state);}
+}
+function sparkAnswer(choice){
+  sparkFlushClock();const run=sparkRun(),item=sparkCurrent(run),q=sparkQuestion(item?.id);
+  if(S.view!=='sparkRun'||!sparkAllowed()||run?.status!=='active'||!item?.shownAt||item.resolvedAt||!sparkIsCurrent(item)||!Number.isInteger(choice)||choice<0||choice>=q.choices.length)return;
+  if(item.attempts.length>=q.choices.length||item.attempts.some(a=>a.choice===choice))return;
+  const attempt={choice,correct:choice===q.answer,ts:Date.now(),foregroundMs:item.foregroundMs,helped:!!(item.hintAt||item.clueShownAt||item.revealAt||item.attempts.length),externalHelp:'unknown'};
+  item.attempts.push(attempt);sparkEvent(run,'answer',{question:q.id,attempt:item.attempts.length,correct:attempt.correct,helped:attempt.helped});
+  if(attempt.correct){item.resolvedAt=Date.now();item.outcome=attempt.helped?'correct-with-support':'correct-first-try';}
+  else item.clueShownAt=item.clueShownAt||Date.now();
+  sparkSaveRun(run);render();sparkFocus('[data-spark-feedback]');
+}
+function sparkHint(){
+  sparkFlushClock();const run=sparkRun(),item=sparkCurrent(run);if(S.view!=='sparkRun'||run?.status!=='active'||!item||item.resolvedAt||!sparkIsCurrent(item)||item.hintAt)return;
+  item.hintAt=Date.now();sparkEvent(run,'hint',{question:item.id});sparkSaveRun(run);render();sparkFocus('[data-spark-clue]');
+}
+function sparkReveal(){
+  sparkFlushClock();const run=sparkRun(),item=sparkCurrent(run);if(S.view!=='sparkRun'||run?.status!=='active'||!item||item.resolvedAt||!sparkIsCurrent(item))return;
+  item.revealAt=Date.now();item.resolvedAt=Date.now();item.outcome='model-seen';sparkEvent(run,'model-seen',{question:item.id});sparkSaveRun(run);render();sparkFocus('[data-spark-feedback]');
+}
+function sparkNext(){
+  sparkFlushClock();const run=sparkRun(),item=sparkCurrent(run);if(S.view!=='sparkRun'||run?.status!=='active'||!item?.resolvedAt)return;
+  run.index++;if(run.index>=run.items.length){run.status='completed';run.completedAt=Date.now();sparkEvent(run,'complete');}sparkSaveRun(run);render();window.scrollTo(0,0);sparkFocus('[data-spark-heading]');
+}
+function sparkSkipChanged(){
+  const run=sparkRun(),item=sparkCurrent(run);if(!item||sparkIsCurrent(item))return;
+  item.outcome='content-changed';item.resolvedAt=Date.now();sparkEvent(run,'content-changed',{question:item.id});sparkSaveRun(run);sparkNext();
+}
+function sparkPause(destination='home'){
+  sparkFlushClock();const run=sparkRun();if(run?.status==='active'){sparkEvent(run,'pause',{question:sparkCurrent(run)?.id||null});sparkSaveRun(run);}go(destination);
+}
+function sparkFullProblem(){
+  sparkFlushClock();const run=sparkRun(),chapter=run?.scope==='mix'?'ch5':run?.scope||smChapter().id;
+  if(run){sparkEvent(run,'full-problem-handoff',{chapter});sparkSaveRun(run);}smSetChapter(chapter);
+  const sheet=WS_SHEETS.find(s=>s.chapter===chapter),item=sheet?.items.find(i=>!i.unavailable&&!S.worksheetState.work[wsKey(sheet,i)]?.lastAttempt)||sheet?.items.find(i=>!i.unavailable);
+  if(sheet&&item)wsOpen(sheet.id,item.id);else smGo('practice');
+}
+function sparkRateStart(value){const run=sparkRun();if(run?.status!=='completed'||!['yes','not-really'].includes(value))return;run.startHelp={value,tier:'self-report',ts:Date.now()};sparkEvent(run,'start-help-report',{value});sparkSaveRun(run);render();}
+// Estimated visible, focused question time; never attention or learning time.
+let sparkClock=null;
+function sparkTick(now=Date.now()){
+  if(!sparkClock)return;
+  const foreground=typeof document.hidden==='boolean'?!document.hidden:true,focused=typeof document.hasFocus==='function'?document.hasFocus():true;
+  const live=S.view==='sparkRun'&&S.sparkRunId===sparkClock.runId&&leActor().profile===sparkClock.profile&&foreground&&focused;
+  // The interval ended in the previous state. Blur/hidden events flush that
+  // last short slice before setting the next interval to inactive.
+  const gap=now-sparkClock.at;if(sparkClock.profile===leActor().profile&&sparkClock.live&&gap>0&&gap<=2500)sparkClock.pending+=gap;
+  sparkClock.at=now;sparkClock.live=live;
+}
+function sparkFlushClock(){
+  if(!sparkClock)return;sparkTick();const clock=sparkClock;sparkClock=null;
+  if(clock.profile!==leActor().profile||!clock.pending)return;
+  const run=sparkRun(clock.runId),item=run?.items.find(i=>i.id===clock.itemId);
+  if(run?.status==='active'&&item&&!item.resolvedAt){item.foregroundMs+=Math.round(clock.pending);sparkSaveRun(run);}
+}
+function sparkBeginClock(){
+  if(S.view!=='sparkRun'||safeStore.get('sparkTimingEnabled',true)===false)return;
+  const run=sparkRun(),item=sparkCurrent(run);if(run?.status!=='active'||!item||item.resolvedAt)return;
+  sparkClock={profile:leActor().profile,runId:run.id,itemId:item.id,at:Date.now(),pending:0,live:!document.hidden&&document.hasFocus()};
+}
+setInterval(()=>{sparkTick();if(sparkClock?.pending>=5000){sparkFlushClock();sparkBeginClock();}},1000);
+document.addEventListener('visibilitychange',()=>{sparkFlushClock();sparkBeginClock();});
+window.addEventListener('blur',()=>{sparkFlushClock();sparkBeginClock();});
+window.addEventListener('focus',()=>{sparkFlushClock();sparkBeginClock();});
+window.addEventListener('pagehide',sparkFlushClock);
+function sparkText(tag,attrs,text){const node=el(tag,attrs);node.textContent=text;return node;}
+function sparkButton(text,action,attrs={}){return sparkText('button',{type:'button',class:'spark-button',onclick:action,...attrs},text);}
+function sparkFocus(selector){const node=document.querySelector(selector);if(node){node.setAttribute('tabindex','-1');node.focus({preventScroll:true});const box=node.getBoundingClientRect();if(box.top<0||box.bottom>innerHeight)node.scrollIntoView({block:'nearest',behavior:'instant'});}}
+function sparkName(scope){return {ch4:'Chapter 4 · Shapes & naming',ch5:'Chapter 5 · Stereochemistry',ch6:'Chapter 6 · Covered topics',mix:'Chapters 4–6 · Practice mix'}[scope]||'Chapter 5';}
+function sparkProgress(run){
+  const done=run.items.filter(i=>i.resolvedAt).length,board=el('div',{class:'spark-track',role:'img','aria-label':done+' of '+run.items.length+' decisions finished. Progress, not a score.'});
+  run.items.forEach((item,i)=>{const dot=sparkText('span',{class:'spark-node'+(item.resolvedAt?' is-lit':'')+(i===run.index?' is-current':''),'aria-hidden':'true'},item.resolvedAt?'✦':String(i+1));board.appendChild(dot);});return board;
+}
+function sparkEntry(){
+  const pending=sparkState().runs.findLast(r=>r.status==='active'),card=el('section',{class:'spark-entry','data-spark-entry':true});
+  const text=el('div');text.appendChild(sparkText('h2',{},'✦ Spark · a playful way in'));text.appendChild(sparkText('p',{},'Five small decisions. Clues welcome. Stop whenever.'));card.appendChild(text);
+  const actions=el('div',{class:'spark-entry-actions'});actions.appendChild(sparkButton(pending?'Resume Spark →':'Play 5 →',()=>sparkStart(pending?.scope||smChapter().id),{'data-spark-start':true}));actions.appendChild(sparkButton('Choose topic',()=>{courseNavigationSaveWork();go('sparkHome');},{class:'spark-link'}));card.appendChild(actions);return card;
+}
+function sparkSettings(host){
+  const box=el('details',{class:'spark-details'});box.appendChild(sparkText('summary',{},'What gets saved'));
+  box.appendChild(sparkText('p',{},'First answers, clues, retries, answer reveals, pauses and full-problem clicks. Stored on this device, separate from readiness. No automatic sharing.'));
+  const label=el('label'),check=el('input',{type:'checkbox','aria-label':'Estimate visible Spark question time'});check.checked=safeStore.get('sparkTimingEnabled',true)!==false;check.onchange=()=>{sparkFlushClock();safeStore.set('sparkTimingEnabled',check.checked);sparkBeginClock();};label.append(check,document.createTextNode(' Estimate visible question time'));box.appendChild(label);
+  box.appendChild(sparkText('p',{},'Timing excludes background/unfocused time and long gaps. It does not measure attention or explain why you stopped. Older history may be missing.'));
+  box.appendChild(sparkButton('Download learning evidence',leDownload,{class:'spark-link'}));
+  box.appendChild(sparkButton('Delete Spark history on this device',()=>{if(!confirm('Delete Spark answers, saved rounds and Spark exposure history for this profile on this device? Other study work stays.'))return;sparkClock=null;safeStore.set('sparkPractice',{version:1,runs:[],exposure:[]});S.sparkRunId=null;go('sparkHome');},{class:'spark-link'}));host.appendChild(box);
+}
+VIEWS.sparkHome=v=>{
+  const root=el('section',{class:'spark-shell'});root.appendChild(sparkText('p',{class:'spark-eyebrow'},'OPTIONAL PLAY PRACTICE'));
+  root.appendChild(sparkText('h1',{'data-spark-heading':true},'Find your spark.'));root.appendChild(sparkText('p',{class:'spark-lead'},'One question. A little feedback. A fresh start.'));
+  const pending=sparkState().runs.findLast(r=>r.status==='active');
+  if(pending)root.appendChild(sparkButton('Resume my round →',()=>sparkStart(pending.scope),{'data-spark-resume':true}));
+  const label=el('label',{class:'spark-topic-label'});label.appendChild(sparkText('span',{},'Play with'));
+  const select=el('select',{'aria-label':'Spark topic'});['ch4','ch5','ch6','mix'].forEach(id=>select.appendChild(sparkText('option',{value:id},sparkName(id))));select.value=['ch4','ch5','ch6','mix'].includes(S.sparkScope)?S.sparkScope:['ch4','ch5','ch6'].includes(smChapter().id)?smChapter().id:'ch5';label.appendChild(select);root.appendChild(label);
+  root.appendChild(sparkButton('Play 5 →',()=>sparkStart(select.value),{'data-spark-start':true}));root.appendChild(sparkText('p',{class:'spark-note'},'Practice, not an exam check. No countdown. Repeated questions are review.'));
+  sparkSettings(root);root.appendChild(sparkButton('Back to study desk',()=>go('home'),{class:'spark-link'}));v.appendChild(root);
+};
+function sparkResults(root,run){
+  root.setAttribute('data-spark-results','true');root.appendChild(sparkText('h1',{'data-spark-heading':true},'Round complete. ✦'));
+  root.appendChild(sparkText('p',{class:'spark-lead'},'You made room for a little chemistry.'));
+  root.appendChild(sparkProgress(run));
+  const counts=el('div',{class:'spark-results-grid'});
+  [['First try',run.items.filter(i=>i.outcome==='correct-first-try').length],['With support',run.items.filter(i=>i.outcome==='correct-with-support').length],['Answer shown',run.items.filter(i=>i.outcome==='model-seen').length]].forEach(([label,n])=>{const c=el('div');c.appendChild(sparkText('strong',{},String(n)));c.appendChild(sparkText('span',{},label));counts.appendChild(c);});root.appendChild(counts);
+  if(run.items.some(i=>i.outcome==='content-changed'))root.appendChild(sparkText('p',{},'Changed questions were skipped, not scored.'));
+  root.appendChild(sparkText('p',{class:'spark-note'},'A practice round—not a readiness score. Familiar answers and outside help may affect results.'));
+  const actions=el('div',{class:'spark-end-actions'});actions.appendChild(sparkButton('Try one full problem →',sparkFullProblem,{'data-spark-handoff':true}));actions.appendChild(sparkButton('Done for now',()=>{sparkEvent(run,'stop-after-round');sparkSaveRun(run);go('home');},{class:'spark-button secondary'}));actions.appendChild(sparkButton('Another 5',()=>sparkStart(run.scope),{class:'spark-link','data-spark-again':true}));root.appendChild(actions);
+  const report=el('div',{class:'spark-start-report'});report.appendChild(sparkText('p',{},'Did this make starting easier? · optional'));
+  [['yes','Yes'],['not-really','Not really']].forEach(([value,text])=>report.appendChild(sparkButton(text,()=>sparkRateStart(value),{class:'spark-link','aria-pressed':String(run.startHelp?.value===value),'data-spark-start-help':value})));if(run.startHelp)report.appendChild(sparkText('span',{role:'status'},'Saved.'));root.appendChild(report);
+  const review=el('details',{class:'spark-details'});review.appendChild(sparkText('summary',{},'Keep one idea from this round'));
+  run.items.filter(i=>i.outcome!=='content-changed').forEach(i=>{const card=sparkCard(i.id);if(card)review.appendChild(sparkText('p',{},card.why));});root.appendChild(review);
+}
+VIEWS.sparkRun=v=>{
+  const run=sparkRun();if(!run){VIEWS.sparkHome(v);return;}
+  const root=el('section',{class:'spark-shell','data-spark-run':run.id});v.appendChild(root);
+  if(run.status==='completed'){sparkResults(root,run);return;}
+  const top=el('div',{class:'spark-top'});top.appendChild(sparkText('span',{class:'spark-wordmark'},'✦ Spark'));top.appendChild(sparkButton('Save & leave',()=>sparkPause(),{class:'spark-link','data-spark-pause':true}));root.appendChild(top);
+  root.appendChild(sparkProgress(run));const item=sparkCurrent(run),q=sparkQuestion(item?.id),card=sparkCard(item?.id);
+  root.appendChild(sparkText('p',{class:'spark-eyebrow'},'DECISION '+(run.index+1)+' / '+run.items.length+' · '+(item?.chapter||'').replace('ch','CHAPTER ')));
+  if(!item||!sparkIsCurrent(item)){root.appendChild(sparkText('h1',{'data-spark-heading':true},'This question changed.'));root.appendChild(sparkText('p',{},'Your old answers stay saved. We won’t score them against a new key.'));root.appendChild(sparkButton('Skip changed question',sparkSkipChanged));return;}
+  sparkShow(run);
+  root.appendChild(sparkText('h1',{'data-spark-heading':true},card.cue));
+  const question=el('div',{class:'spark-question'});question.appendChild(el('div',{class:'qprompt spark-prompt'},q.prompt));root.appendChild(question);
+  const choices=el('div',{class:'spark-choices'});q.choices.forEach((choice,index)=>{
+    const tried=item.attempts.some(a=>a.choice===index),correct=item.resolvedAt&&index===q.answer;
+    const button=el('button',{type:'button',class:'spark-choice'+(correct?' is-correct':tried?' was-tried':''),'data-spark-answer':index,onclick:()=>sparkAnswer(index)});
+    button.appendChild(sparkText('span',{class:'spark-letter','aria-hidden':'true'},String.fromCharCode(65+index)));button.appendChild(el('span',{class:'spark-choice-text'},choice));
+    if(correct)button.appendChild(sparkText('span',{class:'spark-answer-state'},'✓ Answer'));else if(tried)button.appendChild(sparkText('span',{class:'spark-answer-state'},'Try another'));
+    button.disabled=!!item.resolvedAt||tried;choices.appendChild(button);
+  });root.appendChild(choices);
+  if(item.resolvedAt){
+    const feedback=el('section',{class:'spark-feedback good',role:'status','data-spark-feedback':true});feedback.appendChild(sparkText('h2',{},item.outcome==='model-seen'?'Here’s the idea':item.outcome==='correct-first-try'?'That’s it. ✦':'You found it. ✦'));feedback.appendChild(sparkText('p',{},card.why));
+    if(item.outcome==='model-seen')feedback.appendChild(sparkText('p',{class:'spark-note'},'Answer viewed—not counted as correct.'));
+    const more=el('details');more.appendChild(sparkText('summary',{},'More · full explanation'));more.appendChild(el('div',{},q.why));feedback.appendChild(more);root.appendChild(feedback);
+    root.appendChild(sparkButton(run.index===run.items.length-1?'Finish round →':'Next decision →',sparkNext,{'data-spark-next':true}));
+  }else{
+    if(item.hintAt||item.clueShownAt){const clue=el('section',{class:'spark-feedback',role:'status','data-spark-clue':true,...(item.attempts.length?{'data-spark-feedback':true}:{})});clue.appendChild(sparkText('h2',{},item.attempts.length?'Not that one. Try this clue:':'One clue'));clue.appendChild(sparkText('p',{},card.hint));root.appendChild(clue);}
+    const help=el('div',{class:'spark-help'});if(!item.hintAt&&!item.clueShownAt)help.appendChild(sparkButton('Give me a clue',sparkHint,{class:'spark-link','data-spark-hint':true}));help.appendChild(sparkButton('Show me & move on',sparkReveal,{class:'spark-link','data-spark-reveal':true}));root.appendChild(help);
+  }
+  root.appendChild(sparkText('p',{class:'spark-note'},'No timer. Practice only. '+(safeStore.persistent?'Saved on this device.':'Preview only: this round is not saved after reload.')));
+};
+// Wrap final views late; do not remove existing study or diagnostic routes.
+for(const name of ['home','modePractice']){const previous=VIEWS[name];VIEWS[name]=function(v){previous(v);if(!sparkAllowed())return;const entry=sparkEntry(),home=v.querySelector('[data-focus-home]');if(home){const anchor=home.querySelector('[data-daily-coach]')||home.querySelector('.sm-heading');anchor?anchor.after(entry):home.prepend(entry);}else v.prepend(entry);};}
+const SPARK_PREVIOUS_RENDER=render;
+render=function(){sparkFlushClock();document.body.classList.toggle('spark-playing',S.view==='sparkRun');SPARK_PREVIOUS_RENDER.apply(this,arguments);if(['sparkHome','sparkRun'].includes(S.view)){document.querySelector('[data-study-context]')?.remove();const small=document.querySelector('.app-title-copy small');if(small)small.textContent='Spark · optional play practice';}sparkBeginClock();};
+const SPARK_PREVIOUS_GO=go;
+go=function(view){if(S.view==='sparkRun'&&!['sparkRun','sparkHome'].includes(view)){sparkFlushClock();const run=sparkRun();if(run?.status==='active'){sparkEvent(run,'leave-view',{destination:view,question:sparkCurrent(run)?.id});sparkSaveRun(run);}}return SPARK_PREVIOUS_GO(view);};
+const SPARK_PREVIOUS_EXPOSURE=ccExposure;
+ccExposure=function(){const exposure=SPARK_PREVIOUS_EXPOSURE();sparkState().exposure.forEach(id=>{exposure.ids.add(id);const q=sparkQuestion(id);if(q)ccFamilies(q).forEach(f=>exposure.families.add(f));});return exposure;};
+function sparkExport(){
+  const state=sparkState(),runs=state.runs.map(run=>{
+    const row=lePick(run,['id','version','scope','startedAt','updatedAt','completedAt','status','index']);row.actor=lePick(run.actor,['profile','role','qa']);if(run.startHelp)row.startHelp=lePick(run.startHelp,['value','tier','ts']);
+    row.items=(run.items||[]).map(item=>({...lePick(item,['id','chapter','fingerprint','seenBefore','relatedSeenBefore','shownAt','hintAt','clueShownAt','revealAt','resolvedAt','outcome','foregroundMs']),attempts:(item.attempts||[]).map(a=>lePick(a,['choice','correct','ts','foregroundMs','helped','externalHelp']))}));
+    row.events=(run.events||[]).map(event=>lePick(event,['kind','ts','question','attempt','correct','helped','destination','chapter','value']));return row;
+  });
+  return {schemaVersion:1,moduleVersion:SPARK_VERSION,storage:'current profile/device only; no cloud sync',cap:SPARK_CAP,retention:'Latest 40 completed rounds plus unfinished rounds. Deleted and older data may be absent.',timingEnabled:safeStore.get('sparkTimingEnabled',true)!==false,runs,exposure:state.exposure.filter(id=>typeof id==='string'),limits:['Spark is supported recognition practice, not exam readiness.','First try means first submission in this round, not lifetime first exposure.','Outside help is unknown. Hints, retries and models are separated.','Foreground time is estimated exposure, not attention. Long/background gaps are excluded.','Full-problem clicks are navigation; completing that problem requires separate evidence.']};
+}
+const SPARK_PREVIOUS_EXPORT=leBuildExport;
+leBuildExport=function(){const out=SPARK_PREVIOUS_EXPORT();out.sparkPractice=sparkExport();out.scope.sparkPractice='Optional five-question play practice, profile/device-local, separate from readiness and core attempt scores.';return out;};
+const SPARK_PREVIOUS_EVIDENCE=VIEWS.learningEvidence;
+VIEWS.learningEvidence=function(v){SPARK_PREVIOUS_EVIDENCE(v);const card=el('section',{class:'card'});card.appendChild(sparkText('h2',{},'Spark · optional play practice'));card.appendChild(sparkText('p',{},sparkState().runs.length+' retained rounds on this device. First answers, clues and retries stay separate from readiness.'));sparkSettings(card);v.appendChild(card);};
+const SPARK_PREVIOUS_SAVED=VIEWS.savedWork;
+VIEWS.savedWork=function(v){SPARK_PREVIOUS_SAVED(v);const pending=sparkState().runs.filter(r=>r.status==='active');if(!pending.length)return;const box=el('section',{class:'card','data-spark-saved':true});box.appendChild(sparkText('h2',{},'Saved Spark rounds · this device'));pending.forEach(r=>box.appendChild(sparkButton(sparkName(r.scope)+' · Resume',()=>sparkStart(r.scope))));v.appendChild(box);};
+NAV_GROUP.sparkHome='practice';NAV_GROUP.sparkRun='practice';
+const sparkStyle=el('style',{id:'spark-style'});sparkStyle.textContent=`
+body.spark-playing>header,body.spark-playing>#nav{display:none!important}body.spark-playing{padding-bottom:12px}body.spark-playing>#view{padding-top:14px;padding-bottom:12px}.spark-shell .spark-prompt svg{max-height:220px;width:100%}.spark-start-report{border-top:1px solid #d9d6e9;font-size:.85rem}.spark-start-report [aria-pressed='true']{font-weight:800;background:#e9e4fc;border-radius:8px}.spark-start-report p{margin-bottom:0}
+.spark-entry{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;border:1px solid #b6cae3;border-radius:18px;background:linear-gradient(120deg,#eaf0ff,#f5edff 65%,#fff3d4);margin:0 0 18px;color:#243152}.spark-entry h2{font-size:1rem;margin:0 0 4px}.spark-entry p{font-size:.85rem;margin:0}.spark-entry-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}.spark-button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;border:0;border-radius:12px;padding:12px 20px;background:#4437a5;color:#fff;font:inherit;font-weight:750;cursor:pointer;max-width:100%;white-space:normal}.spark-button.secondary{background:#e9e7f8;color:#352e67}.spark-link{font:inherit;background:transparent;border:0;color:#453c7e;cursor:pointer;text-decoration:underline;text-underline-offset:4px;min-height:44px;padding:8px 6px;white-space:normal;max-width:100%}.spark-shell{max-width:740px;margin:10px auto 32px;padding:28px;border:1px solid #d7d9ef;border-radius:24px;background:linear-gradient(155deg,#f0f3ff,#fbfaff 48%,#fff8e8);color:#25304b;box-shadow:0 10px 40px #29224a0c}.spark-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.spark-wordmark{font-weight:850;font-size:1.25rem;color:#49379a}.spark-shell h1{font-size:clamp(1.4rem,4vw,2rem);line-height:1.2;margin:10px 0 18px;color:#252e49}.spark-shell p{line-height:1.5}.spark-lead{font-size:1rem;max-width:45ch}.spark-eyebrow{letter-spacing:.1em;font-size:.68rem;font-weight:750;color:#625b7b;margin:20px 0 8px}.spark-track{display:flex;justify-content:space-between;position:relative;gap:12px;padding:12px 0;margin:6px 0 16px}.spark-track:before{content:'';height:3px;background:#d0cee6;position:absolute;left:18px;right:18px;top:32px}.spark-node{position:relative;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#f7f6ff;color:#706b85;border:2px solid #cbc8df;font-weight:700}.spark-node.is-current{border-color:#6752c8;color:#44379b;box-shadow:0 0 0 5px #e5e0ff}.spark-node.is-lit{background:#ffda76;border-color:#be8c18;color:#5b3f00;animation:spark-pop .25s ease-out}.spark-question{padding:16px 18px;background:#fff;border:1px solid #e0e1ec;border-radius:16px;margin:0 0 16px}.spark-shell .qprompt{margin:0;font-size:1rem;line-height:1.5;overflow-wrap:anywhere}.spark-shell .qprompt svg,.spark-shell .qprompt img,.spark-choice svg,.spark-choice img{max-width:100%;height:auto}.spark-shell .qprompt figure{margin:8px 0}.spark-shell .qprompt table{max-width:100%;font-size:.85rem}.spark-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.spark-choice{display:flex;align-items:center;gap:10px;position:relative;min-height:64px;border:2px solid #d0d5e7;border-radius:14px;background:#fff;color:#26334e;font:inherit;font-size:.95rem;text-align:left;padding:13px;cursor:pointer;min-width:0;transition:transform .12s,border-color .12s}.spark-letter{flex-shrink:0;display:grid;place-items:center;border-radius:8px;background:#f0edfc;color:#59439c;width:28px;height:28px;font-weight:800}.spark-choice-text{min-width:0;overflow-wrap:anywhere}.spark-choice.is-correct{border-color:#177264;background:#e8f7f1}.spark-choice.was-tried{border-style:dashed;background:#f6f3f2;color:#62595c}.spark-choice:disabled{opacity:1;cursor:default}.spark-answer-state{display:block;font-size:.7rem;font-weight:700;margin-left:auto;min-width:45px}.spark-feedback{padding:16px 18px;border-radius:14px;background:#fff5d8;border-left:4px solid #bc8c22;margin:16px 0}.spark-feedback.good{background:#e8f7f1;border-color:#167464}.spark-feedback h2{font-size:1rem;margin:0 0 5px}.spark-feedback p{margin:5px 0}.spark-feedback details{margin-top:10px;font-size:.85rem}.spark-help{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}.spark-note{font-size:.76rem;color:#625f76;margin:14px 0 0}.spark-shell summary{cursor:pointer;min-height:44px;padding-top:10px;font-weight:650}.spark-details{margin:20px 0 8px;border-top:1px solid #d9d6e9;font-size:.85rem}.spark-details label{display:flex;align-items:center;gap:8px}.spark-details input{width:20px;height:20px}.spark-topic-label{display:flex;flex-direction:column;gap:8px;font-weight:650;margin:24px 0 16px}.spark-topic-label select{font:inherit;min-height:48px;padding:10px;border:1px solid #b7b7d6;border-radius:10px;max-width:100%;background:#fff;color:#343653}.spark-results-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:22px 0}.spark-results-grid>div{background:#fff;border:1px solid #dcdcea;padding:14px 8px;border-radius:12px;text-align:center}.spark-results-grid strong{display:block;font-size:1.8rem}.spark-results-grid span{display:block;font-size:.77rem}.spark-end-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:24px 0}.spark-shell :focus-visible,.spark-entry :focus-visible{outline:3px solid #9e6d00;outline-offset:4px}.spark-shell [tabindex='-1']:focus{outline:none}
+@keyframes spark-pop{from{transform:scale(.88)}to{transform:scale(1)}}
+@media(hover:hover){.spark-choice:not(:disabled):hover{border-color:#7462c1;transform:translateY(-2px)}.spark-button:hover{background:#342780}}
+@media(max-width:600px){.spark-entry{padding:14px;align-items:flex-start;flex-direction:column;gap:8px}.spark-entry-actions{width:100%}.spark-entry .spark-button{min-height:44px;padding:9px 18px}.spark-shell{padding:16px;margin-top:0;border-radius:18px}.spark-choices{grid-template-columns:1fr}.spark-choice{min-height:54px;padding:11px}.spark-shell .qprompt{font-size:.93rem}.spark-question{padding:12px}.spark-shell h1{margin-bottom:14px}.spark-track{margin-bottom:10px}.spark-node{width:36px;height:36px}.spark-track:before{top:29px}.spark-results-grid span{font-size:.68rem}.spark-end-actions{align-items:stretch;flex-direction:column}.spark-help{gap:6px}.spark-shell .qprompt [style*='min-width']{min-width:0!important}}
+@media(prefers-reduced-motion:reduce){.spark-node.is-lit{animation:none}.spark-choice{transition:none}.spark-choice:hover{transform:none}}
+`;document.head.appendChild(sparkStyle);
+
+/* END SPARK TAIL */
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
    unless ?qa is present, so learner sessions and their evidence can never use it. */
