@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.130</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.131</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -15124,7 +15124,49 @@ const ARROW_LAB_MOLECULES=[
  graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:80,y:170},{id:"c",el:"C",label:"CH₂",x:200,y:110},{id:"o",el:"O",label:"O",x:320,y:170,lp:3,charge:-1}],bonds:[{a:"m",b:"c",order:1},{a:"c",b:"o",order:1}]},
  expect:{core:1,extra:0,majorTier:1}}
 ];
-if(typeof module!=="undefined"&&module.exports)module.exports={ARROW_LAB_MOLECULES,alRing,alRingBonds};
+/* Original transfer examples aligned to the added Ch2 homework: competing
+ * donors (11/12), ring/exocyclic paths (16), ester donation (18), charge
+ * bookkeeping (22), and localized/delocalized sites (23/30/36). Source images
+ * and captured choices stay private. Counts below are author expectations,
+ * checked against enumeration, not harvested selections. */
+const AL_HOMEWORK_MOLECULES=[
+{key:"hx-ozone",name:"Ozone: keep the central +",formula:"O₃",pattern:"allylic-lp",level:1,
+ why:"One terminal O donates a lone pair while the other π pair moves onto its terminal O. The central O keeps one lone pair and three bond orders, so its formal charge stays +1. The terminal − changes sides; total charge stays zero.",
+ graph:{nodes:[{id:"a",el:"O",label:"O",x:90,y:176,lp:3,charge:-1},{id:"c",el:"O",label:"O",x:200,y:104,lp:1,charge:1},{id:"b",el:"O",label:"O",x:310,y:176,lp:2}],bonds:[{a:"a",b:"c",order:1},{a:"c",b:"b",order:2}]},expect:{core:2,extra:0,majorTier:2}},
+{key:"hx-methyl-acetate",name:"Ester: methyl acetate",formula:"CH₃CO₂CH₃",pattern:"allylic-lp",level:2,
+ why:"The neutral form is major. Donation from the single-bonded O makes that O positive and the carbonyl O negative. The C=O π pair must move out in the same move to keep carbon at eight electrons.",
+ graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:64,y:160},{id:"c",el:"C",label:"C",x:164,y:104},{id:"o",el:"O",label:"O",x:164,y:30,lp:2},{id:"r",el:"O",label:"O",x:264,y:160,lp:2},{id:"t",el:"C",label:"CH₃",x:356,y:104}],bonds:[{a:"m",b:"c",order:1},{a:"c",b:"o",order:2},{a:"c",b:"r",order:1},{a:"r",b:"t",order:1}]},expect:{core:1,extra:2,majorTier:1}},
+{key:"hx-six-lactone",name:"Six-membered cyclic ester",formula:"C₅H₈O₂",pattern:"allylic-lp",level:2,
+ why:"The ring does not block donation from its O into the carbonyl. Move electrons, not atoms or ring bonds. Neutral is major; the O⁺/O⁻ form has full octets but more charge separation.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:78},{id:"o",el:"O",label:"O",x:200,y:18,lp:2},{id:"r",el:"O",label:"O",x:286,y:124,lp:2},{id:"a",el:"C",label:"CH₂",x:286,y:210},{id:"b",el:"C",label:"CH₂",x:200,y:250},{id:"d",el:"C",label:"CH₂",x:114,y:210},{id:"e",el:"C",label:"CH₂",x:114,y:124}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"r",order:1},{a:"r",b:"a",order:1},{a:"a",b:"b",order:1},{a:"b",b:"d",order:1},{a:"d",b:"e",order:1},{a:"e",b:"c",order:1}]},expect:{core:1,extra:2,majorTier:1}},
+{key:"hx-urea",name:"Urea: choose either donor",formula:"O=C(NH₂)₂",pattern:"allylic-lp",level:2,
+ why:"Either N can donate while the C=O π pair moves onto O. The two N⁺/O⁻ drawings are equivalent to each other; neither is equivalent to the neutral major form.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:136},{id:"o",el:"O",label:"O",x:200,y:42,lp:2},{id:"n1",el:"N",label:"NH₂",x:94,y:202,lp:1},{id:"n2",el:"N",label:"NH₂",x:306,y:202,lp:1}],bonds:[{a:"c",b:"o",order:2},{a:"c",b:"n1",order:1},{a:"c",b:"n2",order:1}]},expect:{core:1,extra:3,majorTier:1}},
+{key:"hx-two-donors",name:"C⁺ between O and N donors",formula:"CH₃C⁺(OH)(NH₂)",pattern:"lp-next-to-cation",level:2,
+ why:"Both donors can fill the carbon sextet. O donation gives O⁺; N donation gives N⁺. Full octets beat the C⁺ sextet; among the two octet forms, these rules favor positive charge on N rather than O.",
+ graph:{nodes:[{id:"c",el:"C",label:"C",x:200,y:140,charge:1},{id:"m",el:"C",label:"CH₃",x:88,y:202},{id:"o",el:"O",label:"OH",x:200,y:42,lp:2},{id:"n",el:"N",label:"NH₂",x:310,y:202,lp:1}],bonds:[{a:"c",b:"m",order:1},{a:"c",b:"o",order:1},{a:"c",b:"n",order:1}]},expect:{core:3,extra:0,majorTier:1}},
+{key:"hx-substituted-allyl",name:"Extended allyl cation",formula:"CH₃–CH=CH–CH⁺–CH₃",pattern:"allylic-cation",level:2,
+ why:"Move the π pair into the neighboring bond and put + on the carbon at the arrow's tail side. Both allylic ends have the same methyl substitution and are related by framework symmetry. The two contributors are equivalent; the middle carbon never gains the charge.",
+ graph:{nodes:[{id:"a",el:"C",label:"CH₃",x:40,y:174},{id:"b",el:"C",label:"CH",x:120,y:108},{id:"c",el:"C",label:"CH",x:200,y:174},{id:"d",el:"C",label:"CH",x:280,y:108,charge:1},{id:"e",el:"C",label:"CH₃",x:360,y:174}],bonds:[{a:"a",b:"b",order:1},{a:"b",b:"c",order:2},{a:"c",b:"d",order:1},{a:"d",b:"e",order:1}]},expect:{core:2,extra:0,majorTier:2}},
+{key:"hx-dienolate",name:"A longer conjugated anion",formula:"O=CH–CH=CH–CH₂⁻",pattern:"allylic-lp",level:3,
+ why:"The negative charge can reach the terminal carbon, the middle carbon and oxygen along the conjugated path. Keep every H on the same atom. The O⁻ contributor is favored by electronegativity among octet forms.",
+ graph:{nodes:[{id:"o",el:"O",label:"O",x:38,y:104,lp:2},{id:"a",el:"C",label:"CH",x:116,y:166},{id:"b",el:"C",label:"CH",x:194,y:104},{id:"c",el:"C",label:"CH",x:272,y:166},{id:"d",el:"C",label:"CH₂",x:350,y:104,lp:1,charge:-1}],bonds:[{a:"o",b:"a",order:2},{a:"a",b:"b",order:1},{a:"b",b:"c",order:2},{a:"c",b:"d",order:1}]},expect:{core:3,extra:0,majorTier:1}},
+{key:"hx-iminium",name:"Start from an iminium ion",formula:"CH₂=NH⁺–CH₃",pattern:"polar-pi",level:1,
+ why:"Move the C=N π pair onto N: N becomes neutral and carbon becomes positive. Net charge stays +1. The starting iminium has full octets and is more significant than the carbon-sextet form.",
+ graph:{nodes:[{id:"c",el:"C",label:"CH₂",x:84,y:174},{id:"n",el:"N",label:"NH",x:200,y:104,charge:1},{id:"m",el:"C",label:"CH₃",x:316,y:174}],bonds:[{a:"c",b:"n",order:2},{a:"n",b:"m",order:1}]},expect:{core:2,extra:0,majorTier:1}},
+{key:"hx-amide-remote-amine",name:"Two nitrogens, different jobs",formula:"CH₃CONHCH₂CH₂NH₂",pattern:"allylic-lp",level:3,
+ why:"The amide N is directly next to C=O and can donate. The terminal amine is separated from it by saturated carbons, so its lone pair cannot jump across that gap. Do not place a positive charge on the untouched terminal N.",
+ graph:{nodes:[{id:"m",el:"C",label:"CH₃",x:32,y:164},{id:"c",el:"C",label:"C",x:100,y:108},{id:"o",el:"O",label:"O",x:100,y:28,lp:2},{id:"n",el:"N",label:"NH",x:168,y:164,lp:1},{id:"a",el:"C",label:"CH₂",x:236,y:108},{id:"b",el:"C",label:"CH₂",x:304,y:164},{id:"t",el:"N",label:"NH₂",x:372,y:108,lp:1}],bonds:[{a:"m",b:"c",order:1},{a:"c",b:"o",order:2},{a:"c",b:"n",order:1},{a:"n",b:"a",order:1},{a:"a",b:"b",order:1},{a:"b",b:"t",order:1}]},expect:{core:1,extra:2,majorTier:1}},
+{key:"hx-isolated-diene",name:"Two isolated double bonds",formula:"CH₂=CHCH₂CH=CH₂",pattern:"none",level:2,trap:"sp3-blocker",
+ why:"The middle CH₂ breaks conjugation. The two π bonds cannot pass electrons across it while preserving octets and the same sigma framework. No additional significant contributor is used in this course model.",
+ graph:{nodes:[{id:"a",el:"C",label:"CH₂",x:40,y:172},{id:"b",el:"C",label:"CH",x:120,y:108},{id:"c",el:"C",label:"CH₂",x:200,y:172},{id:"d",el:"C",label:"CH",x:280,y:108},{id:"e",el:"C",label:"CH₂",x:360,y:172}],bonds:[{a:"a",b:"b",order:2},{a:"b",b:"c",order:1},{a:"c",b:"d",order:1},{a:"d",b:"e",order:2}]},expect:{core:1,extra:0,majorTier:1}},
+{key:"hx-vinylammonium",name:"A nitrogen with no lone pair",formula:"CH₂=CH–NH₃⁺",pattern:"none",level:2,trap:"no-lp",
+ why:"NH₃⁺ has four single bonds and no lone pair to donate. Pushing the adjacent π pair into C–N would give N five bonds and ten electrons. A positive sign is not an empty orbital when N already has an octet.",
+ graph:{nodes:[{id:"a",el:"C",label:"CH₂",x:80,y:170},{id:"b",el:"C",label:"CH",x:200,y:104},{id:"n",el:"N",label:"NH₃",x:320,y:170,charge:1}],bonds:[{a:"a",b:"b",order:2},{a:"b",b:"n",order:1}]},expect:{core:1,extra:0,majorTier:1}}
+];
+AL_HOMEWORK_MOLECULES.forEach(m=>{m.sourceKind='original-practice';m.sourceAlignment='Added Chapter 2 homework skills; not copied source answers';m.sourceUrls=['https://openstax.org/books/organic-chemistry/pages/2-3-formal-charges','https://openstax.org/books/organic-chemistry/pages/2-6-drawing-resonance-forms'];m.revision='2026-10-18.1';m.family=m.key==='hx-iminium'?'heteroatom-cation':m.key==='hx-six-lactone'||m.key==='hx-methyl-acetate'?'ester-donation':m.key;});
+ARROW_LAB_MOLECULES.push(...AL_HOMEWORK_MOLECULES);
+if(typeof module!=="undefined"&&module.exports)module.exports={ARROW_LAB_MOLECULES,AL_HOMEWORK_MOLECULES,alRing,alRingBonds};
 
 /* Arrow Lab, 2026-10-02 — resonance you DRAW, checked stroke by stroke.
  * Depends on resonance-engine.js and resonance-arrow-lab-content.js, plus the app's
@@ -15141,6 +15183,8 @@ if(typeof module!=="undefined"&&module.exports)module.exports={ARROW_LAB_MOLECUL
  * match — the engine checks legality, octets, formal charges and conservation. */
 
 const AL_VB_W=400,AL_VB_H=260;
+// Include room for lone pairs/charges outside the atom-center box.
+function alViewBox(){return '-32 -32 464 324';}
 const AL_HIT=30;            // px (viewBox units) for snapping stroke ends to atoms/bonds/lone pairs
 const AL_TAP=16;            // max stroke length that counts as a dot / tap
 const AL_SIGN=48;           // max length of a + or − stroke
@@ -15213,6 +15257,14 @@ function alInterpret(fw,state,pts,panel){
 
 /* ---------- model / session ---------- */
 function alMolecule(key){return ARROW_LAB_MOLECULES.find(m=>m.key===key);}
+function alStartHomeworkMix(){
+  const pool=AL_HOMEWORK_MOLECULES.filter(m=>m.pattern!=='none'),seen=safeStore.get('arrowHomeworkSeen',[]);
+  const unused=pool.filter(m=>!seen.includes(m.key)),choices=(unused.length?unused:pool.filter(m=>m.key!==seen.at(-1)));
+  const chosen=choices[Math.floor(Math.random()*choices.length)];
+  // Selection is exposure only, never an attempt or a readiness signal.
+  safeStore.set('arrowHomeworkSeen',[...(unused.length?seen:[]),chosen.key].slice(-pool.length));
+  alStart(chosen.key,'next');
+}
 function alBuild(M){const {fw,state}=rxBuild(M.graph);return {fw,start:state};}
 function alSession(){return S.arrowLab||null;}
 function alSave(){try{safeStore.set("arrowLab",S.arrowLab||null);}catch(e){} }
@@ -15243,7 +15295,7 @@ function alCurrentStart(R,fw,start){
 function alLogEvent(R,code,detail){R.log.push({t:Date.now()-R.ts,code,...(detail||{})});}
 
 /* ---------- SVG rendering ---------- */
-function alSvgEl(tag,attrs,parent){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));if(parent)parent.appendChild(e);return e;}
+function alSvgEl(tag,attrs,parent){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);if(tag==='svg'&&attrs?.viewBox==='0 0 '+AL_VB_W+' '+AL_VB_H)attrs={...attrs,viewBox:alViewBox()};Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));if(parent)parent.appendChild(e);return e;}
 function alBondLines(fw,state,b,svg,cls){
   const [a,c]=b.key.split("-"),A=fw.byId[a],C=fw.byId[c],order=state.order[b.key];
   const dx=C.x-A.x,dy=C.y-A.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,px=-uy,py=ux;
@@ -15293,6 +15345,40 @@ function alDrawStructure(svg,fw,state,opts={}){
   (opts.ink||[]).forEach(st=>{if(st.length>1)alSvgEl("polyline",{points:st.map(p=>p.join(",")).join(" "),class:"al-ink"+(st.rejected?" rejected":"")},svg);});
 }
 
+/* Export only our known lab SVG vocabulary, preserving all ink and arrowheads.
+ * The tutor's generic serializer intentionally rejects CSS/marker dependencies.
+ * Inline these reviewed styles; unknown content fails rather than disappearing. */
+function alTutorFigure(node){
+  const svg=node.cloneNode(true),allowed=new Set(['al-svg','al-mini','al-bond','al-partial','al-claim','al-atom','sel','al-atom-bg','al-label','al-tag','al-lp','al-charge','al-delta','al-octet','over','short','full','al-arrow','bad','al-arrow-n','al-ink','rejected']);
+  if(svg.querySelector('script,style,foreignObject,iframe,image,use,animate,set'))throw Error('Unsupported lab figure');
+  const nodes=[svg,...svg.querySelectorAll('*')];
+  for(const n of nodes){
+    for(const a of [...n.attributes])if(/^on|href/i.test(a.name))throw Error('Unexpected lab dependency');
+    for(const c of n.classList)if(!allowed.has(c))throw Error('Unknown lab style');
+    const has=c=>n.classList.contains(c),set=attrs=>Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+    if(has('al-bond'))set({stroke:'#20302f','stroke-width':3,'stroke-linecap':'round',fill:'none'});
+    if(has('al-partial'))set({stroke:'#5d4b87','stroke-dasharray':'6 5'});
+    if(has('al-atom-bg'))set({fill:'#ffffff',stroke:'none'});
+    if(has('al-lp'))set({fill:has('al-claim')?'#1766b3':'#1d272c'});
+    if(has('al-label'))set({'font-family':'Arial,sans-serif','font-size':17,'font-weight':700,fill:'#1d272c'});
+    if(has('al-tag'))set({'font-family':'Arial,sans-serif','font-size':10,'font-weight':600,fill:'#6b7a80'});
+    if(has('al-delta')||has('al-octet')||has('al-arrow-n'))set({'font-family':'Arial,sans-serif','font-size':has('al-delta')?12:11,'font-weight':700,fill:has('al-arrow-n')?'#a5222d':has('over')?'#be3548':has('short')?'#b26a00':has('full')?'#2f6b4c':'#5d4b87'});
+    if(has('al-bond')&&has('al-claim'))set({stroke:'#1766b3'});
+    const charge=n.closest('.al-charge');if(charge){const color=charge.classList.contains('al-claim')?'#1766b3':'#1d272c';if(n.tagName==='circle')set({fill:'#ffffff',stroke:color,'stroke-width':1.6});if(n.tagName==='text')set({'font-family':'Arial,sans-serif','font-size':12,'font-weight':700,fill:color});}
+    if(has('al-ink'))set({fill:'none',stroke:has('rejected')?'#be3548':'#1766b3','stroke-width':2.5,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.9,...(has('rejected')?{'stroke-dasharray':'3 4'}:{})});
+    if(has('al-arrow')){
+      const color=has('bad')?'#8a8a8a':'#a5222d';set({fill:'none',stroke:color,'stroke-width':2.6,'stroke-linecap':'round',...(has('bad')?{'stroke-dasharray':'5 4'}:{})});
+      if(!/^url\(#al-head(?:-bad)?\)$/.test(n.getAttribute('marker-end')||''))throw Error('Unknown arrowhead');
+      const p=(n.getAttribute('d')||'').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi)?.map(Number);if(p?.length!==6)throw Error('Unknown arrow geometry');
+      const [,,cx,cy,x,y]=p,angle=Math.atan2(y-cy,x-cx),L=9,head=alSvgEl('path',{d:'M'+(x-L*Math.cos(angle-.5))+' '+(y-L*Math.sin(angle-.5))+' L'+x+' '+y+' L'+(x-L*Math.cos(angle+.5))+' '+(y-L*Math.sin(angle+.5)),fill:'none',stroke:color,'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'});
+      n.after(head);n.removeAttribute('marker-end');
+    }
+  }
+  svg.querySelectorAll('defs').forEach(n=>n.remove());
+  for(const n of [svg,...svg.querySelectorAll('*')])n.removeAttribute('class');
+  return svg;
+}
+
 /* ---------- product-panel claims → a state the engine can check ---------- */
 function alClaimedState(fw,start,claims){
   // The product panel starts from the σ skeleton: every bond order 1, no lone pairs.
@@ -15322,6 +15408,50 @@ function alCheckProduct(fw,start,arrowsResult,claims,names){
   const p0=rxPairCount(fw,start),p1=rxPairCount(fw,drawn);
   if(p1!==p0)issues.push({code:"pair-count",text:"Your drawing holds "+p1+" electron pairs (bonds + lone pairs); the molecule has "+p0+". Pairs move; they are not created or lost."});
   return {rows,issues,ok:issues.length===0,drawn};
+}
+
+/* Structured reasoning is checked as arithmetic, not keyword matching.
+ * Free text is retained for tutor/manual review and never auto-certified. */
+function alChargeReasoning(fw,from,result,answers={}){
+  const rows=fw.nodes.filter(n=>from.lp[n.id]!==result.lp[n.id]||rxSumOrders(fw,from,n.id)!==rxSumOrders(fw,result,n.id)).map(n=>{
+    const a=rxAtom(fw,result,n.id),given=answers[n.id]||{};
+    const integer=v=>/^[-+]?\d+$/.test(String(v??'').trim())?Number(v):null;
+    return {id:n.id,expected:{lp:a.lp,bonds:a.bondOrders+a.h,fc:a.fc},given,
+      ok:integer(given.lp)===a.lp&&integer(given.bonds)===a.bondOrders+a.h&&integer(given.fc)===a.fc};
+  });
+  return {ok:rows.length>0&&rows.every(r=>r.ok),rows,signature:rxStateSig(result)};
+}
+function alChargeReasoningCard(c,R,M,fw,from,result,names){
+  if(!M.sourceKind)return;
+  R.chargeReasoning=R.chargeReasoning||{};
+  const section=el('section',{'data-charge-reasoning':true});
+  section.appendChild(el('h4',{},'Explain the charges you just drew'));
+  section.appendChild(el('p',{},'Count bond order including H: single = 1, double = 2, triple = 3. Formal charge = valence electrons − 2 × lone pairs − bond-order total. Enter 0 for no charge.'));
+  const check=alChargeReasoning(fw,from,result,R.chargeReasoning);
+  check.rows.forEach(row=>{
+    const group=el('fieldset',{});group.appendChild(el('legend',{},names[row.id]));
+    [['lp','Lone pairs'],['bonds','Bond-order total, including H'],['fc','Formal charge']].forEach(([key,title])=>{
+      const label=el('label',{style:'display:inline-flex;flex-direction:column;gap:3px;margin:4px;max-width:100%'},title);
+      const input=el('input',{type:'text',inputmode:'text','aria-label':names[row.id]+' · '+title,style:'width:8em;max-width:100%;min-height:42px','data-charge-atom':row.id,'data-charge-field':key});
+      input.value=R.chargeReasoning[row.id]?.[key]??'';
+      input.oninput=()=>{R.chargeReasoning[row.id]=R.chargeReasoning[row.id]||{};R.chargeReasoning[row.id][key]=input.value.slice(0,8);R.chargeAudit=null;alSave();};label.appendChild(input);group.appendChild(label);
+    });section.appendChild(group);
+  });
+  section.appendChild(el('button',{class:'btn small',onclick:()=>{
+    R.chargeAudit=alChargeReasoning(fw,from,result,R.chargeReasoning);
+    if(!R.chargeAudit.ok){R.chargeReasoningTries=(R.chargeReasoningTries||0)+1;alLogEvent(R,'charge-reasoning-issues',{codes:['charge-reasoning']});}
+    alSave();render();
+  }},'Check my charge reasoning'));
+  if(R.chargeAudit){
+    const feedback=el('div',{class:'al-fb '+(R.chargeAudit.ok?'ok':'bad'),'aria-live':'polite','data-charge-feedback':true});
+    feedback.textContent=R.chargeAudit.ok?'Your counts and charges agree with the contributor you drew.':R.chargeAudit.rows.filter(r=>!r.ok).map(r=>{const a=rxAtom(fw,result,r.id);return names[r.id]+': '+a.fcText+'. Count '+a.lp+' lone pairs and '+(a.bondOrders+a.h)+' bond orders, including H.';}).join(' ');
+    section.appendChild(feedback);
+  }
+  const label=el('label',{style:'display:block;margin-top:12px'},'Your explanation (optional; use Tutor to check it)');
+  const explanation=el('textarea',{'aria-label':'Explain my resonance reasoning',rows:3,maxlength:2000,style:'display:block;width:100%;box-sizing:border-box','data-resonance-explanation':true});
+  explanation.value=R.explanation||'';explanation.oninput=()=>{R.explanation=explanation.value.slice(0,2000);alSave();};label.appendChild(explanation);section.appendChild(label);
+  section.appendChild(el('p',{class:'muted'},'The app checks your drawing, counts, pattern and ranking rule. Free-text explanations need tutor or manual review; typing one is not proof of correctness.'));
+  c.appendChild(section);
 }
 
 /* ---------- the view ---------- */
@@ -15402,6 +15532,12 @@ function alLibrary(v){
   const head=el("div",{class:"card teal"});
   head.innerHTML='<span class="tag coral">Chapter 2 · resonance you draw</span><h2>Arrow Lab</h2><p>Draw the curved arrows with your pen. Then draw the contributor they produce — extra bond lines, lone-pair dots, + and − signs. Every stroke is read back to you and checked at once: legal pattern, octets, formal charges, conservation. No multiple choice, no exact-match key: any correct contributor is accepted and ranked.</p><p class="muted" style="margin:6px 0 0">'+ARROW_LAB_MOLECULES.length+' structures · '+rows.length+' logged builds · the "Your patterns" box below is the record we review together.</p>';
   v.appendChild(head);
+  const added=el('section',{class:'card cream','data-resonance-expansion':true});
+  added.innerHTML='<h3>New homework-style drawing practice</h3><p>'+AL_HOMEWORK_MOLECULES.length+' new structures. Draw arrows → build the contributor → explain the charges → rank it. These are original examples, not imported answer keys.</p>';
+  const actions=el('div',{class:'al-tools'});
+  actions.appendChild(el('button',{class:'btn small',onclick:()=>alStartHomeworkMix()},'Start a different drawing'));
+  actions.appendChild(el('button',{class:'btn ghost small',onclick:()=>{const card=document.querySelector('[data-al-homework="hx-methyl-acetate"]');if(card)card.scrollIntoView({block:'center'});}},'Browse new structures'));
+  added.appendChild(actions);v.appendChild(added);
   v.appendChild(alPatternsCard(rows));
   const groups=[["allylic-lp","Pattern 1 · Allylic lone pair"],["allylic-cation","Pattern 2 · Allylic carbocation"],["lp-next-to-cation","Pattern 3 · Lone pair next to C⁺"],["polar-pi","Pattern 4 · Polar π bond"],["ring-pi","Pattern 5 · π bonds in a ring"],["none","Traps · no resonance here"]];
   groups.forEach(([pat,title])=>{
@@ -15410,8 +15546,8 @@ function alLibrary(v){
     const grid=el("div",{class:"al-lib"});
     Ms.forEach(M=>{
       const {fw,start}=alBuild(M);const done=rows.filter(a=>a.drawing.molecule===M.key);const clean=done.filter(a=>a.ok&&!a.h).length;
-      const c=el("div",{class:"card cream"});
-      const svg=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-mini",role:"img","aria-label":M.name});alDrawStructure(svg,fw,start);c.appendChild(svg);
+      const c=el("div",{class:"card cream",...(M.sourceKind?{'data-al-homework':M.key}:{})});
+      const svg=alSvgEl("svg",{viewBox:alViewBox(),class:"al-mini",role:"img","aria-label":M.name});alDrawStructure(svg,fw,start);c.appendChild(svg);
       c.appendChild(el("h4",{},M.name+" <span class='muted' style='font-weight:400'>"+M.formula+"</span>"));
       c.appendChild(el("p",{class:"muted",style:"margin:0 0 6px"},(M.trap?"Trap · ":"Level "+M.level+" · ")+(done.length?done.length+" build"+(done.length===1?"":"s")+", "+clean+" clean":"not yet built")));
       const row=el("div",{class:"al-tools"});
@@ -15430,6 +15566,7 @@ function alPatternsCard(rows){
   const codes={},mism={pattern:0,rank:0,reason:0,n:0},rec={ok:0,total:0};
   rows.forEach(a=>{const d=a.drawing;(d.errors||[]).forEach(e=>{codes[e.code]=(codes[e.code]||0)+e.count;});if(d.patternClaimed&&d.patternActual){mism.n++;if(d.patternClaimed!==d.patternActual&&d.patternClaimed!=="unsure")mism.pattern++;}if(d.rankClaimed&&d.rankActual&&d.rankClaimed!==d.rankActual)mism.rank++;if(d.reasonClaimed&&d.reasonActual&&d.reasonClaimed!==d.reasonActual&&d.reasonClaimed!=="unsure")mism.reason++;rec.ok+=d.strokesRecognized||0;rec.total+=(d.strokesRecognized||0)+(d.strokesRejected||0);});
   const names={"tail-sigma":"tried to move a σ bond","tail-no-lp":"tail on an atom with no lone pair","lp-in-plane":"pushed an in-plane (sp²) lone pair","lp-to-atom":"lone pair aimed at an atom","head-not-adjacent":"head not on an adjacent bond","head-not-endpoint":"π collapsed onto a non-member atom","head-new-bond":"tried to create a new connection","octet-over":"left an atom with 10 electrons","charge-wrong":"written charge ≠ formal charge","lp-count":"lone-pair count off","bond-order":"bond order off","net-charge":"net charge changed","pair-count":"electron pairs created/lost","collapse-no-payoff":"collapsed π with no EN payoff","charges-on-carbon":"separated charge onto carbons","new-sextet":"made a sextet without payoff","heteroatom-sextet":"left N/O with six electrons","dominated-by-donation":"polar collapse beside an anion","unreasonable":"legal but not a contributor to draw"};
+  names['charge-reasoning']='charge calculation needed correction';
   const sorted=Object.entries(codes).sort((a,b)=>b[1]-a[1]);
   c.innerHTML='<h3>Your patterns <span class="muted" style="font-weight:400">· '+rows.length+' builds</span></h3>';
   const t=el("table",{class:"al-pattern-table"});
@@ -15507,31 +15644,30 @@ function alView(v){
     const right=el("div",{class:"al-panel"});
     const ev=rxEvaluateMove(fw,from,R.arrows);
     right.appendChild(el("h4",{},R.phase==="product"?"3 · Draw the contributor your arrows make: a 2nd line along a bond for π, dots for lone pairs, + or − beside an atom":"3 · Your contributor"));
-    const svgR=alSvgEl("svg",{viewBox:"0 0 "+AL_VB_W+" "+AL_VB_H,class:"al-svg",role:"img","aria-label":"Draw the resulting contributor"});
+    const svgR=alSvgEl("svg",{viewBox:alViewBox(),class:"al-svg",role:"img","aria-label":"Draw the resulting contributor"});
     const bare={lp:Object.fromEntries(fw.nodes.map(n=>[n.id,0])),order:Object.fromEntries(fw.bonds.map(b=>[b.key,1]))};
     const paintRight=()=>alDrawStructure(svgR,fw,bare,{names,showCharges:false,claimOrders:R.claims.order,claimLp:R.claims.lp,claimCharge:R.claims.charge,claimChargeAt:R.claims.chargeAt,ink:R.productInk,selected:R.selected});
     paintRight();right.appendChild(svgR);
     const readR=el("div",{class:"al-read","aria-live":"polite"},R.msg&&R.msg.panel==="product"?R.msg.html:"&nbsp;");right.appendChild(readR);
     const toolsR=el("div",{class:"al-tools"});
     if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn ghost small",onclick:()=>{const last=R.log.filter(x=>x.code==="claim").pop();if(last){alUnclaim(R,last);alLogEvent(R,"undo-claim");}R.msg=null;R.productInk=[];alSave();render();}},"Undo"));
-    if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn ghost small",onclick:()=>{R.claims={lp:{},order:{},charge:{},chargeAt:{}};R.productInk=[];R.msg=null;alSave();render();}},"Clear"));
+    if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn ghost small",onclick:()=>{R.claims={lp:{},order:{},charge:{},chargeAt:{}};R.pendingPlusHalf=null;R.productInk=[];R.msg=null;alSave();render();}},"Clear"));
     if(R.phase==="product"&&!R.prefilled)toolsR.appendChild(el("button",{class:"btn ghost small",title:"Copies lone pairs, π bonds and charges of atoms your arrows do not touch. Counts as a hint.",onclick:()=>{alPrefill(R,fw,from);R.hints++;alLogEvent(R,"prefill");alSave();render();}},"Prefill untouched atoms (hint)"));
     if(R.phase==="product")toolsR.appendChild(el("button",{class:"btn small",onclick:()=>alCheckProductNow(R,M,fw,start,from,names)},"Check my contributor →"));
     right.appendChild(toolsR);
     if(R.phase==="product"){
-      let pendingHalf=null;
+      let pendingHalf=R.pendingPlusHalf||null;
       alAttachInk(svgR,fw,()=>bare,"product",evt=>{
         if(evt.type!=="end"){R.productInk=[evt.points];paintRight();return;}
-        R.productInk=[];const it=alInterpret(fw,bare,evt.points,"product");
+        R.productInk=[];let it=alInterpret(fw,bare,evt.points,"product");
         if(it.kind==="none"){R.rejected++;alLogEvent(R,"stroke-rejected",{why:it.why,panel:"product"});R.msg={panel:"product",html:"<span style='color:#be3548'>Not read.</span> "+it.why};const pts=evt.points;pts.rejected=true;R.productInk=[pts];alSave();render();return;}
         if(it.kind==="select"){const have=alClaimedState(fw,start,R.claims);const A=rxAtom(fw,have,it.atom);R.msg={panel:"product",html:"<b>"+names[it.atom]+"</b> as drawn: "+alNamed(fw,names,it.atom,A.electronText)+" · "+alNamed(fw,names,it.atom,A.fcText)};alSave();render();return;}
         if(it.kind==="plus-half"){ // a vertical stroke: half of a +; pair it with a horizontal drawn just before or after
           const lastClaim=R.log.filter(x=>x.code==="claim").pop();
-          if(lastClaim&&lastClaim.kind==="minus"&&lastClaim.atom===it.atom&&Date.now()-R.ts-lastClaim.t<4000){alUnclaim(R,lastClaim);alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
-          else if(pendingHalf&&pendingHalf.atom===it.atom&&Date.now()-pendingHalf.t<4000){pendingHalf=null;alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
-          else{pendingHalf={atom:it.atom,t:Date.now()};R.msg={panel:"product",html:"Vertical stroke by <b>"+names[it.atom]+"</b> — cross it to make a <b>+</b>."};render();return;}
+          if(lastClaim&&lastClaim.kind==="minus"&&lastClaim.atom===it.atom&&R.claims.charge[it.atom]===-1&&Date.now()-R.ts-lastClaim.t<4000){alUnclaim(R,lastClaim);alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};R.pendingPlusHalf=null;}
+          else{pendingHalf=R.pendingPlusHalf={atom:it.atom,t:Date.now()};R.msg={panel:"product",html:"Vertical stroke by <b>"+names[it.atom]+"</b> — cross it to make a <b>+</b>."};alSave();render();return;}
         }else if(it.kind==="minus"){
-          if(pendingHalf&&pendingHalf.atom===it.atom&&Date.now()-pendingHalf.t<4000){pendingHalf=null;alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
+          if(pendingHalf&&pendingHalf.atom===it.atom&&Date.now()-pendingHalf.t<4000){pendingHalf=R.pendingPlusHalf=null;alClaim(R,{kind:"plus",atom:it.atom,at:it.at});it={kind:"plus",atom:it.atom};}
           else alClaim(R,{kind:"minus",atom:it.atom,at:it.at});
         }else alClaim(R,it);
         // instant read-back + arithmetic for the atom touched
@@ -15600,6 +15736,7 @@ function alRankCard(v,R,M,fw,start,from,names,all,ranked){
   c.innerHTML="<h3>4 · Rank it</h3><p class='muted' style='margin:0 0 6px'>Compared with the structure you pushed FROM, is this contributor more significant, less, or equivalent? If octets, charge count and electronegativity do not distinguish non-equivalent forms, choose unresolved. A tie in those rules does not prove equal weight.</p>";
   const chips=el("div",{class:"al-chips"});[["more","More significant"],["equal","Equivalent by symmetry"],["less","Less significant"],["unresolved","Unresolved by these rules"]].forEach(([k,l])=>chips.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.rankClaimed===k),onclick:()=>{R.rankClaimed=k;alSave();render();}},l)));c.appendChild(chips);
   const chips2=el("div",{class:"al-chips"});AL_RANK_REASONS.forEach(([k,l])=>chips2.appendChild(el("button",{class:"al-chip","aria-pressed":String(R.reasonClaimed===k),onclick:()=>{R.reasonClaimed=k;alSave();render();}},"because "+l)));c.appendChild(chips2);
+  alChargeReasoningCard(c,R,M,fw,from,ev.result,names);
   c.appendChild(el("button",{class:"btn small",disabled:!(R.rankClaimed&&R.reasonClaimed),onclick:()=>{if(!(R.rankClaimed&&R.reasonClaimed))return;alFinish(R,M,fw,start,from,names,all,ranked);}},"Show me the verdict →"));
   v.appendChild(c);
 }
@@ -15613,6 +15750,10 @@ function alDecidingReason(fa,fb){
 }
 function alFinish(R,M,fw,start,from,names,all,ranked){
   const ev=rxEvaluateMove(fw,from,R.arrows),sig=rxStateSig(ev.result);
+  if(M.sourceKind){
+    R.chargeAudit=alChargeReasoning(fw,from,ev.result,R.chargeReasoning||{});
+    if(!R.chargeAudit.ok){R.phase='rank';R.chargeReasoningTries=(R.chargeReasoningTries||0)+1;alLogEvent(R,'charge-reasoning-issues',{codes:['charge-reasoning']});alSave();render();return;}
+  }
   const inSet=all.find(c=>c.sig===sig),reasonable=rxReasonable(fw,from,R.arrows,ev.result);
   const fa=rxFactors(fw,ev.result),fb=rxFactors(fw,from),cmp=rxCompare(fa,fb);
   const equivalent=cmp===0&&rxEquivalent(fw,ev.result,from),rankActual=cmp<0?"more":cmp>0?"less":equivalent?"equal":"unresolved",reasonActual=cmp===0&&!equivalent?"unsure":alDecidingReason(fa,fb);
@@ -15623,14 +15764,16 @@ function alFinish(R,M,fw,start,from,names,all,ranked){
   const errCounts={};
   R.log.forEach(e=>{
     if(e.code==="arrow-illegal"&&e.legality)errCounts[e.legality]=(errCounts[e.legality]||0)+1;
-    if(e.code==="commit-invalid"||e.code==="product-issues")(e.codes||[]).forEach(c=>{errCounts[c]=(errCounts[c]||0)+1;});
+    if(e.code==="commit-invalid"||e.code==="product-issues"||e.code==='charge-reasoning-issues')(e.codes||[]).forEach(c=>{errCounts[c]=(errCounts[c]||0)+1;});
   });
   if(!reasonable.ok)errCounts[reasonable.code]=(errCounts[reasonable.code]||0)+1;
   const clean=Object.keys(errCounts).length===0&&R.rejected===0&&R.hints===0;
   const ok=!!inSet&&R.productCheck&&R.productCheck.ok&&R.rankClaimed===rankActual&&R.reasonClaimed===reasonActual&&R.patternClaimed===patternActual;
-  const ev2={id:"AL-"+M.key+"-"+R.task,questionRevision:'2026-10-03.2',ts:Date.now(),ok:ok?1:0,g:0,d:Math.min(900,Math.round((Date.now()-R.ts)/1000)),m:"arrowlab",t:"resonance",h:R.hints,a:(R.patternClaimed||"")+"/"+(R.rankClaimed||"")+"/"+(R.reasonClaimed||""),
+  const ev2={id:"AL-"+M.key+"-"+R.task,questionRevision:M.revision||'2026-10-03.2',ts:Date.now(),ok:ok?1:0,g:0,d:Math.min(900,Math.round((Date.now()-R.ts)/1000)),m:"arrowlab",t:"resonance",h:R.hints,a:(R.patternClaimed||"")+"/"+(R.rankClaimed||"")+"/"+(R.reasonClaimed||""),
+    ...(M.sourceKind?{reasoning:String(R.explanation||'').slice(0,2000),reasoningKind:'unreviewed-text'}:{}),
     drawing:{kind:"arrow-lab",version:1,molecule:M.key,task:R.task,fromSig:R.fromSig,arrows:R.arrows.map(x=>({...x})),product:{lp:Object.fromEntries(Object.entries(R.claims.lp).map(([k,v])=>[k,v.length])),order:{...R.claims.order},charge:{...R.claims.charge}},
       inSet:!!inSet,reasonable:reasonable.ok,patternClaimed:R.patternClaimed,patternActual,rankClaimed:R.rankClaimed,rankActual,reasonClaimed:R.reasonClaimed,reasonActual,
+      ...(M.sourceKind?{family:M.family,firstTry:!(R.productTries||R.chargeReasoningTries),checks:1+(R.productTries||0)+(R.chargeReasoningTries||0),chargeReasoning:JSON.parse(JSON.stringify(R.chargeReasoning||{})),chargeReasoningPassed:R.chargeAudit?.ok===true,chargeReasoningTries:R.chargeReasoningTries||0,explanation:String(R.explanation||'').slice(0,2000),explanationReview:'not-automatically-graded'}:{}),
       errors:Object.entries(errCounts).map(([code,count])=>({code,count})),strokesRejected:R.rejected,strokesRecognized:R.log.filter(e=>e.code==="arrow"||e.code==="arrow-illegal"||e.code==="claim").length,productTries:R.productTries||0,hints:R.hints,clean}};
   if(!ok){const first=Object.keys(errCounts)[0];ev2.x=first||(R.rankClaimed!==rankActual?"rank-"+rankActual:R.reasonClaimed!==reasonActual?'rank-reason':R.patternClaimed!==patternActual?'resonance-pattern':"not-in-set");}
   S.attempts.push(ev2);if(S.attempts.length>5000)S.attempts=S.attempts.slice(-5000);
@@ -15666,11 +15809,15 @@ function alDoneCard(v,R,M,fw,start,from,names,all,ranked){
   row2.appendChild(el("button",{class:"btn ghost small",onclick:()=>alAbandon()},"Back to library"));
   if(R.returnTo==="drill"&&S.drill)row2.appendChild(el("button",{class:"btn gold small",onclick:()=>{S.arrowLab=null;alSave();go("drill");}},"Back to the question →"));
   c.appendChild(row2);
+  if(M.sourceKind){
+    c.appendChild(el('p',{},'Charge reasoning: your entered counts were checked against the drawn contributor. Corrections stay in the attempt record; free text is not automatically graded.'));
+    if(R.explanation){const explanation=el('p',{});explanation.textContent='Your explanation: '+R.explanation;c.appendChild(explanation);}
+  }
   v.appendChild(c);
   c.appendChild(el("p",{class:"muted",style:"margin-top:8px"},"<b>Why this one matters:</b> "+M.why));
 }
 function alReasonText(code){return ({"collapse-no-payoff":"it collapses a π bond onto an atom that is not more electronegative, with nothing forcing it — no chemist draws that form.","charges-on-carbon":"it separates charge with both new charges on carbon, so there is no electronegativity payoff.","new-sextet":"it creates a new incomplete octet without the polar-π payoff.","heteroatom-sextet":"it leaves a nitrogen or oxygen with six electrons — never significant.","dominated-by-donation":"it leaves C⁺ right beside a lone pair that would simply fill it; the real contributor comes from pushing that lone pair in.","too-much-separation":"it creates two new pairs of charges at once."})[code]||"it is not a contributor chemists draw.";}
-function alContinueFrom(R,sig){R.fromSig=sig;R.phase="arrows";R.arrows=[];R.ink=[];R.productInk=[];R.claims={lp:{},order:{},charge:{},chargeAt:{}};R.patternClaimed=null;R.rankClaimed=null;R.reasonClaimed=null;R.msg=null;R.result=null;R.productCheck=null;R.productTries=0;R.prefilled=false;R.ts=Date.now();R.log=[];R.hints=0;R.rejected=0;alSave();render();}
+function alContinueFrom(R,sig){R.fromSig=sig;R.phase="arrows";R.arrows=[];R.ink=[];R.productInk=[];R.claims={lp:{},order:{},charge:{},chargeAt:{}};R.patternClaimed=null;R.rankClaimed=null;R.reasonClaimed=null;R.msg=null;R.result=null;R.productCheck=null;R.productTries=0;R.prefilled=false;R.chargeReasoning={};R.chargeAudit=null;R.chargeReasoningTries=0;R.explanation='';R.tutorHelpAt=null;R.ts=Date.now();R.log=[];R.hints=0;R.rejected=0;alSave();render();}
 function alAbandon(){S.arrowLab=null;alSave();go("arrowlab");}
 
 /* Trap task: declare "no resonance" or try arrows */
@@ -17173,6 +17320,11 @@ function smCh6PracticeCard(){
 }
 VIEWS.modePractice=v=>{
   smHeading(v,'practice');
+  if(smChapter().id==='ch2'){
+    const card=el('section',{class:'card sm-panel','data-resonance-practice':true});
+    card.innerHTML='<h2>Draw resonance—not just answers</h2><p>Arrow Lab: '+AL_HOMEWORK_MOLECULES.length+' new homework-style structures. Draw curved arrows, build the contributor and explain its charges. Check your explanation with Tutor.</p>';
+    card.appendChild(smButton(S.arrowLab?'Resume my resonance drawing':'Open resonance drawing practice',()=>{courseNavigationSaveWork();go('arrowlab');},{class:'btn'}));v.appendChild(card);
+  }
   if(['ch4','ch5'].includes(smChapter().id)&&typeof ch45HCard==='function')v.appendChild(ch45HCard(Number(smChapter().id.slice(2))));
   const warm=el('details',{class:'card sm-panel','data-study-warmup-panel':true});warm.innerHTML='<summary>Optional warm-up · up to 3 quick questions</summary><p>Try a few single skills before a full problem.</p>';
   const pool=smWarmupPool(),topics=[...new Set(pool.map(q=>q.topic))];
@@ -20079,7 +20231,7 @@ const swStyle=el('style',{id:'saved-work-style'});swStyle.textContent=`
 swPrune();
 
 /* BEGIN EXAM PRACTICE TAIL */
-const MASTER_SOURCE_SUMMARY={"sourceDocuments":68,"indexedPages":585,"captureRecords":190,"capturedQuestionGroups":146,"completeRenderedStates":316,"partialOrUnknownStates":667,"chadsQuestionGroups":2};
+const MASTER_SOURCE_SUMMARY={"sourceDocuments":68,"indexedPages":585,"captureRecords":242,"capturedQuestionGroups":198,"completeRenderedStates":384,"partialOrUnknownStates":872,"chadsQuestionGroups":14};
 /* BEGIN EXAM A PRACTICE — source-aware MC sampling, 2026-10-16.
  * Uses the existing sealed check ledger, response controls and grader. Nothing
  * here awards ordinary attempt/mastery credit or claims instructor weighting. */
@@ -21088,6 +21240,18 @@ window.TutorChat=TutorChat;
     Object.entries(out.work).forEach(([key,row])=>{const shownAt=validTime(state.work[key]?.tutorHelpAt);if(shownAt)row.tutorHelpAt=shownAt;});return out;
   };
   wrapView('masterBankQuestion',v=>{const q=QUESTIONS.find(x=>x.id===S.masterBankQuestion);if(q)mount(v.querySelector('.mb-root'),q,{runId:'bank-preview:'+q.id,surface:'bank-preview'});});
+  wrapView('arrowlab',v=>{
+    const R=S.arrowLab,M=R&&alMolecule(R.key);if(!R||!M||R.task==='spot')return;
+    const {fw,start}=alBuild(M),from=alCurrentStart(R,fw,start),profile=actor(),names=alDisplayNames(fw);
+    const source=alSvgEl('svg',{viewBox:alViewBox(),role:'img','aria-label':M.name});alDrawStructure(source,fw,from,{names});
+    const q={id:'AL-'+M.key+'-'+R.task,chapter:2,topic:'resonance',type:'arrow-lab',
+      prompt:'<p>'+escape(M.name)+': draw resonance arrows and the resulting contributor. Atoms and hydrogens stay fixed.</p>'+alTutorFigure(source).outerHTML,
+      why:'<p>'+escape(M.why)+'</p><p>Check electron source/destination, unchanged sigma framework, octets, lone pairs, formal charge = valence − 2×LP − bond-order total (including H), net charge, and the stated ranking reason. Free text is not deterministically graded. The local ranking model omits substitution and aromaticity energy; do not interpret a rule tie as equal physical weights.</p>'};
+    mount(v,q,{runId:'arrowlab:'+M.key+':'+R.ts,surface:'arrow-lab',locked:R.mode!=='guided'&&R.phase!=='done',fingerprint:leFingerprint({key:M.key,revision:M.revision||'2026-10-03.2',graph:M.graph,fromSig:R.fromSig,task:R.task}),
+      getWork:()=>text(JSON.stringify({atoms:fw.nodes.map(n=>({id:n.id,name:names[n.id],element:n.el,hydrogens:n.h})),sourceState:from,arrows:R.arrows,drawn:R.claims,chargeReasoning:R.chargeReasoning||{},pattern:R.patternClaimed,ranking:R.rankClaimed,rankingReason:R.reasonClaimed,explanation:R.explanation||'',phase:R.phase})),
+      getFigureNodes:()=>[...v.querySelectorAll('.al-panel svg.al-svg')].map(alTutorFigure),
+      onHelp:()=>{if(!sameActor(profile)||S.view!=='arrowlab'||S.arrowLab!==R||(R.mode!=='guided'&&R.phase!=='done'))return false;if(R.phase!=='done'&&!validTime(R.tutorHelpAt)){R.tutorHelpAt=Date.now();R.hints++;alLogEvent(R,'tutor-help');alSave();}return true;}});
+  });
   function attachLessonCheck(host,progress,spec){
     if(!progress||!spec?.id||progress.phase!=='check')return;
     const profile=actor(),q={id:spec.id,type:'lesson-check',prompt:'<p>'+escape(spec.prompt)+'</p>',choices:spec.choices.map(c=>escape(c.text)),why:'<p>'+escape(spec.feedback||'')+'</p>'};
