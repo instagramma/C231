@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.132</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.133</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -4774,6 +4774,8 @@ function renderProtonArrowQuestion(host,q,D,finish,onWrittenArrowPass,reviewOnly
     if(locked())return;
     if(draft.arrows.length!==2||(q.fields||[]).slice(4).some((f,i)=>!draft.answers[i+4])){status.textContent=q.type==="written"?'Draw both arrows before checking Part 1.':'Draw two arrows and choose the answer below before checking.';return;}
     const correctArrows=spec.expected.every(w=>draft.arrows.some(a=>a.from===w.from&&a.to===w.to));
+    draft.practiceChecks=(draft.practiceChecks||[]).concat({ts:Date.now(),actor:leActor(),fingerprint:QuestionPractice.fingerprint(q),helped:hintUse(D,q).count>0,correct:correctArrows,arrows:JSON.parse(JSON.stringify(draft.arrows)),answers:{...draft.answers},stage:'proton-transfer-arrows'});
+    remember();save(); // Seal even a failed Part 1 before feedback or navigation.
     if(q.type==="written"){
       if(!correctArrows){status.textContent='Not yet. One or both arrows has the wrong electron source or destination. Use Undo and try Part 1 again.';return;}
       draft.locked=true;(D.writtenArrowPassed||(D.writtenArrowPassed={}))[q.id]=true;remember();save();
@@ -5229,7 +5231,7 @@ function logAttempt(q,ok,guessed,D,dk,ans){
   const hu=hintUse(D,q); ev.h=hu.count; // v3.69: explicit zero matters—unassisted work is evidence too
   if(hu.steps.length)ev.hs=hu.steps;
   if(hu.feedback)ev.hf=hu.feedback;
-  if(q.arrowBoard&&D.arrowDrafts?.[q.id]){const a=D.arrowDrafts[q.id];ev.drawing={kind:'proton-transfer',version:1,model:q.arrowBoard,arrows:a.arrows.map(x=>({...x})),answers:{...a.answers}};}
+  if(q.arrowBoard&&D.arrowDrafts?.[q.id]){const a=D.arrowDrafts[q.id];ev.drawing={kind:'proton-transfer',version:1,model:q.arrowBoard,arrows:a.arrows.map(x=>({...x})),answers:{...a.answers},componentChecks:JSON.parse(JSON.stringify(a.practiceChecks||[]))};}
   else if((q.resonanceBoard||D.diagResonanceRequirements?.[q.id])&&D.resLabEvidence?.[q.id]){const a=D.resLabEvidence[q.id];ev.drawing={kind:'resonance',version:1,model:a.key,arrows:(a.arrows||[]).map(x=>({...x})),product:a.product?resCloneGraph(a.product):null,clean:!!a.clean};}
   if(D.ch4Evidence?.[q.id])ev.drawing=JSON.parse(JSON.stringify(D.ch4Evidence[q.id]));
   if(q.requiresDrawing&&D.sketchDrafts?.[q.id]){
@@ -11940,6 +11942,7 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   (attempts||[]).filter(a=>adaptiveLearningRecordedAttempt(a,now)).forEach(a=>{priorCounts[a.id]=(priorCounts[a.id]||0)+1;latestTs[a.id]=Math.max(latestTs[a.id]||0,a.ts||0);});
   const usedSkills={};used.forEach(id=>{const q=byId.get(id);if(q){const key=adaptiveLearningSkill(q).key;usedSkills[key]=(usedSkills[key]||0)+1;}});
   const tutorSignals=options.tutorSignals||(typeof TutorInsights!=='undefined'?TutorInsights.pending(pool,attempts,now):[]);
+  const practiceSignals=options.practiceSignals||(typeof QuestionPractice!=='undefined'?QuestionPractice.pending(pool,attempts,now):[]);
   const ranked=working.map(q=>{
     const skill=evidence.skills[adaptiveLearningSkill(q).key],level=adaptiveLearningDifficulty(q);
     const lower=skill.levels.filter(x=>x<skill.target),base=skill.levels.find(x=>x>=1)??skill.levels[0];
@@ -11953,7 +11956,9 @@ function adaptiveLearningSelect(pool,attempts,options={}){
     const families=adaptiveLearningFamilies(q),planned=Math.max(0,...families.map(k=>plannedCounts[k]||0)),lastPlanned=Math.max(0,...families.map(k=>plannedLast[k]||0));
     const tutorSignal=tutorSignals.find(s=>!s.resolved&&(typeof TutorInsights!=='undefined'?TutorInsights.matches(q,s):s.skill===skill.key));
     const tutorProbe=!!tutorSignal&&!usedSkills[skill.key]&&!repair&&!foundation;
-    return {q,skill,level,desired,score:score+(rotating?planned*45:0)+(tutorProbe?-35:0)+(tutorProbe&&q.id===tutorSignal.questionId?250:0),familySeen,lastPlanned,tutorSignal:tutorProbe?tutorSignal:null};
+    const practiceSignal=practiceSignals.find(s=>QuestionPractice.matches(q,s));
+    const practiceProbe=!!practiceSignal&&!usedSkills[skill.key]&&!repair&&!foundation;
+    return {q,skill,level,desired,score:score+(rotating?planned*45:0)+(tutorProbe?-35:0)+(tutorProbe&&q.id===tutorSignal.questionId?250:0)+(practiceProbe?-40:0)+(practiceProbe&&q.id===practiceSignal.questionId?200:0),familySeen,lastPlanned,tutorSignal:tutorProbe?tutorSignal:null,practiceSignal:practiceProbe?practiceSignal:null};
   }).sort((a,b)=>a.score-b.score||a.lastPlanned-b.lastPlanned||String(a.q.id).localeCompare(String(b.q.id)));
   const pick=ranked[0],role=repair?(repairFallback?'repair-fallback':foundation?'foundation-repair':'repair'):foundation?(pick.level<pick.skill.target?'foundation-check':'foundation-fallback'):pick.skill.promoted?'challenge':'calibration';
   const levelNames=['recall','foundation','intermediate','challenge'];
@@ -11965,7 +11970,8 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   if(rotating&&selections.length)reason+=' '+(alternatives.length?'A different item from the previous round is available.':'This small skill pool needs a repeat; use it as retrieval practice, not new proof.');
   let summary=repair?(repairFallback?'That skill needs more work. Try another skill while it stays on your review list.':'Practise the step you just missed or needed help with.'):foundation?'Check a basic skill before moving on.':pick.skill.promoted?'Your recent answers support trying a harder problem.':'Try this problem so we can see what needs practice.';
   if(pick.tutorSignal){summary=pick.tutorSignal.label+'. Try it without help.';reason+=' Your learner-authored tutor reasoning or help request prompted this check; the chat was not graded.';}
-  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role:pick.tutorSignal?'tutor-follow-up':role,target:pick.desired,level:pick.level,reason,summary,tutorEvidence:pick.tutorSignal?pick.tutorSignal.requests:null,freshInApp:!pick.familySeen,slot:slot?.label||null,slotFallback}};
+  if(pick.practiceSignal){summary=pick.practiceSignal.label+'. Try a different example.';reason+=' A retained '+pick.practiceSignal.source+' '+pick.practiceSignal.kind+' prompted this practice follow-up; it does not change readiness.';}
+  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role:pick.practiceSignal?'practice-follow-up':pick.tutorSignal?'tutor-follow-up':role,target:pick.desired,level:pick.level,reason,summary,practiceEvidence:pick.practiceSignal||null,tutorEvidence:pick.tutorSignal?pick.tutorSignal.requests:null,freshInApp:!pick.familySeen,slot:slot?.label||null,slotFallback}};
 }
 function adaptiveLearningPool(options={}){
   let topics=options.topics?.slice(),chapter=options.chapter;
@@ -11978,6 +11984,7 @@ function adaptiveLearningPool(options={}){
 }
 function adaptiveLearningQueue(pool,attempts,total=10,options={}){
   const queue=[],decisions=[];
+  if(!options.practiceSignals&&typeof QuestionPractice!=='undefined')options={...options,practiceSignals:QuestionPractice.pending(pool,attempts,options.now??Date.now())};
   for(let i=0;i<total;i++){
     const next=adaptiveLearningSelect(pool,attempts,{...options,index:i,usedIds:queue.map(q=>q.id)});
     if(!next)break;queue.push(next.question);decisions.push({...next.decision,index:i});
@@ -19273,6 +19280,11 @@ function dcRecommend({questions=[],attempts=[],chapters=[],settings={},coverage=
     const stale=now-repair.latestAt>7*86400000;
     return {...context,kind:stale?'practice':'repair',topic:repair.topic,capability:repair.capability,skillKey:repair.skillKey,granularity:repair.granularity,questionId:repair.rows[0].id,title:stale?'Recheck an older gap':'Fix one missed step',why:(stale?'The last signal for this skill is over a week old. Try a problem before assuming the same gap remains. ':repair.repeatedMisses?'More than one retained miss appears on this skill. ':'A recent retained answer or review flag needs another look. ')+(repair.selfReviewed?'Drawing results here are self-reported, not an automatic chemistry grade. ':'')+(repair.granularity==='topic-fallback'?'This bank only labels the broader topic, so the exact missed decision is unknown. ':'')+'Correct recognition answers do not settle a separate drawing or conversion skill.'};
   }
+  const practiceGap=typeof QuestionPractice!=='undefined'?QuestionPractice.pending(pool,attempts,now)[0]:null;
+  if(practiceGap){
+    const ids=pool.filter(q=>QuestionPractice.matches(q,practiceGap)&&q.id!==practiceGap.questionId).map(q=>q.id);
+    if(ids.length)return {...context,kind:'practice',practiceFollowUp:true,topic:pool.find(q=>ids.includes(q.id)).topic,questionId:practiceGap.questionId,tutorPracticeIds:ids,title:practiceGap.label,why:'Your '+practiceGap.source+' record shows a '+practiceGap.kind+'. Try a different example. First answers, corrections and help stay separate; this does not change a readiness score.'};
+  }
   const chatGap=typeof TutorInsights!=='undefined'?TutorInsights.pending(pool,attempts,now)[0]:null;
   if(chatGap){
     const ids=pool.filter(q=>TutorInsights.matches(q,chatGap)&&q.id!==chatGap.questionId).map(q=>q.id);
@@ -19323,7 +19335,9 @@ function dcPulsePlan({questions=[],attempts=[],chapters=[],settings={},now=Date.
   }
   const firstChatGaps=typeof TutorInsights!=='undefined'?TutorInsights.pending(focus,attempts,now):[];
   const firstChatProbes=focus.filter(q=>firstChatGaps.some(g=>TutorInsights.matches(q,g)&&g.questionId!==q.id));
-  pick(firstChatProbes.length?firstChatProbes:familiar.length?familiar:focus,firstChatProbes.length?'tutor reasoning follow-up':familiar.length?'familiar focus skill':'focus foundation',focus);
+  const practiceGaps=typeof QuestionPractice!=='undefined'?QuestionPractice.pending(focus,attempts,now):[];
+  const practiceProbes=focus.filter(q=>practiceGaps.some(g=>QuestionPractice.matches(q,g)&&g.questionId!==q.id));
+  pick(practiceProbes.length?practiceProbes:firstChatProbes.length?firstChatProbes:familiar.length?familiar:focus,practiceProbes.length?'first try / correction / help follow-up':firstChatProbes.length?'tutor reasoning follow-up':familiar.length?'familiar focus skill':'focus foundation',focus);
   pick(focus,'current focus');
   const focusDrawings=drawings.filter(inFocus),drawingGap=repairGroups.find(g=>focusDrawings.some(q=>dcMatchesSkill(q,g))),repairDrawings=drawingGap?focusDrawings.filter(q=>dcMatchesSkill(q,drawingGap)):[];
   if(focusDrawings.length)pick(repairDrawings.length?repairDrawings:focusDrawings,repairDrawings.length?'drawing repair':'short drawing',focusDrawings);
@@ -19423,7 +19437,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   function dcOpenRegular(rec){
     courseNavigationSaveWork();smSetChapter(rec.chapter);
     if(rec.tutorPracticeIds?.length&&typeof startAdaptiveLearning==='function'){
-      if(startAdaptiveLearning({chapter:rec.chapter,poolIds:rec.tutorPracticeIds,total:rec.minutes===10?1:3,label:'Check your tutor reasoning',rotationKey:'tutor-follow-up-'+rec.chapter+'-'+rec.topic}))smTagRun('practice','tutor-follow-up',rec.chapter);
+      if(startAdaptiveLearning({chapter:rec.chapter,poolIds:rec.tutorPracticeIds,total:rec.minutes===10?1:3,label:rec.practiceFollowUp?'Follow up on your practice':'Check your tutor reasoning',rotationKey:(rec.practiceFollowUp?'practice-follow-up-':'tutor-follow-up-')+rec.chapter+'-'+rec.topic}))smTagRun('practice',rec.practiceFollowUp?'practice-follow-up':'tutor-follow-up',rec.chapter);
       return;
     }
     if(rec.chapter==='ch5'&&!rec.skillKey&&rec.kind!=='probe'&&rec.minutes>10&&(!rec.capability||rec.capability==='recognition')){
@@ -19660,6 +19674,7 @@ function renderExamOverview(v){
     card.appendChild(epText('p',{class:'sm-eyebrow'},exam.id===EXAM_PREP.currentExam?'CURRENT PREPARATION':'REVIEW'));
     card.appendChild(epText('h2',{},exam.title));card.appendChild(epText('p',{},exam.summary));
     if(exam.goal)card.appendChild(epText('p',{class:'ep-goal'},exam.goal));
+    if(typeof ExamReadiness!=='undefined')card.appendChild(ExamReadiness.summary(exam.id));
     card.appendChild(epButton((exam.status==='review'?'Review ':'Open ')+exam.title+' →',()=>openExamPrep(exam.id),{class:'btn'+(exam.id===EXAM_PREP.currentExam?'':' ghost'),'data-open-exam':exam.id}));grid.appendChild(card);
   });root.appendChild(grid);
   const links=el('div',{class:'ep-actions'});links.appendChild(epButton('All chapters',()=>courseNavigationGo('overview')));links.appendChild(epButton('Study desk',()=>courseNavigationGo('quiz')));root.appendChild(links);v.appendChild(root);
@@ -19693,6 +19708,7 @@ function renderExamPrep(v){
     const format=el('section',{class:'ep-grid ep-format','aria-label':'Exam format'});
     exam.format.forEach(part=>{const box=el('div');box.appendChild(epText('h2',{},part.title));box.appendChild(epText('p',{},part.detail));format.appendChild(box);});root.appendChild(format);
   }
+  if(typeof ExamReadiness!=='undefined')root.appendChild(ExamReadiness.panel(exam.id));
   if(exam.id==='exam2'&&typeof epPartACard==='function'&&typeof renderExamBPracticeCard==='function'){
     const routes=el('div',{class:'ep-grid ep-practice-routes','data-exam-practice-routes':true});routes.append(epPartACard(),renderExamBPracticeCard());root.appendChild(routes);
     root.appendChild(epExamAnalysisCard());root.appendChild(epMasterBankCard());
@@ -19781,6 +19797,8 @@ function epBPlan(){
   const previousFamily=q=>epBFamilies(q).some(f=>lastFamilies.has(f));
   const known=q=>attempted.has(q.id)||planned.has(q.id)||exposure.ids.has(q.id)||relatedExposure(q);
   const repairSkills=new Set(epBAnalysis().skills.filter(skill=>skill.needsWork>0).map(skill=>skill.id));
+  const practiceGaps=typeof QuestionPractice!=='undefined'?QuestionPractice.pending(pool):[];
+  pool.filter(q=>practiceGaps.some(s=>QuestionPractice.matches(q,s))).forEach(q=>repairSkills.add(epBSkill(q)));
   const seenCount=id=>rows.filter(a=>a.id===id).length+plans.filter(p=>p.plannedIds?.includes(id)).length;
   const lastUsed=id=>Math.max(0,...rows.filter(a=>a.id===id).map(a=>a.ts||0),...plans.filter(p=>p.plannedIds?.includes(id)).map(p=>p.ts||0));
   const rank=new Map(pool.map(q=>[q.id,Math.random()]));
@@ -20550,9 +20568,10 @@ function sparkPlan(scope){
   state.runs.forEach(r=>r.items.filter(i=>i.shownAt).forEach(i=>{counts[i.id]=(counts[i.id]||0)+1;last[i.id]=i.shownAt;}));
   const tie=Object.fromEntries(pool.map(c=>[c.questionId,Math.random()])),picked=[],chapters={},topics={};
   const chatGaps=typeof TutorInsights!=='undefined'?TutorInsights.pending(pool.map(c=>sparkQuestion(c.questionId)),S.attempts||[],Date.now()):[];
+  const practiceGaps=typeof QuestionPractice!=='undefined'?QuestionPractice.pending(pool.map(c=>sparkQuestion(c.questionId))):[];
   while(picked.length<5){
     const rest=pool.filter(c=>!picked.includes(c));if(!rest.length)break;
-    const score=c=>[chapters[c.chapterId]||0,picked.length===0&&chatGaps.some(g=>TutorInsights.matches(sparkQuestion(c.questionId),g)&&g.questionId!==c.questionId)?-1:0,counts[c.questionId]||0,topics[sparkQuestion(c.questionId).topic]||0,last[c.questionId]||0,tie[c.questionId]];
+    const score=c=>[chapters[c.chapterId]||0,picked.length===0&&practiceGaps.some(g=>QuestionPractice.matches(sparkQuestion(c.questionId),g)&&g.questionId!==c.questionId)?-1:0,picked.length===0&&chatGaps.some(g=>TutorInsights.matches(sparkQuestion(c.questionId),g)&&g.questionId!==c.questionId)?-1:0,counts[c.questionId]||0,topics[sparkQuestion(c.questionId).topic]||0,last[c.questionId]||0,tie[c.questionId]];
     rest.sort((a,b)=>{const x=score(a),y=score(b);for(let i=0;i<x.length;i++)if(x[i]!==y[i])return x[i]-y[i];return 0;});
     const c=rest[0];picked.push(c);chapters[c.chapterId]=(chapters[c.chapterId]||0)+1;const topic=sparkQuestion(c.questionId).topic;topics[topic]=(topics[topic]||0)+1;
   }
@@ -20901,6 +20920,377 @@ alContinueFrom=function(R){delete R.learningRun;const result=alLearningContinue.
 const alLearningLibrary=alLibrary;
 alLibrary=function(v){alLearningLibrary.apply(this,arguments);v.querySelector('[data-resonance-expansion]')?.after(ResonanceLearning.card());};
 if(typeof leBuildExport==='function'){const prior=leBuildExport;leBuildExport=function(){return {...prior(),resonanceChecks:{version:1,checks:ResonanceLearning.records(),limits:'In-progress checkpoints are on this device; completed builds embed their checks in the synced attempt log. Free text is unreviewed. Guided feedback is not an independent exam.'}};};}
+
+/* Cross-mode practice routing. Native answers/drawings stay in their original
+ * ledgers. This reads them, never converts practice into readiness credit.
+ * Side-ledger help is device/profile-local, exportable, and contains no chat.
+ * A first retained record is not necessarily a learner's first-ever attempt. */
+const QuestionPractice=(()=>{
+  'use strict';
+  const VERSION=1,STORE='questionPracticeHelpV1',DAY=86400000;
+  const copy=x=>JSON.parse(JSON.stringify(x));
+  const fingerprint=q=>{const m=leQuestionMetadata(q);return leFingerprint([m.itemFingerprint,m.keyFingerprint,q.correctedAt||null]);};
+  const question=id=>QUESTIONS.find(q=>q.id===id);
+  const actor=()=>leActor();
+  const cleanActor=a=>a?lePick(a,['profile','role','qa']):null;
+  const sameActor=(a,b)=>!!a&&!!b&&a.profile===b.profile&&a.role===b.role&&!!a.qa===!!b.qa;
+  const validActor=a=>!!a&&!a.qa&&a.profile===actor().profile&&a.role==='owner';
+  const key=q=>dcSkillKey(q); // Authored skill + response capability, not just topic.
+  const helpRows=()=>{const s=safeStore.get(STORE,{});return s.version===VERSION&&Array.isArray(s.events)?s.events:[];};
+  const helpTimes=x=>[x.hintAt,x.clueShownAt,x.revealAt,x.tutorHelpAt].filter(t=>Number.isFinite(t)&&t>0);
+  const checked=v=>typeof v==='boolean'?v:null;
+  function help(q,c,state){
+    if(!actor().profile||c.locked||!['none','answered','review'].includes(state))return;
+    const alreadySubmitted=records().some(r=>sameActor(r.actor,actor())&&r.id===q.id&&(r.runId===c.runId||r.source==='worksheet')&&r.submissions>0);
+    const row={id:makeRunId('question-help'),version:VERSION,ts:Date.now(),actor:cleanActor(actor()),questionId:q.id,
+      fingerprint:question(q.id)?fingerprint(q):c.fingerprint,surface:c.surface,runId:c.runId,
+      phase:state==='none'&&!alreadySubmitted?'before-submission':'after-submission',kind:'question-tutor'};
+    safeStore.set(STORE,{version:VERSION,events:[...helpRows(),row].slice(-1500)});
+  }
+  function coreMetadata(q,a,D){
+    if(!a.evidence)return;
+    const prior=(S.attempts||[]).filter(x=>x!==a&&sameActor(x.evidence?.actor,a.evidence.actor)&&x.id===q.id&&x.u===a.u&&a.u&&x.evidence?.practice?.fingerprint===fingerprint(q));
+    const legacyInRun=(S.attempts||[]).some(x=>x!==a&&x.id===q.id&&x.u===a.u&&a.u&&!x.evidence?.practice);
+    const drawing=a.drawing||{},checks=Number.isInteger(drawing.checks)?drawing.checks:null;
+    const first=prior[0]?.evidence.practice;
+    const manual=!!a.sr||drawing.kind==='freehand-self-review';
+    const unknown=legacyInRun||!a.u;
+    const firstCorrect=manual||unknown?null:first?.firstSubmissionCorrect??(drawing.firstTry===false||checks>1?null:!!a.ok);
+    a.evidence.practice={version:VERSION,fingerprint:fingerprint(q),
+      firstSubmissionCorrect:firstCorrect,firstInRun:unknown?null:prior.length===0,
+      submissionNumber:unknown?null:prior.length+1,firstRetainedForQuestion:!(S.attempts||[]).some(x=>x!==a&&x.id===q.id),
+      corrected:manual?null:!!a.ok&&(prior.some(x=>!x.ok)||checks>1||drawing.componentChecks?.some(c=>c.correct===false)),
+      historyStatus:unknown?'partial-or-unknown':'captured-from-run-start',
+      grading:manual?'self-review-not-engine-graded':'engine-checked',
+      componentFirstSubmissionCorrect:drawing.componentChecks?.length?drawing.componentChecks[0].correct:null,
+      lifetimeFirst:'unknown',externalHelp:'unknown'};
+  }
+  // Each episode retains the first submitted result and the final result. A
+  // change before sealed-check feedback is a revision, not a supported retry.
+  function episode({id,source,runId,fp,actor:who,submissions=[],help=[],targets=[],manual=false,firstKnown=true,revision=false,complete=true}){
+    if(!submissions.length)return null;
+    const rows=submissions.slice().sort((a,b)=>a.ts-b.ts),first=rows[0],last=rows.at(-1);
+    const ht=help.filter(t=>Number.isFinite(t)&&t>0),before=ht.some(t=>t<first.ts),after=ht.some(t=>t>first.ts)||rows.slice(1).some(r=>r.helped===true);
+    return {id,source,runId,fp,actor:cleanActor(who),ts:last.ts,targets:[...new Set(targets)],manual,
+      firstCorrect:firstKnown&&!manual?checked(first.correct):null,finalCorrect:manual?null:checked(last.correct),
+      submissions:rows.length,corrections:!revision&&rows.slice(0,-1).some(x=>x.correct===false),
+      revisedBeforeFeedback:revision&&rows.length>1,helpBeforeFirst:before||first.helped===true,
+      helpAfterFirst:after,helped:before||after||rows.some(x=>x.helped===true),
+      unknownHelp:rows.some(x=>x.helped==null),complete,firstKnown,
+      timing:rows.map(x=>x.seconds??null),timingCaveat:'Recorded foreground estimate only; not attention or mastery.'};
+  }
+  function records(attempts=S.attempts||[]){
+    const out=[],groups=new Map(),push=x=>{if(x)out.push(x);};
+    const fingerprints=new Map(),fpFor=q=>{if(!fingerprints.has(q.id))fingerprints.set(q.id,fingerprint(q));return fingerprints.get(q.id);};
+    for(const a of attempts){
+      const q=question(a.id);
+      if(!q){
+        const l=a.drawing?.learning;
+        if(l){const r=episode({id:a.id,source:'resonance-lab',runId:l.runId,fp:l.checks?.[0]?.fingerprint,actor:l.actor,targets:[],firstKnown:!l.legacy,
+          submissions:[{ts:a.ts,correct:!!a.ok,helped:l.helped,seconds:a.d??null}]});
+          if(r){r.firstCorrect=l.firstSubmissionCorrect;r.corrections=l.hadCorrections===true;push(r);}}
+        continue; // Resonance routing retains its more specific graph adapter.
+      }
+      const m=a.evidence?.practice,who=a.evidence?.actor||a.actor;
+      const fp=m?.fingerprint||null,group=[a.id,a.u||a.evidence?.eventId||a.ts,fp,leStable(cleanActor(who))].join('|');
+      if(!groups.has(group))groups.set(group,[]);groups.get(group).push(a);
+    }
+    for(const rows of groups.values()){
+      rows.sort((a,b)=>a.ts-b.ts);const first=rows[0],last=rows.at(-1),q=question(first.id),m=first.evidence?.practice;
+      if(m?.fingerprint&&m.fingerprint!==fpFor(q))continue;
+      if(!m&&(!adaptiveLearningValidAttempt(first,q,Date.now())||first.evidence?.question?.itemFingerprint&&first.evidence.question.itemFingerprint!==leQuestionMetadata(q).itemFingerprint))continue;
+      const r=episode({id:q.id,source:'practice',runId:first.u,fp:m?.fingerprint||null,actor:first.evidence?.actor||first.actor,
+        targets:[key(q)],manual:!!first.sr||first.drawing?.kind==='freehand-self-review',firstKnown:!!m&&m.historyStatus==='captured-from-run-start',
+        submissions:rows.map(a=>({ts:a.ts,correct:!!a.ok,seconds:a.d??null,helped:Number.isFinite(a.h)?!!(a.h||a.hf||a.transfer?.help||a.transfer?.phase==='guided'||a.coursePhase==='guided'||a.evidence?.externalHelp?.value===true):null}))});
+      if(r){if(m)r.firstCorrect=m.firstSubmissionCorrect;r.corrections=r.corrections||last.evidence?.practice?.corrected===true||last.drawing?.checks>1||last.drawing?.componentChecks?.some(c=>c.correct===false);
+        r.uncertain=rows.some(a=>a.g||a.dk||a.rf||['unsure','guess'].includes(a.evidence?.confidence?.value));push(r);}
+    }
+    // The written proton-transfer task has a checked arrow step before its
+    // self-reviewed written finish. Keep failed checks even if left unfinished.
+    const draftRuns=[S.drill,S.pausedDrill,...(S.parkedDrills||[])].filter(Boolean),seenDrafts=new Set();
+    for(const D of draftRuns)for(const [id,draft] of Object.entries(D.arrowDrafts||{})){
+      const q=question(id),identity=D.runId+'|'+id;if(!q||seenDrafts.has(identity)||out.some(r=>r.id===id&&r.runId===D.runId))continue;seenDrafts.add(identity);
+      const checks=(draft.practiceChecks||[]).filter(c=>c.fingerprint===fpFor(q));
+      push(episode({id,source:'proton-arrow-step',runId:D.runId,fp:fpFor(q),actor:checks[0]?.actor,targets:[key(q)],complete:!!draft.locked,
+        submissions:checks.map(c=>({ts:c.ts,correct:c.correct,helped:c.helped}))}));
+    }
+    // Spark: initial answer, retries, clues and tutor help are already sealed.
+    for(const run of sparkState().runs)for(const item of run.items||[]){
+      const q=question(item.id);if(!q||item.fingerprint!==sparkFingerprint(q))continue;
+      push(episode({id:q.id,source:'spark',runId:run.id,fp:fpFor(q),actor:run.actor,targets:[key(q)],help:helpTimes(item).filter(t=>t!==item.clueShownAt),complete:!!item.resolvedAt,
+        submissions:(item.attempts||[]).map((a,i)=>({ts:a.ts,correct:a.correct,seconds:Number.isFinite(a.foregroundMs)?a.foregroundMs/1000:null,helped:typeof a.helped==='boolean'?a.helped:i>0||[item.hintAt,item.tutorHelpAt,item.revealAt].some(t=>Number.isFinite(t)&&t<=a.ts)}))}));
+    }
+    // Immediate lesson checks route only to the authored unit's practice IDs.
+    const lessonGroups=new Map();
+    for(const e of lcEvents().filter(e=>e.kind==='answer')){const k=e.runId+'|'+e.checkId+'|'+e.itemFingerprint;if(!lessonGroups.has(k))lessonGroups.set(k,[]);lessonGroups.get(k).push(e);}
+    for(const rows of lessonGroups.values()){
+      const e=rows[0],spec=Object.values(LESSON_CHECKS[e.lessonKey]||{}).find(s=>s.id===e.checkId);
+      if(!spec||lcFingerprint(spec)!==e.itemFingerprint)continue;
+      const chapter=e.lessonKey.split(':')[0],unit=(CHAPTER_LEARNING_UNITS[chapter]||[]).find(u=>e.lessonKey===chapter+':'+u.id);
+      push(episode({id:e.checkId,source:'lesson-check',runId:e.runId,fp:e.itemFingerprint,actor:e.actor,
+        targets:(unit?.practiceIds||[]).map(question).filter(Boolean).map(key),
+        firstKnown:rows.some(r=>r.attemptNumber===1),submissions:rows.map(r=>({ts:r.ts,correct:r.correct,seconds:Number.isFinite(r.foregroundResponseMs)?r.foregroundResponseMs/1000:null,helped:!!r.supportKinds?.length}))}));
+    }
+    // Worksheets use verified component checks only; ink/reasoning remains
+    // ungraded. Unmapped source items remain visible, never guessed into a skill.
+    for(const sheet of WS_SHEETS)for(const item of sheet.items){
+      const id=wsKey(sheet,item),work=S.worksheetState.work[id]||{},fp=leFingerprint({sheet:sheet.id,item});
+      const rows=S.worksheetState.attempts.filter(a=>a.question===id&&(!a.practice||a.practice.fingerprint===fp));
+      for(const kind of new Set(rows.map(a=>a.kind))){const same=rows.filter(a=>a.kind===kind);
+        const targets=worksheetTargets(sheet,item,kind);
+        const row=episode({id,source:'worksheet',runId:'worksheet:'+id+':'+kind,fp:same.some(a=>a.practice)?fp:null,actor:same.at(-1)?.practice?.actor||actor(),targets:same.some(a=>a.practice)?targets:[],manual:!same.some(a=>a.checks?.length),
+          firstKnown:same[0]?.practice?.firstInRun===true,help:[work.tutorHelpAt,work.keyViewedAt].filter(Boolean),
+          submissions:same.map(a=>({ts:a.ts,correct:a.checks?.length?a.checks.every(c=>c.ok):null,helped:!!(a.keyViewedBefore||a.tutorHelpBefore)}))});
+        if(row){row.gradingScope='checked-components-only';row.unreviewedWork=!!item.draw||same.some(a=>!!a.notes?.trim());push(row);}
+      }
+    }
+    // Do not read or adapt a sealed check until it is finished. Manual results
+    // and skipped/unknown first commits never become clean-first evidence.
+    for(const run of ccStore().runs.filter(ccCompleted))for(const item of run.items||[]){
+      const q=question(item.id),r=run.responses?.[item.id];if(!q||!r||item.itemFingerprint!==ccQuestionFingerprint(q))continue;
+      const commits=r.commits?.length?r.commits:[{ts:r.firstCommittedAt||run.completedAt,value:r.value,skipped:r.skipped}];
+      const subs=commits.map(c=>({ts:c.ts,correct:c.skipped?false:ccGrade(q,c.value).correct,helped:run.helpUsed==='some'?true:run.helpUsed==='none'?false:null}));
+      const row=episode({id:q.id,source:typeof examAIsRun==='function'&&examAIsRun(run)?'exam-a':'chapter-check',runId:run.id,fp:fpFor(q),actor:run.actor||{...actor(),qa:!!run.qa},
+        targets:[key(q)],manual:!!item.manualReview,firstKnown:!!r.firstCommittedAt,revision:true,submissions:subs});
+      if(row)row.uncertain=['unsure','guess'].includes(r.firstConfidence)||['unsure','guess'].includes(r.confidence);push(row);
+    }
+    // Tutor help after submission must not rewrite the already-sealed answer.
+    for(const h of helpRows()){
+      const matches=out.filter(r=>sameActor(r.actor,h.actor)&&r.id===h.questionId&&(r.runId===h.runId||r.source==='worksheet')&&r.fp===h.fingerprint);
+      if(matches.length){for(const match of matches){match.helped=true;if(h.phase==='before-submission')match.helpBeforeFirst=true;else match.helpAfterFirst=true;match.ts=Math.max(match.ts,h.ts);}}
+      else{const q=question(h.questionId);if(q&&h.fingerprint===fpFor(q))out.push({id:q.id,source:h.surface,runId:h.runId,fp:h.fingerprint,actor:cleanActor(h.actor),ts:h.ts,targets:[key(q)],firstCorrect:null,finalCorrect:null,firstKnown:false,helped:true,helpBeforeFirst:h.phase==='before-submission',helpAfterFirst:h.phase==='after-submission',submissions:0,corrections:false,manual:false});}
+    }
+    return out;
+  }
+  function worksheetTargets(sheet,item,kind){
+    if(kind==='builder')return QUESTIONS.filter(q=>q.type==='ch4production'&&q.production?.kind==='newman').map(key);
+    // Explicit course-item mapping, not inferred from a learner's free text.
+    const maps={
+      'ch1-dipoles':{'1':'polarity','2a':'formal','2b':'formal','2c':'hybrid'},
+      ch2a:{'1':'lewis','2a':'bondline','2b':'bondline','3':'bondline'},
+      ch2b:{'1':'bondline','2':'bondline','3':'bondline','4':'bondline','5':'bondline','6':'fgroups','7':'fgroups','8':'fgroups','9':'resonance','10':'lewis','11':'lewis','12':'resonance','13':'arrows','14':'resonance','15':'resonance','16':'resonance','17':'resonance','18':'resonance','19':'resonance'},
+      'ch3-acidbase':{'1':'acidbase2','2':'acidbase1','3':'acidbase1','4':'acidbase1'},
+      'ch4-naming1':{'1a':'alkanes','1b':'alkanes','1c':'alkanes','1d':'alkanes','2c':'alkanes','2d':'alkanes','3':'alkanes','4':'alkanes'},
+      'ch4-naming2':{'1a':'alkanes','2':'isomers','3':'isomers','4':'conform','5':'conform','6a':'conform','6b':'conform'},
+      'ch5-ws1':{'1':'stereoRelations','2':'stereoRelations','3':'stereoOptical','4':'stereoProchiral','5a':'stereoRS','5v':'stereoOptical','5vi':'stereoOptical','6A':'stereoRelations','6B':'stereoRelations','6C':'stereoRelations','7':'stereoProchiral','8a':'stereoRelations','8b':'stereoRelations','9':'stereoOptical'},
+      'ch5-ws2':{'1':'stereoRelations','2':'stereoRS','3':'stereoRS','4':'stereoRS','5':'stereoOptical','6a':'stereoRelations','6b':'stereoRelations','7':'stereoRelations','8':'stereoSymmetry','9':'fischer','10':'fischer','11':'stereoRS','12':'stereoRelations'},
+      'ch5-ws3':{'1a':'stereoRelations','1b':'stereoRelations','1c':'stereoRelations','1d':'stereoSymmetry','2':'stereoOptical','3':'alkanes'},
+      'ch5-ws4':{'1':'chirality','2':'stereoRelations','3':'chirality','4':'stereoRS','5':'stereoRS','6':'stereoRS','7':'stereoRelations','8':'stereoOptical','9':'stereoRelations','10':'stereoOptical','11':'stereoRelations','12':'stereoRS','13':'stereoRelations','14':'stereoOptical'}
+    };
+    const topic=sheet.id==='ch4-naming3'?'alkanes':maps[sheet.id]?.[item.id];
+    const pool=QUESTIONS.filter(q=>q.topic===topic),cap=item.draw?'construction':'response';
+    const specific=pool.filter(q=>dcCapability(q)===cap);
+    // No drawing task available? Keep a drawing gap open; recognition cannot
+    // silently substitute for construction. Typed component practice may use
+    // recognition when the source itself asks for a choice.
+    const candidates=specific.length?specific:item.draw?[]:pool.filter(q=>dcCapability(q)==='recognition');
+    return (item.practiceIds||[]).map(question).filter(Boolean).map(key).concat(candidates.map(key));
+  }
+  function pending(pool,attempts=S.attempts||[],now=Date.now(),input=null){
+    const rows=(input||records(attempts)).filter(r=>validActor(r.actor)&&Number.isFinite(r.ts)&&r.ts<=now&&now-r.ts<30*DAY);
+    const signals=[];
+    for(const row of rows){
+      const need=row.finalCorrect===false||row.firstCorrect===false||row.corrections||row.helped||row.manual||row.unreviewedWork||row.uncertain;
+      if(!need)continue;
+      for(const target of row.targets){
+        // Two different later families can retire a practice priority, never
+        // award readiness. A recognition answer cannot clear a drawing target.
+        const later=rows.filter(r=>r.ts>row.ts&&r.targets.includes(target)&&r.firstCorrect===true&&r.finalCorrect===true&&!r.corrections&&!r.helped&&!r.unknownHelp&&!r.uncertain&&!r.manual&&!r.unreviewedWork&&r.firstKnown);
+        const families=new Set(),distinct=new Set();
+        const source=question(row.id);if(source)adaptiveLearningFamilies(source).forEach(f=>families.add(f));
+        for(const r of later){const q=question(r.id);if(!q)continue;const fs=adaptiveLearningFamilies(q);if(fs.some(f=>families.has(f)))continue;distinct.add(r.id);fs.forEach(f=>families.add(f));}
+        if(distinct.size>=2)continue;
+        if(!pool.some(q=>key(q)===target))continue;
+        signals.push({questionId:row.id,skill:target,ts:row.ts,source:row.source,
+          kind:row.finalCorrect===false?'miss':row.corrections||row.firstCorrect===false?'correction':row.helped?'help':row.uncertain?'confidence-check':'manual-review',
+          label:row.finalCorrect===false?'Recheck a missed step':row.corrections||row.firstCorrect===false?'Try the step you corrected':row.helped?'Try without the help you used':row.uncertain?'Recheck an uncertain answer':'Review your drawing or explanation',
+          examples:distinct.size,families:families.size});
+      }
+    }
+    const order={miss:0,correction:1,help:2,'confidence-check':3,'manual-review':4};
+    return signals.sort((a,b)=>order[a.kind]-order[b.kind]||b.ts-a.ts).filter((s,i,all)=>all.findIndex(x=>x.skill===s.skill)===i);
+  }
+  const matches=(q,s)=>key(q)===s.skill;
+  const priorLog=logAttempt;
+  logAttempt=function(q,ok,guessed,D,dk,ans){const a=priorLog.apply(this,arguments);coreMetadata(q,a,D);return a;};
+  const priorWorksheet=wsRecord;
+  wsRecord=function(sheet,item,work,kind){
+    const first=!S.worksheetState.attempts.some(a=>a.question===wsKey(sheet,item)&&a.kind===kind);
+    const a=priorWorksheet.apply(this,arguments);a.practice={version:VERSION,fingerprint:leFingerprint({sheet:sheet.id,item}),actor:actor(),firstInRun:first};wsSave();return a;
+  };
+  const priorExport=leBuildExport;
+  leBuildExport=function(){const out=priorExport.apply(this,arguments);out.questionPractice={version:VERSION,
+    help:helpRows().map(h=>({...lePick(h,['id','version','ts','questionId','fingerprint','surface','runId','phase','kind']),actor:cleanActor(h.actor)})),
+    episodes:copy(records()),scope:'Native history and additional tutor-help markers on this device/profile; synced core attempts retain their metadata. No readiness credit.'};return out;};
+  function panel(){
+    const rows=records().filter(r=>validActor(r.actor)),box=el('details',{class:'card','data-question-practice-evidence':true});
+    box.appendChild(el('summary',{},'First tries, corrections & tutor help · all practice'));
+    const add=text=>{const p=el('p',{});p.textContent=text;box.appendChild(p);};
+    add(rows.filter(r=>r.firstCorrect===true&&!r.helpBeforeFirst).length+' right first time with no recorded help before that answer · '+rows.filter(r=>r.corrections&&r.finalCorrect===true).length+' right after corrections · '+rows.filter(r=>r.helped).length+' helped. Groups can overlap. Outside help can be unknown.');
+    add(rows.filter(r=>r.firstCorrect===null).length+' first results unknown or ungraded. Changes saved before a sealed check finishes are revisions, not feedback-supported corrections. Freehand drawings and explanations still need review.');
+    add('These counts describe checked responses or parts—not verified whole-question drawing or reasoning accuracy. Older records without first-try tracking stay unclassified.');
+    const signals=pending(QUESTIONS),next=signals[0];
+    add(next?next.label+'. This comes from '+next.source+'; the next suitable practice set uses a different example when available.':'No current mapped repair signal. This is not a readiness verdict.');
+    add('Regular practice, Challenge, Daily Pulse, Part B, Spark, worksheets and lesson checks keep their own records. Finished chapter / Part A checks can guide later practice; unfinished checks never adapt. Resonance keeps its arrow-and-charge routing. Extra help markers and local modes stay on this device; core attempt metadata follows existing sync.');
+    const unmapped=rows.filter(r=>!r.targets.length&&r.source!=='resonance-lab').length;
+    if(unmapped)add(unmapped+' source records have no matched practice task. They stay saved for review; the engine does not guess a replacement skill.');
+    box.appendChild(el('button',{class:'btn ghost small',onclick:leDownload},'Download learning evidence'));return box;
+  }
+  for(const name of ['topicProgress','more']){const previous=VIEWS[name];if(previous)VIEWS[name]=function(v){const result=previous.apply(this,arguments);v.appendChild(panel());return result;};}
+  return Object.freeze({version:VERSION,fingerprint,help,records,pending,matches,key,episode,coreMetadata,helpRows,worksheetTargets,panel});
+})();
+
+/* Visible, rule-based readiness EVIDENCE, not a predicted exam grade.
+ * Only finished, version-matched checks can supply Part A evidence. Ordinary
+ * practice, corrections, tutor praise and self-reviewed drawings cannot certify
+ * a written exam. All calculations are read-only and explicitly scoped. */
+const ExamReadiness=(()=>{
+  'use strict';
+  const VERSION=1,WINDOW_DAYS=30,MIN_FAMILIES=2,TARGET=90;
+  const familiar=item=>item.review!==false||item.seenBefore!==false||item.seenFamilyBefore!==false||item.familiarContent===true||item.withinFormFamilyOverlap===true;
+  const who=()=>leActor();
+  const owner=a=>!!a&&a.profile===who().profile&&a.role==='owner'&&!a.qa;
+  function examPool(exam){
+    const topics=new Set(exam.chapters.flatMap(c=>CHAPTERS.find(x=>x.id===c.id)?.topics||[]));
+    return exam.id==='exam2'?examAPool():QUESTIONS.filter(q=>topics.has(q.topic)&&ccEligible(q)&&q.type==='mc'&&ccAutoSupported(q));
+  }
+  function domains(exam,pool){
+    const out=[],reserved=new Set();
+    for(const chapter of exam.chapters){
+      const blueprint=ccBlueprint(chapter.id);
+      for(const d of blueprint.domains){
+        if(d.laterDeckTopic||d.preview&&!pool.some(q=>d.topics.includes(q.topic)))continue;
+        const ids=pool.filter(q=>!reserved.has(q.id)&&(d.poolIds?.includes(q.id)||d.unitIds?.includes(q.adaptiveSkill))).map(q=>q.id);
+        ids.forEach(id=>reserved.add(id));
+        out.push({id:chapter.id+':'+d.id,chapter:chapter.id,label:d.label,topics:d.topics,ids,bankGap:ids.length===0});
+      }
+    }
+    // Exam-only items do not always belong to an authored lesson. Keep their
+    // extra topic area explicit instead of silently assigning them to a lesson.
+    const assigned=new Set(out.flatMap(d=>d.ids));
+    for(const topic of new Set(pool.filter(q=>!assigned.has(q.id)).map(q=>q.topic))){
+      const qs=pool.filter(q=>q.topic===topic&&!assigned.has(q.id)),chapter=CHAPTERS.find(c=>c.topics.includes(topic))?.id;
+      out.push({id:'exam-extra:'+topic,chapter,label:'Additional '+(TOPICS[topic]?.name||topic),topics:[topic],ids:qs.map(q=>q.id),bankGap:false});
+    }
+    return out;
+  }
+  function analyze(examId='exam2',options={}){
+    const exam=epExam(examId);if(!exam)return null;
+    const now=options.now??Date.now(),pool=options.pool||examPool(exam),byId=new Map(pool.map(q=>[q.id,q])),candidates=[],runs=options.runs||ccStore().runs;
+    const excluded={unfinished:0,qaOrOtherActor:0,stale:0,changed:0,firstUnknown:0,helpOrUnknown:0,familiar:0};
+    const allowed=new Set(exam.chapters.map(c=>c.id));
+    for(const run of runs){
+      if(!allowed.has(run.chapter)&&!(exam.id==='exam2'&&examAIsRun(run)))continue;
+      if(!['completed','complete'].includes(run.status)||!ccCompleted(run)){excluded.unfinished++;continue;}
+      if(who().role!=='owner'||who().qa||run.qa!==false||run.synthetic||run.actor&&!owner(run.actor)){excluded.qaOrOtherActor++;continue;}
+      if(!Number.isFinite(run.completedAt)||run.completedAt>now||now-run.completedAt>WINDOW_DAYS*86400000){excluded.stale++;continue;}
+      // Starting checks are useful for learning, not a post-learning readiness
+      // verdict. Keep the latest middle/final check or completed Exam A form.
+      if(!examAIsRun(run)&&!['middle','final'].includes(run.phase))continue;
+      for(const item of run.items||[]){
+        const q=byId.get(item.id);if(!q||item.manualReview)continue;
+        const r=run.responses?.[item.id]||{},grade=run.grades?.[item.id];
+        if(item.itemFingerprint!==ccQuestionFingerprint(q)||!grade?.graded||grade.contentChanged){excluded.changed++;continue;}
+        const row={id:q.id,runId:run.id,ts:run.completedAt,run,item,response:r,q};
+        candidates.push(row);
+      }
+    }
+    const latestEligible=new Map();
+    for(const r of candidates.sort((a,b)=>a.ts-b.ts)){
+      const response=r.response;
+      if(!Number.isFinite(response.firstCommittedAt)||response.firstCommittedAt>r.run.completedAt||response.firstCommittedAt<r.run.startedAt||!Object.hasOwn(response,'firstValue')){excluded.firstUnknown++;continue;}
+      if(examAIsRun(r.run)&&r.run.examMode==='timed'&&(!Number.isFinite(r.run.deadlineAt)||response.firstCommittedAt>r.run.deadlineAt)){excluded.firstUnknown++;continue;}
+      const firstSkip=response.commits?.[0]?.skipped===true;
+      const firstCorrect=!firstSkip&&ccGrade(r.q,response.firstValue).correct===true;
+      const help=r.run.helpUsed!=='none'||response.externalHelp===true;
+      const seen=familiar(r.item)||r.q.familiarRepresentation===true||r.q.eligibleForUnseenTransfer===false||r.q.sourceKind==='learner-homework-redraw';
+      if(help)excluded.helpOrUnknown++;if(seen)excluded.familiar++;
+      const confident=response.firstConfidence==='sure';
+      const normalized={id:r.id,ts:r.ts,runId:r.runId,firstCorrect,help,seen,confident,
+        revised:response.edited===true,eligible:!help&&!seen,
+        // A timed form is a pacing sample, never an attention measure.
+        timed:examAIsRun(r.run)&&r.run.examMode==='timed',
+        committedInTime:!r.run.deadlineAt||response.firstCommittedAt<=r.run.deadlineAt};
+      // A familiar/helped retry cannot erase an earlier fresh first-answer miss.
+      if(normalized.eligible)latestEligible.set(r.id,normalized);
+    }
+    const eligible=[...latestEligible.values()],correct=eligible.filter(r=>r.firstCorrect).length;
+    const areas=(options.domains||domains(exam,pool)).map(d=>{
+      const samples=eligible.filter(r=>d.ids.includes(r.id)),used=new Set(),distinct=[];
+      const lastGap=Math.max(0,...samples.filter(r=>!r.firstCorrect||!r.confident).map(r=>r.ts));
+      for(const r of samples.filter(r=>r.firstCorrect&&r.confident&&r.ts>lastGap).sort((a,b)=>b.ts-a.ts)){
+        const fs=ccFamilies(byId.get(r.id));if(fs.some(f=>used.has(f)))continue;distinct.push(r);fs.forEach(f=>used.add(f));
+      }
+      const missed=samples.some(r=>!r.firstCorrect),uncertain=samples.some(r=>!r.confident);
+      const supported=!d.bankGap&&distinct.length>=MIN_FAMILIES;
+      return {id:d.id,chapter:d.chapter,label:d.label,bankGap:d.bankGap,checked:samples.length,
+        correct:samples.filter(r=>r.firstCorrect).length,distinctCorrectFamilies:distinct.length,
+        supported,status:d.bankGap?'Bank gap':supported?'Supported in this sample':missed?'Needs another check':uncertain?'Recheck without guessing':samples.length?'Needs another distinct example':'Not measured'};
+    });
+    const supported=areas.filter(d=>d.supported).length,accuracy=eligible.length?Math.round(100*correct/eligible.length):null;
+    const a={checked:eligible.length,correct,accuracy,coverage:areas.length?Math.round(100*supported/areas.length):null,
+      supportedAreas:supported,totalAreas:areas.length,areas,bankGaps:areas.filter(d=>d.bankGap).length,
+      revisedFirstMisses:eligible.filter(r=>r.revised&&!r.firstCorrect).length,
+      status:!eligible.length?'Not measured':areas.every(d=>d.supported)&&accuracy>=TARGET?'Supports the practice target':'More checking needed'};
+    const bPool=exam.id==='exam2'?epBPool():QUESTIONS.filter(q=>allowed.has(CHAPTERS.find(c=>c.topics.includes(q.topic))?.id)&&q.type==='written');
+    const bIds=new Set(bPool.map(q=>q.id)),attempts=options.attempts||S.attempts||[];
+    const bRows=attempts.filter(a=>bIds.has(a.id)&&owner(a.evidence?.actor||a.actor)&&adaptiveLearningValidAttempt(a,QUESTIONS.find(q=>q.id===a.id),now)&&a.ts>=now-WINDOW_DAYS*86400000);
+    const b={attempted:new Set(bRows.map(a=>a.id)).size,selfReviewed:bRows.filter(a=>a.sr).length,
+      needsCorrectionOrHelp:bRows.filter(a=>!a.ok||a.g||a.dk||a.rf||a.h>0||a.evidence?.practice?.corrected).length,
+      verifiedScore:null,status:'Written work needs independent review'};
+    const practice=typeof QuestionPractice!=='undefined'?QuestionPractice.records(attempts).filter(r=>owner(r.actor)&&allowed.has(CHAPTERS.find(c=>c.topics.includes(QUESTIONS.find(q=>q.id===r.id)?.topic))?.id)):[];
+    const states={firstCorrect:practice.filter(r=>r.firstCorrect===true&&!r.helpBeforeFirst).length,
+      corrected:practice.filter(r=>r.corrections&&r.finalCorrect===true).length,helped:practice.filter(r=>r.helped).length,
+      unknownOrUngraded:practice.filter(r=>r.firstCorrect===null).length};
+    const pacingRuns=runs.filter(r=>who().role==='owner'&&!who().qa&&exam.id==='exam2'&&examAIsRun(r)&&r.examMode==='timed'&&['completed','complete'].includes(r.status)&&ccCompleted(r)&&r.qa===false&&!r.synthetic&&r.helpUsed==='none'&&(!r.actor||owner(r.actor))&&Number.isFinite(r.completedAt)&&r.completedAt<=now&&now-r.completedAt<=WINDOW_DAYS*86400000);
+    const pacing=pacingRuns.some(r=>r.timeLimitSec===4800&&r.deadlineAt-r.startedAt===4800000&&r.items.length===40&&new Set(r.items.map(i=>i.id)).size===40&&r.items.every(i=>{const q=byId.get(i.id),s=r.responses?.[i.id];return q&&i.itemFingerprint===ccQuestionFingerprint(q)&&!s?.externalHelp&&Number.isFinite(s?.firstCommittedAt)&&s.firstCommittedAt>=r.startedAt&&s.firstCommittedAt<=r.deadlineAt;}));
+    return {version:VERSION,examId,calculatedAt:now,partA:a,partB:b,practiceStates:states,pacingMeasured:pacing,
+      status:!eligible.length?'Not measured yet':'More checking needed',overallPercent:null,
+      excluded,nextArea:areas.find(d=>!d.bankGap&&d.status==='Needs another check')||areas.find(d=>!d.bankGap&&!d.supported)||null,
+      rules:{windowDays:WINDOW_DAYS,minDistinctFamilies:MIN_FAMILIES,practiceTarget:TARGET},
+      limits:['Coverage is the share of declared app areas with two distinct confident first-answer successes, no reported help, after the latest missed or uncertain first answer. This is a transparent planning rule, not a validated exam prediction.',
+        'The official topic list is not exhaustive; the app bank and scope map are partial. A high coverage percentage is not full exam coverage.',
+        'Corrected or helped practice guides repair but cannot fill independent readiness evidence. Self-review and AI chat do not verify full written work.',
+        'No combined readiness percentage is invented while Part B is unverified. Missing evidence does not mean zero ability. Local check history may differ across devices.']};
+  }
+  function summary(examId){
+    const r=analyze(examId),box=el('div',{'data-exam-readiness-summary':examId,class:'er-summary'});if(!r)return box;
+    box.appendChild(epText('strong',{},'Readiness · '+r.status));
+    box.appendChild(epText('p',{},'A: '+(r.partA.accuracy===null?'not measured':r.partA.accuracy+'% first-answer accuracy')+' · B: needs written review'));
+    box.appendChild(epText('p',{class:'muted'},r.partA.supportedAreas+'/'+r.partA.totalAreas+' app areas supported · not a predicted grade'));return box;
+  }
+  function panel(examId){
+    const r=analyze(examId),box=el('section',{class:'card er-panel','data-exam-readiness':examId,'aria-label':'Exam readiness evidence'});if(!r)return box;
+    box.appendChild(epText('p',{class:'sm-eyebrow'},'EXAM READINESS · EVIDENCE, NOT A PREDICTION'));
+    box.appendChild(epText('h2',{},r.status));
+    const grid=el('div',{class:'ep-grid'}),a=el('section'),b=el('section');
+    a.appendChild(epText('h3',{},'Part A · first answers'));
+    a.appendChild(epText('p',{class:'er-value'},r.partA.accuracy===null?'Not measured':r.partA.accuracy+'%'));
+    a.appendChild(epText('p',{},r.partA.status));
+    a.appendChild(epText('p',{},r.partA.checked?r.partA.correct+'/'+r.partA.checked+' eligible first submissions correct. Corrections do not replace the first answer.':'Finish a chapter or Part A check. Report help and confidence so the engine can judge the evidence.'));
+    a.appendChild(epText('p',{},r.partA.supportedAreas+'/'+r.partA.totalAreas+' app areas supported'+(r.partA.coverage===null?'':' · '+r.partA.coverage+'% evidence coverage')));
+    if(r.partA.totalAreas){const meter=el('progress',{max:r.partA.totalAreas,value:r.partA.supportedAreas,'aria-label':'Supported app-area evidence coverage'});a.appendChild(meter);}
+    if(examId==='exam2')a.appendChild(epButton('Measure Part A',()=>openExamAPractice('short'),{class:'btn','data-readiness-part-a':true}));
+    else a.appendChild(epButton('Open a chapter check',()=>epOpenChapter(epExam(examId).chapters[0].id,'check')));
+    b.appendChild(epText('h3',{},'Part B · draw & explain'));b.appendChild(epText('p',{class:'er-value'},'Needs review'));
+    b.appendChild(epText('p',{},r.partB.attempted+' written tasks attempted · '+r.partB.needsCorrectionOrHelp+' recorded attempts needed correction or help. Self-checks and tutor replies are not an independently verified written score.'));
+    b.appendChild(epText('p',{},'A full readiness percentage is not yet supported. Have fresh linked written problems scored against the rubric. Missing evidence is not a zero.'));
+    if(examId==='exam2')b.appendChild(epButton('Practice Part B',()=>startExamBPractice(),{'data-readiness-part-b':true}));
+    grid.append(a,b);box.appendChild(grid);
+    if(r.nextArea)box.appendChild(epText('p',{class:'er-next'},'Next check: '+r.nextArea.label+'. '+r.nextArea.status+'.'));
+    box.appendChild(epText('p',{},'Pacing: '+(r.pacingMeasured?'a completed 40-question timed sample is recorded.':'not established by untimed practice.')));
+    const more=el('details');more.appendChild(epText('summary',{},'How this is calculated · see all areas'));
+    more.appendChild(epText('p',{},'Planning target: '+TARGET+'% first-answer accuracy. Each supported app area needs '+MIN_FAMILIES+' distinct families correct first time, with confidence marked Sure and no reported help, within '+WINDOW_DAYS+' days. These are app rules, not an instructor cutoff or a guarantee.'));
+    more.appendChild(epText('p',{},r.practiceStates.firstCorrect+' checked responses/parts right first time · '+r.practiceStates.corrected+' right after correction · '+r.practiceStates.helped+' helped · '+r.practiceStates.unknownOrUngraded+' first results unknown/ungraded. These practice counts can overlap; they do not fill the readiness bar.'));
+    r.partA.areas.forEach(d=>more.appendChild(epText('p',{'data-readiness-area':d.id},d.label+' — '+d.status+' · '+d.distinctCorrectFamilies+'/'+MIN_FAMILIES+' distinct confident first-answer successes')));
+    for(const note of r.limits)more.appendChild(epText('p',{class:'muted'},note));
+    box.appendChild(more);return box;
+  }
+  const previousExport=leBuildExport;
+  leBuildExport=function(){const out=previousExport.apply(this,arguments);out.examReadiness=EXAM_PREP.exams.map(e=>analyze(e.id));return out;};
+  const style=el('style',{id:'exam-readiness-style'});style.textContent='.er-summary{border-top:1px solid #d4e3dd;margin:12px 0;padding-top:12px}.er-summary strong{display:block;color:#264d43}.er-summary p{margin:5px 0!important;font-size:.83rem}.er-panel{margin:0 0 20px;padding:20px;border:1px solid #b6d2c8;background:#f3f9f6}.er-panel .ep-grid{margin:14px 0}.er-value{font-size:1.8rem;font-weight:750;margin:4px 0!important;color:#264d43}.er-panel p{font-size:.9rem}.er-panel progress{display:block;width:100%;height:14px;accent-color:#2b7560;margin:10px 0}.er-next{font-weight:650}.er-panel details{margin-top:12px}.er-panel details p{font-size:.83rem}.er-panel h3{margin:8px 0}.er-panel button{margin:6px 0}@media(max-width:600px){.er-panel{padding:16px}.er-panel .ep-grid{gap:18px}.er-value{font-size:1.5rem}}';document.head.appendChild(style);
+  return Object.freeze({version:VERSION,analyze,panel,summary});
+})();
 
 /* Learner-authored chat signals -> bounded practice probes. No paid AI calls.
  * Wording rules identify a hypothesis to check, never grade free-form chemistry.
@@ -21304,7 +21694,13 @@ window.TutorChat=TutorChat;
   }
   function mount(host,q,context){
     if(!host||!q?.id||!window.TutorChat?.mount)return null;
-    return window.TutorChat.mount(host,{questionId:q.id,fingerprint:fingerprint(q),promptHtml:questionPrompt(q),choices:(q.choices||q.choiceLabels||[]).map(String),choiceLabels:(q.choiceLabels||[]).map(String),referenceHtml:'<p>Course rule check: '+escape(TutorCourseCoach.rule(q))+'</p>'+reference(q),preAttemptRule:TutorCourseCoach.rule(q),getAttemptState:()=> 'none',getWork:()=>'',locked:false,onHelp:()=>false,...context});
+    const c={questionId:q.id,fingerprint:fingerprint(q),promptHtml:questionPrompt(q),choices:(q.choices||q.choiceLabels||[]).map(String),choiceLabels:(q.choiceLabels||[]).map(String),referenceHtml:'<p>Course rule check: '+escape(TutorCourseCoach.rule(q))+'</p>'+reference(q),preAttemptRule:TutorCourseCoach.rule(q),getAttemptState:()=> 'none',getWork:()=>'',locked:false,onHelp:()=>false,...context};
+    const profile=actor(),previousHelp=c.onHelp;
+    c.onHelp=()=>{const state=c.getAttemptState(),accepted=previousHelp();
+      if(sameActor(profile)&&!c.locked&&(accepted!==false||['answered','review'].includes(state)))QuestionPractice.help(q,c,state);
+      return accepted;
+    };
+    return window.TutorChat.mount(host,c);
   }
   function wrapView(name,after){
     const previous=VIEWS[name];if(typeof previous!=='function')return;
