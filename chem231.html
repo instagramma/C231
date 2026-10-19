@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.133</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.134</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -9001,7 +9001,7 @@ const CH4_GRAPHS={
 };
 function ch4Skeleton(key,title='Given bond-line structure',marks=[]){const g=CH4_GRAPHS[key];return ch4Figure(title,g.e.map(e=>ch4Line(...g.p[e[0]],...g.p[e[1]])).join('')+marks.map(m=>ch4Label(g.p[m.index][0]+(m.dx||0),g.p[m.index][1]+(m.dy||-13),m.label,16)).join(''),500,270);}
 function ch4GraphPair(a,b){return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px">'+ch4Skeleton(a,'Structure A')+ch4Skeleton(b,'Structure B')+'</div>';}
-function ch4Newman(front,back,mode='staggered',title='Given Newman projection'){
+function ch4Newman(front,back,mode='staggered',title='Given Newman projection',tags=null){
   const cx=240,cy=130,r=48,far=99,fa=[270,30,150],ba=[330,90,210];
   const pos=(a,d)=>[cx+Math.cos(a*Math.PI/180)*d,cy+Math.sin(a*Math.PI/180)*d];
   let body='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'"/>';
@@ -9012,6 +9012,7 @@ function ch4Newman(front,back,mode='staggered',title='Given Newman projection'){
   }
   ba.forEach((a,i)=>{body+=ch4Line(...pos(a,r),...pos(a,far-21))+ch4Label(...pos(a,far),back[i],20);});
   fa.forEach((a,i)=>{body+=ch4Line(cx,cy,...pos(a,far-21))+ch4Label(...pos(a,far),front[i],20);});
+  if(tags)for(const [side,angles]of [['front',fa],['back',ba]])angles.forEach((a,i)=>{if(tags[side]?.[i]){const [x,y]=pos(a,far);body+=ch4Label(x,y+19,tags[side][i],13);}});
   body+='<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="currentColor"/>'+ch4Label(240,266,'Front carbon = center dot; back carbon = circle',15);
   return ch4Figure(title,body,480,284);
 }
@@ -14601,6 +14602,83 @@ const CX_RELATED_FAMILIES={3:'exam2-carbon-degree-count',8:'exam2-combustion-sta
 CHALLENGE_EXPANSION_QUESTIONS.forEach((q,index)=>{if(CX_RELATED_FAMILIES[index+1])q.transferFamily=CX_RELATED_FAMILIES[index+1];});
 QUESTIONS.push(...CHALLENGE_EXPANSION_QUESTIONS);
 /* END CHALLENGE EXPANSION */
+
+/* Explicit ID-preserving clarity repairs from Gabe's 2026-10-19 use report.
+ * No new questions/families or changed numerical chemistry keys. Old content
+ * fingerprints remain stale evidence; display repairs are not unseen items. */
+const CH4_CLARITY_IDS=['CH4-20260923-49','CH4-L11-20260924-08','CH4-L11-20260924-25','CH4-HX07','CH4-HX08','CH4-HX10','CH4-HX20','CH4-HXW02','CH4-HXW03','CH4-HXW04'];
+function ch4PairDiagram(kind='A'){
+  const front=['H','CH₃','CH₃'],back=kind==='A'?['H','CH₃','CH₃']:['CH₃','H','CH₃'];
+  return ch4Newman(front,back,'staggered','Projection '+kind+' · labels identify the methyl groups',
+    {front:{1:'F1',2:'F2'},back:kind==='A'?{1:'B1',2:'B2'}:{0:'B1',2:'B2'}})+
+    '<p class="muted">F1/F2 tag the front methyl groups; B1/B2 tag the rear methyl groups. These tags are not extra atoms.</p>';
+}
+function ch4PairLedger(kind='A'){
+  const a=kind==='A',angles=a?[60,180,60,60]:[60,180,180,60],pairs=['F1–B1','F1–B2','F2–B1','F2–B2'];
+  return cxTable(['Methyl pair','Smaller angle','Relationship'],pairs.map((p,i)=>[p,angles[i]+'°',angles[i]===60?'gauche':'anti']))+
+    '<p><b>'+ (a?'3 × 3.8 = 11.4':'2 × 3.8 = 7.6')+' kJ/mol</b> in the supplied model. Count a pair once. One methyl can be gauche to more than one methyl on the other carbon.</p>';
+}
+function ch4ClarityPatch(id,changes){const q=QUESTIONS.find(q=>q.id===id);if(!q)throw Error('Missing clarity target '+id);Object.assign(q,changes,{clarifiedAt:'2026-10-19',clarificationReason:'Learner-reported unclear task/model; identity and source family retained.'});}
+function ch4PaperChairModels(subs){
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px">'+['A','B'].map(board=>{
+    const geometry=chairGeometry(board,2),groups=[];
+    for(const s of subs)for(const site of geometry[s.carbon-1].sites)groups.push({carbon:s.carbon,site:site.site,label:site.up===s.up?s.label:'H'});
+    return ch4QPChair(board,{groups,title:'Model chair '+board+' · C1 axial '+(board==='A'?'up':'down')});
+  }).join('')+'</div>';
+}
+for(const [id,subs]of [
+  ['CH4-L11-20260924-08',[{carbon:1,label:'Br',up:true},{carbon:4,label:'Me',up:true}]],
+  ['CH4-L11-20260924-25',[{carbon:1,label:'Et',up:false},{carbon:2,label:'Br',up:true}]]
+]){
+  const q=QUESTIONS.find(q=>q.id===id);ch4ClarityPatch(id,{model:ch4PaperChairModels(subs)+q.model});
+}
+ch4ClarityPatch('CH4-20260923-49',{
+  prompt:'You are looking from <b>C2 toward C3</b>. C2 is the front carbon (dot), and C3 is the rear carbon (circle). You then move your eye to look from <b>C3 toward C2</b>, without rotating any bond. What changes?'+ch4Newman(['Br','CH₃','H'],['CH₃','H','H'],'staggered','Starting view · C2 in front; C3 behind'),
+  choices:['C3 becomes the front carbon; C2 becomes the rear carbon. The molecule and conformation stay the same.','C2 must stay in front because atom numbers cannot change.','Only the Br atom moves to C3.','The staggered conformation becomes eclipsed.'],
+  why:'<p><b>The viewing order changes, not the molecule.</b> In C3 → C2, C3 is the near carbon, so it is the dot; C2 is behind, so it is the circle. The groups stay bonded to their original carbons. No bond rotation occurred, so the conformation stays staggered.</p><p>A Newman uses dot/circle and ordinary radial bonds—not wedge/dash bonds. Where groups sit on the page also depends on how you orient the new drawing; a left/right rule needs a specified orientation.</p>',
+  hints:['The first carbon in the viewing arrow is the one nearest your eye.','Keep each group attached to the same numbered carbon.']
+});
+for(const [id,kind]of [['CH4-HX07','A'],['CH4-HX08','B']])ch4ClarityPatch(id,{
+  prompt:'Count the <b>front-methyl / rear-methyl pairs</b> that are gauche in this staggered 2,3-dimethylbutane Newman. Gauche means a 60° separation around the viewed bond; anti means 180°. Do not count pairs on the same carbon. '+(kind==='A'?'Also calculate their total cost using 3.8 kJ/mol per gauche pair; ignore other terms.':'Give the number of gauche methyl pairs.')+ch4PairDiagram(kind),
+  why:ch4PairDiagram(kind)+ch4PairLedger(kind),
+  hints:['Choose one front methyl. Compare it separately with each rear methyl.','Repeat for the other front methyl. A methyl group can belong to two different pairs.']
+});
+const ch4PentaneModel=()=>ch4Skeleton('pentane','Answer: pentane · five-carbon continuous chain',[0,1,2,3,4].map(i=>({index:i,label:String(i+1)})));
+function ch4ButaneAngle(angle){
+  const fa=[270,30,150],back=fa.map(a=>(a+angle)%360),groups=['CH₃','H','H'],p=(a,d)=>[240+Math.cos(a*Math.PI/180)*d,130+Math.sin(a*Math.PI/180)*d];
+  let body='<circle cx="240" cy="130" r="48"/>';
+  if(angle%120===0){
+    fa.forEach((a,i)=>{const j=back.findIndex(b=>b===a);body+=ch4Line(240,130,...p(a,78))+ch4Label(...p(a,104),groups[i]+' / '+groups[j],19);});
+    body+=ch4Label(240,266,'Each label is front / rear; the bonds overlap.',14);
+  }else{
+    back.forEach((a,i)=>body+=ch4Line(...p(a,48),...p(a,78))+ch4Label(...p(a,104),groups[i],20));
+    fa.forEach((a,i)=>body+=ch4Line(240,130,...p(a,78))+ch4Label(...p(a,104),groups[i],20));
+    body+=ch4Label(240,266,'Dot = front C2; circle = rear C3.',14);
+  }
+  body+='<circle cx="240" cy="130" r="4" fill="currentColor"/>';
+  return ch4Figure('Butane · '+angle+'° rear-carbon rotation from the start',body,480,290);
+}
+ch4ClarityPatch('CH4-HX20',{
+  prompt:'Look along <b>C2 → C3 of butane</b>. The starting projection below defines <b>0°</b>: the two methyl groups overlap. Hold the front carbon fixed and rotate only the rear carbon through one full turn.<p>At which <b>two angles</b> are the methyl groups gauche and the conformation a staggered energy minimum?</p>'+ch4ButaneAngle(0),
+  why:'<p><b>60° and 300°.</b> In both, the methyl groups are 60° apart by the smaller angle, and the bonds are staggered. At 180° they are anti; that is a different, lower minimum. At 0°, 120° and 240°, bonds are eclipsed, so those are maxima in this butane model.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px">'+[0,60,120,180,240,300].map(a=>ch4ButaneAngle(a)).join('')+'</div>'+ch4ButaneEnergyModel(),
+  hints:['Start from the shown 0° picture. Move only the rear groups; keep each group on its carbon.','Separate two questions: are the bonds staggered or eclipsed, and are the two methyl groups 60° or 180° apart?']
+});
+ch4ClarityPatch('CH4-HX10',{
+  prompt:'What is the <b>complete IUPAC name</b> of the molecule shown in this Newman projection?'+ch4Newman(['CH₃','H','H'],['CH₂CH₃','H','H'],'staggered','Given Newman · identify the full carbon chain'),
+  why:'<p><b>Pentane.</b> Expand the projection into one chain: CH₃–CH₂(front)–CH₂(rear)–CH₂–CH₃. That is five carbons, with no branch. The dot and circle each represent one of the two carbons in the viewed bond. CH₂CH₃ adds two more; it is not a one-carbon label.</p>'+ch4PentaneModel(),
+  hints:['The dot and circle stand for two separate carbon atoms.','Write the chain from the front CH₃, through the viewed bond, and then through the rear CH₂CH₃ group.']
+});
+ch4ClarityPatch('CH4-HXW02',{
+  model:'<h3>(a) Which groups are on each carbon?</h3><p>Front: CH₃, H, H. Rear: CH₂CH₃, H, H. Both viewed carbons are CH₂; their fourth bond is the viewed C–C bond.</p><h3>(b) Bond-line structure and name</h3>'+ch4PentaneModel()+'<p>Pentane: CH₃–CH₂–CH₂–CH₂–CH₃.</p><h3>(c) One valid eclipsed rotamer</h3>'+ch4Newman(['CH₃','H','H'],['CH₂CH₃','H','H'],'eclipsed','One valid answer · labels show front / rear')+'<p>Other correctly connected eclipsed rotamers are valid. Compare each carbon’s groups, not only where the picture sits on the page.</p><h3>(d) Why not a constitutional isomer?</h3><p>The same atoms remain bonded to the same neighbors. Only rotation about the viewed C–C bond changed.</p>'
+});
+ch4ClarityPatch('CH4-HXW03',{
+  prompt:'Compare projections A and B of 2,3-dimethylbutane. Use 3.8 kJ/mol per methyl–methyl gauche pair; ignore other terms.'+ch4PairDiagram('A')+ch4PairDiagram('B')+'<ol type="a"><li>List the four front/rear methyl pairs in each drawing using its F1/F2/B1/B2 tags.</li><li>Give each pair’s smaller angle and classify it as gauche (60°) or anti (180°).</li><li>Find the total cost of each drawing and their difference.</li><li>Is either drawing eclipsed?</li></ol>',
+  model:'<h3>(a–b) Projection A: all four pairs</h3>'+ch4PairDiagram('A')+ch4PairLedger('A')+'<h3>(a–b) Projection B: all four pairs</h3>'+ch4PairDiagram('B')+ch4PairLedger('B')+'<h3>(c) Compare costs</h3><p>A = 11.4; B = 7.6 kJ/mol. B is lower by 3.8 kJ/mol in this model.</p><h3>(d) Conformation</h3><p>Both drawings are staggered. Neither is eclipsed.</p>'
+});
+ch4ClarityPatch('CH4-HXW04',{
+  prompt:'Draw <b>two ring-flipped chairs for each of three compounds</b>: (1) cis-1,2-, (2) cis-1,3-, and (3) trans-1,4-dimethylcyclohexane. That means six chairs total.<p>For <b>each compound</b>:</p><ol type="a"><li>Number the carbons. Put the C1 methyl up; set the second methyl up/down from cis/trans.</li><li>Label both methyls axial/equatorial and up/down in both chairs.</li><li>Compare the two chairs using 7.6 kJ/mol per axial methyl. State which is favored, <b>or say they tie</b>.</li></ol>',
+  model:'<h3>Compound 1 · cis-1,2-dimethylcyclohexane</h3>'+ch45HChairs(2,['up','up'])+'<p>(a–b) Both methyls stay up. A: C1 equatorial / C2 axial. B: C1 axial / C2 equatorial. (c) One axial methyl in each: 7.6 kJ/mol each. <b>Equal stability in this model.</b></p><h3>Compound 2 · cis-1,3-dimethylcyclohexane</h3>'+ch45HChairs(3,['up','up'])+'<p>(a–b) Both methyls stay up. A: both equatorial. B: both axial. (c) A costs 0; B costs 15.2 kJ/mol. <b>A is favored by 15.2 kJ/mol.</b></p><h3>Compound 3 · trans-1,4-dimethylcyclohexane</h3>'+ch45HChairs(4,['up','down'])+'<p>(a–b) C1 methyl stays up; C4 methyl stays down. A: both equatorial. B: both axial. (c) A costs 0; B costs 15.2 kJ/mol. <b>A is favored by 15.2 kJ/mol.</b></p><p>Chair A/B are model labels, not required page orientations. A valid flipped pair must preserve carbon attachments and up/down faces while swapping axial/equatorial.</p>'
+});
 
 /* BEGIN ARROW LAB (resonance you draw), 2026-10-02 */
 /* Resonance engine, 2026-10-02. Pure, deterministic electron bookkeeping for the
@@ -21522,11 +21600,12 @@ const TutorChat = (() => {
     const id=identity(c),owner=actor(),root=document.createElement('details');
     root.className='tutor-chat';root.dataset.tutorChat='';root.dataset.questionTutor=String(c.questionId);
     mounts.set(root,c);
-    const summary=text('summary','Ask about this question');root.appendChild(summary);host.appendChild(root);
+    const readiness=c.surface==='exam-readiness';
+    const summary=text('summary',readiness?'Talk about my readiness':'Ask about this question');root.appendChild(summary);host.appendChild(root);
     if(isLocked(c)){root.appendChild(text('p','Tutor opens after you finish this independent check. Your answers stay independent.',{'data-tutor-locked':'true'}));return root;}
     const panel=document.createElement('div');panel.className='tutor-panel';root.appendChild(panel);
     const modes=text('div','',{class:'tutor-modes',role:'group','aria-label':'Type of help'});panel.appendChild(modes);
-    const modeButtons={};for(const [mode,label]of [['ask','Ask a question'],['reasoning','Check my reasoning']]){
+    const modeButtons={};for(const [mode,label]of [['ask','Ask a question'],['reasoning',readiness?'Check my study plan':'Check my reasoning']]){
       const b=text('button',label,{type:'button','data-tutor-mode':mode});b.onclick=()=>{if(!alive())return;update(t=>{t.mode=mode;});refresh();input.focus();};modes.appendChild(b);modeButtons[mode]=b;
     }
     const connectionStatus=text('p','',{class:'tutor-status','data-tutor-connection':''});panel.appendChild(connectionStatus);
@@ -21540,8 +21619,8 @@ const TutorChat = (() => {
     const saveButton=text('button','Save draft',{type:'button','data-tutor-save':''}),sendButton=text('button','Send',{type:'button','data-tutor-send':''}),cancelButton=text('button','Cancel request',{type:'button','data-tutor-cancel':''});actions.append(saveButton,sendButton,cancelButton);
     const note=text('p','',{class:'tutor-note'});panel.appendChild(note);
     const more=document.createElement('details');more.className='tutor-more';more.appendChild(text('summary','Privacy & saved work'));panel.appendChild(more);
-    more.appendChild(text('p','The engine uses your sent reasoning and requests for help to suggest follow-up practice. Wording patterns are hypotheses to check, not grades. Flagged tutor exchanges are held out until review. Two later distinct answers without recorded help can release a practice priority; chat never raises readiness.'));
-    more.appendChild(text('p','Only this question, its figures, your current work, the bank’s explanation and the latest 16 chat messages would be sent when you press Send. No entire profile, grades, other questions or course files. AI feedback can be wrong and never changes the answer key.'));
+    more.appendChild(text('p',readiness?'This conversation helps you plan; it does not grade chemistry or create new evidence of understanding. Practice and readiness still come from the recorded answers and checks. You can flag any reply for accuracy review. Chat never raises readiness.':'The engine uses your sent reasoning and requests for help to suggest follow-up practice. Wording patterns are hypotheses to check, not grades. Flagged tutor exchanges are held out until review. Two later distinct answers without recorded help can release a practice priority; chat never raises readiness.'));
+    more.appendChild(text('p',readiness?'When you press Send, the tutor gets this exam’s current readiness summary, practice counts, named gaps and the latest 16 messages in this chat. No raw answers, drawings, other chats, official grades, or entire profile are included. The summary comes from this browser’s available records; another device may differ. AI advice can be wrong and cannot certify readiness.':'Only this question, its figures, your current work, the bank’s explanation and the latest 16 chat messages would be sent when you press Send. No entire profile, grades, other questions or course files. AI feedback can be wrong and never changes the answer key.'));
     more.appendChild(text('p',connection.cloudUser?'Drafts stay in this browser. Sent conversations are saved privately in Supabase for your signed-in account. Open Saved tutor chats to review them on another device. Clearing this browser chat does not delete the review archive.':'The latest 40 question conversations are kept on this browser and app profile, not synced to other devices. Up to 40 messages per conversation. Clearing chat text does not erase help already recorded on an answer.'));
     const exportButton=text('button','Download this conversation',{type:'button','data-tutor-export':''}),clearButton=text('button','Clear this conversation',{type:'button','data-tutor-clear':''});more.append(exportButton,clearButton);
     let busy=false,notice='',memoryDraft=null;
@@ -21555,7 +21634,7 @@ const TutorChat = (() => {
     function refresh(){
       if(!alive())return;const t=read(c,id),active=connection.enabled;
       Object.entries(modeButtons).forEach(([mode,b])=>b.setAttribute('aria-pressed',String(t.mode===mode)));
-      input.value=memoryDraft===null?t.draft:memoryDraft;input.placeholder=t.mode==='reasoning'?'I think ___ because ___. The step I’m unsure about is…':'What part would you like explained?';input.disabled=busy;
+      input.value=memoryDraft===null?t.draft:memoryDraft;input.placeholder=readiness?(t.mode==='reasoning'?'My plan is ___. Is that a good next step?':'How am I doing? What should I practise next?'):(t.mode==='reasoning'?'I think ___ because ___. The step I’m unsure about is…':'What part would you like explained?');input.disabled=busy;
       history.replaceChildren();for(const m of t.messages.filter(m=>m.role!=='assistant'||TutorCourseCoach.state(c)!=='none')){
         const item=text('section','',{class:'tutor-message '+m.role});item.appendChild(text('strong',m.role==='assistant'?'Tutor · AI feedback':m.mode==='reasoning'?'Your reasoning':'You'));item.appendChild(text('p',m.text,m.role==='assistant'?{'data-tutor-reply':''}:{}));
         if(m.auditSaved)item.appendChild(text('small',m.auditStorage==='private-supabase'?'Saved privately in Supabase for accuracy review.':'Saved privately on this Mac for accuracy review.'));
@@ -21579,12 +21658,12 @@ const TutorChat = (() => {
       }
       const first=TutorCourseCoach.state(c)==='none';
       coach.hidden=!first;coach.textContent=first?'Before your first submitted attempt: rule checks only. Full tutor replies open after an attempt. Typing a draft or selecting an option is not a submission.':'';
-      privacy.hidden=!active||first;consentText.textContent=active?'Send this question and my work to '+(connection.providerLabel||'my tutor connection')+' through '+new URL(connection.endpoint).origin+'.'+(connection.auditEnabled?' Keep sent messages, replies and supplied diagrams '+(connection.cloudUser?'in private Supabase storage for my signed-in account':'privately on this Mac')+' for accuracy review. Clearing this chat does not delete that review record.':''):'';consent.checked=t.consentEndpoint===connection.endpoint&&active&&(!connection.auditEnabled||t.auditConsent===true);
+      privacy.hidden=!active||first;consentText.textContent=active?'Send '+(readiness?'this exam’s readiness summary and my message':'this question and my work')+' to '+(connection.providerLabel||'my tutor connection')+' through '+new URL(connection.endpoint).origin+'.'+(connection.auditEnabled?' Keep sent messages, replies and supplied diagrams '+(connection.cloudUser?'in private Supabase storage for my signed-in account':'privately on this Mac')+' for accuracy review. Clearing this chat does not delete that review record.':''):'';consent.checked=t.consentEndpoint===connection.endpoint&&active&&(!connection.auditEnabled||t.auditConsent===true);
       sendButton.hidden=!active&&!first;sendButton.textContent=first?'Show a rule check':'Send';sendButton.disabled=busy||(!first&&(!consent.checked||!input.value.trim()||t.messages.length>=MAX_MESSAGES-1));
       saveButton.disabled=busy;cancelButton.hidden=!busy;
       connectionStatus.textContent=active?'Tutor connection configured. AI feedback is not a grade.':'Tutor not connected. You can save your question or reasoning; no AI reply is available yet.';
       status.textContent=notice||(busy?'Waiting for a tutor reply…':'');
-      note.textContent=(safeStore.persistent?'Drafts stay on this device.':'Preview only: drafts disappear when this page reloads.')+' Tutor help is recorded separately from independent answers.'+(t.messages.length>=MAX_MESSAGES-1?' Conversation limit reached. Download or clear this chat to start again.':'');
+      note.textContent=(safeStore.persistent?'Drafts stay on this device.':'Preview only: drafts disappear when this page reloads.')+(readiness?' This chat does not change scores or count as an answer.':' Tutor help is recorded separately from independent answers.')+(t.messages.length>=MAX_MESSAGES-1?' Conversation limit reached. Download or clear this chat to start again.':'');
       showHelp(t);
     }
     input.addEventListener('input',()=>{memoryDraft=input.value;if(!alive())return;notice='';if(update(t=>{t.draft=input.value;}))notice=safeStore.persistent?'Draft saved on this device.':'Draft kept for this preview only.';status.textContent=notice;sendButton.disabled=busy||(TutorCourseCoach.state(c)!=='none'&&(!consent.checked||!input.value.trim()||read(c,id).messages.length>=MAX_MESSAGES-1));});
@@ -21628,7 +21707,7 @@ const TutorChat = (() => {
         // A reply may finish after navigation. Save to its original question only;
         // mark assistance later when that reply is actually opened and shown.
         update(row=>row.messages.push({role:'assistant',text:data.reply,ts:Date.now(),requestId,visualStatus:q.visualStatus,auditSaved:config.auditEnabled===true,auditStorage:config.cloudUser?'private-supabase':'private-mac'}));
-        if(config.cloudUser&&typeof TutorInsights!=='undefined')TutorInsights.observe({requestId,questionId:q.id,fingerprint:q.fingerprint,ts:message.ts,mode:message.mode,learnerText:message.text});
+        if(!readiness&&config.cloudUser&&typeof TutorInsights!=='undefined')TutorInsights.observe({requestId,questionId:q.id,fingerprint:q.fingerprint,ts:message.ts,mode:message.mode,learnerText:message.text});
         document.dispatchEvent(new CustomEvent('tutor-turn-saved'));
         notice=q.visualStatus==='incomplete'?'Reply received. Some diagrams could not be sent; the tutor must not guess about them.':q.images.length?'Reply received. '+q.images.length+' diagram'+(q.images.length===1?'':'s')+' sent.':'Reply received.';
       }catch(e){notice=e.message==='CONTEXT'?'This question and conversation are too large to send safely. No request was sent. Download or clear this chat to shorten it.':e.message==='LIMIT'?'Tutor usage limit reached. Your question is saved.':e.message==='AUTH'?'Tutor connection needs setup. Your question is saved.':controller.signal.aborted||e.message==='Stopped'?'Request stopped. Your question is saved; no new tutor help was recorded.':'No reply received. Your question is saved; no new tutor help was recorded.';
@@ -21859,6 +21938,46 @@ window.TutorChat=TutorChat;
   window.TutorChatAdapters=Object.freeze({version:'2026-10-18.2',fingerprint,drillCold,attachDrill,attachSpark,attachCheck,attachLessonCheck});
 })();
 
+/* Readiness conversation, not a question attempt. Aggregates only, refreshed
+ * at Send. Existing authenticated/capped/audited tutor transport is reused. */
+const ReadinessTutor=(()=>{
+  'use strict';
+  const RULES='Readiness coaching, not a chemistry answer key. Use the CURRENT_SNAPSHOT below as the only performance evidence. Earlier chat snapshots may be stale. Start with one short honest answer. Then use at most three short points: What looks solid; What still needs checking; Do this next. Use everyday words, explain technical terms briefly, and ask only one small follow-up. Usually stay under 150 words; give more detail only when asked. If no independent data exist, say "I cannot judge exam readiness yet"—not that the learner has zero ability. Never invent grades, pass probabilities, strengths, missing course scope or full coverage. Keep Part A, written Part B and pacing separate. Helped/corrected practice is learning, not fresh independent success. Self-reviewed ink and AI praise are not verified written scores. The app scope is partial; its rules are planning rules, not a calibrated prediction. Offer one specific achievable next action from the supplied gaps. If the learner shares a plan, check it against those gaps. Do not convert this conversation into a question attempt or mastery award.';
+  function snapshot(examId){
+    const r=ExamReadiness.analyze(examId);if(!r)return null;
+    return {kind:'exam-readiness-summary',examId,exam:epExam(examId).title,
+      calculatedAt:new Date(r.calculatedAt).toISOString(),timeZone:'America/Los_Angeles',
+      scope:epExam(examId).summary,source:'Current browser/profile records only; not a complete cross-device ledger.',
+      partA:{firstAnswerAccuracy:r.partA.accuracy,correct:r.partA.correct,checked:r.partA.checked,supportedAreas:r.partA.supportedAreas,totalAppAreas:r.partA.totalAreas,coveragePercent:r.partA.coverage,bankGaps:r.partA.bankGaps,status:r.partA.status},
+      partB:{attempted:r.partB.attempted,selfReviewed:r.partB.selfReviewed,needsCorrectionOrHelp:r.partB.needsCorrectionOrHelp,verifiedScore:null,status:r.partB.status},
+      ordinaryPractice:{...r.practiceStates,limits:'Counts may overlap; these do not fill independent readiness evidence.'},
+      pacingMeasured:r.pacingMeasured,overallPercent:null,nextCheck:r.nextArea?{label:r.nextArea.label,status:r.nextArea.status}:null,
+      areas:r.partA.areas.filter(d=>!d.supported).slice(0,8).concat(r.partA.areas.filter(d=>d.supported).slice(0,4)).map(d=>({label:d.label,status:d.status,checked:d.checked,distinctCorrectFamilies:d.distinctCorrectFamilies})),
+      areaDetailLimit:'At most eight gaps and four supported areas are named; use the total counts for overall coverage. This is not the full course scope.',
+      rules:r.rules,limits:r.limits};
+  }
+  function mount(host,examId){
+    if(!host||!epExam(examId)||host.querySelector('[data-readiness-tutor]'))return;
+    const box=el('section',{class:'card rt-card','data-readiness-tutor':examId});host.appendChild(box);
+    box.appendChild(epText('h2',{},'How am I doing?'));
+    box.appendChild(epText('p',{},'Ask the tutor about your progress or study plan. It can explain what your saved evidence shows—and what it cannot tell yet.'));
+    const launch=epButton('Ask about my readiness',()=>{const current=box.querySelector('.tutor-chat');if(current){current.open=true;current.querySelector('[data-tutor-input]')?.focus();}},{class:'btn','data-readiness-chat-open':true});box.appendChild(launch);
+    const root=TutorChat.mount(box,{questionId:'READINESS-'+examId,runId:'readiness:'+examId,surface:'exam-readiness',fingerprint:'readiness-coach-v1:'+examId,
+      promptHtml:'<p>Talk with me about '+epExam(examId).title+' preparation. This is a study-planning conversation, not an unanswered test question.</p>',
+      referenceHtml:'<p>'+RULES+'</p>',choices:[],getAttemptState:()=> 'review',
+      getWork:()=> 'CURRENT_SNAPSHOT\n'+JSON.stringify(snapshot(examId)),onHelp:()=>false,locked:false});
+    const info=el('details');info.appendChild(epText('summary',{},'What the tutor sees'));
+    info.appendChild(epText('p',{},'Only this exam’s summary: first answers, corrections/help counts, checked areas, missing checks and pacing. No raw answers, drawings, other chats or official grades. The summary refreshes when you send.'));
+    info.appendChild(epText('p',{},'Uses your existing private tutor connection and shared monthly allowance. Replies are saved for review; use “Flag wrong or unclear answer” if needed. Chat cannot raise readiness.'));
+    box.appendChild(info);
+  }
+  for(const [name,selector]of [['examPrep','[data-exam-readiness]'],['examOverview','[data-exams-overview]']]){
+    const previous=VIEWS[name];VIEWS[name]=function(v){const out=previous.apply(this,arguments),host=v.querySelector(selector);if(host)mount(host,name==='examPrep'?S.examPrepId:EXAM_PREP.currentExam);return out;};
+  }
+  const css=el('style');css.textContent='.rt-card{border:1px solid #b7d3cc;border-radius:16px;background:#f4faf7;margin:16px 0;padding:18px}.rt-card h2{margin-top:0}.rt-card>p{line-height:1.5}.rt-card>details:not(.tutor-chat){font-size:.83rem;margin-top:10px}.rt-card .tutor-chat{margin-top:12px}.rt-card>details>summary{min-height:44px;padding:10px 0;cursor:pointer}';document.head.appendChild(css);
+  return Object.freeze({version:1,snapshot,mount});
+})();
+
 /* One question-aware launcher. The same saved workspace is moved into the dock;
  * there is no second chat, duplicate request, or separate draft. */
 (function(){
@@ -21877,7 +21996,7 @@ window.TutorChat=TutorChat;
   }
   function open(){
     if(!active?.home.isConnected)return;
-    title.textContent='Question tutor · '+active.id;dock.append(active.root);active.root.open=true;dock.hidden=false;launcher.setAttribute('aria-expanded','true');
+    title.textContent=active.readiness?'Readiness tutor':'Question tutor · '+active.id;dock.append(active.root);active.root.open=true;dock.hidden=false;launcher.setAttribute('aria-expanded','true');
     (active.root.querySelector('[data-tutor-input]')||close).focus();
   }
   launcher.onclick=()=>dock.hidden?open():hide(true);close.onclick=()=>hide(true);
@@ -21887,7 +22006,7 @@ window.TutorChat=TutorChat;
   TutorChat.mount=function(host,context){
     const root=originalMount(host,context);if(!root)return root;
     hide();const home=document.createElement('span');home.hidden=true;home.dataset.tutorHome='';root.before(home);
-    active={root,home,id:String(context.questionId)};launcher.hidden=false;return root;
+    active={root,home,id:String(context.questionId),readiness:context.surface==='exam-readiness'};launcher.setAttribute('aria-label',active.readiness?'Talk to the tutor about my readiness':'Talk to the tutor about this question');launcher.hidden=false;return root;
   };
   const configure=TutorChat.configure;
   TutorChat.configure=function(){hide();return configure.apply(this,arguments);};
