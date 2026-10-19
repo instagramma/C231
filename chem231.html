@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.131</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.132</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -15260,10 +15260,10 @@ function alMolecule(key){return ARROW_LAB_MOLECULES.find(m=>m.key===key);}
 function alStartHomeworkMix(){
   const pool=AL_HOMEWORK_MOLECULES.filter(m=>m.pattern!=='none'),seen=safeStore.get('arrowHomeworkSeen',[]);
   const unused=pool.filter(m=>!seen.includes(m.key)),choices=(unused.length?unused:pool.filter(m=>m.key!==seen.at(-1)));
-  const chosen=choices[Math.floor(Math.random()*choices.length)];
+  const chosen=typeof ResonanceLearning!=='undefined'?ResonanceLearning.choose(pool).molecule:choices[Math.floor(Math.random()*choices.length)];
   // Selection is exposure only, never an attempt or a readiness signal.
   safeStore.set('arrowHomeworkSeen',[...(unused.length?seen:[]),chosen.key].slice(-pool.length));
-  alStart(chosen.key,'next');
+  alStart(chosen.key,chosen.pattern==='none'?'trap':'next');
 }
 function alBuild(M){const {fw,state}=rxBuild(M.graph);return {fw,start:state};}
 function alSession(){return S.arrowLab||null;}
@@ -15545,11 +15545,11 @@ function alLibrary(v){
     v.appendChild(el("h3",{style:"margin:16px 0 8px"},title));
     const grid=el("div",{class:"al-lib"});
     Ms.forEach(M=>{
-      const {fw,start}=alBuild(M);const done=rows.filter(a=>a.drawing.molecule===M.key);const clean=done.filter(a=>a.ok&&!a.h).length;
+      const {fw,start}=alBuild(M);const done=rows.filter(a=>a.drawing.molecule===M.key);const clean=done.filter(a=>a.drawing.learning?.cleanFirst===true).length;
       const c=el("div",{class:"card cream",...(M.sourceKind?{'data-al-homework':M.key}:{})});
       const svg=alSvgEl("svg",{viewBox:alViewBox(),class:"al-mini",role:"img","aria-label":M.name});alDrawStructure(svg,fw,start);c.appendChild(svg);
       c.appendChild(el("h4",{},M.name+" <span class='muted' style='font-weight:400'>"+M.formula+"</span>"));
-      c.appendChild(el("p",{class:"muted",style:"margin:0 0 6px"},(M.trap?"Trap · ":"Level "+M.level+" · ")+(done.length?done.length+" build"+(done.length===1?"":"s")+", "+clean+" clean":"not yet built")));
+      c.appendChild(el("p",{class:"muted",style:"margin:0 0 6px"},(M.trap?"Trap · ":"Level "+M.level+" · ")+(done.length?done.length+" build"+(done.length===1?"":"s")+", "+clean+" without recorded correction/help":"not yet built")));
       const row=el("div",{class:"al-tools"});
       if(M.pattern==="none")row.appendChild(el("button",{class:"btn small",onclick:()=>alStart(M.key,"trap")},"Test it →"));
       else{row.appendChild(el("button",{class:"btn small",onclick:()=>alStart(M.key,"next")},"Draw a contributor →"));if(M.expect.core+M.expect.extra>2)row.appendChild(el("button",{class:"btn ghost small",onclick:()=>alStart(M.key,"set")},"Whole set"));row.appendChild(el("button",{class:"btn ghost small",onclick:()=>alStart(M.key,"spot")},"Spot the error"));}
@@ -17324,6 +17324,7 @@ VIEWS.modePractice=v=>{
     const card=el('section',{class:'card sm-panel','data-resonance-practice':true});
     card.innerHTML='<h2>Draw resonance—not just answers</h2><p>Arrow Lab: '+AL_HOMEWORK_MOLECULES.length+' new homework-style structures. Draw curved arrows, build the contributor and explain its charges. Check your explanation with Tutor.</p>';
     card.appendChild(smButton(S.arrowLab?'Resume my resonance drawing':'Open resonance drawing practice',()=>{courseNavigationSaveWork();go('arrowlab');},{class:'btn'}));v.appendChild(card);
+    if(typeof ResonanceLearning!=='undefined')v.appendChild(ResonanceLearning.card());
   }
   if(['ch4','ch5'].includes(smChapter().id)&&typeof ch45HCard==='function')v.appendChild(ch45HCard(Number(smChapter().id.slice(2))));
   const warm=el('details',{class:'card sm-panel','data-study-warmup-panel':true});warm.innerHTML='<summary>Optional warm-up · up to 3 quick questions</summary><p>Try a few single skills before a full problem.</p>';
@@ -20744,6 +20745,163 @@ body.spark-playing>header,body.spark-playing>#nav{display:none!important}body.sp
 
 /* END SPARK TAIL */
 /* BEGIN QUESTION TUTOR TAIL */
+/* Resonance evidence -> next drawing. Checked work, not clicks or AI praise.
+ * Checkpoint snapshots are append-only and profile-local until completion;
+ * the completed attempt embeds them in the existing cross-device attempt log. */
+const ResonanceLearning=(()=>{
+  'use strict';
+  const VERSION=1,STORE='resonanceChecksV1',DAY=86400000;
+  const copy=x=>JSON.parse(JSON.stringify(x));
+  const actor=()=>typeof leActor==='function'?leActor():{profile:null,qa:true};
+  const revision=m=>m.revision||'2026-10-03.2';
+  const family=m=>m.family||m.key;
+  const fingerprint=(m,fromSig,task)=>leFingerprint({key:m.key,revision:revision(m),graph:m.graph,fromSig,task});
+  function question(id){
+    const m=ARROW_LAB_MOLECULES.find(m=>['next','set','trap'].some(t=>id==='AL-'+m.key+'-'+t));
+    return m?{id,chapter:2,topic:'resonance',type:'arrow-lab',molecule:m.key,learningSkill:'resonance:'+m.pattern}:null;
+  }
+  function current(q,fp){
+    const m=alMolecule(q.molecule);if(!m)return false;
+    const task=q.id.slice(('AL-'+m.key+'-').length),{fw,start}=alBuild(m);
+    return rxEnumerate(fw,start).some(c=>fingerprint(m,c.sig,task)===fp);
+  }
+  function run(R){
+    if(!R.learningRun){R.learningRun={id:typeof crypto?.randomUUID==='function'?crypto.randomUUID():'al-'+R.ts+'-'+Math.random().toString(36).slice(2),actor:actor(),startedAt:Date.now(),legacy:R.log.length>0,checks:[]};}
+    return R.learningRun;
+  }
+  function local(){const s=safeStore.get(STORE,{});return s.version===VERSION&&Array.isArray(s.checks)?s.checks:[];}
+  function checkpoint(R,stage,ok,codes=[],detail={}){
+    const m=alMolecule(R.key);if(!m||R.task==='spot')return;
+    const r=run(R),row={version:VERSION,runId:r.id,ordinal:r.checks.length+1,ts:Date.now(),startedAt:r.startedAt,
+      actor:r.actor,molecule:m.key,revision:revision(m),family:family(m),pattern:m.pattern,fromSig:R.fromSig,task:R.task,
+      fingerprint:fingerprint(m,R.fromSig,R.task),stage,ok:ok===true,codes:[...new Set(codes)],
+      hints:R.hints||0,tutorHelpAt:R.tutorHelpAt||null,mode:R.mode||'guided',legacy:r.legacy,
+      work:copy({arrows:R.arrows,product:R.claims,chargeReasoning:R.chargeReasoning||{},pattern:R.patternClaimed,rank:R.rankClaimed,reason:R.reasonClaimed,explanation:R.explanation||''}),...detail};
+    r.checks.push(row);safeStore.set(STORE,{version:VERSION,checks:[...local(),row].slice(-800)});alSave();
+  }
+  function skill(code){
+    if(/charge|lp-count|pair-count/.test(code))return 'charges';
+    if(/octet|bond-order/.test(code))return 'octets';
+    if(/rank/.test(code))return 'ranking';
+    if(/pattern|resonance|set|separation|sextet|donation|payoff/.test(code))return 'pattern';
+    return 'arrows';
+  }
+  const labels={charges:'Count lone pairs, bond orders and formal charges',octets:'Finish the companion arrow and check the octet',arrows:'Start each arrow on an electron pair',ranking:'Explain which ranking rule decides',pattern:'Find the connected resonance pathway',reasoning:'Explain your next drawing; ask Tutor to check it'};
+  function records(){
+    const completed=(S.attempts||[]).flatMap(a=>a.drawing?.learning?.checks||[]);
+    return [...new Map([...local(),...completed].map(r=>[r.runId+':'+r.ordinal,r])).values()];
+  }
+  function analyze(rows=records(),now=Date.now()){
+    const p=actor(),valid=rows.filter(r=>{
+      const m=alMolecule(r.molecule);return m&&!r.actor?.qa&&r.actor?.profile===p.profile&&r.actor?.role==='owner'&&r.revision===revision(m)&&r.fingerprint===fingerprint(m,r.fromSig,r.task)&&Number.isFinite(r.ts)&&r.ts<=now&&now-r.ts<30*DAY;
+    });
+    const signals=[];
+    for(const r of valid){
+      if(r.stage==='complete'&&r.ok&&(r.hints>0||r.tutorHelpAt)){
+        const later=valid.filter(x=>x.ts>r.ts&&x.stage==='complete'&&x.ok&&x.cleanFirst===true&&x.pattern===r.pattern);
+        if(new Set(later.map(x=>x.family)).size<2)signals.push({skill:'reasoning',label:'Try this decision on another structure without help',pattern:r.pattern,molecule:r.molecule,ts:r.ts,source:'assisted-build',examples:0});
+      }
+      if(r.stage==='complete'&&String(r.work?.explanation||'').trim()){
+        const later=valid.filter(x=>x.ts>r.ts&&x.stage==='complete'&&x.ok&&x.cleanFirst===true&&x.pattern===r.pattern);
+        if(new Set(later.map(x=>x.family)).size<2)signals.push({skill:'reasoning',label:labels.reasoning,pattern:r.pattern,molecule:r.molecule,ts:r.ts,source:'unreviewed-explanation',examples:0});
+      }
+      if(r.ok||r.stage==='input')continue;
+      for(const k of new Set(r.codes.map(skill))){
+        const later=valid.filter(x=>x.ts>r.ts&&x.stage==='complete'&&x.ok&&x.cleanFirst===true&&x.pattern===r.pattern);
+        const families=new Set(later.map(x=>x.family));
+        if(families.size<2)signals.push({skill:k,label:labels[k],pattern:r.pattern,molecule:r.molecule,ts:r.ts,source:'checked-drawing',examples:families.size});
+      }
+    }
+    // Chat asks for a probe, never certifies correctness. Existing review and
+    // owner/fingerprint guards exclude disputed or stale tutor exchanges.
+    if(typeof TutorInsights!=='undefined'){
+      const pool=ARROW_LAB_MOLECULES.map(m=>question('AL-'+m.key+'-next')).filter(Boolean);
+      for(const s of TutorInsights.pending(pool,S.attempts||[],now)){
+        const m=alMolecule(pool.find(q=>q.id===s.questionId)?.molecule);
+        if(m)signals.push({skill:'reasoning',label:labels.reasoning,pattern:m.pattern,molecule:m.key,ts:s.latestAt,source:'learner-chat',examples:0});
+      }
+    }
+    const weight={'checked-drawing':3,'assisted-build':2,'learner-chat':1,'unreviewed-explanation':0};
+    return signals.sort((a,b)=>weight[b.source]-weight[a.source]||b.ts-a.ts);
+  }
+  function choose(pool,rows=records(),seen=safeStore.get('arrowHomeworkSeen',[])){
+    const needs=analyze(rows),need=needs[0];
+    let candidates=need?ARROW_LAB_MOLECULES.filter(m=>m.pattern===need.pattern&&(need.skill!=='charges'||m.sourceKind)):pool;
+    if(!candidates.length)candidates=pool;
+    const prior=need&&alMolecule(need.molecule),different=candidates.filter(m=>m.key!==need?.molecule&&(!prior||family(m)!==family(prior)));if(different.length)candidates=different;
+    const unused=candidates.filter(m=>!seen.includes(m.key));if(unused.length)candidates=unused;
+    else {const notLast=candidates.filter(m=>m.key!==seen.at(-1));if(notLast.length)candidates=notLast;}
+    return {molecule:candidates[Math.floor(Math.random()*candidates.length)],need};
+  }
+  function enrich(R,event){
+    const r=run(R),checks=r.checks,missed=checks.some(c=>!c.ok&&c.stage!=='input'),help=(R.hints||0)>0||!!R.tutorHelpAt;
+    const cleanFirst=!r.legacy&&!missed&&!help&&event.ok===1;
+    checkpoint(R,'complete',event.ok===1,event.ok?[]:[event.x||'resonance-pattern'],{cleanFirst});
+    event.drawing.learning={version:VERSION,runId:r.id,actor:r.actor,legacy:r.legacy,
+      firstSubmissionCorrect:r.legacy?null:!missed&&event.ok===1,corrected:missed&&event.ok===1,hadCorrections:missed,helped:help,
+      // Guided real-time checks are feedback, not an independent exam.
+      feedbackMode:'guided-live-checks',cleanFirst,checks:copy(r.checks),explanationReview:'unreviewed'};
+    event.drawing.firstTry=cleanFirst;event.drawing.clean=event.drawing.clean&&cleanFirst;
+    event.drawing.family=family(alMolecule(R.key));
+    event.questionRevision=revision(alMolecule(R.key));
+    // Compatibility field means initial attempt + failed checks, NOT the number
+    // of normal stages. Otherwise every clean arrow/product build looks helped.
+    event.drawing.checks=1+checks.filter(c=>!c.ok&&c.stage!=='input').length;
+    event.evidence={...(event.evidence||{}),actor:r.actor};
+    if(r.actor.qa)event.qa=true;
+    save();alSave();
+  }
+  function card(){
+    const c=el('section',{class:'card cream','data-resonance-next':true}),needs=analyze(),n=needs[0];
+    c.appendChild(el('h3',{},'Your next drawing'));
+    const p=el('p',{});p.textContent=n?n.label+'. '+(n.source==='checked-drawing'?'A checked step needed correction. Try the same decision on another structure.':n.source==='unreviewed-explanation'?'Your explanation is saved but not graded. Use Tutor to check it; compare your reasoning on another structure.':n.source==='assisted-build'?'Your last correct build used help. Another example can check the same decision.':'Your tutor question suggests a step to recheck—not a proven mistake.'):'Start a different drawing. Checked mistakes will guide the next one.';c.appendChild(p);
+    c.appendChild(el('button',{class:'btn small',onclick:()=>alStartHomeworkMix()},'Practice the next drawing'));
+    const attempts=(S.attempts||[]).filter(a=>a.drawing?.kind==='arrow-lab'),fresh=attempts.filter(a=>a.drawing.learning&&!a.qa&&a.drawing.learning.actor?.profile===actor().profile),legacy=attempts.length-fresh.length;
+    const details=el('details',{});details.appendChild(el('summary',{},'First tries, corrections & help'));
+    const p2=el('p',{class:'muted'});p2.textContent=fresh.filter(a=>a.drawing.learning.cleanFirst).length+' correct with no recorded correction/help · '+fresh.filter(a=>a.drawing.learning.corrected).length+' correct after corrections · '+fresh.filter(a=>a.drawing.learning.helped).length+' helped · '+fresh.filter(a=>!a.ok).length+' still need work. These groups can overlap. '+legacy+' older/unclassified builds.';details.appendChild(p2);c.appendChild(details);
+    c.appendChild(el('p',{class:'muted'},'Guided checks are not an independent readiness test.'));
+    return c;
+  }
+  return {checkpoint,run,records,analyze,choose,enrich,card,question,current,fingerprint,skill};
+})();
+
+const alLearningStart=alStart;
+alStart=function(){const result=alLearningStart.apply(this,arguments);if(S.arrowLab)ResonanceLearning.run(S.arrowLab);alSave();return result;};
+// Check BEFORE showing feedback, keeping the original submitted drawing intact.
+const alLearningCommit=alCommitArrows;
+alCommitArrows=function(R,fw,from,names){
+  if(R.arrows.length){const ev=rxEvaluateMove(fw,from,R.arrows);ResonanceLearning.checkpoint(R,'arrows',ev.legal&&ev.validity.ok&&!ev.validity.unchanged,
+    [...(ev.perArrow||[]).filter(x=>!x.ok).map(x=>x.code),...(ev.validity?.problems||[]).map(x=>x.code),...(ev.validity?.unchanged?['unchanged']:[])]);}
+  return alLearningCommit.apply(this,arguments);
+};
+const alLearningProduct=alCheckProductNow;
+alCheckProductNow=function(R,M,fw,start,from,names){
+  const ev=rxEvaluateMove(fw,from,R.arrows),c=alCheckProduct(fw,start,ev.result,R.claims,names);
+  ResonanceLearning.checkpoint(R,'product',c.ok,c.issues.map(x=>x.code),{issues:copyResonanceIssues(c.issues)});
+  return alLearningProduct.apply(this,arguments);
+};
+function copyResonanceIssues(issues){return issues.map(x=>({code:x.code,atom:x.atom||null,bond:x.bond||null}));}
+const alLearningLog=alLogEvent;
+alLogEvent=function(R,code,detail){
+  if(code==='arrow-illegal')ResonanceLearning.checkpoint(R,'live-feedback',false,[detail?.legality||'arrow-illegal']);
+  if(code==='charge-reasoning-issues')ResonanceLearning.checkpoint(R,'charge-reasoning',false,['charge-reasoning']);
+  return alLearningLog.apply(this,arguments);
+};
+function alLearningCompletion(original){return function(R){
+    if(R.phase==='done')return;
+    const old=S.attempts.at(-1),result=original.apply(this,arguments);
+    if(S.attempts.at(-1)!==old){ResonanceLearning.enrich(R,S.attempts.at(-1));render();}
+    return result;
+  };}
+alFinish=alLearningCompletion(alFinish);
+alDeclareNone=alLearningCompletion(alDeclareNone);
+alTrapResolve=alLearningCompletion(alTrapResolve);
+const alLearningContinue=alContinueFrom;
+alContinueFrom=function(R){delete R.learningRun;const result=alLearningContinue.apply(this,arguments);ResonanceLearning.run(R);alSave();return result;};
+const alLearningLibrary=alLibrary;
+alLibrary=function(v){alLearningLibrary.apply(this,arguments);v.querySelector('[data-resonance-expansion]')?.after(ResonanceLearning.card());};
+if(typeof leBuildExport==='function'){const prior=leBuildExport;leBuildExport=function(){return {...prior(),resonanceChecks:{version:1,checks:ResonanceLearning.records(),limits:'In-progress checkpoints are on this device; completed builds embed their checks in the synced attempt log. Free text is unreviewed. Guided feedback is not an independent exam.'}};};}
+
 /* Learner-authored chat signals -> bounded practice probes. No paid AI calls.
  * Wording rules identify a hypothesis to check, never grade free-form chemistry.
  * Tutor assertions are deliberately not evidence of learner knowledge. */
@@ -20752,6 +20910,7 @@ const TutorInsights=(()=>{
   const VERSION=1,STORE='tutorPracticeSignalsV1',DAY=86400000;
   let owner=null,syncedAt=null;
   const bank=()=>typeof QUESTIONS!=='undefined'?QUESTIONS:[];
+  const findQuestion=id=>bank().find(q=>q.id===id)||(typeof ResonanceLearning!=='undefined'?ResonanceLearning.question(id):null);
   const profile=()=>typeof leActor==='function'?leActor():{profile:null,qa:true};
   const read=()=>{const s=safeStore.get(STORE,{});return s?.version===VERSION&&s.owner===owner&&s.profile===profile().profile&&Array.isArray(s.records)&&Array.isArray(s.reviews)?s:{version:VERSION,owner,profile:profile().profile,records:[],reviews:[]};};
   const write=s=>safeStore.set(STORE,{...s,records:s.records.slice(-200),reviews:s.reviews.slice(-500)});
@@ -20779,7 +20938,7 @@ const TutorInsights=(()=>{
   }
   function observe(row){
     if(!owner||!profile().profile||profile().qa||profile().role!=='owner'||row.qa||row.synthetic)return false;
-    const q=bank().find(q=>q.id===row.questionId);if(!q||!row.requestId||!Number.isFinite(row.ts)||row.ts>Date.now()||qaText(row.learnerText||''))return false;
+    const q=findQuestion(row.questionId);if(!q||!row.requestId||!Number.isFinite(row.ts)||row.ts>Date.now()||qaText(row.learnerText||''))return false;
     const cues=signals(row.learnerText,row.mode,q);if(!cues.length)return false;
     const s=read(),record={requestId:row.requestId,questionId:q.id,fingerprint:row.fingerprint,ts:row.ts,cues,source:'learner-chat',version:VERSION};
     s.records=s.records.filter(r=>r.requestId!==row.requestId).concat(record).sort((a,b)=>a.ts-b.ts);write(s);return true;
@@ -20800,6 +20959,7 @@ const TutorInsights=(()=>{
   }
   function current(q,fp){
     if(!fp)return false;
+    if(q.type==='arrow-lab')return typeof ResonanceLearning!=='undefined'&&ResonanceLearning.current(q,fp);
     return typeof window!=='undefined'&&window.TutorChatAdapters?.fingerprint(q)===fp||typeof sparkFingerprint==='function'&&sparkFingerprint(q)===fp;
   }
   function target(q,cues){
@@ -20817,7 +20977,7 @@ const TutorInsights=(()=>{
     if(!records&&(!owner||!profile().profile||profile().qa||profile().role!=='owner'))return [];
     const s=read(),groups=new Map(),sources=records||s.records,reviewRows=reviews||s.reviews;
     for(const r of sources){
-      const q=bank().find(q=>q.id===r.questionId)||pool.find(q=>q.id===r.questionId);
+      const q=findQuestion(r.questionId)||pool.find(q=>q.id===r.questionId);
       if(!q||!Number.isFinite(r.ts)||r.ts>now||now-r.ts>30*DAY||r.qa||r.synthetic||reviewState(r.requestId,reviewRows).flagged||!current(q,r.fingerprint))continue;
       const mapping=target(q,r.cues),key=mapping.skill;
       if(!pool.some(x=>matches(x,mapping)))continue;
@@ -20839,6 +20999,28 @@ const TutorInsights=(()=>{
   return {signals,observe,setOwner,sync,markReview,reviewState,analyze,pending,matches,exportEvidence};
 })();
 window.TutorInsights=TutorInsights;
+
+/* Reviewed course rules, not item-specific answers. No AI request before a
+ * submitted attempt. A draft/selected option alone does not unlock solutions. */
+const TutorCourseCoach=Object.freeze({
+  rule(q){
+    const topic=String(q.topic||'')+' '+String(q.learningSkill||'')+' '+String(q.adaptiveSkill||'');
+    if(/resonan|formal|charge/i.test(topic))return 'Keep the atoms, hydrogens and sigma bonds fixed. Start each arrow on a lone pair or π bond. After moving the pair, recount lone pairs and bond orders. Formal charge = valence electrons − 2 × lone pairs − bond-order total, including H. Net charge stays the same. Which atom will you count first?';
+    if(/enantiomer|optical|excess/i.test(topic))return 'First name the quantity asked for: enantiomeric excess or mixture composition. ee is the difference between the two percentages; the percentages must total 100. Under matching measurement conditions, ee = |mixture rotation / pure rotation| × 100. What quantity does this question ask for?';
+    if(/stereoRelations|stereoSymmetry|stereoIntro|\bisomers\b|meso|chirality/i.test(topic))return 'Check connectivity first. If it is the same, compare the arrangement at every corresponding center. Enantiomers are non-superimposable mirror images; diastereomers differ but are not mirror images. Check whole-molecule symmetry: R/S labels alone are not enough. Which centers are you comparing?';
+    if(/stereoAlkenes|alkene|E\/Z/i.test(topic))return 'For E/Z, each alkene carbon must have two different groups. Rank the two groups on each carbon by CIP; compare the higher-priority groups. Same side = Z; opposite sides = E. cis/trans needs an unambiguous matching pair; it is not interchangeable with E/Z. Which two groups are you ranking?';
+    if(/stereo|fischer|config/i.test(topic))return 'Assign priorities, then locate priority 4 before reading 1 → 2 → 3. With 4 away: clockwise is R; counterclockwise is S. With 4 toward: reverse it. In a Fischer, horizontal bonds point toward you. Which way does priority 4 point?';
+    if(/chair|cyclohex/i.test(topic))return 'A chair flip swaps axial and equatorial; it does not swap up and down. Preserve cis/trans. Compare axial penalties using the supplied A-values, not just the number of axial groups. Which group stays up after the flip?';
+    if(/newman|conform/i.test(topic))return 'Keep the stated viewing direction and identify front vs back carbon. Classify staggered/eclipsed, then compare the interactions using the course’s supplied values and units. Which two groups are you comparing?';
+    if(/naming|nomencl/i.test(topic))return 'Choose the parent first. Number it to give the required group/multiple bond priority, then compare locant lists at the first difference—not their sum. Alphabetize substituent names without counting di-, tri-, etc. What is your parent chain or ring?';
+    if(/\balkanes\b/i.test(topic))return 'Identify the task first: naming, carbon classification, or comparing isomers. For naming, choose the parent before numbering. For primary/secondary/tertiary carbon, count directly attached carbons—not hydrogens. For isomers, check formula and connectivity. Which decision does this question ask for?';
+    if(/reactionTypes|nucleophil|electrophil|bondCleavage/i.test(topic))return 'For the reaction class, compare bonds before and after: addition, elimination, substitution or rearrangement. Electron-pair arrows start at electrons—a lone pair or bond—and end where that pair goes. Heterolytic cleavage sends both bond electrons to one atom; homolytic cleavage sends one to each. Which bond changes first?';
+    if(/energyProfile|kinetic/i.test(topic))return 'For an activation barrier, measure a peak from its own preceding valley—not from the axis or another valley. Under the course model, compare those local activation energies for the slowest step. Reaction progress is not time. Which valley belongs to the peak you chose?';
+    if(/thermo|enthalpy|bondEnergy|freeEnergy|equilib/i.test(topic))return 'Separate speed from favorability. ΔG = ΔH − TΔS with compatible units and temperature in kelvin. Bond-energy estimates use broken minus formed. A catalyst changes barriers, not ΔG or the equilibrium constant. Which quantity is being asked for?';
+    return 'Name the rule this question tests. Write one first step or a tentative answer, then submit it for checking. A wrong first attempt is useful evidence; you do not need to be sure.';
+  },
+  state(c){const s=typeof c.getAttemptState==='function'?c.getAttemptState():'none';return ['answered','review'].includes(s)?s:'none';}
+});
 
 /* Question tutor workspace. Connection is separately authenticated.
  * Learner-authored chat can guide probes; only independent answers measure readiness. */
@@ -20959,6 +21141,7 @@ const TutorChat = (() => {
     }
     const connectionStatus=text('p','',{class:'tutor-status','data-tutor-connection':''});panel.appendChild(connectionStatus);
     const status=text('p','',{class:'tutor-status',role:'status','aria-live':'polite','data-tutor-status':''});panel.appendChild(status);
+    const coach=text('p','',{'data-tutor-coach':'',class:'tutor-note'});panel.appendChild(coach);
     const history=text('div','',{class:'tutor-history','aria-label':'Question conversation'});panel.appendChild(history);
     const label=text('label','Your question or reasoning',{class:'tutor-input-label'});panel.appendChild(label);
     const input=document.createElement('textarea');input.rows=3;input.maxLength=2000;input.dataset.tutorInput='';input.setAttribute('aria-label','Your question or reasoning');label.appendChild(input);
@@ -20975,7 +21158,7 @@ const TutorChat = (() => {
     function alive(){return root.isConnected&&owner===actor()&&!isLocked(c);}
     function update(fn){const ok=mutate(c,id,fn);if(!ok)notice='Could not save here. Keep a copy before leaving.';return ok;}
     function showHelp(t){
-      if(!alive()||!root.open||document.hidden||!t.messages.some(m=>m.role==='assistant'&&m.text))return;
+      if(!alive()||TutorCourseCoach.state(c)==='none'||!root.open||document.hidden||!t.messages.some(m=>m.role==='assistant'&&m.text))return;
       // An archived reply marks this workspace as helped only when it is shown.
       try{c.onHelp?.();}catch{notice='Help tracking could not be updated. Do not count this as independent work.';}
     }
@@ -20983,7 +21166,7 @@ const TutorChat = (() => {
       if(!alive())return;const t=read(c,id),active=connection.enabled;
       Object.entries(modeButtons).forEach(([mode,b])=>b.setAttribute('aria-pressed',String(t.mode===mode)));
       input.value=memoryDraft===null?t.draft:memoryDraft;input.placeholder=t.mode==='reasoning'?'I think ___ because ___. The step I’m unsure about is…':'What part would you like explained?';input.disabled=busy;
-      history.replaceChildren();for(const m of t.messages){
+      history.replaceChildren();for(const m of t.messages.filter(m=>m.role!=='assistant'||TutorCourseCoach.state(c)!=='none')){
         const item=text('section','',{class:'tutor-message '+m.role});item.appendChild(text('strong',m.role==='assistant'?'Tutor · AI feedback':m.mode==='reasoning'?'Your reasoning':'You'));item.appendChild(text('p',m.text,m.role==='assistant'?{'data-tutor-reply':''}:{}));
         if(m.auditSaved)item.appendChild(text('small',m.auditStorage==='private-supabase'?'Saved privately in Supabase for accuracy review.':'Saved privately on this Mac for accuracy review.'));
         if(m.role==='assistant'&&m.auditStorage==='private-supabase'&&connection.flagReply){
@@ -21004,22 +21187,30 @@ const TutorChat = (() => {
         }
         history.appendChild(item);
       }
-      privacy.hidden=!active;consentText.textContent=active?'Send this question and my work to '+(connection.providerLabel||'my tutor connection')+' through '+new URL(connection.endpoint).origin+'.'+(connection.auditEnabled?' Keep sent messages, replies and supplied diagrams '+(connection.cloudUser?'in private Supabase storage for my signed-in account':'privately on this Mac')+' for accuracy review. Clearing this chat does not delete that review record.':''):'';consent.checked=t.consentEndpoint===connection.endpoint&&active&&(!connection.auditEnabled||t.auditConsent===true);
-      sendButton.hidden=!active;sendButton.disabled=busy||!consent.checked||!input.value.trim()||t.messages.length>=MAX_MESSAGES-1;
+      const first=TutorCourseCoach.state(c)==='none';
+      coach.hidden=!first;coach.textContent=first?'Before your first submitted attempt: rule checks only. Full tutor replies open after an attempt. Typing a draft or selecting an option is not a submission.':'';
+      privacy.hidden=!active||first;consentText.textContent=active?'Send this question and my work to '+(connection.providerLabel||'my tutor connection')+' through '+new URL(connection.endpoint).origin+'.'+(connection.auditEnabled?' Keep sent messages, replies and supplied diagrams '+(connection.cloudUser?'in private Supabase storage for my signed-in account':'privately on this Mac')+' for accuracy review. Clearing this chat does not delete that review record.':''):'';consent.checked=t.consentEndpoint===connection.endpoint&&active&&(!connection.auditEnabled||t.auditConsent===true);
+      sendButton.hidden=!active&&!first;sendButton.textContent=first?'Show a rule check':'Send';sendButton.disabled=busy||(!first&&(!consent.checked||!input.value.trim()||t.messages.length>=MAX_MESSAGES-1));
       saveButton.disabled=busy;cancelButton.hidden=!busy;
       connectionStatus.textContent=active?'Tutor connection configured. AI feedback is not a grade.':'Tutor not connected. You can save your question or reasoning; no AI reply is available yet.';
       status.textContent=notice||(busy?'Waiting for a tutor reply…':'');
       note.textContent=(safeStore.persistent?'Drafts stay on this device.':'Preview only: drafts disappear when this page reloads.')+' Tutor help is recorded separately from independent answers.'+(t.messages.length>=MAX_MESSAGES-1?' Conversation limit reached. Download or clear this chat to start again.':'');
       showHelp(t);
     }
-    input.addEventListener('input',()=>{memoryDraft=input.value;if(!alive())return;notice='';if(update(t=>{t.draft=input.value;}))notice=safeStore.persistent?'Draft saved on this device.':'Draft kept for this preview only.';status.textContent=notice;sendButton.disabled=busy||!consent.checked||!input.value.trim()||read(c,id).messages.length>=MAX_MESSAGES-1;});
+    input.addEventListener('input',()=>{memoryDraft=input.value;if(!alive())return;notice='';if(update(t=>{t.draft=input.value;}))notice=safeStore.persistent?'Draft saved on this device.':'Draft kept for this preview only.';status.textContent=notice;sendButton.disabled=busy||(TutorCourseCoach.state(c)!=='none'&&(!consent.checked||!input.value.trim()||read(c,id).messages.length>=MAX_MESSAGES-1));});
     saveButton.onclick=()=>{if(!alive())return;const ok=update(t=>{t.draft=input.value;});notice=ok?(safeStore.persistent?'Draft saved on this device.':'Draft kept for this preview only.'):'Could not save here. Copy your reasoning before leaving.';refresh();};
     consent.onchange=()=>{if(!alive())return;update(t=>{t.consentEndpoint=consent.checked?connection.endpoint:null;t.auditConsent=consent.checked&&connection.auditEnabled;});refresh();};
     clearButton.onclick=()=>{if(!alive()||busy||!confirm('Clear this question’s browser chat and draft? Separate accuracy-review records and help already recorded on answers stay unchanged.'))return;pending.get(id.key)?.abort();update(t=>{t.messages=[];t.draft='';t.consentEndpoint=null;});memoryDraft='';notice='Browser chat cleared. Separate accuracy-review and answer records are unchanged.';refresh();};
     exportButton.onclick=()=>{if(!alive())return;const t=read(c,id),out={schema:'chem231-question-tutor',version:VERSION,questionId:t.questionId,fingerprint:t.fingerprint,surface:t.surface,runId:t.runId,draft:t.draft,messages:t.messages,limits:'AI replies are suggestions, not grading or proof of understanding.'};const url=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='question-chat-'+t.questionId.replace(/[^a-z0-9_-]/gi,'_')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
     cancelButton.onclick=()=>pending.get(id.key)?.abort();
     sendButton.onclick=async()=>{
-      if(!alive()||busy||!connection.enabled||!input.value.trim())return;
+      if(!alive()||busy)return;
+      if(TutorCourseCoach.state(c)==='none'){
+        notice=c.preAttemptRule||'Write and submit one first step or tentative answer. Then ask the tutor to check it. You do not have to be sure.';
+        try{c.onHelp?.();}catch{notice+=' Help tracking could not be updated.';}
+        refresh();return;
+      }
+      if(!connection.enabled||!input.value.trim())return;
       const t=read(c,id);if(t.consentEndpoint!==connection.endpoint||(connection.auditEnabled&&t.auditConsent!==true)||t.messages.length>=MAX_MESSAGES-1)return;
       const config={...connection},stamp=generation,requestId=uid(),controller=new AbortController();
       if(pending.has(id.key)){notice='A reply for this question is already pending.';refresh();return;}
@@ -21029,6 +21220,7 @@ const TutorChat = (() => {
       const timeout=setTimeout(()=>controller.abort(),135000);
       try{
         const q=await question(c,id);
+        if(TutorCourseCoach.state(c)==='none')throw Error('Stopped');
         if(config.beforeSend)await config.beforeSend();
         if(!alive()||stamp!==generation||controller.signal.aborted)throw Error('Stopped');
         const messages=read(c,id).messages.filter(m=>m.role!=='assistant'||((!config.allowPriorReplies||config.allowPriorReplies())&&(typeof TutorInsights==='undefined'||!TutorInsights.reviewState(m.requestId).flagged))).slice(-16).map(m=>({role:m.role,text:m.text}));
@@ -21112,7 +21304,7 @@ window.TutorChat=TutorChat;
   }
   function mount(host,q,context){
     if(!host||!q?.id||!window.TutorChat?.mount)return null;
-    return window.TutorChat.mount(host,{questionId:q.id,fingerprint:fingerprint(q),promptHtml:questionPrompt(q),choices:(q.choices||q.choiceLabels||[]).map(String),choiceLabels:(q.choiceLabels||[]).map(String),referenceHtml:reference(q),getWork:()=>'',locked:false,onHelp:()=>false,...context});
+    return window.TutorChat.mount(host,{questionId:q.id,fingerprint:fingerprint(q),promptHtml:questionPrompt(q),choices:(q.choices||q.choiceLabels||[]).map(String),choiceLabels:(q.choiceLabels||[]).map(String),referenceHtml:'<p>Course rule check: '+escape(TutorCourseCoach.rule(q))+'</p>'+reference(q),preAttemptRule:TutorCourseCoach.rule(q),getAttemptState:()=> 'none',getWork:()=>'',locked:false,onHelp:()=>false,...context});
   }
   function wrapView(name,after){
     const previous=VIEWS[name];if(typeof previous!=='function')return;
@@ -21136,7 +21328,7 @@ window.TutorChat=TutorChat;
     if(D.transferCoach&&complete){
       v.querySelectorAll('[data-transfer-feedback]').forEach(host=>{
         const id=host.getAttribute('data-transfer-feedback'),q=D.queue.find(x=>x.id===id),row=(D.log||[]).find(x=>x.id===id);
-        if(q)mount(host,q,{runId:D.runId||D.savedWorkId||'legacy-transfer',surface:'transfer-review',getWork:()=>text((row?.ans||[]).join(' · ')+'\n'+(row?.transfer?.reasoning||''))});
+        if(q)mount(host,q,{runId:D.runId||D.savedWorkId||'legacy-transfer',surface:'transfer-review',getAttemptState:()=> 'review',getWork:()=>text((row?.ans||[]).join(' · ')+'\n'+(row?.transfer?.reasoning||''))});
       });return;
     }
     const reviewing=D.reviewIdx!=null&&D.log?.length;
@@ -21147,6 +21339,7 @@ window.TutorChat=TutorChat;
     if(!host)return;
     const index=D.i,surface=D.transferCoach?'transfer':typeof epBIsRun==='function'&&epBIsRun(D)?'exam-b':D.studyContext?.mode==='challenge'?'challenge':'drill';
     mount(host,q,{runId:D.runId||D.savedWorkId||'legacy-drill-'+leFingerprint({ids:D.queue.map(x=>x.id),topic:D.topic}),surface,locked,
+      getAttemptState:()=>reviewing?'review':D.answered&&(D.log||[]).some(x=>x.id===q.id)?'answered':'none',
       getWork:()=>{
         if(row)return text('Submitted answer: '+String(row.ans??'')+'\nReasoning: '+(row.note||row.transfer?.reasoning||''));
         const submitted=D.answered?(D.log||[]).findLast(x=>x.id===q.id):null;
@@ -21184,6 +21377,7 @@ window.TutorChat=TutorChat;
     const run=sparkRun(),item=sparkCurrent(run);if(run?.status!=='active'||!item||!sparkIsCurrent(item))return;
     const q=sparkQuestion(item.id),profile=actor(),host=v.querySelector('[data-spark-run]');if(!q||!host)return;
     mount(host,q,{runId:run.id,surface:'spark',fingerprint:sparkFingerprint(q),
+      getAttemptState:()=>sparkRun(run.id)?.items.find(x=>x.id===item.id)?.attempts?.length?'answered':'none',
       getWork:()=>{const latest=sparkRun(run.id)?.items.find(x=>x.id===item.id);return text((latest?.attempts||[]).map((a,i)=>'Attempt '+(i+1)+': '+(q.choiceLabels||q.choices)[a.choice]).join('\n'));},
       onHelp:()=>{
         if(!sameActor(profile)||S.view!=='sparkRun'||S.sparkRunId!==run.id)return false;
@@ -21206,6 +21400,7 @@ window.TutorChat=TutorChat;
       const changed=item.itemFingerprint!==ccQuestionFingerprint(q);
       if(review&&changed){const notice=document.createElement('p');notice.className='muted';notice.setAttribute('data-tutor-version-warning','');notice.textContent='Question changed; old response not sent.';host.appendChild(notice);}
       mount(host,q,{runId:run.id,surface:exam?'exam-a':'chapter-check',locked:!review||!ccCompleted(run),
+        getAttemptState:()=>review&&ccCompleted(run)?'review':'none',
         promptHtml:questionPrompt(q)+(changed?'<p>Question changed; old response not sent. This is the current question version, not the version used for the historical answer.</p>':''),
         getWork:()=>{if(changed)return 'Historical response withheld because the question version changed.';const r=response();return text('Answer: '+ccAnswerText(q,r)+'\nReasoning: '+(r.reasoning||''));},
         getFigureNodes:()=>changed?[]:workFigures(host)});
@@ -21222,6 +21417,7 @@ window.TutorChat=TutorChat;
     const id=wsKey(sheet,item),work=wsWork(sheet,item),profile=actor(),host=v.querySelector('.ws-response');
     const q={id,type:'worksheet',prompt:'<p>'+escape(sheet.title+' · '+item.label)+'</p>'+((item.questionImages||[]).map(imageHtml).join('')),why:item.unavailable?'':('<p>'+escape(item.answer||'')+'</p>'+(item.keyImages||[]).map(imageHtml).join('')),rubric:item.unavailable?[]:item.rubric||[],source:sheet.question};
     mount(host,q,{runId:'worksheet:'+id,surface:'worksheet',fingerprint:leFingerprint({sheet:sheet.id,item}),
+      getAttemptState:()=>work.keyViewed?'review':S.worksheetState.attempts.some(a=>a.question===id)?'answered':'none',
       getWork:()=>text((item.fields||[]).map((field,i)=>field[0]+': '+(work.values[i]||'')).join('\n')+'\nWritten work: '+(work.notes||'')),
       getFigureNodes:()=>workFigures(host),onHelp:()=>{
         if(!sameActor(profile)||S.view!=='worksheet'||S.worksheetSheet!==sheet.id||S.worksheetItem!==item.id||wsWork(sheet,item)!==work)return false;
@@ -21239,7 +21435,7 @@ window.TutorChat=TutorChat;
     out.attempts.forEach(row=>{const original=state.attempts.find(a=>a.id===row.id),shownAt=validTime(original?.tutorHelpBefore?.shownAt);if(shownAt)row.tutorHelpBefore={shownAt};});
     Object.entries(out.work).forEach(([key,row])=>{const shownAt=validTime(state.work[key]?.tutorHelpAt);if(shownAt)row.tutorHelpAt=shownAt;});return out;
   };
-  wrapView('masterBankQuestion',v=>{const q=QUESTIONS.find(x=>x.id===S.masterBankQuestion);if(q)mount(v.querySelector('.mb-root'),q,{runId:'bank-preview:'+q.id,surface:'bank-preview'});});
+  wrapView('masterBankQuestion',v=>{const q=QUESTIONS.find(x=>x.id===S.masterBankQuestion);if(q)mount(v.querySelector('.mb-root'),q,{runId:'bank-preview:'+q.id,surface:'bank-preview',getAttemptState:()=> 'review'});});
   wrapView('arrowlab',v=>{
     const R=S.arrowLab,M=R&&alMolecule(R.key);if(!R||!M||R.task==='spot')return;
     const {fw,start}=alBuild(M),from=alCurrentStart(R,fw,start),profile=actor(),names=alDisplayNames(fw);
@@ -21248,6 +21444,7 @@ window.TutorChat=TutorChat;
       prompt:'<p>'+escape(M.name)+': draw resonance arrows and the resulting contributor. Atoms and hydrogens stay fixed.</p>'+alTutorFigure(source).outerHTML,
       why:'<p>'+escape(M.why)+'</p><p>Check electron source/destination, unchanged sigma framework, octets, lone pairs, formal charge = valence − 2×LP − bond-order total (including H), net charge, and the stated ranking reason. Free text is not deterministically graded. The local ranking model omits substitution and aromaticity energy; do not interpret a rule tie as equal physical weights.</p>'};
     mount(v,q,{runId:'arrowlab:'+M.key+':'+R.ts,surface:'arrow-lab',locked:R.mode!=='guided'&&R.phase!=='done',fingerprint:leFingerprint({key:M.key,revision:M.revision||'2026-10-03.2',graph:M.graph,fromSig:R.fromSig,task:R.task}),
+      getAttemptState:()=>R.phase==='done'?'review':(R.learningRun?.checks||[]).some(c=>['arrows','product','charge-reasoning'].includes(c.stage))?'answered':'none',
       getWork:()=>text(JSON.stringify({atoms:fw.nodes.map(n=>({id:n.id,name:names[n.id],element:n.el,hydrogens:n.h})),sourceState:from,arrows:R.arrows,drawn:R.claims,chargeReasoning:R.chargeReasoning||{},pattern:R.patternClaimed,ranking:R.rankClaimed,rankingReason:R.reasonClaimed,explanation:R.explanation||'',phase:R.phase})),
       getFigureNodes:()=>[...v.querySelectorAll('.al-panel svg.al-svg')].map(alTutorFigure),
       onHelp:()=>{if(!sameActor(profile)||S.view!=='arrowlab'||S.arrowLab!==R||(R.mode!=='guided'&&R.phase!=='done'))return false;if(R.phase!=='done'&&!validTime(R.tutorHelpAt)){R.tutorHelpAt=Date.now();R.hints++;alLogEvent(R,'tutor-help');alSave();}return true;}});
@@ -21256,6 +21453,7 @@ window.TutorChat=TutorChat;
     if(!progress||!spec?.id||progress.phase!=='check')return;
     const profile=actor(),q={id:spec.id,type:'lesson-check',prompt:'<p>'+escape(spec.prompt)+'</p>',choices:spec.choices.map(c=>escape(c.text)),why:'<p>'+escape(spec.feedback||'')+'</p>'};
     mount(host,q,{runId:progress.runId,surface:'lesson-check',fingerprint:progress.fingerprint,
+      getAttemptState:()=>progress.answerCount>0?'answered':'none',
       getWork:()=>text('Selected answer: '+(spec.choices.find(c=>c.id===progress.selected)?.text||'Not answered')),
       onHelp:()=>{
         if(!sameActor(profile)||progress.closed||progress.passed||progress.phase!=='check'||lcRuntime.get(progress.key)!==progress||progress.fingerprint!==lcFingerprint(spec))return false;
