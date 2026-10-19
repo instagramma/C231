@@ -6,7 +6,11 @@
 <title>CHEM 231 · Ochem Bootcamp</title>
 <!--
   ============================================================
-  CHEM 231 — OCHEM BOOTCAMP  ·  v3.125 (LOCAL ONLY)
+  CHEM 231 — OCHEM BOOTCAMP  ·  v3.126 (LOCAL ONLY)
+  v3.126 (2026-10-18): QUESTION TUTOR WORKSPACE — AI CONNECTION OFF.
+    Optional question-linked reasoning drafts across practice and Spark.
+    Conversation help remains distinct from independent answers. No paid AI
+    requests, provider credentials, deployment or fabricated tutor replies.
   v3.125 (2026-10-17): BOND-LINE STIMULI FOR LATER-CHAPTER PRACTICE.
   v3.124 (2026-10-17): SPARK — OPTIONAL FIVE-DECISION PLAY PRACTICE.
   Supported practice, separate from readiness. Local-only until published.
@@ -1763,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.125 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.127 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -17352,12 +17356,12 @@ function lcSubmit(p,spec){
   lcTick();const correct=p.selected===spec.answer,first=p.answerCount===0;
   const previous=lcEvents().filter(e=>e.kind==='answer'&&e.checkId===spec.id&&e.itemFingerprint===p.fingerprint);
   const feedbackBefore=p.feedbackSeen;
-  const supportKinds=[...(p.rereads?['reread']:[]),...(p.fullRuleViewed?['full-rule']:[]),...(feedbackBefore?['answer-feedback']:[])];
+  const supportKinds=[...(p.rereads?['reread']:[]),...(p.fullRuleViewed?['full-rule']:[]),...(feedbackBefore?['answer-feedback']:[]),...(p.tutorHelpAt?['question-tutor']:[])];
   p.answerCount++;p.passed=correct;p.lastCorrect=correct;p.updatedAt=Date.now();
   lcRecord('answer',p,{choiceId:p.selected,choiceText:spec.choices.find(c=>c.id===p.selected).text,
     correct,attemptNumber:p.answerCount,firstInRun:first,firstRetainedForItem:previous.length===0,
     confidence:p.confidence||null,confidenceStatus:p.confidence?'reported':'not-answered',
-    rereads:p.rereads,fullRuleViewed:p.fullRuleViewed,feedbackSeenBefore:feedbackBefore,
+    rereads:p.rereads,fullRuleViewed:p.fullRuleViewed,feedbackSeenBefore:feedbackBefore,...(p.tutorHelpAt?{tutorHelpAt:p.tutorHelpAt}:{}),
     supportKinds,firstWithoutReopenedHelp:first&&supportKinds.length===0,
     supportedRetry:!first||feedbackBefore,foregroundResponseMs:Math.max(0,p.activeMs-p.lastAnswerActiveMs),
     timingCaveat:'Idle-limited foreground estimate, not attention; silent reading may be undercounted.'});
@@ -17438,12 +17442,13 @@ focusRuleSteps=function(host,u,key,example){
         if(p.confusionReported)return;p.confusionReported=true;lcRecord('confusion-reported',p,{tier:'self-report',phase:p.phase,afterAttempts:p.answerCount});lcSave(p);draw();
       },true,{'data-lc-confusing':true,disabled:p.confusionReported});panel.appendChild(report);
     }
+    if(isCheck&&spec&&window.TutorChatAdapters?.attachLessonCheck)window.TutorChatAdapters.attachLessonCheck(panel,p,spec);
     focusVisitStart(panel.dataset.focusLesson);
   };draw();
 };
 function lcExport(){
   lcTick();if(lcClock)lcSave(lcClock);
-  const rows=lcEvents().map(e=>lePick(e,['id','kind','ts','version','actor','runId','key','lessonKey','step','checkId','conceptId','itemFingerprint','context','cold','instructionShown','instructionVisitId','instructionForegroundMs','instructionActiveMs','choiceId','choiceText','correct','attemptNumber','firstInRun','firstRetainedForItem','confidence','confidenceStatus','rereads','fullRuleViewed','feedbackSeenBefore','supportKinds','firstWithoutReopenedHelp','supportedRetry','foregroundResponseMs','timingCaveat','afterCorrect','attempts','skippedRuleSteps','skippedParts','meaning','afterAttempts','tier','phase']));
+  const rows=lcEvents().map(e=>lePick(e,['id','kind','ts','version','actor','runId','key','lessonKey','step','checkId','conceptId','itemFingerprint','context','cold','instructionShown','instructionVisitId','instructionForegroundMs','instructionActiveMs','choiceId','choiceText','correct','attemptNumber','firstInRun','firstRetainedForItem','confidence','confidenceStatus','rereads','fullRuleViewed','feedbackSeenBefore','tutorHelpAt','supportKinds','firstWithoutReopenedHelp','supportedRetry','foregroundResponseMs','timingCaveat','afterCorrect','attempts','skippedRuleSteps','skippedParts','meaning','afterAttempts','tier','phase']));
   const answers=rows.filter(e=>e.kind==='answer'),first=answers.filter(e=>e.firstInRun),correctRuns=new Set(answers.filter(e=>e.correct).map(e=>e.runId));
   return {version:LC_VERSION,enabled:lcEnabled(),storage:'device-local, current profile; no automatic Claude/Codex delivery',cap:LC_EVENT_CAP,events:rows,
     summary:{firstResponses:{correct:first.filter(e=>e.correct).length,n:first.length},retryResponses:{correct:answers.filter(e=>!e.firstInRun&&e.correct).length,n:answers.filter(e=>!e.firstInRun).length},runsWithCorrectAnswer:correctRuns.size,
@@ -20169,7 +20174,7 @@ function sparkAnswer(choice){
   sparkFlushClock();const run=sparkRun(),item=sparkCurrent(run),q=sparkQuestion(item?.id);
   if(S.view!=='sparkRun'||!sparkAllowed()||run?.status!=='active'||!item?.shownAt||item.resolvedAt||!sparkIsCurrent(item)||!Number.isInteger(choice)||choice<0||choice>=q.choices.length)return;
   if(item.attempts.length>=q.choices.length||item.attempts.some(a=>a.choice===choice))return;
-  const attempt={choice,correct:choice===q.answer,ts:Date.now(),foregroundMs:item.foregroundMs,helped:!!(item.hintAt||item.clueShownAt||item.revealAt||item.attempts.length),externalHelp:'unknown'};
+  const attempt={choice,correct:choice===q.answer,ts:Date.now(),foregroundMs:item.foregroundMs,helped:!!(item.hintAt||item.clueShownAt||item.revealAt||item.tutorHelpAt||item.attempts.length),externalHelp:'unknown',...(item.tutorHelpAt?{tutorHelpAt:item.tutorHelpAt}:{})};
   item.attempts.push(attempt);sparkEvent(run,'answer',{question:q.id,attempt:item.attempts.length,correct:attempt.correct,helped:attempt.helped});
   if(attempt.correct){item.resolvedAt=Date.now();item.outcome=attempt.helped?'correct-with-support':'correct-first-try';}
   else item.clueShownAt=item.clueShownAt||Date.now();
@@ -20313,7 +20318,7 @@ ccExposure=function(){const exposure=SPARK_PREVIOUS_EXPOSURE();sparkState().expo
 function sparkExport(){
   const state=sparkState(),runs=state.runs.map(run=>{
     const row=lePick(run,['id','version','scope','startedAt','updatedAt','completedAt','status','index']);row.actor=lePick(run.actor,['profile','role','qa']);if(run.startHelp)row.startHelp=lePick(run.startHelp,['value','tier','ts']);
-    row.items=(run.items||[]).map(item=>({...lePick(item,['id','chapter','fingerprint','seenBefore','relatedSeenBefore','shownAt','hintAt','clueShownAt','revealAt','resolvedAt','outcome','foregroundMs']),attempts:(item.attempts||[]).map(a=>lePick(a,['choice','correct','ts','foregroundMs','helped','externalHelp']))}));
+    row.items=(run.items||[]).map(item=>({...lePick(item,['id','chapter','fingerprint','seenBefore','relatedSeenBefore','shownAt','hintAt','clueShownAt','revealAt','tutorHelpAt','resolvedAt','outcome','foregroundMs']),attempts:(item.attempts||[]).map(a=>lePick(a,['choice','correct','ts','foregroundMs','helped','externalHelp','tutorHelpAt']))}));
     row.events=(run.events||[]).map(event=>lePick(event,['kind','ts','question','attempt','correct','helped','destination','chapter','value']));return row;
   });
   return {schemaVersion:1,moduleVersion:SPARK_VERSION,storage:'current profile/device only; no cloud sync',cap:SPARK_CAP,retention:'Latest 40 completed rounds plus unfinished rounds. Deleted and older data may be absent.',timingEnabled:safeStore.get('sparkTimingEnabled',true)!==false,runs,exposure:state.exposure.filter(id=>typeof id==='string'),limits:['Spark is supported recognition practice, not exam readiness.','First try means first submission in this round, not lifetime first exposure.','Outside help is unknown. Hints, retries and models are separated.','Foreground time is estimated exposure, not attention. Long/background gaps are excluded.','Full-problem clicks are navigation; completing that problem requires separate evidence.']};
@@ -20335,6 +20340,399 @@ body.spark-playing>header,body.spark-playing>#nav{display:none!important}body.sp
 `;document.head.appendChild(sparkStyle);
 
 /* END SPARK TAIL */
+/* BEGIN QUESTION TUTOR TAIL */
+/* Question tutor workspace. Provider disabled until separately configured.
+ * Local chat is learner work, not a grading source or a mastery signal.
+ * No provider key, automatic transmission, background inference or cloud sync.
+ */
+const TutorChat = (() => {
+  'use strict';
+  const VERSION='2026-10-18.1', STORE='questionTutorWorkspace', MAX_THREADS=40, MAX_MESSAGES=40;
+  let connection={enabled:false,endpoint:'',token:''}, generation=0;
+  const pending=new Map(),panels=new Map(),mounts=new Map();
+  const text=(tag,value,attrs={})=>{const n=document.createElement(tag);n.textContent=value;Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,String(v)));return n;};
+  const actor=()=>{const base=typeof leActor==='function'?leActor():{profile:null,qa:true};return JSON.stringify(connection.cloudUser?[base,connection.cloudUser]:base);};
+  const uid=()=>typeof crypto?.randomUUID==='function'?crypto.randomUUID():'tutor-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+  function state(){
+    const s=safeStore.get(STORE,null);if(s?.version!==1||!Array.isArray(s.threads))return {version:1,threads:[]};
+    return {...s,threads:s.threads.filter(t=>t&&typeof t.key==='string'&&typeof t.questionId==='string'&&typeof t.runId==='string').map(t=>({...t,mode:t.mode==='reasoning'?'reasoning':'ask',draft:typeof t.draft==='string'?t.draft.slice(0,2000):'',messages:(Array.isArray(t.messages)?t.messages:[]).filter(m=>m&&['user','assistant'].includes(m.role)&&typeof m.text==='string'&&m.text.length<=8000).slice(0,MAX_MESSAGES)}))};
+  }
+  function plain(html){
+    const box=document.createElement('div');box.innerHTML=String(html||'');
+    box.querySelectorAll('script,style,iframe,object,embed,[hidden],.tutor-chat').forEach(n=>n.remove());
+    box.querySelectorAll('br,p,div,li,tr,h1,h2,h3,section').forEach(n=>n.appendChild(document.createTextNode('\n')));
+    box.querySelectorAll('td,th').forEach(n=>n.appendChild(document.createTextNode(' | ')));
+    return (box.textContent||'').replace(/[\t ]+/g,' ').replace(/\n\s*\n+/g,'\n').trim();
+  }
+  function identity(c){
+    const fingerprint=c.fingerprint||leFingerprint({prompt:c.promptHtml,choices:c.choices,reference:c.referenceHtml});
+    return {key:JSON.stringify([actor(),String(c.surface),String(c.runId),String(c.questionId),fingerprint]),fingerprint};
+  }
+  function fresh(c,id){return {key:id.key,conversationId:uid(),questionId:String(c.questionId),fingerprint:id.fingerprint,runId:String(c.runId),surface:String(c.surface),createdAt:Date.now(),updatedAt:Date.now(),mode:'ask',draft:'',messages:[],consentEndpoint:null};}
+  function read(c,id){return state().threads.find(t=>t.key===id.key)||fresh(c,id);}
+  function mutate(c,id,fn){
+    const s=state(),t=s.threads.find(t=>t.key===id.key)||fresh(c,id);fn(t);t.updatedAt=Date.now();
+    s.threads=s.threads.filter(x=>x.key!==id.key);s.threads.push(t);
+    s.threads.sort((a,b)=>a.updatedAt-b.updatedAt);s.threads=s.threads.slice(-MAX_THREADS);
+    const nonce=uid();s.lastWrite=nonce;safeStore.set(STORE,s);
+    return safeStore.get(STORE,{}).lastWrite===nonce;
+  }
+  function configure(next={}){
+    const previousOwner=connection.cloudUser||'local';
+    generation++;for(const controller of pending.values())controller.abort();pending.clear();
+    connection={enabled:false,endpoint:'',token:''};
+    function refreshConnection(){
+      if(previousOwner!==(connection.cloudUser||'local'))for(const [root,context] of [...mounts]){mounts.delete(root);panels.delete(root);if(root.isConnected){const host=root.parentElement;root.remove();mount(host,context);}}
+      for(const refresh of panels.values())refresh();
+    }
+    if(!next.enabled){refreshConnection();return false;}
+    const url=new URL(String(next.endpoint));
+    const local=url.protocol==='http:'&&['127.0.0.1','localhost','[::1]'].includes(url.hostname);
+    const cloud=next.mode==='supabase'&&url.href==='https://tzdreklmkntpopqncada.supabase.co/functions/v1/chem-tutor';
+    if((url.protocol!=='https:'&&!local)||url.username||url.password||url.search||url.hash||(!cloud&&url.pathname!=='/tutor'))throw Error('Use the approved secure tutor endpoint.');
+    if(cloud&&(!/^[a-f0-9-]{36}$/i.test(next.userId||'')||typeof next.getToken!=='function'||typeof next.publicKey!=='string'||/^sk-/i.test(next.publicKey)))throw Error('Verified cloud sign-in is required.');
+    if(typeof next.token!=='string'||next.token.length<24||/^sk-/i.test(next.token))throw Error('Use a tutor access token, never a provider API key.');
+    connection={enabled:true,endpoint:url.href,token:next.token,providerLabel:next.providerLabel==='OpenAI API'?'OpenAI API':'',auditEnabled:next.auditEnabled===true,
+      cloudUser:cloud?next.userId:null,getToken:cloud?next.getToken:null,publicKey:cloud?next.publicKey:null};
+    refreshConnection();return true;
+  }
+  function work(c){try{return String(c.getWork?.()||'').slice(0,6000);}catch{return '[Current work could not be read.]';}}
+  function isLocked(c){try{return typeof c.locked==='function'?!!c.locked():!!c.locked;}catch{return true;}}
+  function figureNodes(c){
+    const nodes=[];
+    const collect=(html,role)=>{const box=document.createElement('div');box.innerHTML=String(html||'');for(const node of box.querySelectorAll('svg,img'))if(!node.parentElement?.closest('svg'))nodes.push({node,role});};
+    collect(c.promptHtml,'Question');
+    (c.choices||[]).forEach((choice,i)=>collect(choice,'Answer option '+String.fromCharCode(65+i)));
+    collect(c.referenceHtml,'Authored reference, not learner work');
+    try{for(const node of c.getFigureNodes?.()||[])if(node&&!nodes.some(n=>n.node===node))nodes.push({node,role:'Learner work'});}catch{}
+    return nodes;
+  }
+  async function raster(node){
+    const name=node.tagName?.toLowerCase();let source='',cleanup=()=>{};
+    if(name==='canvas')return node.toDataURL('image/png');
+    if(name==='svg'){
+      const svg=node.cloneNode(true);svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+      // Reviewed courseBondLine uses this theme variable only for neutral ink.
+      // Pin it to its authored dark fallback for the white exported image.
+      // Unknown variables/dependencies still fail visibly, never become blank.
+      for(const n of [svg,...svg.querySelectorAll('*')])for(const a of [...n.attributes])
+        a.value=a.value.replace(/var\(\s*--text\s*,\s*#193d45\s*\)/g,'#193d45');
+      // Fail visibly rather than silently deleting part of a molecule/cropped
+      // source page. Embedded images, referenced symbols and styles need their
+      // own tested serializer before they may be sent as complete figures.
+      if(svg.querySelector('foreignObject,iframe,image,use,animate,set,style')||[svg,...svg.querySelectorAll('*')].some(n=>[...n.attributes].some(a=>/url\s*\(|var\s*\(|@import/i.test(a.value)||a.name==='class')))throw Error('Unsupported figure dependencies');
+      svg.querySelectorAll('script').forEach(n=>n.remove());
+      for(const n of [svg,...svg.querySelectorAll('*')])for(const a of [...n.attributes])if(/^on/i.test(a.name)||/url\s*\(|@import/i.test(a.value)||/href/i.test(a.name))n.removeAttribute(a.name);
+      const vb=(svg.getAttribute('viewBox')||'').split(/[\s,]+/).map(Number);
+      if(vb.length===4&&vb.every(Number.isFinite)){svg.setAttribute('width',String(Math.min(1600,Math.max(1,vb[2]))));svg.setAttribute('height',String(Math.min(1600,Math.max(1,vb[3]))));}
+      source=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));cleanup=()=>URL.revokeObjectURL(source);
+    }else if(name==='img'){
+      const url=new URL(node.getAttribute('src')||'',document.baseURI);
+      if(url.protocol==='data:'&&!/^data:image\/(png|jpeg);base64,/i.test(url.href))throw Error('Unsupported image');
+      if(!['data:','file:'].includes(url.protocol)&&url.origin!==location.origin)throw Error('External image omitted');
+      if(url.protocol==='file:'&&location.protocol!=='file:')throw Error('Local image omitted');
+      source=url.href;
+    }else throw Error('Unsupported figure');
+    try{
+      const img=await new Promise((resolve,reject)=>{const i=new Image(),timer=setTimeout(()=>reject(Error('Image timed out')),5000);i.onload=()=>{clearTimeout(timer);resolve(i);};i.onerror=()=>{clearTimeout(timer);reject(Error('Image unavailable'));};i.src=source;});
+      if(!img.naturalWidth||!img.naturalHeight)throw Error('Empty image');
+      const scale=Math.min(1,1600/img.naturalWidth,2000/img.naturalHeight),canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);return canvas.toDataURL('image/png');
+    }finally{cleanup();}
+  }
+  async function question(c,id){
+    const nodes=figureNodes(c),images=[];let omitted=Math.max(0,nodes.length-4);
+    for(const {node,role} of nodes.slice(0,4)){
+      try{const dataUrl=await raster(node);if(dataUrl.length>1398104)throw Error('Large figure');images.push({dataUrl,alt:(role+': '+(node.getAttribute('aria-label')||node.getAttribute('alt')||'Figure')).slice(0,300)});}catch{omitted++;}
+    }
+    return {id:String(c.questionId),fingerprint:id.fingerprint,prompt:plain(c.promptHtml).slice(0,14000),choices:(c.choices||[]).map(x=>plain(x).slice(0,2000)).slice(0,16),reference:plain(c.referenceHtml).slice(0,12000),work:work(c),images,visualStatus:omitted?'incomplete':images.length?'complete':'none'};
+  }
+  function mount(host,c){
+    if(!host||!c?.questionId||!c.runId)return null;
+    const id=identity(c),owner=actor(),root=document.createElement('details');
+    root.className='tutor-chat';root.dataset.tutorChat='';root.dataset.questionTutor=String(c.questionId);
+    mounts.set(root,c);
+    const summary=text('summary','Ask about this question');root.appendChild(summary);host.appendChild(root);
+    if(isLocked(c)){root.appendChild(text('p','Tutor opens after you finish this independent check. Your answers stay independent.',{'data-tutor-locked':'true'}));return root;}
+    const panel=document.createElement('div');panel.className='tutor-panel';root.appendChild(panel);
+    const modes=text('div','',{class:'tutor-modes',role:'group','aria-label':'Type of help'});panel.appendChild(modes);
+    const modeButtons={};for(const [mode,label]of [['ask','Ask a question'],['reasoning','Check my reasoning']]){
+      const b=text('button',label,{type:'button','data-tutor-mode':mode});b.onclick=()=>{if(!alive())return;update(t=>{t.mode=mode;});refresh();input.focus();};modes.appendChild(b);modeButtons[mode]=b;
+    }
+    const connectionStatus=text('p','',{class:'tutor-status','data-tutor-connection':''});panel.appendChild(connectionStatus);
+    const status=text('p','',{class:'tutor-status',role:'status','aria-live':'polite','data-tutor-status':''});panel.appendChild(status);
+    const history=text('div','',{class:'tutor-history','aria-label':'Question conversation'});panel.appendChild(history);
+    const label=text('label','Your question or reasoning',{class:'tutor-input-label'});panel.appendChild(label);
+    const input=document.createElement('textarea');input.rows=3;input.maxLength=2000;input.dataset.tutorInput='';input.setAttribute('aria-label','Your question or reasoning');label.appendChild(input);
+    const privacy=text('label','',{class:'tutor-consent'}),consent=document.createElement('input');consent.type='checkbox';consent.dataset.tutorConsent='';privacy.appendChild(consent);const consentText=text('span','');privacy.appendChild(consentText);panel.appendChild(privacy);
+    const actions=text('div','',{class:'tutor-actions'});panel.appendChild(actions);
+    const saveButton=text('button','Save draft',{type:'button','data-tutor-save':''}),sendButton=text('button','Send',{type:'button','data-tutor-send':''}),cancelButton=text('button','Cancel request',{type:'button','data-tutor-cancel':''});actions.append(saveButton,sendButton,cancelButton);
+    const note=text('p','',{class:'tutor-note'});panel.appendChild(note);
+    const more=document.createElement('details');more.className='tutor-more';more.appendChild(text('summary','Privacy & saved work'));panel.appendChild(more);
+    more.appendChild(text('p','Only this question, its figures, your current work, the bank’s explanation and the latest 16 chat messages would be sent when you press Send. No entire profile, grades, other questions or course files. AI feedback can be wrong and never changes the answer key.'));
+    more.appendChild(text('p',connection.cloudUser?'Drafts stay in this browser. Sent conversations are saved privately in Supabase for your signed-in account. Open Saved tutor chats to review them on another device. Clearing this browser chat does not delete the review archive.':'The latest 40 question conversations are kept on this browser and app profile, not synced to other devices. Up to 40 messages per conversation. Clearing chat text does not erase help already recorded on an answer.'));
+    const exportButton=text('button','Download this conversation',{type:'button','data-tutor-export':''}),clearButton=text('button','Clear this conversation',{type:'button','data-tutor-clear':''});more.append(exportButton,clearButton);
+    let busy=false,notice='',memoryDraft=null;
+    function alive(){return root.isConnected&&owner===actor()&&!isLocked(c);}
+    function update(fn){const ok=mutate(c,id,fn);if(!ok)notice='Could not save here. Keep a copy before leaving.';return ok;}
+    function showHelp(t){
+      if(!alive()||!root.open||document.hidden||!t.messages.some(m=>m.role==='assistant'&&m.text))return;
+      // An archived reply marks this workspace as helped only when it is shown.
+      try{c.onHelp?.();}catch{notice='Help tracking could not be updated. Do not count this as independent work.';}
+    }
+    function refresh(){
+      if(!alive())return;const t=read(c,id),active=connection.enabled;
+      Object.entries(modeButtons).forEach(([mode,b])=>b.setAttribute('aria-pressed',String(t.mode===mode)));
+      input.value=memoryDraft===null?t.draft:memoryDraft;input.placeholder=t.mode==='reasoning'?'I think ___ because ___. The step I’m unsure about is…':'What part would you like explained?';input.disabled=busy;
+      history.replaceChildren();for(const m of t.messages){const item=text('section','',{class:'tutor-message '+m.role});item.appendChild(text('strong',m.role==='assistant'?'Tutor · AI feedback':m.mode==='reasoning'?'Your reasoning':'You'));item.appendChild(text('p',m.text,m.role==='assistant'?{'data-tutor-reply':''}:{}));if(m.auditSaved)item.appendChild(text('small',m.auditStorage==='private-supabase'?'Saved privately in Supabase for accuracy review · not reviewed here.':'Saved privately on this Mac for accuracy review · not reviewed here.'));history.appendChild(item);}
+      privacy.hidden=!active;consentText.textContent=active?'Send this question and my work to '+(connection.providerLabel||'my tutor connection')+' through '+new URL(connection.endpoint).origin+'.'+(connection.auditEnabled?' Keep sent messages, replies and supplied diagrams '+(connection.cloudUser?'in private Supabase storage for my signed-in account':'privately on this Mac')+' for accuracy review. Clearing this chat does not delete that review record.':''):'';consent.checked=t.consentEndpoint===connection.endpoint&&active&&(!connection.auditEnabled||t.auditConsent===true);
+      sendButton.hidden=!active;sendButton.disabled=busy||!consent.checked||!input.value.trim()||t.messages.length>=MAX_MESSAGES-1;
+      saveButton.disabled=busy;cancelButton.hidden=!busy;
+      connectionStatus.textContent=active?'Tutor connection configured. AI feedback is not a grade.':'Tutor not connected. You can save your question or reasoning; no AI reply is available yet.';
+      status.textContent=notice||(busy?'Waiting for a tutor reply…':'');
+      note.textContent=(safeStore.persistent?'Drafts stay on this device.':'Preview only: drafts disappear when this page reloads.')+' Tutor help is recorded separately from independent answers.'+(t.messages.length>=MAX_MESSAGES-1?' Conversation limit reached. Download or clear this chat to start again.':'');
+      showHelp(t);
+    }
+    input.addEventListener('input',()=>{memoryDraft=input.value;if(!alive())return;notice='';if(update(t=>{t.draft=input.value;}))notice=safeStore.persistent?'Draft saved on this device.':'Draft kept for this preview only.';status.textContent=notice;sendButton.disabled=busy||!consent.checked||!input.value.trim()||read(c,id).messages.length>=MAX_MESSAGES-1;});
+    saveButton.onclick=()=>{if(!alive())return;const ok=update(t=>{t.draft=input.value;});notice=ok?(safeStore.persistent?'Draft saved on this device.':'Draft kept for this preview only.'):'Could not save here. Copy your reasoning before leaving.';refresh();};
+    consent.onchange=()=>{if(!alive())return;update(t=>{t.consentEndpoint=consent.checked?connection.endpoint:null;t.auditConsent=consent.checked&&connection.auditEnabled;});refresh();};
+    clearButton.onclick=()=>{if(!alive()||busy||!confirm('Clear this question’s browser chat and draft? Separate accuracy-review records and help already recorded on answers stay unchanged.'))return;pending.get(id.key)?.abort();update(t=>{t.messages=[];t.draft='';t.consentEndpoint=null;});memoryDraft='';notice='Browser chat cleared. Separate accuracy-review and answer records are unchanged.';refresh();};
+    exportButton.onclick=()=>{if(!alive())return;const t=read(c,id),out={schema:'chem231-question-tutor',version:VERSION,questionId:t.questionId,fingerprint:t.fingerprint,surface:t.surface,runId:t.runId,draft:t.draft,messages:t.messages,limits:'AI replies are suggestions, not grading or proof of understanding.'};const url=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='question-chat-'+t.questionId.replace(/[^a-z0-9_-]/gi,'_')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+    cancelButton.onclick=()=>pending.get(id.key)?.abort();
+    sendButton.onclick=async()=>{
+      if(!alive()||busy||!connection.enabled||!input.value.trim())return;
+      const t=read(c,id);if(t.consentEndpoint!==connection.endpoint||(connection.auditEnabled&&t.auditConsent!==true)||t.messages.length>=MAX_MESSAGES-1)return;
+      const config={...connection},stamp=generation,requestId=uid(),controller=new AbortController();
+      if(pending.has(id.key)){notice='A reply for this question is already pending.';refresh();return;}
+      const message={role:'user',text:input.value.trim(),mode:t.mode,ts:Date.now(),requestId,work:work(c)};
+      if(!update(row=>{row.messages.push(message);row.draft='';}))return;
+      memoryDraft='';notice='';busy=true;pending.set(id.key,controller);refresh();
+      const timeout=setTimeout(()=>controller.abort(),135000);
+      try{
+        const q=await question(c,id);
+        if(!alive()||stamp!==generation||controller.signal.aborted)throw Error('Stopped');
+        const messages=read(c,id).messages.slice(-16).map(m=>({role:m.role,text:m.text}));
+        if(q.prompt.length+q.reference.length+q.work.length+q.choices.join('').length+messages.reduce((n,m)=>n+m.text.length,0)>60000)throw Error('CONTEXT');
+        const accessToken=config.getToken?await config.getToken():config.token;
+        if(!alive()||stamp!==generation||controller.signal.aborted)throw Error('Stopped');
+        const requestBody={requestId,mode:message.mode,question:q,messages};
+        let conversationId=read(c,id).conversationId;
+        if(config.cloudUser&&!conversationId){conversationId=uid();if(!update(row=>{row.conversationId=conversationId;}))throw Error('CONTEXT');}
+        const response=await fetch(config.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+accessToken,...(config.cloudUser?{apikey:config.publicKey}:{})},body:JSON.stringify(config.cloudUser?{conversationId,request:requestBody}:requestBody),signal:controller.signal,credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
+        if(!response.ok)throw Error(response.status===429?'LIMIT':response.status===401||response.status===403?'AUTH':'HTTP_'+response.status);
+        const data=await response.json();
+        if(data.requestId!==requestId||typeof data.reply!=='string'||!data.reply.trim()||data.reply.length>8000||(config.cloudUser&&(data.auditSaved!==true||data.conversationId!==conversationId)))throw Error('INVALID');
+        if(owner!==actor()||stamp!==generation||controller.signal.aborted)throw Error('Stopped');
+        // A reply may finish after navigation. Save to its original question only;
+        // mark assistance later when that reply is actually opened and shown.
+        update(row=>row.messages.push({role:'assistant',text:data.reply,ts:Date.now(),requestId,visualStatus:q.visualStatus,auditSaved:config.auditEnabled===true,auditStorage:config.cloudUser?'private-supabase':'private-mac'}));
+        notice=q.visualStatus==='incomplete'?'Reply received. Some diagrams could not be sent; the tutor must not guess about them.':q.images.length?'Reply received. '+q.images.length+' diagram'+(q.images.length===1?'':'s')+' sent.':'Reply received.';
+      }catch(e){notice=e.message==='CONTEXT'?'This question and conversation are too large to send safely. No request was sent. Download or clear this chat to shorten it.':e.message==='LIMIT'?'Tutor usage limit reached. Your question is saved.':e.message==='AUTH'?'Tutor connection needs setup. Your question is saved.':controller.signal.aborted||e.message==='Stopped'?'Request stopped. Your question is saved; no new tutor help was recorded.':'No reply received. Your question is saved; no new tutor help was recorded.';
+        if(/^HTTP_[0-9]{3}$/.test(e.message))notice+=' Connection status: '+e.message.slice(5)+'.';
+      }finally{clearTimeout(timeout);pending.delete(id.key);busy=false;refresh();}
+    };
+    root.addEventListener('toggle',()=>{if(root.open)refresh();});
+    for(const node of panels.keys())if(!node.isConnected){panels.delete(node);mounts.delete(node);}
+    panels.set(root,refresh);refresh();return root;
+  }
+  function evidence(){return {version:VERSION,storage:'profile/device-local; no cloud sync',conversations:state().threads.map(t=>({questionId:t.questionId,fingerprint:t.fingerprint,runId:t.runId,surface:t.surface,createdAt:t.createdAt,updatedAt:t.updatedAt,learnerMessages:t.messages.filter(m=>m.role==='user').length,reasoningMessages:t.messages.filter(m=>m.role==='user'&&m.mode==='reasoning').length,replyMessages:t.messages.filter(m=>m.role==='assistant').length,hasDraft:!!t.draft})),limits:['Counts are not understanding or mastery.','Chat text is excluded from this export; explicit conversation download is separate.','A received reply is not necessarily displayed; attempt help markers track display.']};}
+  if(typeof leBuildExport==='function'){const original=leBuildExport;leBuildExport=function(){const out=original();out.questionTutor=evidence();return out;};}
+  document.addEventListener('visibilitychange',()=>{for(const [node,refresh]of panels){if(!node.isConnected)panels.delete(node);else if(!document.hidden&&node.open)refresh();}});
+  const style=text('style',`.tutor-chat{margin:18px 0 8px;border:1px solid #c6d8d6;border-radius:12px;background:#f7fbfa;color:#233c40;font-size:.9rem;overflow-wrap:anywhere}.tutor-chat>summary{cursor:pointer;padding:13px 16px;min-height:44px;font-weight:750}.tutor-panel{padding:0 16px 16px}.tutor-modes,.tutor-actions{display:flex;flex-wrap:wrap;gap:8px}.tutor-chat button{font:inherit;min-height:44px;padding:9px 13px;border:1px solid #9bb8b6;border-radius:9px;background:#fff;color:#244e54;cursor:pointer;max-width:100%;white-space:normal}.tutor-chat button[aria-pressed=true],.tutor-chat [data-tutor-send]{background:#185f6b;color:#fff}.tutor-chat button:disabled{opacity:.55;cursor:default}.tutor-chat [hidden]{display:none!important}.tutor-status{font-size:.85rem;line-height:1.5}.tutor-input-label{display:block;font-weight:650}.tutor-chat textarea{display:block;width:100%;box-sizing:border-box;margin:7px 0 12px;min-height:100px;padding:11px;border:1px solid #9ab5b5;border-radius:8px;background:white;color:#172f35;font:inherit;line-height:1.5;resize:vertical}.tutor-consent{display:flex;align-items:flex-start;gap:8px;font-size:.8rem;line-height:1.45;margin:12px 0}.tutor-consent input{flex-shrink:0;width:18px;height:18px}.tutor-message{margin:9px 0;padding:12px;border:1px solid #d5e3e0;border-radius:9px;background:#fff}.tutor-message.user{background:#e9f2f2}.tutor-message p{white-space:pre-wrap;margin:7px 0 0;line-height:1.5}.tutor-message strong{font-size:.76rem}.tutor-note,.tutor-more{font-size:.76rem;line-height:1.5}.tutor-more>summary{cursor:pointer;min-height:40px;padding-top:9px}.tutor-more button{margin:4px}.tutor-chat :focus-visible{outline:3px solid #267e91;outline-offset:3px}@media(max-width:390px){.tutor-panel{padding:0 10px 12px}.tutor-chat>summary{padding:12px 10px}.tutor-modes button{flex:1;padding:8px}.tutor-chat{font-size:.85rem}}`,{id:'question-tutor-style'});document.head.appendChild(style);
+  return {mount,configure,evidence,version:VERSION};
+})();
+window.TutorChat=TutorChat;
+
+/* Question tutor adapters. Load after all question renderers and tutor-chat.js.
+ * Explicit source IDs only: never identify a question from visible text.
+ * Appends a small panel without replacing an answer form or drawing.
+ * No provider, network, or generated chemistry lives in this module.
+ */
+(function(){
+  'use strict';
+  const actor=()=>typeof leActor==='function'?leActor().profile:null;
+  const sameActor=profile=>actor()===profile;
+  const clone=value=>JSON.parse(JSON.stringify(value));
+  const validTime=value=>typeof value==='number'&&Number.isFinite(value)&&value>0?value:null;
+  const text=value=>String(value??'').slice(0,12000);
+  const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fingerprint=q=>leFingerprint({question:leQuestionMetadata(q),explanation:q.why||'',model:q.model||'',rubric:q.rubric||[]});
+  const completedDrill=D=>!!D?.queue?.length&&D.i>=D.queue.length;
+  function drillCold(D){
+    return !!(D&&(D.cold||D.diagVersion||D.masteryTopic||D.studyContext?.mode==='readiness'||['check','proof','mixed'].includes(D.coursePhase)));
+  }
+  function questionPrompt(q){
+    return String(q.prompt||'')+(q.template?'<p>'+escape(q.template.replace(/\{\{\d+\}\}/g,'_____'))+'</p>':'')+
+      (q.fields?.length?'<ol>'+q.fields.map(f=>'<li>'+escape(f.label||'Answer field')+'</li>').join('')+'</ol>':'');
+  }
+  function reference(q){
+    return [q.why||'',q.type==='written'&&q.model?'<h4>Authored model</h4>'+q.model:'',q.rubric?.length?'<ul>'+q.rubric.map(x=>'<li>'+escape(x)+'</li>').join('')+'</ul>':''].filter(Boolean).join('\n');
+  }
+  function visible(node){
+    if(node.closest('[hidden],[aria-hidden="true"]'))return false;
+    for(let parent=node.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS'&&!parent.open)return false;
+    return true;
+  }
+  function currentControls(host){
+    if(!host)return '';
+    return text([...host.querySelectorAll('input,textarea,select')].filter(n=>!n.closest('[data-tutor-chat]')&&visible(n)&&!['hidden','button','submit','range','color'].includes(n.type)).map((n,i)=>{
+      if(['checkbox','radio'].includes(n.type)&&!n.checked)return '';
+      const value=['checkbox','radio'].includes(n.type)?'selected':n.value;
+      if(!String(value??'').trim())return '';
+      const label=n.getAttribute('aria-label')||n.closest('label')?.textContent?.trim()||n.placeholder||'Answer field '+(i+1);
+      return label.slice(0,160)+': '+String(value).slice(0,4000);
+    }).filter(Boolean).join('\n'));
+  }
+  function workFigures(host){
+    // User work only, not hidden solution/model diagrams. Prompt figures are
+    // retained separately by TutorChat from the authored promptHtml.
+    return [...(host?.querySelectorAll('.course-sketch canvas,.course-sketch svg,.ch4-production svg,.chair-editor svg,[data-proton-arrow-host] svg')||[])].filter(n=>!n.closest('[data-tutor-chat],.cc-production-model,.why')&&visible(n));
+  }
+  function mount(host,q,context){
+    if(!host||!q?.id||!window.TutorChat?.mount)return null;
+    return window.TutorChat.mount(host,{questionId:q.id,fingerprint:fingerprint(q),promptHtml:questionPrompt(q),choices:(q.choices||q.choiceLabels||[]).map(String),choiceLabels:(q.choiceLabels||[]).map(String),referenceHtml:reference(q),getWork:()=>'',locked:false,onHelp:()=>false,...context});
+  }
+  function wrapView(name,after){
+    const previous=VIEWS[name];if(typeof previous!=='function')return;
+    VIEWS[name]=function(v){const result=previous.apply(this,arguments);after(v);return result;};
+  }
+  function drillHelp(D,q,index,profile){
+    if(!sameActor(profile)||S.view!=='drill'||S.drill!==D||D.i!==index||D.reviewIdx!=null||D.answered||drillCold(D)||D.queue?.[index]?.id!==q.id)return false;
+    const key=hintStateKey(D,q);
+    if(!D._hintState||D._hintState.key!==key)D._hintState={key,opened:[],ratings:{}};
+    if(validTime(D._hintState.tutorHelpAt))return true;
+    D._hintState.tutorHelpAt=Date.now();
+    if(D.transferCoach){D.transferCoach.help=true;const draft=D.transferCoach.drafts?.[q.id];if(draft)draft.tutorHelpAt=D._hintState.tutorHelpAt;}
+    // Reuse the existing save/resume path. A help marker is evidence, not a
+    // grade; setting it never changes an already-submitted event.
+    if(typeof courseNavigationCaptureAnswer==='function')courseNavigationCaptureAnswer();
+    snapshotDrill(D.i);save();return true;
+  }
+  function attachDrill(v){
+    const D=S.drill;if(!D?.queue)return;
+    const profile=actor(),complete=completedDrill(D),locked=drillCold(D)&&!complete;
+    if(D.transferCoach&&complete){
+      v.querySelectorAll('[data-transfer-feedback]').forEach(host=>{
+        const id=host.getAttribute('data-transfer-feedback'),q=D.queue.find(x=>x.id===id),row=(D.log||[]).find(x=>x.id===id);
+        if(q)mount(host,q,{runId:D.runId||D.savedWorkId||'legacy-transfer',surface:'transfer-review',getWork:()=>text((row?.ans||[]).join(' · ')+'\n'+(row?.transfer?.reasoning||''))});
+      });return;
+    }
+    const reviewing=D.reviewIdx!=null&&D.log?.length;
+    const row=reviewing?D.log[Math.max(0,Math.min(D.reviewIdx,D.log.length-1))]:null;
+    const q=reviewing?D.queue.find(x=>x.id===row?.id)||QUESTIONS.find(x=>x.id===row?.id):D.queue[D.i];
+    if(!q)return;
+    const host=D.transferCoach?v.querySelector('[data-transfer-task]'):v.querySelector('.qprompt')?.closest('.card');
+    if(!host)return;
+    const index=D.i,surface=D.transferCoach?'transfer':typeof epBIsRun==='function'&&epBIsRun(D)?'exam-b':D.studyContext?.mode==='challenge'?'challenge':'drill';
+    mount(host,q,{runId:D.runId||D.savedWorkId||'legacy-drill-'+leFingerprint({ids:D.queue.map(x=>x.id),topic:D.topic}),surface,locked,
+      getWork:()=>{
+        if(row)return text('Submitted answer: '+String(row.ans??'')+'\nReasoning: '+(row.note||row.transfer?.reasoning||''));
+        const submitted=D.answered?(D.log||[]).findLast(x=>x.id===q.id):null;
+        if(submitted)return text('Submitted answer: '+String(submitted.ans??'')+'\nReasoning: '+(submitted.note||submitted.transfer?.reasoning||''));
+        return currentControls(host);
+      },getFigureNodes:()=>workFigures(host),onHelp:()=>drillHelp(D,q,index,profile)});
+  }
+  wrapView('drill',attachDrill);
+
+  // Count substantive tutor/reference help alongside existing hints without
+  // putting string IDs into the numeric hint-step array the coach renders.
+  function helpTime(D,q){
+    const state=D?._hintState;
+    return validTime(state&&state.key===hintStateKey(D,q)?state.tutorHelpAt:null)||validTime(D?.transferCoach?.drafts?.[q.id]?.tutorHelpAt);
+  }
+  const previousHintUse=hintUse;
+  hintUse=function(D,q){const result=previousHintUse.apply(this,arguments);if(helpTime(D,q))return {...result,count:result.count+1,steps:[...result.steps,'question-tutor']};return result;};
+  const previousAttempt=logAttempt;
+  logAttempt=function(q,ok,guessed,D,dk,answer){
+    const event=previousAttempt.apply(this,arguments),shownAt=helpTime(D,q);
+    if(shownAt){event.tutorHelp={shownAt,beforeSubmission:true};if(event.evidence)event.evidence.tutorHelp=clone(event.tutorHelp);}
+    return event;
+  };
+  const previousAttemptExport=leAttemptExport;
+  leAttemptExport=function(event){
+    const out=previousAttemptExport.apply(this,arguments),shownAt=validTime(event.tutorHelp?.shownAt);
+    if(shownAt&&event.tutorHelp.beforeSubmission===true)out.tutorHelp={shownAt,beforeSubmission:true};
+    if(out.evidence&&typeof out.evidence==='object'){
+      const nestedAt=validTime(event.evidence?.tutorHelp?.shownAt);delete out.evidence.tutorHelp;
+      if(nestedAt&&event.evidence.tutorHelp.beforeSubmission===true)out.evidence.tutorHelp={shownAt:nestedAt,beforeSubmission:true};
+    }return out;
+  };
+
+  function attachSpark(v){
+    const run=sparkRun(),item=sparkCurrent(run);if(run?.status!=='active'||!item||!sparkIsCurrent(item))return;
+    const q=sparkQuestion(item.id),profile=actor(),host=v.querySelector('[data-spark-run]');if(!q||!host)return;
+    mount(host,q,{runId:run.id,surface:'spark',fingerprint:sparkFingerprint(q),
+      getWork:()=>{const latest=sparkRun(run.id)?.items.find(x=>x.id===item.id);return text((latest?.attempts||[]).map((a,i)=>'Attempt '+(i+1)+': '+(q.choiceLabels||q.choices)[a.choice]).join('\n'));},
+      onHelp:()=>{
+        if(!sameActor(profile)||S.view!=='sparkRun'||S.sparkRunId!==run.id)return false;
+        const current=sparkRun(run.id),live=sparkCurrent(current);
+        if(current?.status!=='active'||live?.id!==item.id||live.resolvedAt||!sparkIsCurrent(live))return false;
+        if(validTime(live.tutorHelpAt))return true;
+        live.tutorHelpAt=Date.now();sparkEvent(current,'tutor-help',{question:live.id});sparkSaveRun(current);return true;
+      }});
+  }
+  wrapView('sparkRun',attachSpark);
+
+  function attachCheck(v,exam,review){
+    const run=ccRun(S.ccRunId);if(!run||run.status==='cancelled')return;
+    if(exam&&!(typeof examAIsRun==='function'&&examAIsRun(run)))return;
+    if(review&&!ccCompleted(run))return;
+    const attr=exam?(review?'data-exam-a-review':'data-exam-a-question'):(review?'data-cc-review':'data-cc-question');
+    v.querySelectorAll('['+attr+']').forEach(host=>{
+      const id=host.getAttribute(attr),item=run.items.find(x=>x.id===id),q=ccQuestion(id);if(!item||!q)return;
+      const response=()=>ccRun(run.id)?.responses?.[id]||{};
+      const changed=item.itemFingerprint!==ccQuestionFingerprint(q);
+      if(review&&changed){const notice=document.createElement('p');notice.className='muted';notice.setAttribute('data-tutor-version-warning','');notice.textContent='Question changed; old response not sent.';host.appendChild(notice);}
+      mount(host,q,{runId:run.id,surface:exam?'exam-a':'chapter-check',locked:!review||!ccCompleted(run),
+        promptHtml:questionPrompt(q)+(changed?'<p>Question changed; old response not sent. This is the current question version, not the version used for the historical answer.</p>':''),
+        getWork:()=>{if(changed)return 'Historical response withheld because the question version changed.';const r=response();return text('Answer: '+ccAnswerText(q,r)+'\nReasoning: '+(r.reasoning||''));},
+        getFigureNodes:()=>changed?[]:workFigures(host)});
+    });
+  }
+  wrapView('chapterCheckRun',v=>attachCheck(v,false,false));
+  wrapView('chapterCheckResults',v=>attachCheck(v,false,true));
+  wrapView('examARun',v=>attachCheck(v,true,false));
+  wrapView('examAResults',v=>attachCheck(v,true,true));
+
+  function imageHtml(image){return '<img src="'+escape(image.src)+'" alt="'+escape(image.alt||'Worksheet question')+'">';}
+  wrapView('worksheet',v=>{
+    const sheet=WS_SHEETS.find(s=>s.id===S.worksheetSheet),item=sheet?.items.find(i=>i.id===S.worksheetItem);if(!item)return;
+    const id=wsKey(sheet,item),work=wsWork(sheet,item),profile=actor(),host=v.querySelector('.ws-response');
+    const q={id,type:'worksheet',prompt:'<p>'+escape(sheet.title+' · '+item.label)+'</p>'+((item.questionImages||[]).map(imageHtml).join('')),why:item.unavailable?'':('<p>'+escape(item.answer||'')+'</p>'+(item.keyImages||[]).map(imageHtml).join('')),rubric:item.unavailable?[]:item.rubric||[],source:sheet.question};
+    mount(host,q,{runId:'worksheet:'+id,surface:'worksheet',fingerprint:leFingerprint({sheet:sheet.id,item}),
+      getWork:()=>text((item.fields||[]).map((field,i)=>field[0]+': '+(work.values[i]||'')).join('\n')+'\nWritten work: '+(work.notes||'')),
+      getFigureNodes:()=>workFigures(host),onHelp:()=>{
+        if(!sameActor(profile)||S.view!=='worksheet'||S.worksheetSheet!==sheet.id||S.worksheetItem!==item.id||wsWork(sheet,item)!==work)return false;
+        if(!validTime(work.tutorHelpAt)){work.tutorHelpAt=Date.now();wsSave();}return true;
+      }});
+  });
+  const previousWorksheetRecord=wsRecord;
+  wsRecord=function(sheet,item,work,kind,checks,evidence){
+    const record=previousWorksheetRecord.apply(this,arguments);
+    const shownAt=validTime(work.tutorHelpAt);if(shownAt){record.tutorHelpBefore={shownAt};wsSave();}return record;
+  };
+  const previousWorksheetExport=leWorksheetExport;
+  leWorksheetExport=function(){
+    const out=previousWorksheetExport.apply(this,arguments),state=S.worksheetState;
+    out.attempts.forEach(row=>{const original=state.attempts.find(a=>a.id===row.id),shownAt=validTime(original?.tutorHelpBefore?.shownAt);if(shownAt)row.tutorHelpBefore={shownAt};});
+    Object.entries(out.work).forEach(([key,row])=>{const shownAt=validTime(state.work[key]?.tutorHelpAt);if(shownAt)row.tutorHelpAt=shownAt;});return out;
+  };
+  wrapView('masterBankQuestion',v=>{const q=QUESTIONS.find(x=>x.id===S.masterBankQuestion);if(q)mount(v.querySelector('.mb-root'),q,{runId:'bank-preview:'+q.id,surface:'bank-preview'});});
+  function attachLessonCheck(host,progress,spec){
+    if(!progress||!spec?.id||progress.phase!=='check')return;
+    const profile=actor(),q={id:spec.id,type:'lesson-check',prompt:'<p>'+escape(spec.prompt)+'</p>',choices:spec.choices.map(c=>escape(c.text)),why:'<p>'+escape(spec.feedback||'')+'</p>'};
+    mount(host,q,{runId:progress.runId,surface:'lesson-check',fingerprint:progress.fingerprint,
+      getWork:()=>text('Selected answer: '+(spec.choices.find(c=>c.id===progress.selected)?.text||'Not answered')),
+      onHelp:()=>{
+        if(!sameActor(profile)||progress.closed||progress.passed||progress.phase!=='check'||lcRuntime.get(progress.key)!==progress||progress.fingerprint!==lcFingerprint(spec))return false;
+        if(!validTime(progress.tutorHelpAt)){progress.tutorHelpAt=Date.now();progress.updatedAt=Date.now();lcRecord('tutor-help',progress,{afterAttempts:progress.answerCount,tutorHelpAt:progress.tutorHelpAt});lcSave(progress);}return true;
+      }});
+  }
+  window.TutorChatAdapters=Object.freeze({version:'2026-10-18.1',drillCold,attachDrill,attachSpark,attachCheck,attachLessonCheck});
+})();
+
+/* END QUESTION TUTOR TAIL */
 /* ================= BOOT ================= */
 /* v3.48: a session-only, non-persisting direct-question route for visual QA. It is ignored
    unless ?qa is present, so learner sessions and their evidence can never use it. */
@@ -20350,6 +20748,332 @@ if(PROFILE&&linkedBankId&&QUESTIONS.some(q=>q.id===linkedBankId)){S.masterBankQu
 if(!PROFILE){ renderWhoami(); renderSyncDot(); lockScreen(); } else { render(); cloudPull(); courseContextRuntimeStart(); } // Course clock/feed stop when the page closes; QA never starts live refresh.
 /* hub back-button: only meaningful when served next to index.html (GitHub Pages); hidden for file:// / preview copies */
 (function(){ if(location.protocol!=="http:"&&location.protocol!=="https:"){ var m=document.getElementById("menubtn"); if(m) m.style.display="none"; } })();
+</script>
+<script id="cloud-tutor-public-bundle">
+window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
+(() => {
+  // tutor-service/cloud/auth.mjs
+  var CLOUD_URL = "https://tzdreklmkntpopqncada.supabase.co";
+  var PUBLIC_KEY = "sb_publishable_PWdbyaBoBg8hM2kptSrwBA_I4lFrnQr";
+  var CLOUD_ENDPOINT = CLOUD_URL + "/functions/v1/chem-tutor";
+  var LOGIN = "chem231-tutor-pkce-v1";
+  var SESSION = "chem231-private-tutor-session-v1";
+  function checkedRedirect(redirectTo) {
+    const allowed = ["https://instagramma.github.io/C231/chem231.html?tutor-auth=1", "https://instagramma.github.io/C231/chem231-bootcamp.html?tutor-auth=1", "http://127.0.0.1:8788/chem231-bootcamp.html?tutor-auth=1"];
+    if (!allowed.includes(redirectTo)) throw Error("Unapproved sign-in return address.");
+    return redirectTo;
+  }
+  function createTutorAuth({ fetcher = fetch, storage = localStorage, cryptoAPI = crypto, now = () => Date.now(), onSignOut = () => {
+  }, locks = globalThis.navigator?.locks } = {}) {
+    let session = null, refreshing = null, epoch = 0;
+    const b64 = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    async function request(path, body, token) {
+      const result = await fetcher(CLOUD_URL + "/auth/v1/" + path, { method: body === void 0 ? "GET" : "POST", headers: { apikey: PUBLIC_KEY, "Content-Type": "application/json", ...token ? { Authorization: "Bearer " + token } : {} }, ...body === void 0 ? {} : { body: JSON.stringify(body) }, cache: "no-store", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(15e3) });
+      if (!result.ok) {
+        const error = Error(result.status === 429 ? "Supabase is limiting sign-in emails. Check Spam or try again later; repeated clicks will not help." : "Sign-in could not be verified. Try a new sign-in link.");
+        error.status = result.status;
+        throw error;
+      }
+      if (result.status === 204) return {};
+      return result.json();
+    }
+    async function accept(data, expectedEmail, stamp, prior = null) {
+      if (typeof data.access_token !== "string" || typeof data.refresh_token !== "string" || !Number.isFinite(data.expires_in) || data.expires_in < 1) throw Error("Invalid sign-in response.");
+      const user = await request("user", void 0, data.access_token);
+      if (!/^[a-f0-9-]{36}$/i.test(user.id || "") || !user.email_confirmed_at || typeof user.email !== "string" || expectedEmail !== null && user.email.toLowerCase() !== expectedEmail.toLowerCase() || stamp !== epoch) throw Error("The sign-in identity changed. Sign in again.");
+      if (prior) {
+        const current = stored();
+        if (user.id !== prior.userId || !current || current.userId !== prior.userId || current.refreshToken !== prior.refreshToken) throw Error("Sign-in changed.");
+      }
+      session = { accessToken: data.access_token, refreshToken: data.refresh_token, userId: user.id, email: user.email, expiresAt: now() + data.expires_in * 1e3 };
+      storage.setItem(SESSION, JSON.stringify(session));
+      if (storage.getItem(SESSION) !== JSON.stringify(session)) {
+        session = null;
+        throw Error("This browser cannot keep you signed in.");
+      }
+      return { userId: user.id, email: user.email };
+    }
+    const stored = () => {
+      try {
+        const value = JSON.parse(storage.getItem(SESSION));
+        return value && /^[a-f0-9-]{36}$/i.test(value.userId || "") && typeof value.email === "string" && typeof value.accessToken === "string" && typeof value.refreshToken === "string" && value.accessToken.length < 8192 && value.refreshToken.length < 8192 && Number.isFinite(value.expiresAt) ? value : null;
+      } catch {
+        return null;
+      }
+    };
+    const withLock = (fn) => locks?.request ? locks.request("chem231-private-tutor-refresh", fn) : fn();
+    const api = {
+      async googleLink(redirectTo) {
+        checkedRedirect(redirectTo);
+        const verifier = b64(cryptoAPI.getRandomValues(new Uint8Array(48))), challenge = b64(await cryptoAPI.subtle.digest("SHA-256", new TextEncoder().encode(verifier)));
+        const record = { kind: "google", verifier, createdAt: now() };
+        storage.setItem(LOGIN, JSON.stringify(record));
+        if (storage.getItem(LOGIN) !== JSON.stringify(record)) throw Error("This browser cannot keep the temporary sign-in check.");
+        const url = new URL(CLOUD_URL + "/auth/v1/authorize");
+        for (const [key, value] of Object.entries({ provider: "google", redirect_to: redirectTo, scopes: "openid email profile", code_challenge: challenge, code_challenge_method: "s256", prompt: "select_account" })) url.searchParams.set(key, value);
+        return url.href;
+      },
+      async sendLink(email, redirectTo) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw Error("Enter your approved email address.");
+        checkedRedirect(redirectTo);
+        let previous;
+        try {
+          previous = JSON.parse(storage.getItem(LOGIN));
+        } catch {
+        }
+        const reusable = previous && previous.email?.toLowerCase() === email.toLowerCase() && /^[A-Za-z0-9_-]{64}$/.test(previous.verifier || "") && Number.isFinite(previous.createdAt) && now() >= previous.createdAt && now() - previous.createdAt < 36e5;
+        if (reusable && Number.isFinite(previous.requestedAt) && now() - previous.requestedAt < 6e4) throw Error("A sign-in link was just requested. Check your email and Spam before trying again.");
+        const verifier = reusable ? previous.verifier : b64(cryptoAPI.getRandomValues(new Uint8Array(48))), challenge = b64(await cryptoAPI.subtle.digest("SHA-256", new TextEncoder().encode(verifier)));
+        const record = { verifier, email, createdAt: reusable ? previous.createdAt : now(), requestedAt: now() };
+        storage.setItem(LOGIN, JSON.stringify(record));
+        if (storage.getItem(LOGIN) !== JSON.stringify(record)) throw Error("This browser cannot keep the temporary sign-in check.");
+        await request("otp?redirect_to=" + encodeURIComponent(redirectTo), { email, create_user: false, code_challenge: challenge, code_challenge_method: "s256" });
+      },
+      async complete(code) {
+        const stamp = ++epoch;
+        let pending;
+        try {
+          pending = JSON.parse(storage.getItem(LOGIN));
+        } catch {
+        }
+        storage.removeItem(LOGIN);
+        if (!pending || pending.kind !== "google" && typeof pending.email !== "string" || !/^[A-Za-z0-9_-]{64}$/.test(pending.verifier || "") || !Number.isFinite(pending.createdAt) || now() - pending.createdAt > 36e5 || now() < pending.createdAt || !/^[A-Za-z0-9_-]{8,256}$/.test(code || "")) throw Error("Start sign-in again in this browser to request a new sign-in link.");
+        const data = await request("token?grant_type=pkce", { auth_code: code, code_verifier: pending.verifier });
+        return accept(data, pending.kind === "google" ? null : pending.email, stamp);
+      },
+      async token() {
+        if (!session) throw Error("Sign in to the tutor.");
+        const persisted = stored();
+        if (!persisted || persisted.userId !== session.userId) {
+          session = null;
+          epoch++;
+          onSignOut();
+          throw Error("Sign-in changed.");
+        }
+        if (session.expiresAt - now() > 9e4) return session.accessToken;
+        if (!refreshing) {
+          const old = session, stamp = epoch;
+          refreshing = withLock(async () => {
+            try {
+              const latest = stored();
+              if (!latest || latest.userId !== old.userId || stamp !== epoch) throw Error("Sign-in changed.");
+              if (latest.expiresAt - now() > 9e4) {
+                session = latest;
+                return session.accessToken;
+              }
+              const data = await request("token?grant_type=refresh_token", { refresh_token: latest.refreshToken });
+              await accept(data, old.email, stamp, latest);
+              return session.accessToken;
+            } catch (error) {
+              if (stamp === epoch) {
+                session = null;
+                epoch++;
+                if (error.status === 401 || error.status === 400) storage.removeItem(SESSION);
+                onSignOut();
+              }
+              throw error;
+            } finally {
+              refreshing = null;
+            }
+          });
+        }
+        return refreshing;
+      },
+      async restore() {
+        const saved = stored();
+        if (!saved) return null;
+        const stamp = ++epoch;
+        session = saved;
+        try {
+          const access = await api.token(), user = await request("user", void 0, access);
+          if (stamp !== epoch || user.id !== saved.userId || user.email?.toLowerCase() !== saved.email.toLowerCase() || !user.email_confirmed_at) throw Error("Saved sign-in could not be verified.");
+          return api.identity();
+        } catch (error) {
+          if (stamp === epoch) {
+            session = null;
+            epoch++;
+            if (error.status === 401 || error.status === 400) storage.removeItem(SESSION);
+            onSignOut();
+          }
+          throw error;
+        }
+      },
+      forgetLocalSession() {
+        epoch++;
+        session = null;
+        onSignOut();
+      },
+      identity: () => session ? { userId: session.userId, email: session.email, epoch } : null,
+      async signOut() {
+        const old = session;
+        epoch++;
+        session = null;
+        storage.removeItem(LOGIN);
+        storage.removeItem(SESSION);
+        onSignOut();
+        if (old) await request("logout?scope=local", {}, old.accessToken);
+      }
+    };
+    return api;
+  }
+
+  // tutor-service/cloud/widget.mjs
+  function mountCloudTutor() {
+    const previewParams = new URL(location.href).searchParams;
+    if (previewParams.get("qa") === "1" && previewParams.get("tutorqa") !== "1") return;
+    if (!window.TutorChat || document.getElementById("cloud-tutor-bar")) return;
+    const el = (tag, content2, attrs = {}) => {
+      const n = document.createElement(tag);
+      n.textContent = content2;
+      for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+      return n;
+    };
+    const bar = el("details", "", { id: "cloud-tutor-bar", "aria-label": "Private online tutor" });
+    bar.append(el("summary", "Tutor account"));
+    const status = el("span", "Online tutor \xB7 sign in to connect", { role: "status" }), open = el("button", "Tutor sign-in", { type: "button" }), saved = el("button", "Saved tutor chats", { type: "button" }), out = el("button", "Sign out", { type: "button" });
+    saved.hidden = true;
+    out.hidden = true;
+    bar.append(status, open, saved, out);
+    document.body.prepend(bar);
+    const dialog = el("dialog", "", { id: "cloud-tutor-dialog", "aria-label": "Private tutor account" }), close = el("button", "Close", { type: "button" }), content = el("div", "");
+    dialog.append(close, content);
+    document.body.append(dialog);
+    close.onclick = () => dialog.close();
+    const style = el("style", `#cloud-tutor-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 18px;border-bottom:1px solid #b5d3ca;background:#e9f4f1;color:#234b47;font:14px/1.5 system-ui}#cloud-tutor-bar span{flex:1;min-width:200px}#cloud-tutor-bar button,#cloud-tutor-dialog button{min-height:44px;padding:9px 12px;border:1px solid #8dadaa;border-radius:10px;background:white;color:#185965;font:inherit;cursor:pointer}#cloud-tutor-dialog{width:min(640px,90vw);max-height:85vh;box-sizing:border-box;border:1px solid #c2d6d1;border-radius:18px;padding:20px;background:#f8fcfb;color:#203c40;font:15px/1.5 system-ui}#cloud-tutor-dialog::backdrop{background:#12393e66;backdrop-filter:blur(5px)}#cloud-tutor-dialog input,#cloud-tutor-dialog textarea{display:block;box-sizing:border-box;width:100%;padding:11px;margin:10px 0;border:1px solid #9bb7b2;border-radius:8px;font:inherit}#cloud-tutor-dialog article{padding:12px 0;border-bottom:1px solid #d6e4df}#cloud-tutor-dialog article p{white-space:pre-wrap}#cloud-tutor-bar [hidden]{display:none!important}`);
+    document.head.append(style);
+    style.textContent += `#cloud-tutor-bar{display:block;position:fixed;right:14px;bottom:76px;z-index:900;padding:0;border:1px solid #b5d3ca;border-radius:18px;background:#eef8f3ed;backdrop-filter:blur(18px);box-shadow:0 6px 24px #12393e22;max-width:calc(100vw - 28px)}#cloud-tutor-bar summary{padding:12px 16px;min-height:44px;box-sizing:border-box;cursor:pointer;font-weight:650}#cloud-tutor-bar[open]{width:320px;padding:0 12px 12px;max-height:60vh;overflow:auto}#cloud-tutor-bar[open] span{display:block;min-width:0;margin:0 0 10px;overflow-wrap:anywhere}#cloud-tutor-bar button{margin:3px}#cloud-tutor-bar:not([open])>:not(summary){display:none}`;
+    const auth = createTutorAuth({ onSignOut: () => {
+      window.TutorChat.configure({ enabled: false });
+      status.textContent = "Online tutor \xB7 signed out";
+      open.hidden = false;
+      out.hidden = saved.hidden = true;
+      content.replaceChildren();
+      dialog.close();
+    } });
+    async function api(action, body) {
+      const identity = auth.identity();
+      if (!identity) throw Error("Sign in to the tutor.");
+      const access = await auth.token();
+      if (auth.identity()?.epoch !== identity.epoch) throw Error("Sign-in changed.");
+      const response = await fetch(CLOUD_ENDPOINT + "?action=" + action, { method: body ? "POST" : "GET", headers: { apikey: PUBLIC_KEY, Authorization: "Bearer " + access, ...body ? { "Content-Type": "application/json" } : {} }, ...body ? { body: JSON.stringify(body) } : {}, credentials: "omit", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(15e3) });
+      const data = await response.json();
+      if (auth.identity()?.epoch !== identity.epoch) throw Error("Sign-in changed.");
+      if (!response.ok) throw Error(data?.error?.message || "The online tutor is not ready yet.");
+      return data;
+    }
+    async function connect() {
+      const who = auth.identity(), budget = await api("status");
+      open.hidden = true;
+      out.hidden = saved.hidden = false;
+      const ready = budget.canAsk === true;
+      status.textContent = (ready ? budget.phase === "testing" ? "Tutor test connection" : "Private tutor connected" : "Signed in \xB7 replies still in testing") + " \xB7 " + who.email + " \xB7 $" + (budget.remainingNano / 1e9).toFixed(2) + " remaining this month";
+      if (ready) window.TutorChat.configure({ enabled: true, mode: "supabase", endpoint: CLOUD_ENDPOINT, token: await auth.token(), getToken: () => auth.token(), userId: who.userId, publicKey: PUBLIC_KEY, providerLabel: "OpenAI API", auditEnabled: true });
+      else window.TutorChat.configure({ enabled: false });
+    }
+    open.onclick = () => {
+      content.replaceChildren(el("h2", "Private tutor sign-in"), el("p", "Use your approved email. Your app PIN is separate. We\u2019ll send a one-time link; no password is needed."));
+      if (window.CHEM_TUTOR_GOOGLE_ENABLED === true) {
+        content.replaceChildren(el("h2", "Private tutor sign-in"), el("p", "Choose your approved personal Google account. This checks your identity; it does not grant Gmail or Drive access. Your study app PIN is separate."));
+        const google = el("button", "Continue with Google", { type: "button" }), googleStatus = el("p", "", { role: "status" });
+        content.append(google, googleStatus);
+        google.onclick = async () => {
+          google.disabled = true;
+          try {
+            location.assign(await auth.googleLink(location.origin + location.pathname + "?tutor-auth=1"));
+          } catch (error) {
+            googleStatus.textContent = error.message;
+            google.disabled = false;
+          }
+        };
+      }
+      const form = el("form", ""), label = el("label", "Email address"), input = el("input", "", { type: "email", autocomplete: "email", required: "true", "aria-label": "Tutor email" }), send = el("button", "Email me a sign-in link", { type: "submit" }), note = el("p", "", { role: "status" });
+      label.append(input);
+      form.append(label, send, note);
+      content.append(form, el("p", "Stay signed in on this device: your secure session is kept in this browser and refreshed automatically. Sign out on a shared device. Sent chats and diagrams are stored privately in Supabase for accuracy review; drafts stay here."));
+      form.onsubmit = async (event) => {
+        event.preventDefault();
+        send.disabled = true;
+        try {
+          const redirect = location.origin + location.pathname + "?tutor-auth=1";
+          await auth.sendLink(input.value.trim(), redirect);
+          note.textContent = "Check your email and open the link in this browser. No question has been sent.";
+        } catch (error) {
+          note.textContent = error.message;
+        } finally {
+          send.disabled = false;
+        }
+      };
+      dialog.showModal();
+      input.focus();
+    };
+    out.onclick = async () => {
+      try {
+        await auth.signOut();
+      } catch {
+        status.textContent = "Signed out here. Server session revocation could not be confirmed.";
+      }
+    };
+    saved.onclick = async () => {
+      dialog.showModal();
+      content.replaceChildren(el("p", "Loading your private conversations\u2026"));
+      try {
+        const data = await api("history");
+        content.replaceChildren(el("h2", "Saved tutor chats"), el("p", "Latest 50 exchanges. AI answers start unreviewed. A flag requests review; it does not change your score."));
+        if (!data.conversations.length) content.append(el("p", "No sent conversations saved yet."));
+        for (const turn of data.conversations) {
+          const article = el("article", ""), heading = el("h3", turn.question_id + " \xB7 " + new Date(turn.created_at).toLocaleString()), details = el("details", "");
+          details.append(el("summary", turn.state === "complete" ? "View saved exchange" : "Request " + turn.state));
+          details.append(el("p", turn.prompt));
+          const latest = turn.messages?.filter((m) => m.role === "user").at(-1);
+          if (latest) details.append(el("strong", "You"), el("p", latest.text));
+          if (turn.reply) {
+            details.append(el("strong", "Tutor \xB7 not reviewed"), el("p", turn.reply));
+            const flag = el("button", "Flag for accuracy review", { type: "button" });
+            flag.onclick = () => {
+              flag.disabled = true;
+              const note = el("textarea", "", { "aria-label": "What should we check?", maxlength: "4000" }), submit = el("button", "Save review flag", { type: "button" }), result = el("p", "", { role: "status" });
+              details.append(note, submit, result);
+              submit.onclick = async () => {
+                if (!note.value.trim()) return;
+                submit.disabled = true;
+                try {
+                  await api("flag", { requestId: turn.request_id, note: note.value.trim() });
+                  result.textContent = "Flag saved privately. Accuracy is still unreviewed.";
+                } catch (error) {
+                  result.textContent = error.message;
+                  submit.disabled = false;
+                }
+              };
+            };
+            details.append(flag);
+          }
+          article.append(heading, details);
+          content.append(article);
+        }
+      } catch (error) {
+        content.replaceChildren(el("p", error.message));
+      }
+    };
+    const url = new URL(location.href), code = url.searchParams.get("code");
+    window.addEventListener("storage", (event) => {
+      if (event.key === SESSION && event.newValue === null) auth.forgetLocalSession();
+    });
+    if (url.searchParams.get("tutor-auth") === "1") {
+      url.searchParams.delete("code");
+      url.searchParams.delete("tutor-auth");
+      url.searchParams.delete("error");
+      url.searchParams.delete("error_description");
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+      status.textContent = "Verifying your tutor sign-in\u2026";
+      auth.complete(code).then(connect).catch((error) => {
+        status.textContent = error.message;
+      });
+    } else auth.restore().then((who) => who ? connect() : null).catch(() => {
+      status.textContent = "Saved sign-in could not be checked. Check your connection, then reload; no question was sent.";
+    });
+  }
+  if (typeof window !== "undefined" && window.CHEM_TUTOR_CLOUD_ENABLED === true) mountCloudTutor();
+})();
 </script>
 </body>
 </html>
