@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.127 local</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.128</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -11939,6 +11939,7 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   const priorCounts={},latestTs={};
   (attempts||[]).filter(a=>adaptiveLearningRecordedAttempt(a,now)).forEach(a=>{priorCounts[a.id]=(priorCounts[a.id]||0)+1;latestTs[a.id]=Math.max(latestTs[a.id]||0,a.ts||0);});
   const usedSkills={};used.forEach(id=>{const q=byId.get(id);if(q){const key=adaptiveLearningSkill(q).key;usedSkills[key]=(usedSkills[key]||0)+1;}});
+  const tutorSignals=options.tutorSignals||(typeof TutorInsights!=='undefined'?TutorInsights.pending(pool,attempts,now):[]);
   const ranked=working.map(q=>{
     const skill=evidence.skills[adaptiveLearningSkill(q).key],level=adaptiveLearningDifficulty(q);
     const lower=skill.levels.filter(x=>x<skill.target),base=skill.levels.find(x=>x>=1)??skill.levels[0];
@@ -11950,7 +11951,9 @@ function adaptiveLearningSelect(pool,attempts,options={}){
     const priority=skill.status==='repair'?0:skill.status==='calibrating'?1:2;
     const score=Math.abs(level-desired)*100+(level>desired?15:0)+(recentlySeen?50:0)+(familySeen?18:0)+(q.familiarRepresentation?12:0)+Math.min(10,priorCounts[q.id]||0)+priority*4+(usedSkills[skill.key]||0)*6;
     const families=adaptiveLearningFamilies(q),planned=Math.max(0,...families.map(k=>plannedCounts[k]||0)),lastPlanned=Math.max(0,...families.map(k=>plannedLast[k]||0));
-    return {q,skill,level,desired,score:score+(rotating?planned*45:0),familySeen,lastPlanned};
+    const tutorSignal=tutorSignals.find(s=>!s.resolved&&(typeof TutorInsights!=='undefined'?TutorInsights.matches(q,s):s.skill===skill.key));
+    const tutorProbe=!!tutorSignal&&!usedSkills[skill.key]&&!repair&&!foundation;
+    return {q,skill,level,desired,score:score+(rotating?planned*45:0)+(tutorProbe?-35:0)+(tutorProbe&&q.id===tutorSignal.questionId?250:0),familySeen,lastPlanned,tutorSignal:tutorProbe?tutorSignal:null};
   }).sort((a,b)=>a.score-b.score||a.lastPlanned-b.lastPlanned||String(a.q.id).localeCompare(String(b.q.id)));
   const pick=ranked[0],role=repair?(repairFallback?'repair-fallback':foundation?'foundation-repair':'repair'):foundation?(pick.level<pick.skill.target?'foundation-check':'foundation-fallback'):pick.skill.promoted?'challenge':'calibration';
   const levelNames=['recall','foundation','intermediate','challenge'];
@@ -11960,8 +11963,9 @@ function adaptiveLearningSelect(pool,attempts,options={}){
   if(pick.level!==pick.desired)reason+='The exact target level is unavailable among the remaining distinct items.';
   if(slot)reason+=' '+(slotFallback?'No distinct item remains for '+slot.label+'; using another in-scope task.':'This slot keeps '+slot.label+' in the round.');
   if(rotating&&selections.length)reason+=' '+(alternatives.length?'A different item from the previous round is available.':'This small skill pool needs a repeat; use it as retrieval practice, not new proof.');
-  const summary=repair?(repairFallback?'That skill needs more work. Try another skill while it stays on your review list.':'Practise the step you just missed or needed help with.'):foundation?'Check a basic skill before moving on.':pick.skill.promoted?'Your recent answers support trying a harder problem.':'Try this problem so we can see what needs practice.';
-  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role,target:pick.desired,level:pick.level,reason,summary,freshInApp:!pick.familySeen,slot:slot?.label||null,slotFallback}};
+  let summary=repair?(repairFallback?'That skill needs more work. Try another skill while it stays on your review list.':'Practise the step you just missed or needed help with.'):foundation?'Check a basic skill before moving on.':pick.skill.promoted?'Your recent answers support trying a harder problem.':'Try this problem so we can see what needs practice.';
+  if(pick.tutorSignal){summary=pick.tutorSignal.label+'. Try it without help.';reason+=' Your learner-authored tutor reasoning or help request prompted this check; the chat was not graded.';}
+  return {question:pick.q,decision:{id:pick.q.id,skill:pick.skill.key,granularity:pick.skill.granularity,role:pick.tutorSignal?'tutor-follow-up':role,target:pick.desired,level:pick.level,reason,summary,tutorEvidence:pick.tutorSignal?pick.tutorSignal.requests:null,freshInApp:!pick.familySeen,slot:slot?.label||null,slotFallback}};
 }
 function adaptiveLearningPool(options={}){
   let topics=options.topics?.slice(),chapter=options.chapter;
@@ -18883,6 +18887,11 @@ function dcRecommend({questions=[],attempts=[],chapters=[],settings={},coverage=
     const stale=now-repair.latestAt>7*86400000;
     return {...context,kind:stale?'practice':'repair',topic:repair.topic,capability:repair.capability,skillKey:repair.skillKey,granularity:repair.granularity,questionId:repair.rows[0].id,title:stale?'Recheck an older gap':'Fix one missed step',why:(stale?'The last signal for this skill is over a week old. Try a problem before assuming the same gap remains. ':repair.repeatedMisses?'More than one retained miss appears on this skill. ':'A recent retained answer or review flag needs another look. ')+(repair.selfReviewed?'Drawing results here are self-reported, not an automatic chemistry grade. ':'')+(repair.granularity==='topic-fallback'?'This bank only labels the broader topic, so the exact missed decision is unknown. ':'')+'Correct recognition answers do not settle a separate drawing or conversion skill.'};
   }
+  const chatGap=typeof TutorInsights!=='undefined'?TutorInsights.pending(pool,attempts,now)[0]:null;
+  if(chatGap){
+    const ids=pool.filter(q=>TutorInsights.matches(q,chatGap)&&q.id!==chatGap.questionId).map(q=>q.id);
+    if(ids.length)return {...context,kind:'practice',topic:chatGap.topic,questionId:chatGap.questionId,tutorPracticeIds:ids,title:'Check the step you asked about',why:chatGap.label+'. Your chat suggests a follow-up check; it has not been graded. Try a different example without help.'};
+  }
   // Cold coverage stays open until a diagnostic. That must not trap the coach
   // on the first lesson while normal practice is accumulating elsewhere.
   const coverageDomains=(coverage?.chapter===context.chapter?(coverage.domains||[coverage.nextDomain]):[]).filter(d=>d&&!d.bankGap&&['not-checked','needs-review'].includes(d.status)&&d.topics?.some(t=>pool.some(q=>q.topic===t)));
@@ -18926,13 +18935,17 @@ function dcPulsePlan({questions=[],attempts=[],chapters=[],settings={},now=Date.
     available.sort((a,b)=>selectedTopicCount(a.topic)-selectedTopicCount(b.topic)||Number(old.has(a.id))-Number(old.has(b.id))||((evidence.counts[a.id]||0)-(evidence.counts[b.id]||0))||dcHash(day+'|'+profile+'|'+a.id)-dcHash(day+'|'+profile+'|'+b.id));
     const q=available[0],manual=!!(q.requiresDrawing||q.type==='written');used.add(q.id);selected.push({id:q.id,role:role+(/drawing/.test(role)&&manual?' · self-reviewed':''),chapter:dcChapter(q,chapters),topic:q.topic,manual,capability:dcCapability(q),skillKey:dcSkillKey(q),granularity:dcSkill(q).granularity,previouslyAttempted:!!evidence.counts[q.id]});
   }
-  pick(familiar.length?familiar:focus,familiar.length?'familiar focus skill':'focus foundation',focus);
+  const firstChatGaps=typeof TutorInsights!=='undefined'?TutorInsights.pending(focus,attempts,now):[];
+  const firstChatProbes=focus.filter(q=>firstChatGaps.some(g=>TutorInsights.matches(q,g)&&g.questionId!==q.id));
+  pick(firstChatProbes.length?firstChatProbes:familiar.length?familiar:focus,firstChatProbes.length?'tutor reasoning follow-up':familiar.length?'familiar focus skill':'focus foundation',focus);
   pick(focus,'current focus');
   const focusDrawings=drawings.filter(inFocus),drawingGap=repairGroups.find(g=>focusDrawings.some(q=>dcMatchesSkill(q,g))),repairDrawings=drawingGap?focusDrawings.filter(q=>dcMatchesSkill(q,drawingGap)):[];
   if(focusDrawings.length)pick(repairDrawings.length?repairDrawings:focusDrawings,repairDrawings.length?'drawing repair':'short drawing',focusDrawings);
   else {pick(focus,'current focus');notes.push('No eligible short construction item is loaded for this focus. This set does not check drawing.');}
   const quickGap=repairGroups.find(g=>focus.some(q=>!used.has(q.id)&&dcMatchesSkill(q,g))),quickRepairs=quickGap?focus.filter(q=>!used.has(q.id)&&dcMatchesSkill(q,quickGap)):[];
-  pick(quickRepairs.length?quickRepairs:focus,quickRepairs.length?'repair check':'focus probe',focus);
+  const chatGaps=typeof TutorInsights!=='undefined'?TutorInsights.pending(focus,attempts,now):[];
+  const chatProbes=focus.filter(q=>!used.has(q.id)&&chatGaps.some(g=>TutorInsights.matches(q,g)&&g.questionId!==q.id));
+  pick(quickRepairs.length?quickRepairs:chatProbes.length?chatProbes:focus,quickRepairs.length?'repair check':chatProbes.length?'tutor reasoning follow-up':'focus probe',focus);
   // One review slot at most, within the current exam scope. A pinned topic or
   // chapter remains exclusive. Missing pools produce a shorter set, not drift.
   if(review.length)pick(review,'exam-scope review');else pick(focus,'focus probe');
@@ -19023,6 +19036,10 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   }
   function dcOpenRegular(rec){
     courseNavigationSaveWork();smSetChapter(rec.chapter);
+    if(rec.tutorPracticeIds?.length&&typeof startAdaptiveLearning==='function'){
+      if(startAdaptiveLearning({chapter:rec.chapter,poolIds:rec.tutorPracticeIds,total:rec.minutes===10?1:3,label:'Check your tutor reasoning',rotationKey:'tutor-follow-up-'+rec.chapter+'-'+rec.topic}))smTagRun('practice','tutor-follow-up',rec.chapter);
+      return;
+    }
     if(rec.chapter==='ch5'&&!rec.skillKey&&rec.kind!=='probe'&&rec.minutes>10&&(!rec.capability||rec.capability==='recognition')){
       if(rec.topic==='stereoRelations'&&typeof smStartVisualStereo==='function'){smStartVisualStereo('pairs');return;}
       if(rec.topic==='stereoOptical'&&typeof smStartOpticalVisual==='function'){smStartOpticalVisual();return;}
@@ -20146,9 +20163,10 @@ function sparkPlan(scope){
   const state=sparkState(),pool=SPARK_CARDS.filter(c=>(scope==='mix'||c.chapterId===scope)&&sparkQuestion(c.questionId)?.type==='mc'),counts={},last={};
   state.runs.forEach(r=>r.items.filter(i=>i.shownAt).forEach(i=>{counts[i.id]=(counts[i.id]||0)+1;last[i.id]=i.shownAt;}));
   const tie=Object.fromEntries(pool.map(c=>[c.questionId,Math.random()])),picked=[],chapters={},topics={};
+  const chatGaps=typeof TutorInsights!=='undefined'?TutorInsights.pending(pool.map(c=>sparkQuestion(c.questionId)),S.attempts||[],Date.now()):[];
   while(picked.length<5){
     const rest=pool.filter(c=>!picked.includes(c));if(!rest.length)break;
-    const score=c=>[chapters[c.chapterId]||0,counts[c.questionId]||0,topics[sparkQuestion(c.questionId).topic]||0,last[c.questionId]||0,tie[c.questionId]];
+    const score=c=>[chapters[c.chapterId]||0,picked.length===0&&chatGaps.some(g=>TutorInsights.matches(sparkQuestion(c.questionId),g)&&g.questionId!==c.questionId)?-1:0,counts[c.questionId]||0,topics[sparkQuestion(c.questionId).topic]||0,last[c.questionId]||0,tie[c.questionId]];
     rest.sort((a,b)=>{const x=score(a),y=score(b);for(let i=0;i<x.length;i++)if(x[i]!==y[i])return x[i]-y[i];return 0;});
     const c=rest[0];picked.push(c);chapters[c.chapterId]=(chapters[c.chapterId]||0)+1;const topic=sparkQuestion(c.questionId).topic;topics[topic]=(topics[topic]||0)+1;
   }
@@ -20341,10 +20359,104 @@ body.spark-playing>header,body.spark-playing>#nav{display:none!important}body.sp
 
 /* END SPARK TAIL */
 /* BEGIN QUESTION TUTOR TAIL */
-/* Question tutor workspace. Provider disabled until separately configured.
- * Local chat is learner work, not a grading source or a mastery signal.
- * No provider key, automatic transmission, background inference or cloud sync.
- */
+/* Learner-authored chat signals -> bounded practice probes. No paid AI calls.
+ * Wording rules identify a hypothesis to check, never grade free-form chemistry.
+ * Tutor assertions are deliberately not evidence of learner knowledge. */
+const TutorInsights=(()=>{
+  'use strict';
+  const VERSION=1,STORE='tutorPracticeSignalsV1',DAY=86400000;
+  let owner=null,syncedAt=null;
+  const bank=()=>typeof QUESTIONS!=='undefined'?QUESTIONS:[];
+  const profile=()=>typeof leActor==='function'?leActor():{profile:null,qa:true};
+  const read=()=>{const s=safeStore.get(STORE,{});return s?.version===VERSION&&s.owner===owner&&s.profile===profile().profile&&Array.isArray(s.records)&&Array.isArray(s.reviews)?s:{version:VERSION,owner,profile:profile().profile,records:[],reviews:[]};};
+  const write=s=>safeStore.set(STORE,{...s,records:s.records.slice(-200),reviews:s.reviews.slice(-500)});
+  const qaText=s=>/\bsynthetic\b|\b(?:hosted|cloud|spark|tutor)\s+QA\b|\bQA\s+(?:test|fixture)\b/i.test(s);
+  function signals(learner,mode,q){
+    const s=String(learner||'').slice(0,4000).toLowerCase().replace(/[’]/g,"'"),out=[];
+    if(!s.trim()||qaText(s)||/^(?:thanks|thank you|got it|okay|ok|yes|no|i understand now)[.!\s]*$/.test(s)||/\b(?:your|tutor(?:'s)?) (?:answer|reply).{0,25}(?:wrong|incorrect)|you (?:are|were) wrong/.test(s))return out;
+    const scope=String(q?.topic||'')+' '+String(q?.learningSkill||q?.adaptiveSkill||'');
+    // Negations/questions make a positive misconception match unsafe. Fall back
+    // to a general reasoning probe rather than reverse the learner's meaning.
+    const asserted=!/\?|\b(?:not|isn't|aren't|doesn't|don't|never|incorrect|wrong)\b/.test(s);
+    const cue=(id,label,pattern,domain)=>{if(asserted&&domain.test(scope)&&pattern.test(s))out.push({id,label,tier:'reasoning-hypothesis'});};
+    cue('local-barrier','Compare each peak with its preceding minimum',/because.{0,65}(?:highest|tallest) (?:peak|transition state)|(?:highest|tallest) peak.{0,55}(?:means|so|therefore).{0,30}(?:slow|largest|barrier)/,/kinetic|energy|profile/i);
+    cue('favorability-rate','Separate reaction favorability from reaction speed',/(?:negative|spontaneous|favorable).{0,45}(?:means|so|therefore|because).{0,30}(?:fast|quick)|(?:fast|quick).{0,35}because.{0,30}(?:negative|spontaneous|favorable)/,/kinetic|thermo|freeEnergy/i);
+    cue('dynamic-equilibrium','Check what continues at equilibrium',/equilibrium.{0,35}(?:stops|stop reacting|no reactions|nothing happens)/,/equilibrium|thermo/i);
+    cue('rs-rotation','Separate R/S configuration from rotation sign',/\br\b.{0,20}(?:means|always|must).{0,15}(?:positive|clockwise)|\bs\b.{0,20}(?:means|always|must).{0,15}(?:negative|counterclockwise)/,/stereo/i);
+    if(!out.length&&mode==='reasoning')out.push({id:'reasoning-check',label:'Check this reasoning on a new example',tier:'learner-reasoning'});
+    else if(!out.length)out.push({id:'requested-help',label:'Recheck the step you asked about',tier:'self-report'});
+    return out;
+  }
+  function reviewState(id,reviews=read().reviews){
+    const rows=reviews.filter(r=>r.requestId===id).sort((a,b)=>a.ts-b.ts);
+    const last=rows.at(-1);
+    return {flagged:!!last&&last.kind!=='review_correct',kind:last?.kind||'unreviewed',at:last?.ts||null};
+  }
+  function observe(row){
+    if(!owner||!profile().profile||profile().qa||profile().role!=='owner'||row.qa||row.synthetic)return false;
+    const q=bank().find(q=>q.id===row.questionId);if(!q||!row.requestId||!Number.isFinite(row.ts)||row.ts>Date.now()||qaText(row.learnerText||''))return false;
+    const cues=signals(row.learnerText,row.mode,q);if(!cues.length)return false;
+    const s=read(),record={requestId:row.requestId,questionId:q.id,fingerprint:row.fingerprint,ts:row.ts,cues,source:'learner-chat',version:VERSION};
+    s.records=s.records.filter(r=>r.requestId!==row.requestId).concat(record).sort((a,b)=>a.ts-b.ts);write(s);return true;
+  }
+  function setOwner(value){owner=value||null;syncedAt=null;}
+  function markReview(requestId,kind,ts=Date.now()){
+    if(!owner||!profile().profile)return;
+    const s=read();s.reviews.push({requestId,kind,ts});write(s);
+    document.dispatchEvent(new CustomEvent('tutor-insights-changed'));
+  }
+  function sync(rows,reviews){
+    if(!owner||!profile().profile||profile().qa)return;
+    for(const row of rows){const latest=row.messages?.filter(m=>m.role==='user').at(-1);if(latest)observe({requestId:row.request_id,questionId:row.question_id,fingerprint:row.fingerprint,ts:Date.parse(row.created_at),mode:row.mode,learnerText:latest.text});}
+    const s=read();
+    for(const r of reviews)if(['learner_flag','review_correct','review_incorrect','review_uncertain'].includes(r.kind)&&Number.isFinite(Date.parse(r.created_at)))s.reviews.push({requestId:r.request_id,kind:r.kind,ts:Date.parse(r.created_at)});
+    s.reviews=[...new Map(s.reviews.map(r=>[r.requestId+'|'+r.kind+'|'+r.ts,r])).values()].sort((a,b)=>a.ts-b.ts);write(s);syncedAt=Date.now();
+    document.dispatchEvent(new CustomEvent('tutor-insights-changed'));
+  }
+  function current(q,fp){
+    if(!fp)return false;
+    return typeof window!=='undefined'&&window.TutorChatAdapters?.fingerprint(q)===fp||typeof sparkFingerprint==='function'&&sparkFingerprint(q)===fp;
+  }
+  function target(q,cues){
+    const specific=cues.find(c=>c.id==='local-barrier');
+    if(specific&&q.topic==='energyProfiles')return {skill:'chat:local-barrier',match:'local-barrier'};
+    if(q.learningSkill)return {skill:'authored:'+q.learningSkill,match:'authored',learningSkill:q.learningSkill};
+    return {skill:adaptiveLearningSkill(q).key,match:'adaptive'};
+  }
+  function matches(q,signal){
+    if(signal.match==='local-barrier')return q.topic==='energyProfiles'&&/:(?:forward-g|reverse-g|largest-local-barrier|slowest-step-under-the-stated-model|two-step-profile-and-limits-of-a-highest-peak-shortcut)$/.test(q.learningSkill||'');
+    if(signal.match==='authored')return q.learningSkill===signal.learningSkill;
+    return adaptiveLearningSkill(q).key===signal.skill;
+  }
+  function analyze(pool,attempts=[],now=Date.now(),records=null,reviews=null){
+    if(!records&&(!owner||!profile().profile||profile().qa||profile().role!=='owner'))return [];
+    const s=read(),groups=new Map(),sources=records||s.records,reviewRows=reviews||s.reviews;
+    for(const r of sources){
+      const q=bank().find(q=>q.id===r.questionId)||pool.find(q=>q.id===r.questionId);
+      if(!q||!Number.isFinite(r.ts)||r.ts>now||now-r.ts>30*DAY||r.qa||r.synthetic||reviewState(r.requestId,reviewRows).flagged||!current(q,r.fingerprint))continue;
+      const mapping=target(q,r.cues),key=mapping.skill;
+      if(!pool.some(x=>matches(x,mapping)))continue;
+      const g=groups.get(key)||{...mapping,topic:q.topic,capability:typeof dcCapability==='function'?dcCapability(q):null,questionId:q.id,latestAt:0,requests:[],cues:[],source:'tutor-chat',tier:'needs-independent-check'};
+      if(r.ts>=g.latestAt){g.latestAt=r.ts;g.questionId=q.id;g.cues=r.cues;}
+      g.requests.push(r.requestId);groups.set(key,g);
+    }
+    return [...groups.values()].map(g=>{
+      const clean=attempts.filter(a=>a.ts>g.latestAt&&a.ts<=now&&pool.some(q=>q.id===a.id&&matches(q,g)&&(typeof dcCapability!=='function'||dcCapability(q)===g.capability)&&adaptiveLearningValidAttempt(a,q,now)&&adaptiveLearningOutcome(a,q)==='clean-right'));
+      // Distinct source families, not repeated answers to one item. A success
+      // releases this routing priority only; readiness remains the check engine's.
+      const chosen=[];for(const a of clean){const q=pool.find(q=>q.id===a.id);if(!chosen.some(x=>adaptiveLearningFamilies(x).some(f=>adaptiveLearningFamilies(q).includes(f))))chosen.push(q);}
+      return {...g,requests:[...new Set(g.requests)],independentExamples:chosen.length,resolved:chosen.length>=2,label:g.cues?.[0]?.label||'Check the reasoning you asked about'};
+    }).sort((a,b)=>b.latestAt-a.latestAt);
+  }
+  function pending(pool,attempts,now){return analyze(pool,attempts,now).filter(x=>!x.resolved);}
+  function exportEvidence(){const s=read();return {version:VERSION,scope:'Current signed-in tutor and app profile; latest 200 sent requests and 500 reviews, 30-day routing window',syncedAt,signals:!owner||profile().qa?[]:s.records.map(r=>({requestId:r.requestId,questionId:r.questionId,ts:r.ts,cues:r.cues,review:reviewState(r.requestId),fingerprint:r.fingerprint})),limits:'No raw chat text. Wording rules produce checkable hypotheses, not chemistry grades. Chat evidence never raises readiness.'};}
+  if(typeof leBuildExport==='function'){const previous=leBuildExport;leBuildExport=function(){return {...previous(),tutorPractice:exportEvidence()};};}
+  return {signals,observe,setOwner,sync,markReview,reviewState,analyze,pending,matches,exportEvidence};
+})();
+window.TutorInsights=TutorInsights;
+
+/* Question tutor workspace. Connection is separately authenticated.
+ * Learner-authored chat can guide probes; only independent answers measure readiness. */
 const TutorChat = (() => {
   'use strict';
   const VERSION='2026-10-18.1', STORE='questionTutorWorkspace', MAX_THREADS=40, MAX_MESSAGES=40;
@@ -20393,7 +20505,7 @@ const TutorChat = (() => {
     if(cloud&&(!/^[a-f0-9-]{36}$/i.test(next.userId||'')||typeof next.getToken!=='function'||typeof next.publicKey!=='string'||/^sk-/i.test(next.publicKey)))throw Error('Verified cloud sign-in is required.');
     if(typeof next.token!=='string'||next.token.length<24||/^sk-/i.test(next.token))throw Error('Use a tutor access token, never a provider API key.');
     connection={enabled:true,endpoint:url.href,token:next.token,providerLabel:next.providerLabel==='OpenAI API'?'OpenAI API':'',auditEnabled:next.auditEnabled===true,
-      cloudUser:cloud?next.userId:null,getToken:cloud?next.getToken:null,publicKey:cloud?next.publicKey:null};
+      cloudUser:cloud?next.userId:null,getToken:cloud?next.getToken:null,publicKey:cloud?next.publicKey:null,flagReply:cloud&&typeof next.flagReply==='function'?next.flagReply:null,beforeSend:cloud&&typeof next.beforeSend==='function'?next.beforeSend:null,allowPriorReplies:cloud&&typeof next.allowPriorReplies==='function'?next.allowPriorReplies:null};
     refreshConnection();return true;
   }
   function work(c){try{return String(c.getWork?.()||'').slice(0,6000);}catch{return '[Current work could not be read.]';}}
@@ -20470,6 +20582,7 @@ const TutorChat = (() => {
     const saveButton=text('button','Save draft',{type:'button','data-tutor-save':''}),sendButton=text('button','Send',{type:'button','data-tutor-send':''}),cancelButton=text('button','Cancel request',{type:'button','data-tutor-cancel':''});actions.append(saveButton,sendButton,cancelButton);
     const note=text('p','',{class:'tutor-note'});panel.appendChild(note);
     const more=document.createElement('details');more.className='tutor-more';more.appendChild(text('summary','Privacy & saved work'));panel.appendChild(more);
+    more.appendChild(text('p','The engine uses your sent reasoning and requests for help to suggest follow-up practice. Wording patterns are hypotheses to check, not grades. Flagged tutor exchanges are held out until review. Two later distinct answers without recorded help can release a practice priority; chat never raises readiness.'));
     more.appendChild(text('p','Only this question, its figures, your current work, the bank’s explanation and the latest 16 chat messages would be sent when you press Send. No entire profile, grades, other questions or course files. AI feedback can be wrong and never changes the answer key.'));
     more.appendChild(text('p',connection.cloudUser?'Drafts stay in this browser. Sent conversations are saved privately in Supabase for your signed-in account. Open Saved tutor chats to review them on another device. Clearing this browser chat does not delete the review archive.':'The latest 40 question conversations are kept on this browser and app profile, not synced to other devices. Up to 40 messages per conversation. Clearing chat text does not erase help already recorded on an answer.'));
     const exportButton=text('button','Download this conversation',{type:'button','data-tutor-export':''}),clearButton=text('button','Clear this conversation',{type:'button','data-tutor-clear':''});more.append(exportButton,clearButton);
@@ -20485,7 +20598,27 @@ const TutorChat = (() => {
       if(!alive())return;const t=read(c,id),active=connection.enabled;
       Object.entries(modeButtons).forEach(([mode,b])=>b.setAttribute('aria-pressed',String(t.mode===mode)));
       input.value=memoryDraft===null?t.draft:memoryDraft;input.placeholder=t.mode==='reasoning'?'I think ___ because ___. The step I’m unsure about is…':'What part would you like explained?';input.disabled=busy;
-      history.replaceChildren();for(const m of t.messages){const item=text('section','',{class:'tutor-message '+m.role});item.appendChild(text('strong',m.role==='assistant'?'Tutor · AI feedback':m.mode==='reasoning'?'Your reasoning':'You'));item.appendChild(text('p',m.text,m.role==='assistant'?{'data-tutor-reply':''}:{}));if(m.auditSaved)item.appendChild(text('small',m.auditStorage==='private-supabase'?'Saved privately in Supabase for accuracy review · not reviewed here.':'Saved privately on this Mac for accuracy review · not reviewed here.'));history.appendChild(item);}
+      history.replaceChildren();for(const m of t.messages){
+        const item=text('section','',{class:'tutor-message '+m.role});item.appendChild(text('strong',m.role==='assistant'?'Tutor · AI feedback':m.mode==='reasoning'?'Your reasoning':'You'));item.appendChild(text('p',m.text,m.role==='assistant'?{'data-tutor-reply':''}:{}));
+        if(m.auditSaved)item.appendChild(text('small',m.auditStorage==='private-supabase'?'Saved privately in Supabase for accuracy review.':'Saved privately on this Mac for accuracy review.'));
+        if(m.role==='assistant'&&m.auditStorage==='private-supabase'&&connection.flagReply){
+          const review=typeof TutorInsights!=='undefined'?TutorInsights.reviewState(m.requestId):{};
+          if(review.flagged)item.appendChild(text('p','Flagged: held out of practice analysis and future tutor context pending review.',{'data-tutor-review-status':''}));
+          const flag=text('button',review.kind==='learner_flag'?'Flag saved · add a note':'Flag wrong or unclear answer',{type:'button','data-tutor-flag':m.requestId});
+          flag.onclick=()=>{
+            flag.disabled=true;
+            const reason=document.createElement('textarea');reason.rows=2;reason.maxLength=4000;reason.setAttribute('aria-label','What should we check in this tutor answer?');reason.placeholder='What seems wrong, missing, or unclear?';
+            const submit=text('button','Save accuracy flag',{type:'button','data-tutor-flag-save':''}),result=text('p','',{role:'status'});item.append(reason,submit,result);reason.focus();
+            submit.onclick=async()=>{
+              if(!alive()||!reason.value.trim())return;
+              const config=connection;submit.disabled=true;TutorInsights.markReview(m.requestId,'local_pending');
+              try{await config.flagReply(m.requestId,reason.value.trim());if(!alive())return;result.textContent='Flag saved privately. This exchange is held out of practice analysis until review.';submit.hidden=true;reason.disabled=true;}
+              catch{if(!alive())return;result.textContent='Flag kept out of analysis on this device. Cloud save failed; click Save accuracy flag to retry.';submit.disabled=false;}
+            };
+          };item.appendChild(flag);
+        }
+        history.appendChild(item);
+      }
       privacy.hidden=!active;consentText.textContent=active?'Send this question and my work to '+(connection.providerLabel||'my tutor connection')+' through '+new URL(connection.endpoint).origin+'.'+(connection.auditEnabled?' Keep sent messages, replies and supplied diagrams '+(connection.cloudUser?'in private Supabase storage for my signed-in account':'privately on this Mac')+' for accuracy review. Clearing this chat does not delete that review record.':''):'';consent.checked=t.consentEndpoint===connection.endpoint&&active&&(!connection.auditEnabled||t.auditConsent===true);
       sendButton.hidden=!active;sendButton.disabled=busy||!consent.checked||!input.value.trim()||t.messages.length>=MAX_MESSAGES-1;
       saveButton.disabled=busy;cancelButton.hidden=!busy;
@@ -20511,8 +20644,9 @@ const TutorChat = (() => {
       const timeout=setTimeout(()=>controller.abort(),135000);
       try{
         const q=await question(c,id);
+        if(config.beforeSend)await config.beforeSend();
         if(!alive()||stamp!==generation||controller.signal.aborted)throw Error('Stopped');
-        const messages=read(c,id).messages.slice(-16).map(m=>({role:m.role,text:m.text}));
+        const messages=read(c,id).messages.filter(m=>m.role!=='assistant'||((!config.allowPriorReplies||config.allowPriorReplies())&&(typeof TutorInsights==='undefined'||!TutorInsights.reviewState(m.requestId).flagged))).slice(-16).map(m=>({role:m.role,text:m.text}));
         if(q.prompt.length+q.reference.length+q.work.length+q.choices.join('').length+messages.reduce((n,m)=>n+m.text.length,0)>60000)throw Error('CONTEXT');
         const accessToken=config.getToken?await config.getToken():config.token;
         if(!alive()||stamp!==generation||controller.signal.aborted)throw Error('Stopped');
@@ -20527,6 +20661,8 @@ const TutorChat = (() => {
         // A reply may finish after navigation. Save to its original question only;
         // mark assistance later when that reply is actually opened and shown.
         update(row=>row.messages.push({role:'assistant',text:data.reply,ts:Date.now(),requestId,visualStatus:q.visualStatus,auditSaved:config.auditEnabled===true,auditStorage:config.cloudUser?'private-supabase':'private-mac'}));
+        if(config.cloudUser&&typeof TutorInsights!=='undefined')TutorInsights.observe({requestId,questionId:q.id,fingerprint:q.fingerprint,ts:message.ts,mode:message.mode,learnerText:message.text});
+        document.dispatchEvent(new CustomEvent('tutor-turn-saved'));
         notice=q.visualStatus==='incomplete'?'Reply received. Some diagrams could not be sent; the tutor must not guess about them.':q.images.length?'Reply received. '+q.images.length+' diagram'+(q.images.length===1?'':'s')+' sent.':'Reply received.';
       }catch(e){notice=e.message==='CONTEXT'?'This question and conversation are too large to send safely. No request was sent. Download or clear this chat to shorten it.':e.message==='LIMIT'?'Tutor usage limit reached. Your question is saved.':e.message==='AUTH'?'Tutor connection needs setup. Your question is saved.':controller.signal.aborted||e.message==='Stopped'?'Request stopped. Your question is saved; no new tutor help was recorded.':'No reply received. Your question is saved; no new tutor help was recorded.';
         if(/^HTTP_[0-9]{3}$/.test(e.message))notice+=' Connection status: '+e.message.slice(5)+'.';
@@ -20534,7 +20670,7 @@ const TutorChat = (() => {
     };
     root.addEventListener('toggle',()=>{if(root.open)refresh();});
     for(const node of panels.keys())if(!node.isConnected){panels.delete(node);mounts.delete(node);}
-    panels.set(root,refresh);refresh();return root;
+    panels.set(root,refresh);refresh();document.dispatchEvent(new CustomEvent('tutor-insights-sync'));return root;
   }
   function evidence(){return {version:VERSION,storage:'profile/device-local; no cloud sync',conversations:state().threads.map(t=>({questionId:t.questionId,fingerprint:t.fingerprint,runId:t.runId,surface:t.surface,createdAt:t.createdAt,updatedAt:t.updatedAt,learnerMessages:t.messages.filter(m=>m.role==='user').length,reasoningMessages:t.messages.filter(m=>m.role==='user'&&m.mode==='reasoning').length,replyMessages:t.messages.filter(m=>m.role==='assistant').length,hasDraft:!!t.draft})),limits:['Counts are not understanding or mastery.','Chat text is excluded from this export; explicit conversation download is separate.','A received reply is not necessarily displayed; attempt help markers track display.']};}
   if(typeof leBuildExport==='function'){const original=leBuildExport;leBuildExport=function(){const out=original();out.questionTutor=evidence();return out;};}
@@ -20729,7 +20865,45 @@ window.TutorChat=TutorChat;
         if(!validTime(progress.tutorHelpAt)){progress.tutorHelpAt=Date.now();progress.updatedAt=Date.now();lcRecord('tutor-help',progress,{afterAttempts:progress.answerCount,tutorHelpAt:progress.tutorHelpAt});lcSave(progress);}return true;
       }});
   }
-  window.TutorChatAdapters=Object.freeze({version:'2026-10-18.1',drillCold,attachDrill,attachSpark,attachCheck,attachLessonCheck});
+  window.TutorChatAdapters=Object.freeze({version:'2026-10-18.2',fingerprint,drillCold,attachDrill,attachSpark,attachCheck,attachLessonCheck});
+})();
+
+/* One question-aware launcher. The same saved workspace is moved into the dock;
+ * there is no second chat, duplicate request, or separate draft. */
+(function(){
+  'use strict';
+  if(!window.TutorChat||typeof MutationObserver==='undefined')return;
+  const el=(tag,label,attrs={})=>{const n=document.createElement(tag);n.textContent=label;for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);return n;};
+  let active=null,side='left';
+  const launcher=el('button','✦ Tutor',{'data-tutor-launcher':'',type:'button','aria-label':'Talk to the tutor about this question','aria-expanded':'false'});
+  const dock=el('section','',{class:'tutor-dock',role:'region','aria-label':'Question tutor'});dock.hidden=true;launcher.hidden=true;
+  const header=el('div','',{class:'tutor-dock-header'}),title=el('strong','Question tutor'),move=el('button','Move ↔',{type:'button','data-tutor-position':'','aria-label':'Move tutor to the other side'}),close=el('button','Close ×',{type:'button','data-tutor-close':''});
+  header.append(title,move,close);dock.append(header);document.body.append(launcher,dock);
+  function hide(focus=false){
+    dock.hidden=true;launcher.setAttribute('aria-expanded','false');
+    if(active?.root.parentElement===dock){if(active.home.isConnected)active.home.after(active.root);else active.root.remove();active.root.open=false;}
+    if(focus&&!launcher.hidden)launcher.focus();
+  }
+  function open(){
+    if(!active?.home.isConnected)return;
+    title.textContent='Question tutor · '+active.id;dock.append(active.root);active.root.open=true;dock.hidden=false;launcher.setAttribute('aria-expanded','true');
+    (active.root.querySelector('[data-tutor-input]')||close).focus();
+  }
+  launcher.onclick=()=>dock.hidden?open():hide(true);close.onclick=()=>hide(true);
+  move.onclick=()=>{side=side==='left'?'right':'left';dock.dataset.side=launcher.dataset.side=side;};
+  dock.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();hide(true);}});
+  const originalMount=TutorChat.mount;
+  TutorChat.mount=function(host,context){
+    const root=originalMount(host,context);if(!root)return root;
+    hide();const home=document.createElement('span');home.hidden=true;home.dataset.tutorHome='';root.before(home);
+    active={root,home,id:String(context.questionId)};launcher.hidden=false;return root;
+  };
+  const configure=TutorChat.configure;
+  TutorChat.configure=function(){hide();return configure.apply(this,arguments);};
+  new MutationObserver(()=>{if(active&&!active.home.isConnected){hide();active=null;launcher.hidden=true;}}).observe(document.body,{childList:true,subtree:true});
+  const style=el('style',`[data-tutor-launcher]{position:fixed;left:14px;bottom:82px;z-index:910;min-height:48px;padding:12px 18px;border:1px solid #fff;border-radius:24px;background:#e4f5f0ed;color:#17545c;box-shadow:0 6px 26px #163f472b;backdrop-filter:blur(20px) saturate(150%);font:700 15px system-ui;cursor:pointer}.tutor-dock{position:fixed;left:14px;bottom:140px;z-index:920;width:min(430px,calc(100vw - 28px));max-height:min(72vh,calc(100dvh - 164px));overflow:auto;border:1px solid #fff;border-radius:22px;background:#eef8f6f5;color:#173f46;box-shadow:0 16px 54px #15343d40;backdrop-filter:blur(24px) saturate(140%);box-sizing:border-box;padding:12px}.tutor-dock-header{display:flex;gap:6px;align-items:center;position:sticky;top:-12px;z-index:1;padding:10px 0;background:#eef8f6f5}.tutor-dock-header strong{flex:1;min-width:0;font:700 13px system-ui;overflow-wrap:anywhere}.tutor-dock-header button{min-height:44px;padding:8px;border:1px solid #abc8c1;border-radius:11px;background:#fff;color:#214c53;cursor:pointer}.tutor-dock .tutor-chat{margin:0;border:0;background:transparent}.tutor-dock .tutor-chat>summary{display:none}.tutor-dock .tutor-panel{padding:4px}.tutor-dock[hidden],[data-tutor-launcher][hidden]{display:none!important}.tutor-dock[data-side=right],[data-tutor-launcher][data-side=right]{left:auto;right:14px}.tutor-dock :focus-visible,[data-tutor-launcher]:focus-visible{outline:3px solid #22798b;outline-offset:2px}@media(max-width:480px){.tutor-dock{bottom:140px;max-height:calc(100dvh - 158px)}}@media(prefers-reduced-motion:reduce){.tutor-dock,[data-tutor-launcher]{animation:none!important;transition:none!important;animation-duration:0s!important;transition-duration:0s!important}}`);
+  style.textContent+='[data-tutor-launcher][data-side=right]{bottom:134px}.tutor-dock[data-side=right]{bottom:192px;max-height:min(72vh,calc(100dvh - 210px))}';
+  document.head.append(style);
 })();
 
 /* END QUESTION TUTOR TAIL */
@@ -20931,9 +21105,11 @@ window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
     const bar = el("details", "", { id: "cloud-tutor-bar", "aria-label": "Private online tutor" });
     bar.append(el("summary", "Tutor account"));
     const status = el("span", "Online tutor \xB7 sign in to connect", { role: "status" }), open = el("button", "Tutor sign-in", { type: "button" }), saved = el("button", "Saved tutor chats", { type: "button" }), out = el("button", "Sign out", { type: "button" });
+    const insights = el("button", "What tutor chats suggest", { type: "button" }), insightStatus = el("small", "Sent reasoning can guide follow-up practice.");
+    insights.hidden = true;
     saved.hidden = true;
     out.hidden = true;
-    bar.append(status, open, saved, out);
+    bar.append(status, open, saved, insights, out, insightStatus);
     document.body.prepend(bar);
     const dialog = el("dialog", "", { id: "cloud-tutor-dialog", "aria-label": "Private tutor account" }), close = el("button", "Close", { type: "button" }), content = el("div", "");
     dialog.append(close, content);
@@ -20943,10 +21119,11 @@ window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
     document.head.append(style);
     style.textContent += `#cloud-tutor-bar{display:block;position:fixed;right:14px;bottom:76px;z-index:900;padding:0;border:1px solid #b5d3ca;border-radius:18px;background:#eef8f3ed;backdrop-filter:blur(18px);box-shadow:0 6px 24px #12393e22;max-width:calc(100vw - 28px)}#cloud-tutor-bar summary{padding:12px 16px;min-height:44px;box-sizing:border-box;cursor:pointer;font-weight:650}#cloud-tutor-bar[open]{width:320px;padding:0 12px 12px;max-height:60vh;overflow:auto}#cloud-tutor-bar[open] span{display:block;min-width:0;margin:0 0 10px;overflow-wrap:anywhere}#cloud-tutor-bar button{margin:3px}#cloud-tutor-bar:not([open])>:not(summary){display:none}`;
     const auth = createTutorAuth({ onSignOut: () => {
+      window.TutorInsights?.setOwner(null);
       window.TutorChat.configure({ enabled: false });
       status.textContent = "Online tutor \xB7 signed out";
       open.hidden = false;
-      out.hidden = saved.hidden = true;
+      out.hidden = saved.hidden = insights.hidden = true;
       content.replaceChildren();
       dialog.close();
     } });
@@ -20961,15 +21138,89 @@ window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
       if (!response.ok) throw Error(data?.error?.message || "The online tutor is not ready yet.");
       return data;
     }
+    let syncing = null, lastProfile = null;
+    async function syncInsights(force = false) {
+      const identity = auth.identity(), actor = typeof leActor === "function" ? leActor() : null;
+      if (!identity || !actor?.profile || actor.qa || actor.role !== "owner") return;
+      const scope = identity.userId + "|" + actor.profile;
+      if (syncing) return syncing;
+      if (!force && lastProfile === scope) return;
+      syncing = (async () => {
+        const access = await auth.token();
+        const get = async (path) => {
+          const response = await fetch(CLOUD_URL + path, { headers: { apikey: PUBLIC_KEY, Authorization: "Bearer " + access }, credentials: "omit", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(15e3) });
+          if (!response.ok) throw Error("Private chat evidence could not sync.");
+          return response.json();
+        };
+        const [rows, reviews] = await Promise.all([
+          get("/rest/v1/chem_tutor_turns?owner_id=eq." + identity.userId + "&select=request_id,question_id:request->question->>id,fingerprint:request->question->>fingerprint,mode:request->>mode,messages:request->messages,state,created_at&order=created_at.desc&limit=200"),
+          get("/rest/v1/chem_tutor_reviews?owner_id=eq." + identity.userId + "&select=request_id,kind,created_at&order=created_at.desc&limit=500")
+        ]);
+        if (auth.identity()?.epoch !== identity.epoch || leActor().profile !== actor.profile) return;
+        window.TutorInsights?.sync(rows, reviews);
+        lastProfile = scope;
+        insightStatus.textContent = "Chat practice signals synced \xB7 " + (/* @__PURE__ */ new Date()).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      })().catch(() => {
+        lastProfile = null;
+        insightStatus.textContent = "Chat analysis sync unavailable. This device keeps its last saved signals; retry from What tutor chats suggest.";
+      }).finally(() => {
+        syncing = null;
+      });
+      return syncing;
+    }
+    async function flagReply(requestId, note) {
+      window.TutorInsights?.markReview(requestId, "local_pending");
+      const result = await api("flag", { requestId, note });
+      window.TutorInsights?.markReview(requestId, "learner_flag");
+      return result;
+    }
     async function connect() {
       const who = auth.identity(), budget = await api("status");
       open.hidden = true;
-      out.hidden = saved.hidden = false;
+      out.hidden = saved.hidden = insights.hidden = false;
+      window.TutorInsights?.setOwner(who.userId);
       const ready = budget.canAsk === true;
       status.textContent = (ready ? budget.phase === "testing" ? "Tutor test connection" : "Private tutor connected" : "Signed in \xB7 replies still in testing") + " \xB7 " + who.email + " \xB7 $" + (budget.remainingNano / 1e9).toFixed(2) + " remaining this month";
-      if (ready) window.TutorChat.configure({ enabled: true, mode: "supabase", endpoint: CLOUD_ENDPOINT, token: await auth.token(), getToken: () => auth.token(), userId: who.userId, publicKey: PUBLIC_KEY, providerLabel: "OpenAI API", auditEnabled: true });
+      if (ready) window.TutorChat.configure({ enabled: true, mode: "supabase", endpoint: CLOUD_ENDPOINT, token: await auth.token(), getToken: () => auth.token(), userId: who.userId, publicKey: PUBLIC_KEY, providerLabel: "OpenAI API", auditEnabled: true, flagReply, beforeSend: () => syncInsights(true), allowPriorReplies: () => lastProfile === auth.identity()?.userId + "|" + (typeof leActor === "function" ? leActor().profile : "") });
       else window.TutorChat.configure({ enabled: false });
+      await syncInsights();
     }
+    document.addEventListener("tutor-insights-sync", () => {
+      syncInsights();
+    });
+    document.addEventListener("tutor-turn-saved", () => {
+      syncInsights(true);
+      api("status").then((budget) => {
+        if (auth.identity()) status.textContent = "Private tutor connected \xB7 " + auth.identity().email + " \xB7 $" + (budget.remainingNano / 1e9).toFixed(2) + " remaining this month";
+      }).catch(() => {
+      });
+    });
+    insights.onclick = async () => {
+      dialog.showModal();
+      content.replaceChildren(el("h2", "What tutor chats suggest"), el("p", "Loading your private chat signals\u2026"));
+      await syncInsights(true);
+      content.replaceChildren(el("h2", "What tutor chats suggest"), el("p", "Your sent reasoning and help requests guide practice checks. Chat wording is not graded, and tutor approval never raises readiness. Flagged exchanges stay out until review."));
+      const rows = window.TutorInsights?.pending(typeof QUESTIONS !== "undefined" ? QUESTIONS : [], typeof S !== "undefined" ? S.attempts || [] : [], Date.now()) || [];
+      if (!rows.length) content.append(el("p", "No current chat follow-up is available. Open a question and use Check my reasoning."));
+      for (const row of rows) {
+        const item = el("article", "");
+        item.append(el("strong", row.label), el("p", row.questionId + " \xB7 " + row.requests.length + " sent exchange" + (row.requests.length === 1 ? "" : "s") + " \xB7 needs an independent check"));
+        const practice = el("button", "Practise a different example", { type: "button" });
+        practice.onclick = () => {
+          const ids = QUESTIONS.filter((q) => q.id !== row.questionId && window.TutorInsights.matches(q, row)).map((q) => q.id);
+          if (!ids.length) {
+            practice.textContent = "No different example in this skill yet";
+            practice.disabled = true;
+            return;
+          }
+          dialog.close();
+          startAdaptiveLearning({ poolIds: ids, topics: [row.topic], chapter: "all", total: 3, label: "Tutor reasoning follow-up", rotationKey: "tutor-insight-" + row.skill });
+        };
+        item.append(practice);
+        content.append(item);
+      }
+      content.append(el("p", "Uses the latest 200 saved requests and 500 review events. Routing signals expire after 30 days. Broader reasoning remains available for manual review in Saved tutor chats."), el("p", insightStatus.textContent));
+    };
     open.onclick = () => {
       content.replaceChildren(el("h2", "Private tutor sign-in"), el("p", "Use your approved email. Your app PIN is separate. We\u2019ll send a one-time link; no password is needed."));
       if (window.CHEM_TUTOR_GOOGLE_ENABLED === true) {
@@ -21027,8 +21278,9 @@ window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
           const latest = turn.messages?.filter((m) => m.role === "user").at(-1);
           if (latest) details.append(el("strong", "You"), el("p", latest.text));
           if (turn.reply) {
-            details.append(el("strong", "Tutor \xB7 not reviewed"), el("p", turn.reply));
-            const flag = el("button", "Flag for accuracy review", { type: "button" });
+            const review = window.TutorInsights?.reviewState(turn.request_id);
+            details.append(el("strong", review?.flagged ? "Tutor \xB7 flagged for review" : review?.kind === "review_correct" ? "Tutor \xB7 reviewed correct" : "Tutor \xB7 not reviewed"), el("p", turn.reply));
+            const flag = el("button", "Flag wrong or unclear answer", { type: "button" });
             flag.onclick = () => {
               flag.disabled = true;
               const note = el("textarea", "", { "aria-label": "What should we check?", maxlength: "4000" }), submit = el("button", "Save review flag", { type: "button" }), result = el("p", "", { role: "status" });
@@ -21037,8 +21289,8 @@ window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
                 if (!note.value.trim()) return;
                 submit.disabled = true;
                 try {
-                  await api("flag", { requestId: turn.request_id, note: note.value.trim() });
-                  result.textContent = "Flag saved privately. Accuracy is still unreviewed.";
+                  await flagReply(turn.request_id, note.value.trim());
+                  result.textContent = "Flag saved privately. This exchange stays out of practice analysis until review.";
                 } catch (error) {
                   result.textContent = error.message;
                   submit.disabled = false;
@@ -21074,6 +21326,7 @@ window.CHEM_TUTOR_CLOUD_ENABLED=true;window.CHEM_TUTOR_GOOGLE_ENABLED=true;
   }
   if (typeof window !== "undefined" && window.CHEM_TUTOR_CLOUD_ENABLED === true) mountCloudTutor();
 })();
+
 </script>
 </body>
 </html>
