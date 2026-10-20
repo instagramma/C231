@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.138</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.139</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -14155,12 +14155,91 @@ for(const unit of [...CH6_THERMO_LESSONS,...CH6_KINETICS_LESSONS]){
   unit.practiceIds.push(...CH6_HOMEWORK_QUESTIONS.filter(q=>q.adaptiveSkill===unit.id).map(q=>q.id));
 }
 
+/* Original practice aligned to Oct 20 lecture, 14:39–31:30.
+ * Public content contains no transcript, learner work or reconstructed board image.
+ * Models are examples satisfying constraints, not unique required curve shapes.
+ */
+const CH6_PROFILE_CHECKLIST=[
+  'Axes: free energy G vertically; reaction coordinate horizontally (not time).',
+  'States: label the starting material, final product and every intermediate valley.',
+  'Transition states: one labeled peak per step, above both neighboring minima.',
+  'Step changes: place each next minimum higher for endergonic, lower for exergonic.',
+  'Barriers: draw each activation arrow from that step’s starting valley to its next peak.',
+  'Overall ΔG: show the difference from the initial reactant to the final product.',
+  'RDS: label the specified step and make its local barrier the largest.'
+];
+function ch6EPChecklist(){return '<ol>'+CH6_PROFILE_CHECKLIST.map(s=>'<li>'+ch6KEscape(s)+'</li>').join('')+'</ol><p><b>Self-review only.</b> Curve shape and invented numbers need not match the model. Check the stated relationships and labels. Unspecified heights are free to vary.</p>';}
+function ch6EPChoice(levels,labels){return ch6KProfile(levels,labels,{qualitative:true,title:'Candidate energy profile'});}
+function ch6EPQ(n,skill,prompt,choices,answer,why,extra={}){
+  return {id:'CH6-EP'+String(n).padStart(2,'0'),chapter:6,courseRoute:'ch6',topic:'energyProfiles',adaptiveSkill:'ch6-energy',learningSkill:'ch6-energy:'+skill,askedFor:skill.replace(/-/g,' '),lessonRotationKey:'ch6-energy:'+skill,transferFamily:'ch6-oct20-'+skill,type:'mc',diff:2,difficulty:2,learningCapability:'application',sourceKind:'original-practice',source:'Original practice aligned to instructor Oct 20 lecture, energy-profile worksheet/grading discussion (14:39–31:30); not a reproduced instructor question.',sourceUrls:[CH6_KINETICS_SOURCES.profiles,CH6_KINETICS_SOURCES.intermediates],sourceAlignment:{document:'Oct 20 lecture: qualitative energy-profile construction and grading',style:'Original constrained examples; relative heights, not one required sketch'},scopeStatus:'exam2-lecture-confirmed',examExcluded:false,eligibleForUnseenTransfer:false,familiarRepresentation:true,sourceModelIds:['ch6-oct20-profile-worked'],hints:['Place the minima first. Then compare each peak with its own starting valley.'],prompt,choices,answer,why,...extra};
+}
+function ch6EPWritten(n,skill,prompt,levels,labels,why,criteria){
+  const barriers=levels.filter((_,i)=>i%2).map((v,i)=>v-levels[2*i]);
+  const rds=barriers.indexOf(Math.max(...barriers))+1;
+  const profile=ch6KProfile(levels,labels,{title:'One valid example; chosen levels are illustrative',barriers:levels.flatMap((_,i)=>i%2?[[i-1,i]]:[]),delta:true}).replace('</svg>',ch6KText(475,20,'RDS: step '+rds,16)+'</svg>');
+  return ch6EPQ(n,skill,prompt,undefined,undefined,why,{type:'written',diff:3,difficulty:3,requiresDrawing:true,learningCapability:'construction',reviewMode:'self-reviewed-paper',model:profile+'<p><b>Activation barriers:</b> '+barriers.map((v,i)=>'ΔG‡<sub>'+(i+1)+'</sub> = '+v).join('; ')+' kJ/mol. <b>RDS = step '+rds+'.</b> Overall ΔG = '+(levels.at(-1)-levels[0])+' kJ/mol. These numbers are one possible choice, not extra givens or required answers.</p><p>'+why+'</p><details><summary>How to check your drawing</summary>'+ch6EPChecklist()+'</details>',rubric:[...CH6_PROFILE_CHECKLIST,...criteria,'Accept other curves/numbers satisfying every stated relationship; ink is not automatically graded.'],profileAudit:{levels,labels,barriers,delta:levels.at(-1)-levels[0]}});
+}
+const CH6_LECTURE20_QUESTIONS=[
+  ch6EPQ(1,'match-intermediate-stability','For A → B → C → D at the same conditions, <b>B is more stable than C</b>. Which profile matches that information? No other energy ordering is specified.',[
+    ch6EPChoice([0,55,-20,60,20,65,-30],['A','TS1','B','TS2','C','TS3','D']),
+    ch6EPChoice([0,55,20,60,-20,65,-30],['A','TS1','B','TS2','C','TS3','D']),
+    ch6EPChoice([0,55,10,60,10,65,-30],['A','TS1','B','TS2','C','TS3','D']),
+    ch6EPChoice([0,55,30,60,0,65,-30],['A','TS1','B','TS2','C','TS3','D'])
+  ],0,'Choose the profile with <b>B’s valley below C’s valley</b>. More stable means lower free energy in this stated comparison. Peak heights do not determine which intermediate is more stable.',{profileAudit:{kind:'stability-match',candidates:[[0,55,-20,60,20,65,-30],[0,55,20,60,-20,65,-30],[0,55,10,60,10,65,-30],[0,55,30,60,0,65,-30]],minima:[2,4]}}),
+  ch6EPQ(2,'read-intermediate-stability','Which <b>intermediate</b> has the lowest free energy? Do not include the starting material or final product.'+ch6KProfile([0,60,15,70,-25,35,-40],['A','TS1','B','TS2','C','TS3','D']),['B','C','TS2','D'],1,'<b>C</b> is the more stable intermediate: −25 is below B at +15 kJ/mol. D is lower still, but it is the final product, not an intermediate.'),
+  ch6EPQ(3,'match-two-step-instructions','Choose the profile for A → B → C: <b>step 1 is endergonic; the overall reaction is exergonic; step 1 is rate-determining.</b> Use the classroom rule: largest local barrier.',[
+    ch6EPChoice([0,55,-10,40,-30],['A','TS1','B','TS2','C']),
+    ch6EPChoice([0,55,20,100,-30],['A','TS1','B','TS2','C']),
+    ch6EPChoice([0,70,20,50,-30],['A','TS1','B','TS2','C']),
+    ch6EPChoice([0,70,20,50,10],['A','TS1','B','TS2','C'])
+  ],2,'The matching profile has <b>B above A, C below A, and the first valley-to-peak climb larger than the second</b>. Check those three conditions separately.',{profileAudit:{kind:'two-step-match',candidates:[[0,55,-10,40,-30],[0,55,20,100,-30],[0,70,20,50,-30],[0,70,20,50,10]]}}),
+  ch6EPQ(4,'match-faster-path','These are alternative one-step paths from the <b>same reactant to the same product</b> at one temperature. Assume comparable prefactors. Which path is expected to be fastest?',[
+    ch6KProfile([0,80,-20],['R','TS','P']),ch6KProfile([0,35,-20],['R','TS','P']),ch6KProfile([0,60,-20],['R','TS','P']),ch6KProfile([0,100,-20],['R','TS','P'])
+  ],1,'The <b>35 kJ/mol barrier</b> is lowest, so that path is fastest under the stated assumptions. All four endpoints match; favorability is not what changes here.',{profileAudit:{kind:'speed-match',candidates:[[0,80,-20],[0,35,-20],[0,60,-20],[0,100,-20]]}}),
+  ch6EPQ(5,'match-overall-endergonic','Which profile is <b>endergonic overall</b>? Compare only the starting and final levels.',[
+    ch6KProfile([0,70,15,80,-20],['A','TS1','B','TS2','C']),ch6KProfile([0,65,-15,50,-40],['A','TS1','B','TS2','C']),ch6KProfile([0,60,10,70,0],['A','TS1','B','TS2','C']),ch6KProfile([0,70,-10,65,25],['A','TS1','B','TS2','C'])
+  ],3,'Choose the profile ending at <b>+25 kJ/mol</b>: final − initial = +25 − 0, so overall ΔG is positive. An uphill middle step alone does not make the whole reaction endergonic.',{profileAudit:{kind:'endergonic-match',candidates:[[0,70,15,80,-20],[0,65,-15,50,-40],[0,60,10,70,0],[0,70,-10,65,25]]}}),
+  ch6EPQ(6,'compare-local-not-absolute-peaks','Using the classroom RDS rule, which step is rate-determining?'+ch6KProfile([0,50,40,70,-20],['A','TS1','B','TS2','C']),['Step 2: TS2 is higher on the page','Step 1: its barrier is 50; step 2’s is 30 kJ/mol','Step 2: its barrier is 70 kJ/mol','Neither: every exergonic reaction is instantaneous'],1,'<b>Step 1.</b> Its climb is 50 − 0 = 50; step 2 climbs 70 − 40 = 30 kJ/mol. The higher absolute peak can still have the smaller local climb.'),
+  ch6EPQ(7,'unspecified-heights-not-required','A drawing task specifies: A → B → C → D; step 2 is rate-determining. It gives <b>no comparison between the barriers of steps 1 and 3</b>. Which extra requirement is justified?',['Step 1’s barrier must be larger than step 3’s','Step 3’s barrier must be larger than step 1’s','Neither ordering is required; both must be smaller than step 2’s','Every peak must be equally high'],2,'<b>Either ordering of barriers 1 and 3 is acceptable.</b> Make barrier 2 the largest. Do not invent a grading requirement the question did not give.'),
+  ch6EPQ(8,'separate-step-and-overall-signs','For A → B → C → D, the minima have G levels A = 0, B = +10, C = +50, D = −30 kJ/mol. Which sequence describes <b>steps 1, 2 and 3</b>?',['Exergonic, endergonic, exergonic','Endergonic, endergonic, exergonic','Endergonic, exergonic, exergonic','All exergonic because D is below A'],1,'<b>Endergonic, endergonic, exergonic.</b> The changes are +10, +40 and −80 kJ/mol. Overall ΔG is −30, but that does not make every step downhill.'),
+  ch6EPWritten(9,'draw-two-step-from-words','<b>Draw a qualitative profile for A → B → C.</b><ul><li>The overall reaction is exergonic.</li><li>Step 1 is endergonic; step 2 is exergonic.</li><li>Step 1 is rate-determining.</li></ul><p>Label both axes, A/B/C, TS1/TS2, each activation barrier, overall ΔG and the RDS. No exact energies are required.</p>',[0,70,20,50,-30],['A','TS1','B','TS2','C'],'B must be above A, and C below A. Barrier 1 must exceed barrier 2. First place A, B and C; then add the two peaks.',['B above A; C below A and B','Barrier 1 larger than barrier 2; RDS labeled step 1']),
+  ch6EPWritten(10,'draw-three-step-relative-changes','<b>Draw a qualitative profile for A → B → C → D.</b><ul><li>Step 1 is slightly endergonic.</li><li>Step 2 is more strongly endergonic than step 1.</li><li>Step 3 is strongly exergonic; the overall reaction is exergonic.</li><li>Step 2 is rate-determining.</li></ul><p>Label both axes, all four minima, all three TS peaks, each activation barrier, overall ΔG and the RDS. Relative heights are sufficient.</p>',[0,40,10,100,60,85,-30],['A','TS1','B','TS2','C','TS3','D'],'A < B < C; D is below A. The B-to-C rise must be larger than the A-to-B rise. Step 2’s local barrier must be largest; no ordering of barriers 1 and 3 is required.',['0 < G(B)−G(A) < G(C)−G(B)','D below A; C-to-D drop larger than either individual uphill change','Barrier 2 largest; do not require barrier 1 versus 3 ordering']),
+  ch6EPWritten(11,'draw-from-intermediate-stability','<b>Draw a qualitative profile for A → B → C → D.</b><ul><li>Intermediate B is more stable than intermediate C.</li><li>The overall reaction is endergonic.</li><li>Step 1 is rate-determining.</li></ul><p>Label both axes, all states, each activation barrier, overall ΔG and the RDS. Other relative heights are not specified; more than one drawing can be correct.</p>',[0,110,-20,40,10,60,25],['A','TS1','B','TS2','C','TS3','D'],'B’s valley must be below C’s, D above A, and the first local climb largest. The prompt does not fix whether B or C is above or below A.',['B below C; do not compare the transition-state peaks to decide stability','D above A; positive overall ΔG','Barrier 1 largest; other unspecified orderings can vary']),
+  ch6EPWritten(12,'repair-inconsistent-profile','<b>Redraw this profile to match the instructions.</b><p>Required: A → B → C; step 1 endergonic; overall exergonic; step 1 rate-determining.</p>'+ch6KProfile([0,40,-20,80,10],['A','TS1','B','TS2','C'])+'<p>The shown draft has three errors. Correct them, then label axes, states, both TS peaks, both activation barriers, overall ΔG and RDS. Explain each correction in one short sentence. No exact energies are required.</p>',[0,80,20,55,-25],['A','TS1','B','TS2','C'],'Move B above A, move C below A, and make the first local barrier larger. In the draft, B is too low, C too high and barrier 2 is larger (100 versus 40).',['Identifies and repairs all three draft errors','B above A; C below A','Barrier 1 largest, not merely TS1 higher than TS2'])
+];
+const ch6EPChoiceReasons={
+  1:['B’s valley is below C’s: the stated stability ordering.','This reverses the ordering: B is above C, so B is less stable.','B and C are level here; the question says B is more stable.','B is above C here; compare their valleys, not their peaks.'],
+  3:['B is below A, so step 1 is exergonic, not endergonic.','The second local climb is larger; that makes step 2 the classroom RDS.','All three conditions match: B above A, C below A, barrier 1 larger.','C is above A, so the overall change is endergonic, not exergonic.'],
+  4:['This path has an 80 kJ/mol barrier, higher than 35.','This path has the smallest barrier: 35 kJ/mol.','This path has a 60 kJ/mol barrier, higher than 35.','This path has a 100 kJ/mol barrier, the largest, not the smallest.'],
+  5:['The final level is below the start: overall exergonic.','The final level is below the start: overall exergonic.','The endpoints are equal: overall ΔG is zero.','The final level is above the start: overall endergonic.']
+};
+for(const q of CH6_LECTURE20_QUESTIONS){
+  if(q.type==='mc'&&q.choices.every(c=>c.includes('<svg'))){
+    q.choiceLabels=['Profile A','Profile B','Profile C','Profile D'];
+    // Enlargement is a separate, non-answer control. Never place <details> or
+    // another button inside the clickable answer button.
+    const figures=q.choices.map(c=>c.replace('class="ch6-kinetics-figure"','class="ch6-profile-choice"'));
+    q.prompt+='<details data-profile-choice-enlarge><summary>Enlarge the profiles · does not select an answer</summary><div class="ch6-diagram-viewport" role="region" tabindex="0" aria-label="Large profile choices; scroll sideways">'+figures.map((c,i)=>'<section style="width:620px;max-width:none"><h3>'+q.choiceLabels[i]+'</h3>'+c+'</section>').join('')+'</div></details>';
+    q.choices=figures.map((c,i)=>'<div class="structure-option"><span class="structure-option-label">'+q.choiceLabels[i]+'</span>'+c+'</div>');
+    q.choiceFeedback=ch6EPChoiceReasons[Number(q.id.slice(-2))];
+  }
+}
+// Keep existing IDs, keys and saved work intact. Add tasks to the existing
+// energy lesson so chapter practice, Part A and Part B use one source bank.
+const ch6EPEnergyUnit=CH6_KINETICS_LESSONS.find(u=>u.id==='ch6-energy');
+ch6EPEnergyUnit.practiceIds.push(...[1,2,3,4,6,8,9,10].map(n=>'CH6-EP'+String(n).padStart(2,'0')));
+ch6EPEnergyUnit.coldIds.push(...[5,7,11,12].map(n=>'CH6-EP'+String(n).padStart(2,'0')));
+ch6EPEnergyUnit.goal='Read profiles and draw one from words, using the instructor’s labeling and relative-energy checklist.';
+ch6EPEnergyUnit.steps=['Place the minima first: endergonic goes up; exergonic goes down. More stable means lower G.','Add one TS peak per step, above both its neighbors. Compare each peak with its own starting valley.','Label axes, every state, each barrier, overall ΔG and the stated RDS. Do not invent unspecified height requirements.'];
+ch6EPEnergyUnit.exampleHtml=()=>ch6KProfile([0,75,25,60,-35],['A','TS1','B','TS2','C'],{title:'One valid worked two-step example',barriers:[[0,1],[2,3]],delta:true})+'<p><b>Task:</b> draw two steps: first endergonic, overall exergonic, step 1 rate-determining.</p><p><b>Start with the valleys:</b> B above A; C below A. Add peaks: ΔG‡₁ = 75 and ΔG‡₂ = 35 kJ/mol; <b>RDS = step 1</b>. These numbers are illustrative; your curve need not match.</p><details><summary>Instructor-aligned drawing checklist</summary>'+ch6EPChecklist()+'<p>Class worksheets may label the activation rise Eₐ. On a free-energy G axis, ΔG‡ is the precise label. Keep either label attached to the correct valley-to-peak rise; do not confuse it with overall ΔG.</p></details>';
+CH6_HOMEWORK_LESSONS.forEach(u=>{u.examExcluded=true;u.scopeLabel='Beyond Exam 2 · Chapter 6 homework';});
+
 /* Chapter 6, covered so far. Original lecture-aligned practice, not the full
  * Exam 2 blueprint. Reading/QA/self-review never establishes mastery. */
 const CH6_LESSONS=[...CH6_THERMO_LESSONS,...CH6_KINETICS_LESSONS,...CH6_HOMEWORK_LESSONS];
-const CH6_QUESTIONS=[...CH6_THERMO_QUESTIONS,...CH6_KINETICS_QUESTIONS,...CH6_HOMEWORK_QUESTIONS];
+const CH6_QUESTIONS=[...CH6_THERMO_QUESTIONS,...CH6_KINETICS_QUESTIONS,...CH6_HOMEWORK_QUESTIONS,...CH6_LECTURE20_QUESTIONS];
 const CH6_TOPICS=[...new Set(CH6_LESSONS.map(u=>u.topic))];
-const CH6_SCOPE_NOTE='Practice includes energy, rates, reactive sites, arrow patterns and carbocation shifts. Broader homework mechanisms are separate from the explicit Exam 2 topic list. All 40 homework numbers are captured; hidden parts and complex mechanisms are not all verified.';
+const CH6_SCOPE_NOTE='Exam 2: energy profiles, reaction concepts and the selected topics on your official list. Oct 20 lecture confirms energy-profile construction; nucleophile/electrophile identification is not on Exam 2. Beyond-exam homework lessons are labeled below. All 40 homework numbers are captured; hidden parts and complex mechanisms are not all verified.';
 const CH6_SCOPE_GAPS=[
   {id:'ch6-scope-arrows',label:'Complex mechanism transfer: Q22/Q39 complete source panels still need verification',topics:[],unitIds:[],poolIds:[],bankGap:true,preview:true,laterDeckTopic:true},
   {id:'ch6-scope-rearrangements',label:'Complex ring migration: Q40 later part/source completeness not yet verified',topics:[],unitIds:[],poolIds:[],bankGap:true,preview:true,laterDeckTopic:true}
@@ -14259,7 +14338,7 @@ function renderCh6Library(v){
   if(typeof ccJourney==='function')v.appendChild(ccJourney('ch6'));
   const grid=el('div',{class:'ch5-grid'});CH6_LESSONS.forEach((u,i)=>{
     const b=ch6Button('',()=>ch6OpenUnit(u.id),true,{class:'ch5-lesson-card','data-ch6-unit':u.id});
-    b.appendChild(el('span',{class:'ch5-card-meta'},'LESSON '+(i+1)));b.appendChild(el('strong',{},u.title));b.appendChild(el('span',{},u.goal));b.appendChild(el('small',{},ch6Signal(u).label+' →'));grid.appendChild(b);
+    b.appendChild(el('span',{class:'ch5-card-meta'},u.scopeLabel||'LESSON '+(i+1)));b.appendChild(el('strong',{},u.title));b.appendChild(el('span',{},u.goal));b.appendChild(el('small',{},ch6Signal(u).label+' →'));grid.appendChild(b);
   });v.appendChild(grid);
   const more=el('details',{class:'card ch5-scope'});more.innerHTML='<summary>Sources &amp; progress limits</summary><p>Original examples aligned with the supplied slides, lectures and captured homework skills. All 40 Chapter 6 homework numbers are present in the private source inventory; that is not proof that every hidden part or embedded drawing was saved completely.</p><p>New reactive-site, arrow-pattern and carbocation-shift lessons cover broader Chapter 6 homework. They are not silently added to the explicit Exam 2 scope. Complex fragmentation, full acetal construction and ring-migration transfer still need further source/model verification.</p><p>Opening lessons is exposure. Correct answers with hints, guesses or self-review stay distinct from independent work. A short chapter sample does not establish whole-chapter readiness or predict an exam grade.</p>';v.appendChild(more);
   v.appendChild(ch6Button('← Study desk',()=>courseNavigationGo('quiz'),true));
@@ -14268,6 +14347,7 @@ function renderCh6Lesson(v,u){
   const step=Math.max(0,Math.min(2,S.ch6LessonStep||0));v.appendChild(ch6Button('← Chapter 6 lessons',()=>courseNavigationGo('ch6'),true));
   const card=el('article',{class:'card ch5-lesson','data-ch6-lesson':u.id,'data-learn-unit':u.id,'data-learn-chapter':'ch6'});
   card.innerHTML='<p class="qp-eyebrow">CHAPTER 6 · LESSON '+(CH6_LESSONS.indexOf(u)+1)+' / '+CH6_LESSONS.length+'</p><h1>'+esc(u.title)+'</h1><p class="ch5-goal">'+esc(u.goal)+'</p>';
+  if(u.examExcluded)card.appendChild(el('p',{class:'ep-gap','data-ch6-beyond-exam':true},'Beyond Exam 2 · chapter homework practice. These questions are kept out of Exam 2 Part A and Part B sets.'));
   const tabs=el('div',{class:'ch5-steps','aria-label':'Lesson steps'});['1 · The rule','2 · Worked example','3 · Your turn'].forEach((label,i)=>tabs.appendChild(ch6Button(label,()=>{S.ch6LessonStep=i;render();},true,{'aria-pressed':String(step===i),'data-ch6-step':String(i)})));card.appendChild(tabs);
   const body=el('section',{class:'ch5-step-body',...(step?{'data-focus-lesson':'ch6:'+u.id+':panel:'+step}:{})});
   if(step===0)focusRuleSteps(body,u,'ch6:'+u.id,()=>{S.ch6LessonStep=1;render();});
@@ -19795,7 +19875,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
  * An imported deck is not proof that all of it is assessed or practiced. */
 const EXAM_PREP={
   version:1,
-  checkedAt:'2026-10-16',
+  checkedAt:'2026-10-20',
   currentExam:'exam2',
   exams:[{
     id:'exam2',title:'Exam 2',status:'current',
@@ -19805,7 +19885,7 @@ const EXAM_PREP={
     goal:'A− or better · preparation goal, not a predicted grade',
     chapters:[
       {id:'ch4',title:'Chapter 4 — Alkanes & cycloalkanes',detail:'Naming, isomers, Newman drawings, chairs, strain and stability.'},
-      {id:'ch5',title:'Chapter 5 — Stereochemistry',detail:'R/S, isomer relationships, meso, optical mixtures and projection conversions.'},
+      {id:'ch5',title:'Chapter 5 — Stereochemistry',detail:'R/S, E/Z, cis/trans, isomer relationships, meso, optical mixtures and projection conversions.'},
       {id:'ch6',title:'Chapter 6 — Selected reaction concepts',detail:'Reaction types, energy diagrams, rates, catalysts, transition states, bond breaking and kinetic vs thermodynamic control.'}
     ],
     backgroundChapters:['ch1','ch2','ch3'],
@@ -19927,6 +20007,15 @@ function renderExamPrep(v){
     exam.format.forEach(part=>{const box=el('div');box.appendChild(epText('h2',{},part.title));box.appendChild(epText('p',{},part.detail));format.appendChild(box);});root.appendChild(format);
   }
   if(typeof ExamReadiness!=='undefined')root.appendChild(ExamReadiness.panel(exam.id));
+  if(exam.id==='exam2'){
+    const energy=el('section',{class:'card ep-practice','data-exam-energy-profiles':true});
+    energy.appendChild(epText('h2',{},'Energy profiles · draw it from the instructions'));
+    energy.appendChild(epText('p',{},'Match profiles, compare intermediate stability, then draw and label your own. The checklist follows the Oct 20 lecture: axes, states, transition states, local barriers, overall ΔG and the RDS.'));
+    energy.appendChild(epButton('Learn & practice energy profiles',()=>ch6OpenUnit('ch6-energy'),{class:'btn','data-exam-energy-start':true}));
+    energy.appendChild(epText('p',{class:'muted'},'Drawings are self-reviewed. Different curves can be correct when they satisfy the same instructions.'));
+    energy.appendChild(epText('p',{class:'ep-gap','data-exam-oct20-scope':true},'Oct 20 clarification: E/Z and cis/trans are on Exam 2. Nucleophile/electrophile identification is not; those lessons remain available as separate Chapter 6 homework practice. Bond polarity, bond cleavage and transition-state tasks on the official list remain in exam practice.'));
+    root.appendChild(energy);
+  }
   if(exam.id==='exam2'&&typeof epPartACard==='function'&&typeof renderExamBPracticeCard==='function'){
     const routes=el('div',{class:'ep-grid ep-practice-routes','data-exam-practice-routes':true});routes.append(epPartACard(),renderExamBPracticeCard());root.appendChild(routes);
     root.appendChild(epExamAnalysisCard());root.appendChild(epMasterBankCard());
