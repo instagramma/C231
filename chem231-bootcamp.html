@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.140</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.141</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -20557,7 +20557,7 @@ const swStyle=el('style',{id:'saved-work-style'});swStyle.textContent=`
 swPrune();
 
 /* BEGIN EXAM PRACTICE TAIL */
-const MASTER_SOURCE_SUMMARY={"sourceDocuments":68,"indexedPages":585,"captureRecords":242,"capturedQuestionGroups":198,"completeRenderedStates":384,"partialOrUnknownStates":872,"chadsQuestionGroups":14};
+const MASTER_SOURCE_SUMMARY={"sourceDocuments":85,"indexedPages":859,"captureRecords":513,"capturedQuestionGroups":375,"completeRenderedStates":781,"partialOrUnknownStates":1745,"chadsQuestionGroups":56};
 /* BEGIN EXAM A PRACTICE — source-aware MC sampling, 2026-10-16.
  * Uses the existing sealed check ledger, response controls and grader. Nothing
  * here awards ordinary attempt/mastery credit or claims instructor weighting. */
@@ -22761,6 +22761,20 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   cmStyle.textContent+='.cm-topic{padding:0;overflow:hidden}.cm-topic-summary{cursor:pointer;min-height:44px;padding:13px 16px;list-style:none}.cm-topic-summary::-webkit-details-marker{display:none}.cm-topic-summary .cm-topic-title:after{content:"＋";margin-left:auto;font-size:1.1rem;color:#607981}.cm-topic[open]>.cm-topic-summary .cm-topic-title:after{content:"−"}.cm-topic-summary .cm-evidence{margin-bottom:0}.cm-topic[open]>.cm-actions{padding:0 16px 12px}.cm-topic-summary:focus-visible{outline:3px solid #aa7a16;outline-offset:-3px}.cm-warmup-note{padding:12px 16px;border:1px solid #d8ccec;border-radius:12px;background:#f7f3ff;margin-bottom:14px}.cm-warmup-note h2{font-size:1rem}.cm-warmup-note p{font-size:.85rem}.cm-warmup-note .btn{min-height:44px;margin:3px 8px 3px 0}';
   cmStyle.textContent+='.cm-modes .sm-mode{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start}.cm-modes .sm-mode strong{line-height:1.35}.cm-modes .sm-mode>span{line-height:1.4}.cm-warmup-note li{margin:8px 0;line-height:1.5}.cm-warmup-note li .btn{margin-left:8px}.cm-topic:not([open]) .cm-evidence{display:none}';
 }
+
+/* Chapter 7 route, 2026-11-09. Private sources remain outside the public bundle.
+   Original practice is in chapter7-study.html. Opens separately to preserve drafts. */
+(function(){
+ function chapter7Entry(){
+  const card=el('section',{class:'card teal','data-ch7-entry':true});
+  const h=el('h2');h.textContent='Chapter 7 · understand the why';card.appendChild(h);
+  const p=el('p');p.textContent='Start with nucleophile vs base. Five foundation checks per topic, explanations, and separate drawing practice.';card.appendChild(p);
+  const a=el('a',{class:'btn',href:'chapter7-study.html',target:'_blank',rel:'noopener'});a.textContent='Open Chapter 7 practice →';card.appendChild(a);
+  const more=el('p',{class:'muted'});more.textContent='Quiz A: the Nov 6 announcement excludes predictive questions. Homework and Exam 3 tasks are available separately. Results from this new desk stay separate from earlier app scores.';card.appendChild(more);
+  return card;
+ }
+ ['home','masterBank','modePractice'].forEach(name=>{const old=VIEWS[name];if(typeof old!=='function')return;VIEWS[name]=function(v){old.apply(this,arguments);if(v.querySelector('[data-ch7-entry]'))return;const card=chapter7Entry(),home=v.querySelector('[data-focus-home]'),coach=home?.querySelector('.dc-start');if(coach)coach.after(card);else if(home)home.appendChild(card);else v.prepend(card);};});
+})();
 
 /* END QUESTION TUTOR TAIL */
 /* ================= BOOT ================= */
