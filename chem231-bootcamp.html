@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.141</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.142</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -12147,6 +12147,7 @@ if(typeof module!=='undefined'&&module.exports)module.exports={adaptiveLearningD
 /* Course navigation only. The study desk is Home; existing chapter views and
  * lesson content are reused. Opening the menu creates no learning evidence. */
 const COURSE_NAV_ANSWER_FIELDS='input.answerbox,textarea.answerbox,select.answerbox,#gk,#dkk,#wgk,#wdk,input[id^="pick-"]';
+const COURSE_LINKED_CHAPTERS=[{id:'ch7',name:'Chapter 7 — Substitution & Elimination',topics:[],href:'chapter7-study.html',detail:'18 topics · warm-ups, explanations & drawing practice'}];
 function courseNavigationAllowed(){return typeof PROFILE==='undefined'||!!PROFILE;}
 function courseNavigationCaptureAnswer(){
   const D=S.drill,q=D?.queue?.[D.i];if(S.view!=='drill'||!q||D.answered)return;
@@ -12174,6 +12175,13 @@ function courseNavigationSaveWork(){
 }
 function courseNavigationGo(destination){
   if(!courseNavigationAllowed())return;
+  const linked=COURSE_LINKED_CHAPTERS.find(ch=>ch.id===destination);
+  if(linked){
+    courseNavigationSaveWork();
+    const target=new URL(linked.href,window.location.href);
+    if(typeof QA_MODE!=='undefined'&&QA_MODE)target.searchParams.set('qa','1');
+    window.location.assign(target.href);return;
+  }
   if(!['quiz','overview','exams'].includes(destination)&&!CHAPTERS.some(ch=>ch.id===destination))return;
   if(destination==='exams'&&typeof VIEWS.examOverview!=='function')return;
   courseNavigationSaveWork();
@@ -12205,12 +12213,12 @@ function renderCourseOverview(v){
     saved.appendChild(el('button',{class:'cn-home-link',type:'button',onclick:resumeDrill},'Resume saved practice →'));v.appendChild(saved);
   }
   const grid=el('div',{class:'cn-chapter-grid'});
-  CHAPTERS.forEach(ch=>{
+  [...CHAPTERS,...COURSE_LINKED_CHAPTERS].forEach(ch=>{
     const count=(CHAPTER_LEARNING_UNITS[ch.id]||[]).length,card=el('button',{class:'cn-chapter-card',type:'button','data-course-chapter':ch.id,onclick:()=>courseNavigationGo(ch.id)});
     const classContext=typeof dcContext==='function'?dcContext({chapters:CHAPTERS,feed:S.canvasFeed}).course:null;
     const top=el('span',{class:'cn-chapter-meta'});top.textContent=ch.id===classContext?.chapter?'SAVED CLASS TOPIC':ch.id==='prelim'?'FOUNDATIONS':'CHAPTER LIBRARY';card.appendChild(top);
     const title=el('strong');title.textContent=ch.name;card.appendChild(title);
-    const desc=el('span',{class:'cn-chapter-detail'});desc.textContent=count?count+' lessons · open the skill you need':ch.topics.length+' topics · foundations and references';card.appendChild(desc);
+    const desc=el('span',{class:'cn-chapter-detail'});desc.textContent=ch.detail||(count?count+' lessons · open the skill you need':ch.topics.length+' topics · foundations and references');card.appendChild(desc);
     card.appendChild(el('span',{class:'cn-chapter-open'},'Open chapter →'));grid.appendChild(card);
   });v.appendChild(grid);
 }
@@ -12255,7 +12263,7 @@ function openCourseNavigation(){
   if(typeof VIEWS.examOverview==='function')nav.appendChild(choice('Exams','Exam 2 prep · Exam 1 review','exams'));
   nav.appendChild(choice('Course overview','See every available chapter','overview'));
   const label=el('p',{class:'cn-menu-label'},'OPEN A CHAPTER');nav.appendChild(label);
-  CHAPTERS.forEach(ch=>{const lessons=(CHAPTER_LEARNING_UNITS[ch.id]||[]).length;nav.appendChild(choice(ch.name,ch.id==='ch4'?'Naming · Newman projections · chairs':(lessons?lessons+' lessons · ':'')+ch.topics.length+' topics',ch.id));});
+  [...CHAPTERS,...COURSE_LINKED_CHAPTERS].forEach(ch=>{const lessons=(CHAPTER_LEARNING_UNITS[ch.id]||[]).length;nav.appendChild(choice(ch.name,ch.detail||(ch.id==='ch4'?'Naming · Newman projections · chairs':(lessons?lessons+' lessons · ':'')+ch.topics.length+' topics'),ch.id));});
   dialog.appendChild(nav);
   dialog.addEventListener('keydown',e=>{
     if(e.key!=='Tab')return;
@@ -17513,8 +17521,8 @@ resumeDrill=function(){const context=S.pausedDrill?.studyContext;SM_PREVIOUS_RES
 function smSelectChapter(host){
   const label=el('label',{class:'sm-scope'});label.appendChild(el('span',{},'Your focus'));
   const select=el('select',{'aria-label':'Study chapter'});
-  CHAPTERS.forEach(ch=>{const option=el('option',{value:ch.id},esc(ch.name));option.selected=ch.id===smChapter().id;select.appendChild(option);});
-  select.onchange=()=>{courseNavigationSaveWork();smSetChapter(select.value);if(typeof dcChooseFocus==='function')dcChooseFocus(select.value);S.learnCh=select.value;render();};label.appendChild(select);host.appendChild(label);
+  [...CHAPTERS,...COURSE_LINKED_CHAPTERS].forEach(ch=>{const option=el('option',{value:ch.id},esc(ch.name));option.selected=ch.id===smChapter().id;select.appendChild(option);});
+  select.onchange=()=>{if(COURSE_LINKED_CHAPTERS.some(ch=>ch.id===select.value)){courseNavigationGo(select.value);return;}courseNavigationSaveWork();smSetChapter(select.value);if(typeof dcChooseFocus==='function')dcChooseFocus(select.value);S.learnCh=select.value;render();};label.appendChild(select);host.appendChild(label);
 }
 function smHeading(v,mode){
   const m=STUDY_MODES[mode],h=el('header',{class:'sm-heading'});
@@ -22773,7 +22781,7 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   const more=el('p',{class:'muted'});more.textContent='Quiz A: the Nov 6 announcement excludes predictive questions. Homework and Exam 3 tasks are available separately. Results from this new desk stay separate from earlier app scores.';card.appendChild(more);
   return card;
  }
- ['home','masterBank','modePractice'].forEach(name=>{const old=VIEWS[name];if(typeof old!=='function')return;VIEWS[name]=function(v){old.apply(this,arguments);if(v.querySelector('[data-ch7-entry]'))return;const card=chapter7Entry(),home=v.querySelector('[data-focus-home]'),coach=home?.querySelector('.dc-start');if(coach)coach.after(card);else if(home)home.appendChild(card);else v.prepend(card);};});
+ ['masterBank','modePractice'].forEach(name=>{const old=VIEWS[name];if(typeof old!=='function')return;VIEWS[name]=function(v){old.apply(this,arguments);if(!v.querySelector('[data-ch7-entry]'))v.prepend(chapter7Entry());};});
 })();
 
 /* END QUESTION TUTOR TAIL */
