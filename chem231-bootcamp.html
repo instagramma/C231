@@ -1767,7 +1767,7 @@ textarea.report{font-size:.84rem;line-height:1.5;border:1px solid #9eabb2;box-sh
 <body>
 <header>
   <h1 class="app-title"><span class="flask">⚗️</span><span class="app-title-copy">CHEM 231<small>Learn one step. Try it. Check it.</small></span></h1>
-  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.143</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
+  <span class="header-actions"><span class="countdown" id="countdown"></span><button class="header-more" type="button" onclick="go('more')" aria-label="Open tools, plan, and progress">Tools</button><span id="verbadge" class="sr-only">v3.144</span><span id="syncdot" class="sr-only">◌ syncing…</span><span id="whoami" class="sr-only"></span></span>
 </header>
 <main id="view"></main>
 <nav id="nav"></nav>
@@ -22781,6 +22781,16 @@ if(typeof document!=='undefined'&&typeof VIEWS!=='undefined'){
   const more=el('p',{class:'muted'});more.textContent='Quiz A: the Nov 6 announcement excludes predictive questions. Homework and Exam 3 tasks are available separately. Results from this new desk stay separate from earlier app scores.';card.appendChild(more);
   return card;
  }
+ function homeworkEntry(){
+  const card=el('section',{class:'card teal','data-homework-entry':true});
+  card.appendChild(el('h2',{},'Homework · inside the app'));
+  card.appendChild(el('p',{},'Chapter 7 captured questions and diagrams, with choices and a drawing workspace. Your private question bank loads inside the app; saved-image questions are included.'));
+  const a=el('a',{class:'btn',href:'chapter7-study.html#homework',target:'_blank',rel:'noopener'});
+  if(new URLSearchParams(location.search).get('qa')==='1')a.setAttribute('href','chapter7-study.html?qa=1#homework');
+  a.textContent='Open homework →';card.appendChild(a);
+  return card;
+ }
+ ['home','masterBank','modePractice'].forEach(name=>{const old=VIEWS[name];if(typeof old!=='function')return;VIEWS[name]=function(v){old.apply(this,arguments);if(!v.querySelector('[data-homework-entry]')){const grid=v.querySelector('.sm-grid');if(grid)grid.insertAdjacentElement('afterend',homeworkEntry());else v.prepend(homeworkEntry());}};});
  ['masterBank','modePractice'].forEach(name=>{const old=VIEWS[name];if(typeof old!=='function')return;VIEWS[name]=function(v){old.apply(this,arguments);if(!v.querySelector('[data-ch7-entry]'))v.prepend(chapter7Entry());};});
 })();
 
