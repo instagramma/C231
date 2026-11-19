@@ -86,14 +86,13 @@
 <main>
   <p class="intro">One place, two courses — <b>semester live</b>. The apps are practice; Canvas is the planner. Open a course, run what's due (diagnostic, drill, journal), close the loop.</p>
 
-  <a class="coursecard chem" href="chem231.html">
+  <a class="coursecard chem" href="chem231-start.html">
     <div class="band"></div>
-    <h2>⚗️ CHEM 231 · Ochem Bootcamp</h2>
-    <div class="sub">Ciesla · lecture Tue/Thu 11:10 · lab Tue 2:10 · quizzes 20% / exams 35% / final 20%</div>
-    <div class="statrow" id="chem-stats"></div>
-    <div class="progressbar"><div id="chem-bar" style="width:0%"></div></div>
+    <h2>⚗️ CHEM 231 · Start here</h2>
+    <div class="sub">Ciesla · lecture Tue/Thu 11:10 · lab Tue/Thu 2:10–5:00</div>
+    <p style="margin-top:12px;font-size:1rem;line-height:1.5">See one example. Draw a whole reaction. Fix the missed step, then try another molecule.</p>
     <div class="duenote" id="chem-due"></div>
-    <span class="go">▶&nbsp; Open Ochem</span>
+    <span class="go">Open chemistry</span>
   </a>
 
   <a class="coursecard phys" href="phys210.html">
@@ -107,7 +106,7 @@
   </a>
 </main>
 <footer>
-  College of San Mateo · Fall 2026. Rules of the house: one mission a day, blank-page generation only, quantify — don't eyeball, honest 🎲/🤷 flags, hard stop at night (sleep is strategy). Cloud-synced across devices; Canvas feed refreshes daily.
+  College of San Mateo · Fall 2026. Course practice and Canvas grades are separate. Check Canvas for updated requirements.
 </footer>
 <script>
 "use strict";
@@ -117,24 +116,8 @@ function daysTo(iso){ return Math.ceil((new Date(iso+"T00:00:00")-new Date())/86
 function cleanAcc(qstats){ let r=0,w=0,g=0; Object.values(qstats||{}).forEach(s=>{r+=s.r||0;w+=s.w||0;g+=s.gr||0;}); const t=r+w; return t?{pct:Math.round(100*Math.max(0,r-g)/t),n:t}:{pct:null,n:0}; }
 const CLASS_START="2026-08-17";
 function courseWeek(){ const ms=new Date(todayStr()+"T00:00:00")-new Date(CLASS_START+"T00:00:00"); return Math.floor(ms/86400000/7)+1; }
-// CHEM — semester card: week, clean accuracy, missed rotation, next-checkpoint countdown
-(function(){
-  const CPS=[{name:"Exam 1",date:"2026-09-15"},{name:"Exam 2",date:"2026-10-20"},{name:"Exam 3",date:"2026-11-10"},{name:"Final (comprehensive)",date:"2026-12-15"}];
-  const nq=readLS("nextQuiz",null); const t=todayStr();
-  let cp=CPS.find(c=>c.date>=t)||null;
-  if(nq&&nq.date>=t&&(!cp||nq.date<=cp.date)) cp={name:nq.name,date:nq.date};
-  const a=cleanAcc(readLS("qstats",{}));
-  const missed=[...new Set(readLS("missed",[]))].length;
-  document.getElementById("chem-stats").innerHTML=
-    '<div class="stat"><div class="n">wk '+Math.max(courseWeek(),1)+'</div><div class="l">semester</div></div>'+
-    '<div class="stat"><div class="n">'+(a.pct===null?"—":a.pct+"%")+'</div><div class="l">clean accuracy</div></div>'+
-    '<div class="stat"><div class="n">'+missed+'</div><div class="l">in missed rotation</div></div>';
-  document.getElementById("chem-bar").style.width=(a.pct||0)+"%";
-  document.getElementById("chem-due").innerHTML= cp
-    ? (daysTo(cp.date)<=3?'<span class="overdue">🎯 '+cp.name+' in '+daysTo(cp.date)+'d</span> — readiness gate: ≥80% clean + scoped diag ≥80%'
-                         :'<span class="clear">🎯 '+cp.name+' · '+cp.date.slice(5).replace("-","/")+' ('+daysTo(cp.date)+'d)</span>')
-    : '<span class="clear">✓ no checkpoint on the radar</span>';
-})();
+// CHEM entry: no aggregate quiz percentage presented as reaction readiness.
+document.getElementById("chem-due").textContent="Chapter 8 additions · E2 repair · saved work stays available";
 // PHYS — semester card: week, accuracy, problems done, journal reminder on class nights
 (function(){
   const a=cleanAcc(readLS("p210_qstats",{}));
