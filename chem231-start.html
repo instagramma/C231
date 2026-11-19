@@ -5,6 +5,10 @@
 .rb-shell .rb-arrow-selectors{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.rb-shell .rb-arrow-selectors label{display:grid;gap:5px;flex:1;min-width:180px}.rb-shell .rb-arrow-selectors select{min-height:46px;max-width:100%;width:100%;font:inherit;border:1px solid #9dbabd;border-radius:8px;padding:8px;background:white;color:#173e45}@media(max-width:600px){.rb-shell .rb-arrow-selectors{display:grid;grid-template-columns:1fr}.rb-shell .rb-arrow-selectors label{min-width:0}.rb-shell .rb-molecule{max-width:320px}.rb-shell .rb-molecule svg{height:220px}}
 
 .rb-shell .rb-save-warning{border:2px solid #9b5727;background:#fff4e8;padding:14px;border-radius:10px}.rb-shell .rb-save-warning[hidden]{display:none}
+
+.rb-shell .rb-recovery{padding:20px;background:#edf6fb;border:2px solid #477d90;border-radius:14px;margin:16px 0}.rb-shell .rb-recovery[hidden]{display:none}.rb-shell .rb-milestones{padding-left:24px}.rb-shell .rb-milestones li{margin:12px 0}.rb-shell .rb-milestones span{display:block;color:#486a72;font-size:.95rem}.rb-shell [data-rb-component]{scroll-margin-top:16px}.rb-shell [data-rb-component]:focus{outline:2px solid #497e87;outline-offset:5px}
+
+.rb-shell .rb-compact h2{margin-top:0}.rb-shell .rb-catalog{padding-left:1.3rem}.rb-shell .rb-catalog li{margin:12px 0}.rb-shell .rb-catalog span{display:block;color:#48666d}.rb-shell .rb-resource{display:inline-block;border:1px solid #8fb3b7;border-radius:10px;padding:12px 16px;margin:8px 0}.rb-shell label>input:not([type=checkbox]):not([type=radio]){display:block;box-sizing:border-box;width:100%;min-height:46px;font:inherit;padding:10px;border:1px solid #9bb9be;border-radius:8px}.rb-shell .rb-card>label{display:block;margin:14px 0}
 </style><style>body{margin:0;background:#f0f5f5;color:#173e45;font:16px/1.5 system-ui,sans-serif}header{background:white;border-bottom:1px solid #bdd4d7;padding:14px 5%;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}header a{color:#12665e;font-weight:700}main{padding:12px 5%}button{font:inherit;background:white;border:1px solid #9dbabd;color:#173e45;border-radius:9px;padding:9px 14px}button:disabled{opacity:.45}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #d58c25;outline-offset:3px}footer{padding:20px;text-align:center;color:#496b71;font-size:.9rem}</style></head><body><header><a href="./chem231-start.html">CHEM 231 · Start here</a><span>Learn, try, check</span></header><main id="work" tabindex="-1"><p>Loading the chemistry editor…</p></main><footer>Practice evidence is separate from exam readiness. Your original course bank is preserved.</footer><script>/* OpenChemLib 9.25.2, BSD-3-Clause. Full license below. Offline synchronous wrapper. */
 /*
 
@@ -107,11 +111,237 @@ var MolecularGrader=(()=>{
  return {version,inspect,compare,gradeSet,model};
 })();
 if(typeof module!=='undefined'&&module.exports)module.exports=MolecularGrader;
+</script><script>/* Public course catalog and local evidence routing. No learner history or keys
+   for unsupported chemistry families are bundled here. */
+(function(root){
+'use strict';
+const ORIGIN='https://smccd.instructure.com',COURSE=ORIGIN+'/courses/73887';
+const link=id=>COURSE+'/modules/items/'+id;
+const sectionRows=[
+ ['8.1','Introduction to Addition Reactions','intro'],
+ ['8.3','Nomenclature and Stability of Alkenes','alkene-bridge'],
+ ['8.5','Hydrohalogenation','hx'],
+ ['8.6','Acid-Catalyzed Hydration','acid-hydration'],
+ ['8.7','Oxymercuration-Demercuration','oxymercuration'],
+ ['8.8','Hydroboration-Oxidation','hydroboration'],
+ ['8.9','Catalytic Hydrogenation','hydrogenation'],
+ ['8.10','Halogenation and Halohydrin Formation','halogenation'],
+ ['8.11','Syn Dihydroxylation','syn-oh'],
+ ['8.12','Epoxidation and Anti Dihydroxylation','epoxide-anti-oh'],
+ ['8.13','Ozonolysis','ozonolysis'],
+ ['8.14','Predicting the Products for Reactions of Alkenes','products'],
+ ['8.15','Synthesis Strategies','synthesis']
+];
+const actions={
+ intro:'After one instructor example, close it. On a different assigned reaction, mark the original C=C and list every output the question asks for.',
+ 'alkene-bridge':'Use a different assigned naming problem. Mark a parent containing C=C, number it, then supply any requested E/Z and R/S labels. Keep your work for review.',
+ hx:'Watch the visual example here, then draw a different complete HBr mechanism. Keep the arrows, charged intermediate, product and written reason separate.',
+ 'acid-hydration':'Read one acid-catalyzed hydration example. Close it, then do a different assigned problem with every requested arrow, intermediate, product and charge.',
+ oxymercuration:'Read one oxymercuration-demercuration example. Close it, then complete a different assigned problem and explain the choice of product and any stereochemistry.',
+ hydroboration:'Read one hydroboration-oxidation example. Close it, then complete a different assigned problem, including the requested position and stereochemistry.',
+ hydrogenation:'Read one catalytic hydrogenation example. Close it, then draw the full product for a different assigned substrate and explain its stereochemistry.',
+ halogenation:'Read one halogenation or halohydrin example. Close it, then finish a different assigned problem. Identify the conditions before deciding which reaction you have.',
+ 'syn-oh':'Read one syn dihydroxylation example. Close it, then draw every requested stereoisomer for a different assigned substrate.',
+ 'epoxide-anti-oh':'Read one epoxidation or anti dihydroxylation example. Close it, then complete a different assigned problem with all requested stereochemistry.',
+ ozonolysis:'Read one ozonolysis example. Close it, then draw all requested organic products for a different assigned substrate, keeping track of the carbon skeleton.',
+ products:'Use one new mixed addition problem. State the reagent family, then give every requested product and a short reason. Do not copy the preceding example.',
+ synthesis:'Read one synthesis example. Close it, then attempt a different assigned target: record the starting material, each reagent step and the structure after each step.'
+};
+const catalog=sectionRows.map(([section,title,key])=>({id:'ch8-'+key,chapter:8,section,title,status:'current',mode:key==='hx'?'automatic-bounded':'tutor-review',family:key==='hx'?'addition-full':null,task:actions[key],resource:{label:'Instructor explanation · '+section,kind:'read-or-watch-one',url:link(key==='intro'||key==='hx'?5586902:5586903)},alternatives:[{label:'Instructor alkene-addition table',url:link(5586904)},{label:'Chapter 8 objectives',url:link(5586900)}],practice:{label:key==='synthesis'?'Open Homework 8B':'Open Homework 8A',url:link(key==='synthesis'?5919520:5586908)}}));
+catalog.push({id:'ch7-e2',chapter:7,title:'E2: one complete event',status:'repair',mode:'automatic-bounded',family:'e2-full',task:'See one E2 event, then complete the selected beta-H event on a different molecule.',resource:{label:'Instructor E1/E2 explanation',url:link(5586920),kind:'read-or-watch-one'},alternatives:[{label:'Instructor Chapter 7 slides',url:link(5586921)}],practice:{label:'Chapter 7 homework',url:link(5586926)}});
+const repairs=[
+ ['ch7-chair','Cyclohexane E2: the reactive chair',7,5586921],
+ ['ch7-pathway','Reagent family and pathway',7,5586919],
+ ['ch7-sn2','SN2: full product and inversion',7,5586919],
+ ['ch7-sn1-e1','SN1/E1: finish the timeline',7,5586919],
+ ['ch5-rotation','Rotation, ee and composition',5,5586944],
+ ['ch6-energy','Energy diagrams and rate',6,5586932],
+ ['ch6-sites','Electron donors and acceptors',6,5586933],
+ ['ch5-count','Stereoisomers and representation',5,5586947],
+ ['ch4-name','Parent chain, configuration and carbon degree',4,5586959],
+ ['ch2-resonance','Lone pairs, resonance and charge',2,5586989],
+ ['ch3-acidbase','Acid/base operation and charge',3,5863301]
+];
+for(const [id,title,chapter,item] of repairs)catalog.push({id,title,chapter,status:'repair',mode:'tutor-review',task:'Use one instructor example for this exact step. Close it, then do a different assigned problem and keep the complete answer and reason for tutor review.',resource:{label:'Instructor explanation',url:link(item),kind:'read-or-watch-one'},alternatives:[],practice:{label:'Open course modules',url:COURSE+'/modules'}});
+for(const [id,title] of [['planned-alkynes','Alkynes'],['planned-alcohols','Alcohols and phenols']])catalog.push({id,title,status:'planned',mode:'not-confirmed',task:'Planned later course work. Detailed objectives and final weighting still need instructor confirmation.',resource:null,alternatives:[]});
+function clone(x){return JSON.parse(JSON.stringify(x));}
+function day(now=Date.now()){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now));}
+function dateAfter(date,n){const [y,m,d]=date.split('-').map(Number),x=new Date(Date.UTC(y,m-1,d+n));return x.toISOString().slice(0,10);}
+function unit(id){return catalog.find(x=>x.id===id)||null;}
+function familyUnit(family){return unit(family==='e2-full'?'ch7-e2':'ch8-hx');}
+function ensure(state){
+ if(!state.curriculum||state.curriculum.version!==1)state.curriculum={version:1};
+ const c=state.curriculum;for(const key of ['retention','pendingReviews','providerEvents','tutorReviews'])if(!Array.isArray(c[key])){if(c[key]!==undefined)c['unrecognized_'+key]=clone(c[key]);c[key]=[];}if(!c.manualDrafts||typeof c.manualDrafts!=='object'||Array.isArray(c.manualDrafts)){if(c.manualDrafts!==undefined)c.unrecognized_manualDrafts=clone(c.manualDrafts);c.manualDrafts={};}return c;
+}
+function defaultTask(now=Date.now()){return {id:'start-hx',kind:'lesson',unitId:'ch8-hx',problemId:'RB8-ADD-FULL-01',title:'See one HBr example',reason:'Chapter 8 is current. Learn one complete example, then try a different molecule.',createdAt:now,cause:{type:'course-priority'}};}
+function firstMiss(result){return result.parts?.find(x=>x.ok===false)||null;}
+function automaticStatus(result){return result.parts?.some(x=>x.ok===false)?'needs-repair':result.parts?.some(x=>x.ok!==true)?'pending':'matched';}
+function helpCondition(d={}){return d.helped||d.modelSeen||d.feedbackSeen||d.reviewSeen?'supported':d.afterExample?'after-example':d.taskClarified?'task-wording-help':d.noHelp===true?'self-reported-no-help':'help-unknown';}
+function scheduleReturns(c,p,now,condition){
+ const base=p.family==='addition-full'?'RB8-ADD-FULL-03':'RB7-E2-FULL-03',origin=day(now);
+ for(const offset of [3,7]){
+  const dueDate=dateAfter(origin,offset),id=p.family+':'+origin+':'+offset;
+  if(!c.retention.some(x=>x.id===id))c.retention.push({id,family:p.family,problemId:base,unitId:familyUnit(p.family).id,dueDate,originDate:origin,fromProblemId:p.id,conditionAtScheduling:condition,status:'scheduled',reasonReview:'pending'});
+ }
+}
+function currentCourseTask(c,now,fallback){
+ const chosen=c.currentCourseNext;if(chosen&&unit(chosen.unitId)?.chapter===8)return {...clone(chosen),createdAt:now};
+ const active=unit(c.currentUnit);if(active?.chapter===8&&active.id!=='ch8-hx')return {id:'return:'+active.id+':'+now,kind:'unit',unitId:active.id,title:'Continue '+active.title,reason:'Return to the current Chapter8 topic you chose.',createdAt:now};
+ return fallback;
+}
+function nextCurrentUnit(id){const rows=catalog.filter(x=>x.status==='current'),i=rows.findIndex(x=>x.id===id);return rows[i+1]||unit('ch8-products');}
+function scheduleUnitReturns(c,unitId,at,condition,fromAttemptId){
+ const origin=day(at);for(const offset of [3,7]){const id=unitId+':'+origin+':'+offset;if(!c.retention.some(x=>x.id===id))c.retention.push({id,unitId,problemId:null,family:'manual:'+unitId,dueDate:dateAfter(origin,offset),originDate:origin,conditionAtScheduling:condition,status:'scheduled',reasonReview:'pending',fromAttemptId});}
+}
+function routeResult(c,p,result,condition,at,id,options={}){
+ const first=firstMiss(result),status=automaticStatus(result),reviewed=options.reviewed===true,u=p.family==='manual'?unit(p.unitId):familyUnit(p.family);
+ const names={'first-arrows':'the first electron arrows','intermediate':p.family==='e2-full'?'the carbocation decision':'the intermediate drawing','next-arrow':'the next electron arrow','product':'the final product','pathway':'the pathway choice','arrows':'the electron arrows','reason':'your written reason','work':'the complete paper answer'};
+ const common={createdAt:at,unitId:u.id,problemId:p.id||null,cause:{type:options.causeType||'checked-rubric',checkId:id,status,partId:first?.id||null},reviewId:options.reviewId||id};
+ if(first)c.next={...common,id:id+':repair',kind:'repair',component:first.id,title:'Repair '+(names[first.id]||first.id),reason:first.text};
+ else if(status==='pending')c.next={...common,id:id+':review',kind:p.family==='manual'?'manual-review':'review',title:'Keep this answer for tutor review',reason:'A required part is still unreviewed. It stays pending, not wrong or passed.'};
+ else {
+  const practiceAt=options.practiceAt??at;
+  if(p.family==='manual'){
+   scheduleUnitReturns(c,u.id,practiceAt,condition,id);const next=u.chapter===8?nextCurrentUnit(u.id):unit('ch8-hx');
+   c.next={...common,id:id+':next',kind:'unit',unitId:next.id,title:'Continue with '+next.title,reason:'The imported review marks this submitted answer correct. Its original help condition is unchanged; try a different current-course task next.'};
+  }else{
+   scheduleReturns(c,p,practiceAt,condition);
+   const why=reviewed?'The imported review has checked your written why.':'Your written why is pending tutor review.';
+   if(p.family==='addition-full'&&p.id.endsWith('-01'))c.next={...common,id:id+':changed',kind:'changed',problemId:'RB8-ADD-FULL-02',title:'Try a changed HBr molecule',reason:'The bounded graph and arrow checks matched. '+why+' The new molecule checks transfer.'};
+   else if(p.family==='e2-full')c.next={...currentCourseTask(c,at,defaultTask(at)),id:id+':current',reason:'The E2 component checks matched. '+why+' Return to current Chapter 8 work.',cause:common.cause};
+   else c.next={...currentCourseTask(c,at,{...common,id:id+':current',kind:'unit',unitId:'ch8-acid-hydration',title:'Learn acid-catalyzed hydration',reason:'The bounded HBr checks matched. '+why+' Other Chapter 8 families still need practice.'}),cause:common.cause};
+  }
+ }
+ return clone(c.next);
+}
+function workSnapshot(d={}){
+ const out={};for(const key of ['molfiles','arrows','reason','mechanism','cation','sourceRef','retention'])if(d[key]!==undefined)out[key]=clone(d[key]);return out;
+}
+function stable(value){if(value===null||typeof value!=='object')return JSON.stringify(value);if(Array.isArray(value))return '['+value.map(stable).join(',')+']';return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+stable(value[k])).join(',')+'}';}
+function attemptTag(r){let h=2166136261;const text=stable({attemptId:r.attemptId||r.id,unitId:r.unitId,submittedAt:r.submittedAt,condition:r.condition,answers:r.snapshot});for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619)>>>0;return 'local-content-'+h.toString(16).padStart(8,'0');}
+function applyCheck(state,p,result,condition,now=Date.now(),checkId,originalAnswers){
+ if(!result.complete)return null;
+ const c=ensure(state),id=checkId||p.id+':'+now,first=firstMiss(result),status=automaticStatus(result),snapshot=workSnapshot(originalAnswers||state.drafts?.[p.id]||{});
+ const review={id,attemptId:id,problemId:p.id,unitId:familyUnit(p.family).id,submittedAt:now,condition,automaticStatus:status,automaticParts:clone(result.parts),expectedFields:[...result.parts.map(x=>x.id),'reason'],snapshot,reviewRevision:0,reasonStatus:'pending',status:'pending',scope:'Written reasoning needs tutor review; automatic graph and arrow results remain separate.'};review.attemptTag=attemptTag(review);
+ if(!c.pendingReviews.some(x=>x.id===id))c.pendingReviews.push(review);
+ const next=routeResult(c,p,result,condition,now,id);
+ c.lastCheck={id,problemId:p.id,at:now,automaticStatus:status,firstMiss:first?.id||null,condition,reasonStatus:'pending'};
+ return next;
+}
+
+function pendingDraft(state){
+ const r=state.resume,d=r?.problemId&&state.drafts?.[r.problemId];
+ return r?.screen==='attempt'&&d&&!d.feedback?{id:'resume:'+r.problemId,kind:'resume',problemId:r.problemId,component:r.component||d.lastSpot,title:'Continue your saved answer',reason:'Your unfinished drawing and last working spot are saved.',cause:{type:'unfinished-draft'}}:null;
+}
+function nextTask(state,now=Date.now()){
+ const c=ensure(state),manual=c.manualResume&&c.manualDrafts[c.manualResume.unitId];if(manual?.status==='draft'&&unit(c.manualResume.unitId))return {id:'resume-manual:'+c.manualResume.unitId,kind:'unit',unitId:c.manualResume.unitId,title:'Continue your saved '+unit(c.manualResume.unitId).title+' attempt',reason:'Your question reference and written draft are saved.',cause:{type:'unfinished-manual-draft'}};
+ const draft=pendingDraft(state);if(draft)return draft;
+ if(c.next?.kind==='repair')return clone(c.next);
+ const due=c.retention.filter(x=>x.status==='scheduled'&&x.dueDate<=day(now)).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];
+ if(due)return {id:due.id,kind:due.problemId?'later':'unit-return',unitId:due.unitId,problemId:due.problemId,title:'Do your later check',reason:'A '+due.family.replace(/-/g,' ')+' check was scheduled for '+due.dueDate+'. Earlier work remains separate.',dueDate:due.dueDate,cause:{type:'scheduled-return',retentionId:due.id}};
+ if(c.next)return clone(c.next);
+ if(state.resume?.screen==='lesson')return {id:'resume-example',kind:'resume-lesson',problemId:state.resume.problemId,title:'Continue your example',reason:'Return to the same part, then make your own attempt.',cause:{type:'saved-example'}};
+ return defaultTask(now);
+}
+function nextReturn(state){return ensure(state).retention.filter(x=>x.status==='scheduled').sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0]||null;}
+function noteReturnAttempt(state,problemId,now=Date.now()){
+ const today=day(now),matching=ensure(state).retention.filter(x=>x.problemId===problemId&&x.status==='scheduled').sort((a,b)=>a.dueDate.localeCompare(b.dueDate)),r=matching[0];
+ if(!r)return null;
+ const timing=today<r.dueDate?'early':'on-or-after-due';r.lastAttemptAt=now;r.lastTiming=timing;
+ if(timing!=='early')r.status='attempted-pending-review';
+ return {retentionId:r.id,dueDate:r.dueDate,timing,retentionProven:false};
+}
+function beginUnitReturn(state,unitId,retentionId){
+ const c=ensure(state),d=c.manualDrafts[unitId];c.activeManualReturn={unitId,retentionId};
+ if(!(d?.status==='draft'&&(d.sourceRef?.trim()||d.reason?.trim())))c.manualDrafts[unitId]={sourceRef:'',reason:'',noHelp:false,status:'draft'};
+ return {unitId,draftPreserved:!!(d?.status==='draft'&&(d.sourceRef?.trim()||d.reason?.trim()))};
+}
+function noteUnitReturnAttempt(state,unitId,sourceRef,now=Date.now()){
+ const c=ensure(state),r=c.retention.filter(x=>x.unitId===unitId&&!x.problemId&&x.status==='scheduled').sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];if(!r)return null;
+ const timing=day(now)<r.dueDate?'early':'on-or-after-due',origin=c.pendingReviews.find(x=>x.attemptId===r.fromAttemptId);r.lastAttemptAt=now;r.lastTiming=timing;if(timing!=='early')r.status='attempted-pending-review';return {retentionId:r.id,dueDate:r.dueDate,timing,sameQuestionReference:origin?.snapshot?.sourceRef?.trim()===sourceRef.trim(),externallyUnseen:'unknown',retentionProven:false};
+}
+function noteResource(state,unitId,now=Date.now()){
+ const u=unit(unitId);if(!u)return null;const event={unitId,at:now,type:'resource-opened',evidence:'exposure-only',plannedNext:u.task};ensure(state).providerEvents.push(event);return event;
+}
+function saveManual(state,unitId,value,now=Date.now()){
+ const u=unit(unitId);if(!u||u.mode==='not-confirmed')return {complete:false,missing:['Choose a confirmed current or repair topic.']};
+ if(!value.sourceRef?.trim()||!value.reason?.trim())return {complete:false,missing:['Name the assigned question and write what you tried, even if unsure.']};
+ const c=ensure(state),prior=c.pendingReviews.filter(x=>x.unitId===unitId&&x.snapshot?.sourceRef?.trim()===value.sourceRef.trim()&&x.tutorReview).at(-1),id=unitId+':manual:'+now+':'+c.pendingReviews.length;
+ const retention=c.activeManualReturn?.unitId===unitId?noteUnitReturnAttempt(state,unitId,value.sourceRef,now):null;delete c.activeManualReturn;
+ const d={...clone(value),...(prior&&!retention?{reviewSeen:true}:{}),...(retention?{retention}:{}),savedAt:now,status:'pending-tutor-review',automaticStatus:'not-scored',reasonStatus:'pending'};c.manualDrafts[unitId]=d;delete c.manualResume;
+ const review={id,attemptId:id,unitId,submittedAt:now,condition:helpCondition(d),status:'pending',automaticStatus:'not-scored',automaticParts:[],expectedFields:['work','reason'],snapshot:workSnapshot(d),reviewRevision:0,reasonStatus:'pending'};review.attemptTag=attemptTag(review);c.pendingReviews.push(review);
+ c.next={id,kind:'manual-review',unitId,title:'Bring this answer for review',reason:'Your work is saved. This family has no approved automatic answer model here, so it stays pending tutor review.',cause:{type:'unscored-work',reviewId:id}};
+ if(u.chapter===8){c.currentUnit=unitId;c.currentCourseNext=clone(c.next);}return {complete:true,status:'pending-tutor-review',attemptId:id,next:clone(c.next)};
+}
+function sameSource(a,b){return a.problemId?b.problemId===a.problemId:!b.problemId&&b.unitId===a.unitId&&b.snapshot?.sourceRef?.trim()===a.snapshot?.sourceRef?.trim();}
+function normalizeReviewTargets(state){
+ const c=ensure(state);for(const r of c.pendingReviews){
+  r.attemptId??=r.id;r.reviewRevision??=0;
+  if(!r.snapshot){const e=(state.events||[]).find(x=>x.type==='submitted'&&(x.checkId===r.id||(r.id==='historical:'+x.problemId+':'+x.at)));const d=e?.answers||(!r.problemId&&c.manualDrafts[r.unitId]?.savedAt===r.submittedAt?c.manualDrafts[r.unitId]:null);if(d)r.snapshot=workSnapshot(d);if(!r.automaticParts&&e)r.automaticParts=clone(e.answers?.feedback?.parts||e.parts||[]);}
+  r.automaticParts??=[];r.expectedFields??=r.problemId?[...r.automaticParts.map(x=>x.id),'reason']:['work','reason'];if(r.snapshot)r.attemptTag=attemptTag(r);
+ }return c;
+}
+function staleTarget(c,r){const index=c.pendingReviews.indexOf(r);return c.pendingReviews.slice(index+1).some(x=>sameSource(r,x));}
+function hasReviewWork(r){return !!(r.snapshot?.reason?.trim()&&(r.problemId?r.snapshot?.molfiles?.product:r.snapshot?.sourceRef?.trim()));}
+function changedSinceSubmission(state,r){
+ const d=r.problemId?state.drafts?.[r.problemId]:ensure(state).manualDrafts[r.unitId];if(!d)return false;
+ if(!r.problemId&&d.sourceRef?.trim()!==r.snapshot?.sourceRef?.trim())return false;
+ return stable(workSnapshot(d))!==stable(r.snapshot);
+}
+function reviewRequest(state,attemptId){
+ const c=normalizeReviewTargets(state),r=attemptId?c.pendingReviews.find(x=>x.attemptId===attemptId):c.pendingReviews.filter(x=>x.status==='pending'&&hasReviewWork(x)&&!staleTarget(c,x)).at(-1);
+ if(!r||r.status!=='pending'||!hasReviewWork(r))return {ok:false,message:'The original answer is not available here. Save or check that answer before sending it for review.'};
+ if(staleTarget(c,r)||changedSinceSubmission(state,r))return {ok:false,message:'This answer has changed. Check or save the revised answer before requesting its review.'};
+ return {ok:true,request:{schema:'chem-tutor-review-request',version:1,target:{attemptId:r.attemptId,unitId:r.unitId,submittedAt:r.submittedAt,attemptTag:r.attemptTag,reviewRevision:r.reviewRevision},attempt:{problemId:r.problemId||null,answers:clone(r.snapshot),condition:r.condition,automaticStatus:r.automaticStatus,automaticParts:clone(r.automaticParts)},requiredFields:clone(r.expectedFields),provenance:'A future review file is locally imported, not authenticated. It cannot change this attempt’s help condition or replace failed automatic checks.'}};
+}
+function keysOnly(x,allowed){return x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).every(k=>allowed.includes(k));}
+function textValue(x,max){return typeof x==='string'&&x.trim().length>0&&x.length<=max;}
+function importReview(state,packet,problems,now=Date.now()){
+ const reject=(code,message)=>({ok:false,code,message});
+ if(!keysOnly(packet,['schema','version','reviewId','target','reviewer','source','reviewedAt','fields'])||packet.schema!=='chem-tutor-review'||packet.version!==1)return reject('schema','Choose a supported tutor review file.');
+ if(!textValue(packet.reviewId,160)||!textValue(packet.reviewer,160)||!textValue(packet.source,1200)||!textValue(packet.reviewedAt,80)||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(packet.reviewedAt)||!Number.isFinite(Date.parse(packet.reviewedAt))||new Date(packet.reviewedAt).toISOString().slice(0,10)!==packet.reviewedAt.slice(0,10)||Date.parse(packet.reviewedAt)>now+300000)return reject('provenance','The review needs a valid ID, author, source and date.');
+ if(!keysOnly(packet.target,['attemptId','unitId','submittedAt','attemptTag','reviewRevision'])||!textValue(packet.target.attemptId,200)||!textValue(packet.target.unitId,100))return reject('target','The review must identify the exact saved answer.');
+ const c=normalizeReviewTargets(state);if(c.tutorReviews.some(x=>x.reviewId===packet.reviewId))return reject('duplicate','This review was already added. It was not counted again.');
+ const r=c.pendingReviews.find(x=>x.attemptId===packet.target.attemptId);
+ if(!r||r.unitId!==packet.target.unitId||!hasReviewWork(r))return reject('target','This review does not match an available saved answer.');
+ if(r.status!=='pending')return reject('closed','This answer already has a complete review. Save/check a revision before adding another.');
+ if(packet.target.submittedAt!==r.submittedAt||packet.target.attemptTag!==r.attemptTag||packet.target.reviewRevision!==r.reviewRevision||staleTarget(c,r)||changedSinceSubmission(state,r))return reject('stale','This review belongs to an older or changed answer. Save/check the current answer and ask for its review.');
+ if(!Array.isArray(packet.fields)||packet.fields.length!==r.expectedFields.length)return reject('fields','The review must address each requested part, marking unreviewed parts explicitly.');
+ const fieldMap=new Map();for(const f of packet.fields){if(!keysOnly(f,['id','verdict','explanation'])||!r.expectedFields.includes(f.id)||fieldMap.has(f.id)||!['correct','needs-repair','not-reviewed'].includes(f.verdict)||!textValue(f.explanation,4000))return reject('fields','One review part is missing, repeated or invalid.');fieldMap.set(f.id,f);}
+ const auto=new Map(r.automaticParts.map(x=>[x.id,x]));
+ for(const f of fieldMap.values())if(auto.get(f.id)?.ok===false&&f.verdict==='correct')return reject('conflict','The review disagrees with a failed automatic drawing or arrow check. That result was kept. Revise/recheck it or ask for the checker to be reviewed.');
+ const p=r.problemId?problems.find(x=>x.id===r.problemId):{id:null,family:'manual',unitId:r.unitId};if(!p||!unit(r.unitId))return reject('target','The original problem is not available in this build.');
+ const effective=r.expectedFields.map(id=>{const f=fieldMap.get(id),a=auto.get(id);return {id,ok:a?.ok===false?false:f.verdict==='needs-repair'?false:f.verdict==='correct'?true:a?.ok===true?true:null,text:a?.ok===false?(f.verdict==='needs-repair'?f.explanation:a.text||'This automatic component still needs repair.'):f.explanation,source:a?.ok===false?'automatic':f.verdict==='not-reviewed'&&a?.ok===true?'automatic':'local-review-file'};});
+ const outcome=automaticStatus({parts:effective}),record={schema:'chem-tutor-review',version:1,reviewId:packet.reviewId,attemptId:r.attemptId,unitId:r.unitId,reviewer:packet.reviewer,source:packet.source,reviewedAt:packet.reviewedAt,importedAt:now,authenticated:false,provenance:'user-selected local file; author identity not verified',fields:clone(packet.fields),originalCondition:r.condition,originalSubmittedAt:r.submittedAt,originalAutomaticStatus:r.automaticStatus,originalRetention:r.snapshot.retention||null,effectiveStatus:outcome};
+ c.tutorReviews.push(record);r.tutorReview=clone(record);r.reviewRevision++;r.reasonStatus=fieldMap.get('reason').verdict==='not-reviewed'?'pending':fieldMap.get('reason').verdict;r.status=effective.some(x=>x.ok===null)?'pending':'reviewed';r.reviewOutcome=outcome;r.effectiveParts=clone(effective);
+ const live=r.problemId?state.drafts?.[r.problemId]:c.manualDrafts[r.unitId];if(live)live.reviewSeen=true;
+ const next=routeResult(c,p,{complete:true,parts:effective},r.condition,now,r.attemptId,{reviewed:r.reasonStatus==='correct',reviewId:packet.reviewId,causeType:'tutor-review-file',practiceAt:r.submittedAt});
+ c.lastTutorReview={reviewId:packet.reviewId,attemptId:r.attemptId,unitId:r.unitId,reviewer:packet.reviewer,source:packet.source,reviewedAt:packet.reviewedAt,authenticated:false,effectiveStatus:outcome,condition:r.condition};
+ if(unit(r.unitId)?.chapter===8)c.currentCourseNext=clone(next);
+ const visible=nextTask(state,now);return {ok:true,code:'applied',message:'Review added. Next: '+visible.title+'. The original answer and help condition were preserved.',next:visible,storedNext:next,provenance:clone(c.lastTutorReview),outcome};
+}
+
+function hydrateExisting(state,problems){
+ const c=ensure(state);if(c.next||c.historicalRoutingMigrated)return false;c.historicalRoutingMigrated=true;
+ const e=(state.events||[]).filter(x=>x.type==='submitted'&&!x.qa).at(-1),p=problems.find(x=>x.id===e?.problemId);if(!e||!p||!Array.isArray(e.parts))return false;
+ const original=e.answers?.feedback;const result={complete:true,parts:(original?.parts||e.parts).map(x=>({...x,text:x.text||(x.ok===false?'The saved check flagged '+x.id+'. Reopen that component and review its feedback.':'Saved component check.')}))};
+ const t=applyCheck(state,p,result,e.condition||'help-unknown',e.at,'historical:'+e.problemId+':'+e.at,e.answers);if(t){c.next.derivedFromExistingRecord=true;return true;}return false;
+}
+function summary(state,unitId){
+ const c=ensure(state),u=unit(unitId);if(!u)return 'Unknown topic.';if(u.status==='planned')return 'Planned; detailed objectives not confirmed.';
+ const checks=c.pendingReviews.filter(x=>x.unitId===unitId);if(!checks.length)return u.mode==='automatic-bounded'?'Not checked here yet.':'Tutor review needed; no automatic model here.';
+ const last=checks.at(-1);if(last.tutorReview)return last.reviewOutcome==='matched'?'Imported review marks the submitted fields correct; original help condition preserved.':last.reviewOutcome==='needs-repair'?'Imported review identifies a specific repair; original results preserved.':'Imported review received; required fields still pending.';return last.automaticStatus==='matched'?'Graph/arrow checks matched; written why pending.':last.automaticStatus==='needs-repair'?'A checked component needs repair; written why pending.':'Saved work pending tutor review.';
+}
+const api={catalog,verifiedSections:sectionRows.map(x=>x[0]),unit,familyUnit,ensure,day,dateAfter,defaultTask,firstMiss,automaticStatus,helpCondition,applyCheck,nextTask,nextReturn,noteReturnAttempt,noteUnitReturnAttempt,beginUnitReturn,noteResource,saveManual,summary,hydrateExisting,routeResult,workSnapshot,reviewRequest,importReview,attemptTag};
+if(typeof module!=='undefined'&&module.exports)module.exports=api;
+root.ChemCurriculum=api;
+})(typeof window!=='undefined'?window:{});
 </script><script>/* Isolated first rebuild slice. Existing question IDs, drafts and storage are
    read only. New full-problem evidence lives in a separate versioned key. */
 (function(root){
 'use strict';
 const STORAGE='gabe-chem-path-v1', LEGACY='gabe-ch7-desk-v1', REVISION=1;
+const C=typeof module!=='undefined'&&module.exports?require('./curriculum-core.js'):root.ChemCurriculum;
 const problems=[
  {id:'RB8-ADD-FULL-01',family:'addition-full',title:'Chapter 8 · reaction check A',substrate:'C=C(C)CC',intermediate:'C[C+](C)CC',product:'CC(Br)(C)CC',tail:2,conditions:'HBr, ordinary ionic conditions; no peroxides. Draw the usual major organic product. Include only the organic molecule in each drawing box.',modelReason:'The alkene pair bonds to H. H adds to the terminal carbon, leaving the more stable tertiary C⁺ on the other alkene carbon. The H–Br pair goes to Br. Then a Br⁻ lone pair bonds to C⁺. No carbon skeleton shift is needed here.'},
  {id:'RB8-ADD-FULL-02',family:'addition-full',title:'Chapter 8 · changed-structure check',substrate:'C=C(C)CCC',intermediate:'C[C+](C)CCC',product:'CC(Br)(C)CCC',tail:3,conditions:'HBr, ordinary ionic conditions; no peroxides. Draw the usual major organic product. Include only the organic molecule in each drawing box.',modelReason:'Follow the same two chemical events on the new skeleton. The first event forms the tertiary carbocation; Br⁻ then attacks that carbon. H and Br add across the original alkene. The product carbon has two identical methyl groups, so no stereocenter is created there.'},
@@ -159,7 +389,7 @@ function grade(p,d,g){
  if(p.family==='addition-full'){
   parts.push({id:'first-arrows',ok:compareArrows(p,d.arrows.one,1),text:compareArrows(p,d.arrows.one,1)?'First event: alkene pair → H; H–Br pair → Br.':'First event: start one arrow at the alkene pi bond and end at H. Start the other at H–Br and end at Br. The pair moves, not a bare positive H magically appearing.'});
   const intermediate=g.compare(d.molfiles.intermediate,{models:[{smiles:p.intermediate}],why:'The positive charge is on the more substituted alkene carbon after H adds to the terminal carbon.'});
-  parts.push({id:'intermediate',ok:intermediate.ok===true,text:'Intermediate: '+intermediate.message});
+  parts.push({id:'intermediate',ok:intermediate.ok,code:intermediate.code,text:'Intermediate: '+intermediate.message});
   parts.push({id:'next-arrow',ok:compareArrows(p,d.arrows.two,2),text:compareArrows(p,d.arrows.two,2)?'Next event: a Br⁻ lone pair bonds to C2.':'Next event: the electrons start on a bromide lone pair and go to the positively charged carbon, C2.'});
  } else {
   parts.push({id:'pathway',ok:d.mechanism==='E2',text:d.mechanism==='E2'?'E2 fits these stated conditions.':'First wrong decision: pathway. Read the charged ethoxide and secondary reacting carbon; heat supports elimination here.'});
@@ -167,24 +397,44 @@ function grade(p,d,g){
   parts.push({id:'arrows',ok:compareArrows(p,d.arrows.one),text:compareArrows(p,d.arrows.one)?'The three pair moves match the selected beta H.':'For the selected beta H: O lone pair → H; C–H bond → neighboring C–C bond; C–Br bond → Br. All happen together.'});
  }
  const product=g.compare(d.molfiles.product,{models:[p.product,...(p.alternatives||[])].map(smiles=>({smiles})),why:'The requested organic product has the correct atoms, connections, bond orders, charge and relevant stereochemistry.'});
- parts.push({id:'product',ok:product.ok===true,text:'Final product: '+product.message});
- return {complete:true,ok:parts.every(x=>x.ok),parts,reasonReview:'Your written why is saved for tutor review. The app does not grade its reasoning by keyword matching.'};
+ parts.push({id:'product',ok:product.ok,code:product.code,text:'Final product: '+product.message});
+ return {complete:true,ok:parts.every(x=>x.ok===true)?true:parts.some(x=>x.ok===false)?false:null,automaticOnly:true,reasonStatus:'pending',parts,reasonReview:'Your written why is saved for tutor review. The app does not grade its reasoning by keyword matching.'};
 }
-function classifyAttempt(d){return d.feedbackSeen||d.modelSeen||d.helped?'supported':d.afterExample?'after-example':d.noHelp===true?'self-reported-no-help':'help-unknown';}
+function classifyAttempt(d){return C.helpCondition(d);}
 function chooseNextAction(d,due){return d&&!d.feedback?'resume':due?'later':d?.feedback?'feedback':'learn';}
-function partLabel(id){return ({'first-arrows':'First event: arrows','intermediate':'Intermediate decision/drawing','next-arrow':'Next event: arrow','product':'Final product','pathway':'Pathway','arrows':'Electron arrows'}[id]||id);}
+function partLabel(id){return ({'first-arrows':'First event: arrows','intermediate':'Intermediate decision/drawing','next-arrow':'Next event: arrow','product':'Final product','pathway':'Pathway','arrows':'Electron arrows','reason':'Written reason','work':'Complete paper answer'}[id]||id);}
 function loadSnapshot(getStore,key){try{return {ok:true,value:JSON.parse(getStore().getItem(key)||'null')};}catch(_){return {ok:false,value:null};}}
 function saveSnapshot(getStore,key,value){try{getStore().setItem(key,JSON.stringify(value));return true;}catch(_){return false;}}
 function bondLabel(label){return /bond$/i.test(label)?label:label+' bond';}
+function taskParts(p,d={},inspect){
+ const drawn=key=>{const value=d.molfiles?.[key];if(!value)return false;try{return inspect?inspect(value).status!=='blank':true;}catch(_){return true;}};
+ const common=[{id:'product',label:'Draw the final organic product',filled:drawn('product')},{id:'reason',label:'Write the clue you used',filled:!!d.reason?.trim()}];
+ return p.family==='addition-full'?[{id:'first-arrows',label:'Draw the first event’s electron arrows',filled:!!d.arrows?.one?.length},{id:'intermediate',label:'Draw the organic intermediate, with its charge',filled:drawn('intermediate')},{id:'next-arrow',label:'Draw the next event’s electron arrow',filled:!!d.arrows?.two?.length},...common]:[{id:'pathway',label:'Choose the dominant pathway',filled:!!d.mechanism},{id:'cation',label:'State whether a separate carbocation forms',filled:!!d.cation},{id:'arrows',label:'Draw the electron arrows for the selected beta H',filled:!!d.arrows?.one?.length},...common];
+}
+function recoveryData(p,d={},inspect){const parts=taskParts(p,d,inspect),next=parts.find(x=>!x.filled);return {problemId:p.id,title:p.title,startingSmiles:p.substrate,conditions:p.conditions,tasks:parts.map(x=>({id:x.id,label:x.label,entered:x.filled})),next:next?{id:next.id,label:next.label}:{id:'check',label:'Check your complete attempt'},allPartsEntered:!next};}
+function savedLocation(state,p){
+ const saved=state.resume;
+ if(saved?.problemId===p.id&&['lesson','attempt','feedback'].includes(saved.screen))return {...saved};
+ const d=state.drafts?.[p.id],allowed=taskParts(p,d).map(x=>x.id);
+ return {screen:d?.feedback?'feedback':'attempt',problemId:p.id,component:allowed.includes(d?.lastSpot)?d.lastSpot:allowed[0]};
+}
+function progressSteps(events,family,d,lessonViewed=false){
+ const rows=(events||[]).filter(e=>!e.qa&&e.family===family),sub=rows.filter(e=>e.type==='submitted'),last=sub.at(-1),changed=family==='addition-full'?'RB8-ADD-FULL-02':'RB7-E2-FULL-02',later=family==='addition-full'?'RB8-ADD-FULL-03':'RB7-E2-FULL-03';
+ const condition=code=>({'supported':'Used help','after-example':'Practiced after an example','self-reported-no-help':'Reported no help','help-unknown':'Help use not recorded','task-wording-help':'Task wording clarified; chemistry help separate'}[code]||'Help use not recorded');
+ const seen=id=>rows.some(e=>e.problemId===id&&e.type==='attempt-start'),checked=id=>sub.filter(e=>e.problemId===id).at(-1),status=id=>checked(id)?'Checked · '+condition(checked(id).condition):seen(id)?'Started; not checked yet':'Not checked yet';
+ return [{id:'lesson',label:'See one example',detail:lessonViewed?'Example opened; learning not checked':'Not opened here yet'},{id:'complete',label:'Finish a whole problem',detail:last?'Attempt checked · '+condition(last.condition):d?'Answer started; not checked yet':'Not checked yet'},{id:'repair',label:'Repair a missed step',detail:last&&last.ok===false?'A checked part needs repair':last?.condition==='supported'?'Revised with help; transfer still needs checking':'Used when a checked part needs repair'},{id:'changed',label:'Try a changed molecule',detail:status(changed)},{id:'later',label:'Check again later',detail:status(later)}];
+}
 function validLegacy(x){return !!x&&x.version===1&&Array.isArray(x.events)&&x.drafts&&typeof x.drafts==='object'&&!Array.isArray(x.drafts);}
-const api={problems,arrowRule,compareArrows,grade,incomplete,classifyAttempt,validLegacy,chooseNextAction,partLabel,renderDiagram:diagram,loadSnapshot,saveSnapshot,bondLabel,storageKey:STORAGE,day};
+const api={curriculum:C,problems,arrowRule,compareArrows,grade,incomplete,classifyAttempt,validLegacy,chooseNextAction,partLabel,renderDiagram:diagram,loadSnapshot,saveSnapshot,bondLabel,storageKey:STORAGE,taskParts,recoveryData,savedLocation,progressSteps,day};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(!root.document)return;
 const qa=new URLSearchParams(location.search).get('qa')==='1';
 const COURSE_BASE=location.pathname.includes('/qa-artifacts/')?location.pathname.split('/qa-artifacts/')[0]+'/':'./';
 const loaded=loadSnapshot(()=>localStorage,STORAGE);let s=loaded.value,saveWarning=loaded.ok?'':'This browser cannot save your work here. Keep this page open and export your answers before leaving.';
 if(!s||s.version!==REVISION)s={version:REVISION,events:[],drafts:{},problem:0,phase:'home',lessonStep:0};
-let editors=[],pendingArrow=null;
+C.ensure(s);C.hydrateExisting(s,problems);
+if(!Number.isInteger(s.problem)||!problems[s.problem])s.problem=0;
+let editors=[],pendingArrow=null,recoveryTarget=null;
 const $=q=>document.querySelector(q), current=()=>problems[s.problem], peek=()=>s.drafts[current().id];
 function storageNotice(){const label=$('#rb-save-state'),notice=$('#rb-save-warning');if(label)label.textContent=qa?'Testing · no learner records saved':saveWarning?'Working in this tab; export to keep it':'Saved in this browser';if(notice){notice.hidden=!saveWarning;const message=$('#rb-save-message');if(message)message.textContent=saveWarning;}}
 function persist(){if(qa)return true;const ok=saveSnapshot(()=>localStorage,STORAGE,s);saveWarning=ok?'':'This browser cannot save your work here. Keep this page open and export your answers before leaving.';storageNotice();return ok;}
@@ -192,17 +442,46 @@ function record(type,data={}){s.events.push({type,at:Date.now(),qa,...data});per
 function draft(){return s.drafts[current().id]??={molfiles:{},arrows:{one:[],two:[]},reason:'',noHelp:false,afterExample:false,helped:false,modelSeen:false,feedbackSeen:false};}
 function sync(){if(!peek())return;for(const {editor,key} of editors){if(!editor.isDestroyed)draft().molfiles[key]=editor.getMolecule().toMolfile();}if($('#rb-reason'))draft().reason=$('#rb-reason').value;persist();}
 function dispose(){sync();editors.forEach(({editor})=>{if(!editor.isDestroyed)editor.destroy();});editors=[];pendingArrow=null;}
-function shell(body,step){dispose();$('#work').innerHTML='<div class="rb-shell"><div class="rb-top"><button data-rb="home">Study home</button><span id="rb-save-state" class="rb-small"></span></div><aside id="rb-save-warning" class="rb-save-warning" role="status" hidden><p id="rb-save-message"></p><button data-rb="export">Export my answers</button></aside>'+(step===undefined?'':'<ol class="rb-steps">'+['See one example','Finish a whole problem','Fix the first wrong step'].map((x,i)=>'<li'+(i===step?' aria-current="step"':'')+'>'+x+'</li>').join('')+'</ol>')+body+'</div>';storageNotice();$('#work').focus();}
+function currentStage(){return s.phase==='lesson'?0:s.phase==='feedback'?2:({complete:1,repair:2,changed:3,later:4}[s.practiceStage]??1);}
+function remember(screen,component){s.resume={screen,problemId:current().id,lessonStep:s.lessonStep,component:component||peek()?.lastSpot};persist();}
+function workingAt(component){if(s.phase!=='attempt')return;draft().lastSpot=component;remember('attempt',component);}
+function shell(body,step){dispose();$('#work').innerHTML='<div class="rb-shell"><div class="rb-top"><button data-rb="home">Study home</button><button data-rb="recover">I got distracted—where was I?</button><span id="rb-save-state" class="rb-small"></span></div><aside id="rb-save-warning" class="rb-save-warning" role="status" hidden><p id="rb-save-message"></p><button data-rb="export">Export my answers</button></aside>'+'<aside id="rb-recovery" class="rb-recovery" tabindex="-1" hidden></aside>'+(step===undefined?'':'<ol class="rb-steps">'+['Example','Whole problem','Repair','Changed molecule','Later check'].map((x,i)=>'<li'+(i===currentStage()?' aria-current="step"':'')+'>'+x+'</li>').join('')+'</ol>')+body+'</div>';storageNotice();$('#work').focus();}
 function molecule(smiles,id,isMolfile=false){try{const title='Organic structure: '+id.replace(/[-_]/g,' ');let svg=(isMolfile?OCL.Molecule.fromMolfile(smiles):OCL.Molecule.fromSmiles(smiles)).toSVG(640,230,'rb-'+id,{autoCrop:true,autoCropMargin:14});svg=svg.replace('<svg ', '<svg role="img" aria-label="'+esc(title)+'" ');return '<div class="rb-molecule">'+svg+'</div>';}catch(_){return '<p>Structure could not load. Do not answer a missing diagram.</p>';}}
 function legacySummary(){let old;try{old=JSON.parse(localStorage.getItem(LEGACY)||'null');}catch(_){}if(!validLegacy(old))old=s.importedLegacy?.snapshot;if(!validLegacy(old))return null;return {events:old.events.filter(e=>!e.qa).length,drafts:Object.keys(old.drafts).length,source:old===s.importedLegacy?.snapshot?'imported copy':'this browser'};}
 function attempts(family){return s.events.filter(e=>e.type==='submitted'&&!e.qa&&(!family||e.family===family));}
-function conditionLabel(code){return ({supported:'Used help', 'after-example':'Practiced after an example','self-reported-no-help':'Checked without help (your report)','help-unknown':'Help use not recorded'}[code]||'Help use not recorded');}
-function evidenceLine(family){const a=attempts(family);if(!a.length)return 'Unassessed here. Earlier evidence is preserved separately.';const last=a.at(-1);return a.length+' full attempt'+(a.length===1?'':'s')+' checked; latest '+(last.ok?'automatic checks match':'needs repair')+' · '+conditionLabel(last.condition)+'. Explanation not tutor-reviewed.';}
+function conditionLabel(code){return ({supported:'Used help', 'after-example':'Practiced after an example','self-reported-no-help':'Checked without help (your report)','help-unknown':'Help use not recorded','task-wording-help':'Task wording clarified; chemistry help separate'}[code]||'Help use not recorded');}
+function evidenceLine(family){const a=attempts(family);if(!a.length)return 'Unassessed here. Earlier evidence is preserved separately.';const last=a.at(-1);return a.length+' full attempt'+(a.length===1?'':'s')+' checked; latest '+(last.ok===true?'automatic components match; why pending':last.ok===false?'a component needs repair':'tutor review pending')+' · '+conditionLabel(last.condition)+'. Explanation not tutor-reviewed.';}
+function taskButtonLabel(t){return t.kind==='repair'?'Repair this step':t.kind==='resume'?'Continue my saved answer':t.kind==='resume-lesson'?'Continue my example':t.kind==='later'||t.kind==='unit-return'?'Do the later check':t.kind==='manual-review'||t.kind==='review'?'Export my answer for review':t.title;}
+function catalogHTML(){return '<ol class="rb-catalog">'+C.catalog.filter(u=>u.status==='current').map(u=>'<li><button data-rb="unit" data-unit="'+esc(u.id)+'">'+esc(u.section+' · '+u.title)+'</button><span class="rb-small">'+esc(C.summary(s,u.id))+'</span></li>').join('')+'</ol><p class="rb-small">These are the verified current sections. Only HBr and one mapped E2 family have automatic graph/arrow checks here. Other complete answers stay pending tutor review.</p>';}
 function home(){
- s.phase='home';persist();const p=current(),d=peek(),old=legacySummary(),a=attempts(),last=a.at(-1),due=last&&day(last.at)<day()&&s.problem!==(p.family==='addition-full'?2:5);
- const action=chooseNextAction(d,due);
- shell('<section class="rb-card rb-next"><p class="rb-kicker">CHEM 231 · Start here</p><h1>See it. Then finish it yourself.</h1><p>Your current course work is Chapter 8 additions. Learn one complete example, then draw the next reaction on a different molecule.</p><p class="rb-small rb-muted">Course context checked Nov18. Chapters 1–8 stay visible; the final’s complete blueprint has not been verified.</p><button class="rb-main" data-rb="'+action+'">'+({resume:'Continue my saved answer',feedback:'Review my last checked answer',later:'Try the later check',learn:'Start Chapter 8: adding HBr'}[action])+'</button><p class="rb-small">'+(p.family==='e2-full'&&d?'You have an E2 repair in progress. Current Chapter 8 work remains below.':'One visible example. One full answer. No recognition-quiz gate first.')+'</p></section><section class="rb-card"><h2>Your three milestones</h2><ol class="rb-checklist"><li><strong>Current Chapter 8 work:</strong> complete a linked intermediate + arrows + product.</li><li><strong>Repair old reaction gaps:</strong> E2 arrows must end in an alkene; charged reagent and solvent have different roles.</li><li><strong>Check transfer later:</strong> a changed molecule now, then a later same-family check. A broader mixed exam check is still needed.</li></ol><p class="rb-small">A viewed example, a supported revision and a no-help attempt are different records. They are never added into a mastery percentage.</p></section><section class="rb-card"><h2>Current work and honest progress</h2><p><strong>Chapter 8 linked reaction:</strong> '+evidenceLine('addition-full')+'</p><p><strong>Chapter 7 E2 integration:</strong> '+evidenceLine('e2-full')+'</p><p><a href="https://smccd.instructure.com/courses/73887/assignments/2086535" target="_blank" rel="noopener">Homework8A</a> · <a href="https://smccd.instructure.com/courses/73887/assignments/2201768" target="_blank" rel="noopener">Homework8B</a> · <a href="'+COURSE_BASE+'chem231.html" target="_blank" rel="noopener">Full course bank</a></p><details><summary>More: repair a weak step or open earlier work</summary><button data-rb="start-ch8">Chapter 8 visual lesson</button><button data-rb="repair-e2">E2 whole-problem repair</button><button data-rb="blind">Try the current problem without its example</button><p><a href="'+COURSE_BASE+'chapter7-study.html" target="_blank" rel="noopener">Existing Chapter 7 lessons, homework and drawings</a></p><p>The original bank and its question IDs are unchanged. Familiar questions remain familiar.</p></details><details><summary>More: Chapters 1–8 coverage</summary><div class="rb-coverage">'+[['Ch1','Bonding and charge'],['Ch2','Representations and resonance'],['Ch3','Acids and bases'],['Ch4','Naming and conformations'],['Ch5','Stereochemistry'],['Ch6','Energy, rate and arrows'],['Ch7','Substitution and elimination'],['Ch8','Alkene additions']].map(([ch,label])=>'<div class="rb-domain"><strong>'+ch+': '+label+'</strong><span>'+(ch==='Ch7'?evidenceLine('e2-full'):ch==='Ch8'?evidenceLine('addition-full'):'Not reassessed in this preview. Retain earlier strengths.')+'</span></div>').join('')+'</div><p class="rb-small">These two families do not cover all objectives. Hydration, syn/anti addition, rearrangements, synthesis, stereochemistry, energy and earlier foundations still need broader checks.</p></details></section><section class="rb-card"><details><summary>Saved work and import</summary>'+(old?'<p>Existing Chapter 7 evidence found ('+old.source+'): '+old.events+' events and '+old.drafts+' drafts. It is preserved without converting it to new independent results.</p>':'<p>Older evidence is not available in this browser. That means unknown here, not zero understanding. Your live-site work has not been erased.</p>')+'<button data-rb="import">Import a copy of my Chapter 7 export</button><button data-rb="export">Export this preview’s work</button><input id="rb-import" type="file" accept="application/json" hidden><p id="rb-import-status" role="status"></p><p class="rb-small">Imports copy old evidence into this practice area. They never overwrite the original Chapter 7 key.</p></details></section>');
+ s.phase='home';const next=C.nextTask(s),ret=C.nextReturn(s),old=legacySummary();persist();
+ shell('<section class="rb-card rb-next"><p class="rb-kicker">CHEM 231 · Current work: Chapter 8</p><h1>'+esc(next.title)+'</h1><p>'+esc(next.reason)+'</p><button class="rb-main" data-rb="next-task">'+esc(taskButtonLabel(next))+'</button><p class="rb-small">'+(next.cause?.type==='tutor-review-file'?'Next task changed from the imported review. Original help conditions stay unchanged.':next.cause?.type==='checked-rubric'?'Next task changed because of your checked answer. Your written reason stays separate.':'One example, then a different complete problem. No quiz gate before new learning.')+'</p></section><section class="rb-card rb-compact"><h2>Before the homework</h2><p>Alkene naming, E/Z and requested R/S labels are part of the work too.</p><button data-rb="unit" data-unit="ch8-alkene-bridge">Open the naming bridge</button><p class="rb-small">One HBr check does not establish readiness for all Chapter 8 questions.</p>'+(ret?'<p><strong>Next return: '+esc(ret.dueDate)+'</strong></p><button data-rb="early-return">Review this early if I want</button><p class="rb-small">Early review is available. It does not prove later retention.</p>':'<p class="rb-small">A return date appears after a bounded complete attempt is checked. Written reasoning still needs review.</p>')+'</section><section class="rb-card"><details><summary>Your path and current topics</summary>'+progressHTML()+catalogHTML()+'</details><details><summary>More: repair an earlier step</summary><button data-rb="repair-e2">E2 whole-problem repair</button>'+C.catalog.filter(u=>u.status==='repair'&&u.id!=='ch7-e2').map(u=>'<button data-rb="unit" data-unit="'+u.id+'">'+esc(u.title)+'</button>').join('')+'<p><a href="'+COURSE_BASE+'chapter7-study.html" target="_blank" rel="noopener">Earlier Chapter 7 work</a> · <a href="'+COURSE_BASE+'chem231.html" target="_blank" rel="noopener">Full course bank</a></p></details><details><summary>More: planned later work</summary>'+C.catalog.filter(u=>u.status==='planned').map(u=>'<p><strong>'+esc(u.title)+':</strong> '+esc(u.task)+'</p>').join('')+'<p>The final is comprehensive over studied topics; a detailed final blueprint is not confirmed here.</p></details><details><summary>Saved answers and review</summary><p>'+C.ensure(s).pendingReviews.filter(x=>x.status==='pending').length+' answers have a part pending tutor review. No percentage of mastery is inferred.</p>'+reviewProvenanceHTML()+(old?'<p>Earlier Chapter 7 records remain available ('+old.events+' events, '+old.drafts+' drafts).</p>':'<p>Older records may be in another browser. Missing here means unknown.</p>')+'<button data-rb="export-review-request">Save the answer for my tutor</button><button data-rb="import-review">Use my tutor’s review file</button><input id="rb-review-import" type="file" accept="application/json" hidden><p id="rb-review-status" role="status"></p><button data-rb="export">Export my saved answers</button><button data-rb="import">Import a copy of earlier Chapter 7 work</button><input id="rb-import" type="file" accept="application/json" hidden><p id="rb-import-status" role="status"></p></details></section>');
 }
+function reviewProvenanceHTML(){const r=C.ensure(s).lastTutorReview;return r?'<p class="rb-small"><strong>Last review file:</strong> '+esc(r.reviewer)+' · '+esc(r.reviewedAt)+'<br>'+esc(r.source)+'<br>Imported from a local file; author identity is not verified. Original help conditions and automatic results are preserved.</p>':'';}
+function downloadJSON(value,name){const a=document.createElement('a');a.download=name;const u=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));a.href=u;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+function unitPage(unitId){
+ const u=C.unit(unitId);if(!u||u.status==='planned')return home();
+ if(u.family){begin(u.family==='addition-full'?0:3,'learn');return;}
+ C.ensure(s).activeUnit=unitId;if(u.chapter===8)C.ensure(s).currentUnit=unitId;C.ensure(s).manualDrafts[unitId]??={sourceRef:'',reason:'',status:'draft'};C.ensure(s).manualResume={unitId,at:Date.now()};s.phase='unit';persist();const d=C.ensure(s).manualDrafts[unitId]||{},repair=C.ensure(s).next;
+ shell('<section class="rb-card"><p class="rb-kicker">'+esc(u.section||'Earlier-step repair')+'</p><h1>'+esc(u.title)+'</h1>'+(repair?.unitId===unitId&&repair.kind==='repair'?'<div class="rb-feedback"><strong>Your tutor’s next step:</strong> '+esc(repair.reason)+'</div>':'')+'<p>'+esc(u.task)+'</p><a class="rb-resource" data-rb="resource" data-unit="'+esc(unitId)+'" href="'+esc(u.resource.url)+'" target="_blank" rel="noopener">'+esc(u.resource.label)+'</a><p class="rb-small">Use one explanation, then close it and attempt a different problem. Opening a resource is not a correctness result.</p><details><summary>More: another explanation</summary>'+u.alternatives.map(a=>'<p><a data-rb="resource" data-unit="'+esc(unitId)+'" href="'+esc(a.url)+'" target="_blank" rel="noopener">'+esc(a.label)+'</a></p>').join('')+'</details><p><a href="'+esc(u.practice.url)+'" target="_blank" rel="noopener">'+esc(u.practice.label)+'</a></p><h2>Keep one complete attempt</h2><p>Do the drawing on paper or in your assigned homework. Keep it for review here with your tutor.</p><label>Which assigned question?<input id="rb-manual-source" value="'+esc(d.sourceRef||'')+'" placeholder="Section and question number"></label><label>Your attempt and why<textarea id="rb-manual-reason" placeholder="What did you try? Where did you get stuck?">'+esc(d.reason||'')+'</textarea></label><label class="rb-choice"><input id="rb-manual-nohelp" type="checkbox"'+(d.noHelp?' checked':'')+'> I attempted it without help (my report).</label><button class="rb-main" data-rb="manual-save" data-unit="'+esc(unitId)+'">Save for tutor review</button><p id="rb-manual-status" role="status">'+(d.status==='pending-tutor-review'?'Saved; pending tutor review.':'This answer is reviewed with a tutor; it is not automatically marked correct.')+'</p></section>');
+}
+function problemIndex(id){return problems.findIndex(p=>p.id===id);}
+function nextTask(){
+ const n=C.nextTask(s),i=problemIndex(n.problemId);
+ if(n.kind==='manual-review'||n.kind==='review'){document.querySelector('[data-rb="export"]')?.click();return;}
+ if(n.kind==='unit'||n.kind==='unit-return'){if(n.kind==='unit-return')C.beginUnitReturn(s,n.unitId,n.cause?.retentionId);return unitPage(n.unitId);}
+ if(n.kind==='repair'&&i<0){unitPage(n.unitId);requestAnimationFrame(()=>$('#rb-manual-reason')?.focus());return;}
+ if(i>=0&&['repair','resume','resume-lesson'].includes(n.kind)){
+  dispose();s.problem=i;
+  if(n.kind==='resume-lesson'){s.lessonStep=s.resume?.lessonStep||0;return lesson();}
+  if(n.kind==='repair'){draft().helped=true;s.practiceStage='repair';attempt({restore:false});const part=n.component==='intermediate'&&current().family==='e2-full'?'cation':n.component;requestAnimationFrame(()=>focusPart(part));return;}
+  return attempt();
+ }
+ if(n.kind==='changed')return begin(i>=0?i:1,'changed');
+ if(n.kind==='later')return begin(i>=0?i:2,'later');
+ return begin(0,'learn');
+}
+
 function diagram(p,work=[],panel='one',interactive=false,animated=false){
  const step=panel==='two'?2:1,r=arrowRule(p,step),compact=!!root.matchMedia?.('(max-width: 600px)').matches,mapOnly=interactive&&p.family==='addition-full'&&step===2,atoms=Object.fromEntries(r.atoms.map(a=>[a.id,a])),sites={};
  if(compact){
@@ -241,7 +520,7 @@ function stages(){
   {title:'All three pair moves happen together.',body:'Ethoxide takes the selected beta H. Its C–H pair forms C=C as the C–Br pair goes to Br. There is no carbocation pause and no ring expansion in E2.',visual:()=>diagram({family:'e2-full',chain:4,alpha:2,beta:3},arrowRule({family:'e2-full',chain:4,alpha:2,beta:3}).expected,'one',false,true)},
   {title:'Finish with an alkene, not OEt attached to carbon.',body:'For this small-base comparison, the more substituted internal alkene is favored. Its E stereoisomer is more stable than Z. In an actual E2, the selected C–H and C–Br must reach anti-periplanar alignment.',visual:()=>molecule('C/C=C/C','worked-e2-product')}];
 }
-function lesson(){s.phase='lesson';const list=stages();s.lessonStep=Math.max(0,Math.min(list.length-1,s.lessonStep));persist();const st=list[s.lessonStep];shell('<section class="rb-card"><p class="rb-kicker">One worked example · '+(s.lessonStep+1)+' of '+list.length+'</p><h1>'+st.title+'</h1><p>'+st.body+'</p>'+st.visual()+'<p class="rb-small">Blue numbers identify carbons in the electron-tracking view. Hidden carbon hydrogens complete valence. This is a bond-line map, not a preferred 3D conformation.</p><button data-rb="prev"'+(!s.lessonStep?' disabled':'')+'>Previous</button>'+(s.lessonStep<list.length-1?'<button data-rb="next">Next part</button>':'')+'<button class="rb-main" data-rb="try">Try the different molecule</button><details><summary>Replay this electron movement</summary><button data-rb="replay">Replay this part</button></details></section>',0);}
+function lesson(){s.phase='lesson';const list=stages();s.lessonStep=Math.max(0,Math.min(list.length-1,s.lessonStep));s.lessonViewed={...(s.lessonViewed||{}),[current().family]:true};remember('lesson');const st=list[s.lessonStep];shell('<section class="rb-card"><p class="rb-kicker">One worked example · '+(s.lessonStep+1)+' of '+list.length+'</p><h1>'+st.title+'</h1><p>'+st.body+'</p>'+st.visual()+'<p class="rb-small">Blue numbers identify carbons in the electron-tracking view. Hidden carbon hydrogens complete valence. This is a bond-line map, not a preferred 3D conformation.</p><button data-rb="prev"'+(!s.lessonStep?' disabled':'')+'>Previous</button>'+(s.lessonStep<list.length-1?'<button data-rb="next">Next part</button>':'')+'<button class="rb-main" data-rb="try">Try the different molecule</button><details><summary>Replay this electron movement</summary><button data-rb="replay">Replay this part</button></details><details><summary>More: use the instructor explanation instead</summary><p><a data-rb="resource" data-unit="'+C.familyUnit(current().family).id+'" href="'+C.familyUnit(current().family).resource.url+'" target="_blank" rel="noopener">'+esc(C.familyUnit(current().family).resource.label)+'</a></p><p>Use one explanation, then close it and try the different molecule. You do not need to watch and read everything.</p></details></section>',0);}
 function radio(name,values,d){return values.map(x=>'<label class="rb-choice"><input type="radio" name="rb-'+name+'" value="'+x+'"'+(d[name]===x?' checked':'')+'> '+x+'</label>').join('');}
 function endpointOptions(p,panel){
  const r=arrowRule(p,panel==='two'?2:1),mapOnly=p.family==='addition-full'&&panel==='two';
@@ -256,7 +535,7 @@ function addArrow(panel,from,to){
 }
 function arrowBox(p,d,panel,title){
  const options='<option value="">Choose a location</option>'+endpointOptions(p,panel).map(a=>'<option value="'+esc(a.id)+'">'+esc(a.label)+'</option>').join('');
- return '<h2>'+title+'</h2><p>Tap an electron pair/bond, then its destination. Or choose the two locations by name below. Nothing is filled in for you.</p><div id="rb-arrows-'+panel+'">'+diagram(p,d.arrows[panel],panel,true)+'</div><p id="rb-arrow-status-'+panel+'" role="status">Choose the source.</p><div class="rb-arrow-selectors"><label>Electron source<select id="rb-source-'+panel+'" data-rb-source="'+panel+'">'+options+'</select></label><label>Destination<select id="rb-destination-'+panel+'">'+options+'</select></label><button data-rb="add-named-arrow" data-panel="'+panel+'">Add this arrow</button></div><button data-rb="undo" data-panel="'+panel+'">Undo this panel’s last arrow</button>';
+ return '<section id="rb-part-'+(panel==='two'?'next-arrow':p.family==='addition-full'?'first-arrows':'arrows')+'" data-rb-component="'+(panel==='two'?'next-arrow':p.family==='addition-full'?'first-arrows':'arrows')+'" tabindex="-1"><h2>'+title+'</h2><p>Tap an electron pair/bond, then its destination. Or choose the two locations by name below. Nothing is filled in for you.</p><div id="rb-arrows-'+panel+'">'+diagram(p,d.arrows[panel],panel,true)+'</div><p id="rb-arrow-status-'+panel+'" role="status">Choose the source.</p><div class="rb-arrow-selectors"><label>Electron source<select id="rb-source-'+panel+'" data-rb-source="'+panel+'">'+options+'</select></label><label>Destination<select id="rb-destination-'+panel+'">'+options+'</select></label><button data-rb="add-named-arrow" data-panel="'+panel+'">Add this arrow</button></div><button data-rb="undo" data-panel="'+panel+'">Undo this panel’s last arrow</button></section>';
 }
 function ownIntermediate(d){return d.molfiles.intermediate&&MolecularGrader.inspect(d.molfiles.intermediate).status!=='blank'?'<h3>Your intermediate</h3><p class="rb-small">This repeats your own drawing. It has not been corrected.</p>'+molecule(d.molfiles.intermediate,'your-intermediate',true):'<p>Draw your intermediate in the box above. Your own structure will appear here while you choose the next arrow.</p>';}
 function fitEditor(holder){
@@ -271,32 +550,82 @@ function fitEditor(holder){
  if(toolbar)toolbar.style.flex='0 0 auto';
  if(surface)Object.assign(surface.style,{flex:'1 1 0',minWidth:'0',width:'0'});
 }
-function editorBox(key,title){return '<h2>'+title+'</h2><div id="rb-editor-'+key+'" class="rb-editor" role="group" aria-label="Blank '+esc(key)+' molecular editor"></div>';}
-function attempt(){
- s.phase='attempt';const p=current(),d=draft(),add=p.family==='addition-full';persist();
- shell('<section class="rb-card"><p class="rb-kicker">'+esc(p.title)+' · original practice</p><h1>Finish one complete reaction.</h1>'+molecule(p.substrate,p.id)+'<p><strong>Conditions:</strong> '+esc(p.conditions)+'</p><ol class="rb-checklist">'+(add?'<li>Draw the electron arrows for the first event.</li><li>Draw the organic intermediate, including charge.</li><li>Draw the next event’s arrow and the final organic product.</li>':'<li>Choose the dominant pathway and state whether it pauses at a carbocation.</li><li>Draw electron arrows for the selected beta H.</li><li>Draw the requested major organic product.</li>')+'<li>Write the clue you used, even if unsure.</li></ol><button data-rb="help-task">I don’t understand what it wants</button><button data-rb="help-chem">I understand the task but don’t know the chemistry</button><details><summary>Drawing controls</summary><p>Use bond, atom, charge and stereochemical controls. A rotated equivalent graph is accepted. Include only the organic molecule in each box, without spectator ions. The diagrams below supply numbered atom mapping.</p></details>'+(add?arrowBox(p,d,'one','1. First event: your arrows')+editorBox('intermediate','2. Your organic intermediate')+'<p class="rb-small">Next use the atom map for your second arrow. The map supplies no carbon bonds or charges; your intermediate drawing above must show those.</p><details id="rb-next-panel"><summary>3. Draw the next event’s arrow</summary><div id="rb-own-intermediate">'+ownIntermediate(d)+'</div>'+arrowBox(p,d,'two','Next event')+'<p class="rb-small">This is an atom map, not another chemical structure. It intentionally gives no carbon bonds, H counts or carbon charges. Bromide’s participating pair is shown; its other pairs are omitted. Use your own intermediate to choose the destination.</p></details>':('<h2>1. Dominant pathway</h2><div class="rb-grid">'+radio('mechanism',['SN1','SN2','E1','E2'],d)+'</div><h3>Separate carbocation intermediate?</h3>'+radio('cation',['yes','no'],d)+arrowBox(p,d,'one','2. Your electron arrows')+'<p class="rb-small">O⁻ is the reactive oxygen of ethoxide. One lone pair is shown; the ethyl group and other pairs are omitted. The selected beta H is explicit. This map does not assert an anti 3D conformation.</p>'))+editorBox('product',add?'4. Your final organic product':'3. Your major organic product')+'<h2>Your decisive clue</h2><textarea id="rb-reason" placeholder="What in the structure and conditions decided your answer?">'+esc(d.reason)+'</textarea><label class="rb-choice"><input id="rb-nohelp" type="checkbox"'+(d.noHelp?' checked':'')+'> I used no help on this attempt. This is my report, not something the app can prove.</label><p id="rb-submit-status" role="status"></p><button class="rb-main" data-rb="check">Check my complete attempt</button><button data-rb="save">Save and leave</button></section>',1);
+function editorBox(key,title){return '<section id="rb-part-'+key+'" data-rb-component="'+key+'" tabindex="-1"><h2>'+title+'</h2><div id="rb-editor-'+key+'" class="rb-editor" role="group" aria-label="Blank '+esc(key)+' molecular editor"></div></section>';}
+function attempt({restore=true}={}){
+ s.phase='attempt';const p=current(),d=draft(),add=p.family==='addition-full';remember('attempt');
+ shell('<section class="rb-card"><p class="rb-kicker">'+esc(p.title)+' · original practice</p><h1>Finish one complete reaction.</h1>'+(C.ensure(s).next?.kind==='repair'&&C.ensure(s).next.problemId===p.id?'<aside class="rb-feedback"><strong>Repair this step:</strong> '+esc(C.ensure(s).next.reason)+'</aside>':'')+molecule(p.substrate,p.id)+'<p><strong>Conditions:</strong> '+esc(p.conditions)+'</p><ol class="rb-checklist">'+(add?'<li>Draw the electron arrows for the first event.</li><li>Draw the organic intermediate, including charge.</li><li>Draw the next event’s arrow and the final organic product.</li>':'<li>Choose the dominant pathway and state whether it pauses at a carbocation.</li><li>Draw electron arrows for the selected beta H.</li><li>Draw the requested major organic product.</li>')+'<li>Write the clue you used, even if unsure.</li></ol><button data-rb="help-task">I don’t understand what it wants</button><button data-rb="help-chem">I understand the task but don’t know the chemistry</button><details><summary>Drawing controls</summary><p>Use bond, atom, charge and stereochemical controls. A rotated equivalent graph is accepted. Include only the organic molecule in each box, without spectator ions. The diagrams below supply numbered atom mapping.</p></details>'+(add?arrowBox(p,d,'one','1. First event: your arrows')+editorBox('intermediate','2. Your organic intermediate')+'<p class="rb-small">Next use the atom map for your second arrow. The map supplies no carbon bonds or charges; your intermediate drawing above must show those.</p><details id="rb-next-panel"><summary>3. Draw the next event’s arrow</summary><div id="rb-own-intermediate">'+ownIntermediate(d)+'</div>'+arrowBox(p,d,'two','Next event')+'<p class="rb-small">This is an atom map, not another chemical structure. It intentionally gives no carbon bonds, H counts or carbon charges. Bromide’s participating pair is shown; its other pairs are omitted. Use your own intermediate to choose the destination.</p></details>':('<section id="rb-part-pathway" data-rb-component="pathway" tabindex="-1"><h2>1. Dominant pathway</h2><div class="rb-grid">'+radio('mechanism',['SN1','SN2','E1','E2'],d)+'</div></section><section id="rb-part-cation" data-rb-component="cation" tabindex="-1"><h3>Separate carbocation intermediate?</h3>'+radio('cation',['yes','no'],d)+'</section>'+arrowBox(p,d,'one','2. Your electron arrows')+'<p class="rb-small">O⁻ is the reactive oxygen of ethoxide. One lone pair is shown; the ethyl group and other pairs are omitted. The selected beta H is explicit. This map does not assert an anti 3D conformation.</p>'))+editorBox('product',add?'4. Your final organic product':'3. Your major organic product')+'<section id="rb-part-reason" data-rb-component="reason" tabindex="-1"><h2>Your decisive clue</h2><textarea id="rb-reason" placeholder="What in the structure and conditions decided your answer?">'+esc(d.reason)+'</textarea></section><label class="rb-choice"><input id="rb-nohelp" type="checkbox"'+(d.noHelp?' checked':'')+'> I used no help on this attempt. This is my report, not something the app can prove.</label><p id="rb-submit-status" role="status"></p><button class="rb-main" data-rb="check" id="rb-part-check" tabindex="-1">Check my complete attempt</button><button data-rb="save">Save and leave</button></section>',1);
  const keys=add?['intermediate','product']:['product'];
- for(const key of keys){const holder=$('#rb-editor-'+key),editor=new OCL.CanvasEditor(holder);fitEditor(holder);editor.setMolecule(d.molfiles[key]?OCL.Molecule.fromMolfile(d.molfiles[key]):new OCL.Molecule(0,0));editors.push({editor,key});editor.setOnChangeListener(ev=>{if(ev.type!=='molecule')return;d.molfiles[key]=editor.getMolecule().toMolfile();if(key==='intermediate'&&$('#rb-own-intermediate'))$('#rb-own-intermediate').innerHTML=ownIntermediate(d);delete d.feedback;persist();if($('#rb-submit-status'))$('#rb-submit-status').textContent='Saved. Check when ready.';});}
+ for(const key of keys){const holder=$('#rb-editor-'+key),editor=new OCL.CanvasEditor(holder);fitEditor(holder);editor.setMolecule(d.molfiles[key]?OCL.Molecule.fromMolfile(d.molfiles[key]):new OCL.Molecule(0,0));editors.push({editor,key});editor.setOnChangeListener(ev=>{if(ev.type!=='molecule')return;d.molfiles[key]=editor.getMolecule().toMolfile();if(key==='intermediate'&&$('#rb-own-intermediate'))$('#rb-own-intermediate').innerHTML=ownIntermediate(d);delete d.feedback;workingAt(key);if($('#rb-submit-status'))$('#rb-submit-status').textContent='Saved. Check when ready.';});}
  if(add)$('#rb-next-panel').addEventListener('toggle',()=>{if($('#rb-next-panel')?.open)record('atom-map-opened',{problemId:p.id,scope:'numbered map only; no carbon bonds or charges supplied'});});
+ if(restore&&d.lastSpot)requestAnimationFrame(()=>focusPart(d.lastSpot));
 }
-function check(){sync();const p=current(),d=draft(),r=grade(p,d,MolecularGrader);if(!r.complete){$('#rb-submit-status').innerHTML='<span class="rb-incomplete">'+r.missing.map(esc).join(' ')+'</span>';return;}const condition=classifyAttempt(d);d.feedback=r;record('submitted',{problemId:p.id,family:p.family,ok:r.ok,parts:r.parts.map(x=>({id:x.id,ok:x.ok})),answers:clone(d),condition,reasonReviewed:false,externallyUnseen:'unknown'});d.lastCondition=condition;feedback();}
+function check(){
+ sync();const p=current(),d=draft(),r=grade(p,d,MolecularGrader);
+ if(!r.complete){$('#rb-submit-status').innerHTML='<span class="rb-incomplete">'+r.missing.map(esc).join(' ')+'</span>';return;}
+ const condition=classifyAttempt(d),now=Date.now(),checkId=p.id+':'+now+':'+attempts().length,retention=C.noteReturnAttempt(s,p.id,now);d.feedback=r;d.lastCondition=condition;d.retention=retention||null;d.lastCheckId=checkId;
+ C.applyCheck(s,p,r,condition,now,checkId);
+ record('submitted',{problemId:p.id,family:p.family,ok:r.ok,automaticOnly:true,automaticStatus:C.automaticStatus(r),parts:r.parts.map(x=>({id:x.id,ok:x.ok,code:x.code})),answers:clone(d),condition,taskSupport:d.taskClarified?'task-wording':'none',reasonReviewed:false,completeAnswerStatus:'pending-tutor-review',retention,externallyUnseen:'unknown',checkId});feedback();
+}
 function feedback(){
- const p=current(),d=draft(),r=d.feedback;if(!r)return attempt();s.phase='feedback';d.feedbackSeen=true;persist();const first=r.parts.find(x=>!x.ok);
- shell('<section class="rb-card"><p class="rb-kicker">Attempt saved before feedback</p><h1>'+(first?'Fix this step first.':'The automatic checks passed.')+'</h1><div class="rb-feedback" data-ok="'+r.ok+'"><p><strong>'+(first?esc(first.text):'The separate checks match this bounded task. Your explanation still needs tutor review.')+'</strong></p></div><ul>'+r.parts.map(x=>'<li><strong>'+esc(partLabel(x.id))+':</strong> '+(x.ok?'matches':'needs repair')+'</li>').join('')+'</ul><p>'+esc(r.reasonReview)+'</p><p class="rb-small">Condition at submission: '+esc(conditionLabel(d.lastCondition))+'. '+' A product graph match alone does not check arrows, sequence or an explanation. Those limited arrow checks are listed separately above.</p><details id="rb-model"><summary>Compare the worked answer</summary>'+(p.intermediate?'<h3>Intermediate</h3>'+molecule(p.intermediate,'model-intermediate'):'')+'<h3>Organic product</h3>'+molecule(p.product,'model-product')+diagram(p,arrowRule(p,1).expected,'one')+(p.intermediate?diagram(p,arrowRule(p,2).expected,'two'):'')+'<p>'+esc(p.modelReason)+'</p></details><button class="rb-main" data-rb="different">Try a changed structure</button><button data-rb="revise">Revise this answer with support</button><button data-rb="home">See progress</button><p class="rb-small">A revision after feedback stays supported. A changed structure in this same family is not a broad mixed exam test. Later checks are separate, with no forced wait.</p></section>',2);
+ const p=current(),d=draft(),r=d.feedback;if(!r)return attempt();s.phase='feedback';d.feedbackSeen=true;remember('feedback');const review=C.ensure(s).pendingReviews.filter(x=>x.problemId===p.id).at(-1),parts=review?.effectiveParts||r.parts,first=C.firstMiss({parts}),status=C.automaticStatus({parts}),effectiveOK=status==='matched'?true:status==='needs-repair'?false:null,next=C.ensure(s).next,reasonText=review?.reasonStatus==='correct'?'The imported review marked your written why correct. Your original help condition is unchanged.':review?.reasonStatus==='needs-repair'?'The imported review asks you to revise your written why.':r.reasonReview;
+ shell('<section class="rb-card"><p class="rb-kicker">Your attempt is saved</p><h1>'+(first?'Repair one step.':status==='pending'?'This part needs tutor review.':'Graph and arrow checks match.')+'</h1><div class="rb-feedback"'+(effectiveOK===null?'':' data-ok="'+effectiveOK+'"')+'><p><strong>'+(first?esc(first.text):review?.reasonStatus==='correct'?'The imported review includes your written why. This remains a bounded submitted-answer result.':'Your written why still needs tutor review. This is a bounded component check, not a complete understanding pass.')+'</strong></p></div><p><strong>Next task changed because:</strong> '+esc(next?.reason||'Keep this answer for review.')+'</p><button class="rb-main" data-rb="next-task">'+esc(next?taskButtonLabel(next):'Review my answer')+'</button><details><summary>See each checked part and compare after your attempt</summary><ul>'+parts.map(x=>'<li><strong>'+esc(partLabel(x.id))+':</strong> '+(x.ok===true?(x.source==='local-review-file'?'review file: correct':'matches'):x.ok===false?'needs repair':'pending tutor review')+'</li>').join('')+'</ul><p>'+esc(reasonText)+'</p><p class="rb-small">At submission: '+esc(conditionLabel(d.lastCondition))+'. A graph match does not grade your written reasoning.</p><details id="rb-model"><summary>Compare the worked answer</summary>'+(p.intermediate?'<h3>Intermediate</h3>'+molecule(p.intermediate,'model-intermediate'):'')+'<h3>Organic product</h3>'+molecule(p.product,'model-product')+diagram(p,arrowRule(p,1).expected,'one')+(p.intermediate?diagram(p,arrowRule(p,2).expected,'two'):'')+'<p>'+esc(p.modelReason)+'</p></details></details><details><summary>More: another next step</summary><button data-rb="different">Try a changed structure</button><button data-rb="revise">Revise with support</button><button data-rb="export">Export this answer for review</button><button data-rb="home">Study home</button></details></section>',2);
  $('#rb-model').addEventListener('toggle',()=>{if($('#rb-model')?.open){d.modelSeen=true;record('model-opened',{problemId:p.id});}});
 }
-function begin(index,mode){dispose();s.problem=index;s.lessonStep=0;const existing=peek();if(mode==='learn'){lesson();return;}const d=draft();if(mode==='after-example')d.afterExample=true;if(existing?.feedback){d.helped=true;record('repeat-start',{problemId:current().id,familiar:true});}record('attempt-start',{problemId:current().id,condition:classifyAttempt(d),externallyUnseen:'unknown'});attempt();}
+
+function begin(index,mode){dispose();delete C.ensure(s).manualResume;s.problem=index;s.practiceStage=mode==='changed'?'changed':mode==='later'?'later':'complete';s.lessonStep=0;const existing=peek();if(mode==='learn'){lesson();return;}const d=draft();if(mode==='after-example')d.afterExample=true;if(existing?.feedback){d.helped=true;record('repeat-start',{problemId:current().id,familiar:true});}record('attempt-start',{problemId:current().id,family:current().family,condition:classifyAttempt(d),externallyUnseen:'unknown'});attempt({restore:false});}
 function different(later=false){const base=current().family==='addition-full'?0:3;const next=later?base+2:s.problem===base?base+1:base;begin(next,later?'later':'changed');}
-function help(taskOnly){sync();const d=draft();d.helped=true;record('cannot-start',{problemId:current().id,reason:taskOnly?'task-meaning':'chemistry'});if(!taskOnly){s.lessonStep=0;lesson();return;}const p=current();$('#rb-submit-status').innerHTML='<div class="rb-feedback"><strong>It wants a beginning, middle and end.</strong><p>'+(p.family==='addition-full'?'Use the starting alkene. Draw where its electrons move first; draw the resulting charged organic molecule; then show the next electron move and the final organic molecule. A carbocation alone is not the final product.':'Use the stated conditions. Choose the pathway; show the electron moves; then draw the organic product. Choosing E2 alone does not finish the answer.')+'</p><button data-rb="return-top">Return to the whole prompt</button></div>';$('#rb-submit-status').scrollIntoView({block:'center',behavior:'smooth'});}
+function help(taskOnly){
+ sync();const d=draft(),p=current();
+ if(taskOnly){d.taskClarified=true;record('cannot-start',{problemId:p.id,reason:'task-meaning',taskSupport:true,chemistryHelp:false});$('#rb-submit-status').innerHTML='<div class="rb-feedback"><strong>Here is what you need to hand in.</strong><ol>'+taskParts(p,d,MolecularGrader.inspect).map(x=>'<li>'+esc(x.label)+'.</li>').join('')+'</ol><p>Use the starting structure and exact conditions above. Nothing has been corrected or filled in.</p><button data-rb="return-top">Return to my prompt</button></div>';$('#rb-submit-status').scrollIntoView({block:'center',behavior:'smooth'});return;}
+ d.helped=true;record('cannot-start',{problemId:p.id,reason:'chemistry',taskSupport:false,chemistryHelp:true});s.lessonStep=0;lesson();
+}
+
+function progressHTML(){return '<ol class="rb-milestones">'+progressSteps(s.events,current().family,peek(),!!s.lessonViewed?.[current().family]).map(x=>'<li><strong>'+esc(x.label)+'</strong><span>'+esc(x.detail)+'</span></li>').join('')+'</ol><p class="rb-small">Entered is not the same as correct. Helped revisions and no-help reports remain separate. The later check is available without a timer.</p>';}
+function focusPart(id){
+ const target=$('#rb-part-'+id);if(!target)return;
+ for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;
+ target.scrollIntoView({block:'start',behavior:'auto'});target.focus({preventScroll:true});
+}
+function recover(){
+ sync();const p=current(),d=peek()||{},panel=$('#rb-recovery');
+ if(s.phase==='unit'){const u=C.unit(C.ensure(s).activeUnit);recoveryTarget={screen:'unit'};panel.innerHTML='<h2>'+esc(u.title)+'</h2><p>'+esc(u.task)+'</p><p>Your question reference and written draft are saved below. Continue where you stopped; no answer has been supplied.</p><button data-rb="recovery-close">Return to my work</button>';panel.hidden=false;panel.focus({preventScroll:true});record('recovery-opened',{unitId:u.id,navigationOnly:true,changesHelpCondition:false});return;}
+ if(s.phase==='lesson'||(s.phase==='home'&&s.resume?.screen==='lesson')){
+  recoveryTarget={screen:'lesson',component:null};
+  const given=p.family==='addition-full'?'C=C(C)C':'CC(Br)CC',conditions=p.family==='addition-full'?'HBr; ordinary ionic conditions, no peroxides.':'NaOEt in EtOH, heat.';
+  panel.innerHTML='<h2>You were in the worked example.</h2>'+molecule(given,'recovery-worked-given')+'<p><strong>Given:</strong> '+conditions+'</p><p>Part '+(s.lessonStep+1)+' of '+stages().length+'. Continue this part, then try the different molecule yourself. No answer has been entered for you.</p><button class="rb-main" data-rb="recovery-go">Return to this part</button><button data-rb="recovery-close">Close</button>';
+ }else{
+  const r=recoveryData(p,d,MolecularGrader.inspect);recoveryTarget={screen:d.feedback?'feedback':'attempt',component:r.next.id};
+  panel.innerHTML='<h2>You’re working on '+esc(r.title)+'.</h2>'+diagram(p,[],'one',false)+'<p><strong>Given:</strong> '+esc(r.conditions)+'</p><p><strong>Your task:</strong></p><ol>'+r.tasks.map(x=>'<li>'+esc(x.label)+'.</li>').join('')+'</ol><p><strong>'+(d.feedback?'This answer has already been checked. Return to review or repair it.':r.allPartsEntered?'You have an entry in every part. Read your full answer, then check when ready.':'Next blank part: '+esc(r.next.label)+'.')+'</strong></p><p class="rb-small">This points to empty work; it does not judge your answers or change your help status.</p><button class="rb-main" data-rb="recovery-go">'+(d.feedback?'Return to my checked answer':r.allPartsEntered?'Return to my full answer':'Continue here')+'</button><button data-rb="recovery-close">Close</button>';
+ }
+ panel.hidden=false;panel.scrollIntoView({block:'start',behavior:'auto'});panel.focus({preventScroll:true});
+ record('recovery-opened',{problemId:p.id,family:p.family,screen:s.phase,navigationOnly:true,changesHelpCondition:false});
+}
+function resumeRecovery(){
+ const target=recoveryTarget;if(!target)return;
+ if(target.screen==='lesson'){if(s.phase==='home'){s.lessonStep=s.resume?.lessonStep||0;lesson();}else $('#rb-recovery').hidden=true;return;}
+ if(target.screen==='feedback'){feedback();return;}
+ if(s.phase!=='attempt')attempt({restore:false});else $('#rb-recovery').hidden=true;
+ requestAnimationFrame(()=>focusPart(target.component));
+}
 document.addEventListener('click',e=>{
+ const spot=e.target.closest('[data-rb-component]');if(spot)workingAt(spot.dataset.rbComponent);
  const site=e.target.closest('[data-rb-site]');if(site){const panel=site.dataset.panel,id=site.dataset.rbSite;if(!pendingArrow||pendingArrow.panel!==panel){pendingArrow={panel,id};$('#rb-arrow-status-'+panel).textContent='Source: '+endpointLabel(current(),panel,id)+'. Now choose its destination.';if($('#rb-source-'+panel))$('#rb-source-'+panel).value=id;}else{addArrow(panel,pendingArrow.id,id);}return;}
  const b=e.target.closest('[data-rb]');if(!b)return;
  switch(b.dataset.rb){
   case'home':case'save':sync();home();break;
+  case'next-task':nextTask();break;
+  case'unit':unitPage(b.dataset.unit);break;
+  case'resource':C.noteResource(s,b.dataset.unit);record('resource-opened',{unitId:b.dataset.unit,evidence:'exposure-only'});break;
+  case'manual-save':{const result=C.saveManual(s,b.dataset.unit,{sourceRef:$('#rb-manual-source').value,reason:$('#rb-manual-reason').value,noHelp:$('#rb-manual-nohelp').checked});persist();$('#rb-manual-status').textContent=result.complete?'Saved. Pending tutor review; no correctness result was assigned.':result.missing.join(' ');if(result.complete)record('manual-work-saved',{unitId:b.dataset.unit,reviewStatus:'pending',automaticStatus:'not-scored'});break;}
+  case'early-return':{const r=C.nextReturn(s);if(r?.problemId)begin(problemIndex(r.problemId),'later');else if(r){C.beginUnitReturn(s,r.unitId,r.id);unitPage(r.unitId);}break;}
   case'learn':case'start-ch8':begin(0,'learn');break;
   case'repair-e2':begin(3,'learn');break;
   case'blind':begin(s.problem,'blind');break;
   case'resume':attempt();break;
+  case'resume-lesson':s.lessonStep=s.resume?.lessonStep||0;lesson();break;
+  case'recover':recover();break;
+  case'recovery-close':$('#rb-recovery').hidden=true;break;
+  case'recovery-go':resumeRecovery();break;
   case'feedback':feedback();break;
   case'prev':s.lessonStep--;lesson();break;
   case'next':s.lessonStep++;lesson();break;
@@ -308,21 +637,29 @@ document.addEventListener('click',e=>{
   case'add-named-arrow':{const panel=b.dataset.panel,from=$('#rb-source-'+panel).value,to=$('#rb-destination-'+panel).value;if(!from||!to){$('#rb-arrow-status-'+panel).textContent='Choose both a source and destination.';break;}addArrow(panel,from,to);break;}
   case'undo':{const panel=b.dataset.panel;draft().arrows[panel].pop();pendingArrow=null;delete draft().feedback;persist();$('#rb-arrows-'+panel).innerHTML=diagram(current(),draft().arrows[panel],panel,true);break;}
   case'check':check();break;
-  case'revise':draft().helped=true;attempt();break;
+  case'revise':draft().helped=true;s.practiceStage='repair';attempt();break;
   case'different':different();break;
   case'later':different(true);break;
   case'import':$('#rb-import').click();break;
+  case'import-review':$('#rb-review-import').click();break;
+  case'export-review-request':{const r=C.reviewRequest(s);persist();if(r.ok)downloadJSON(r.request,'CHEM 231-answer-for-tutor.json');else $('#rb-review-status').textContent=r.message;break;}
   case'export':{sync();const a=document.createElement('a');a.download='CHEM 231-rebuild-preview-work.json';const u=URL.createObjectURL(new Blob([JSON.stringify(s,null,2)],{type:'application/json'}));a.href=u;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);break;}
  }
 });
 document.addEventListener('change',async e=>{
+ if(e.target.id==='rb-review-import'){
+  const notice=$('#rb-review-status');try{const file=e.target.files[0];if(!file)return;if(file.size>1000000)throw Error('Choose the small review file for this answer.');const value=JSON.parse(await file.text()),r=C.importReview(s,value,problems);if(!r.ok){notice.textContent=r.message;e.target.value='';return;}record('tutor-review-imported',{reviewId:value.reviewId,attemptId:value.target.attemptId,unitId:value.target.unitId,authenticated:false,source:'user-selected-local-file',effectiveStatus:r.outcome,originalHelpCondition:r.provenance.condition,learnerAttempt:false});persist();home();const out=$('#rb-review-status');out.textContent=r.message;out.closest('details').open=true;}catch(err){if(notice)notice.textContent=err instanceof SyntaxError?'This review file could not be read. Ask your tutor for the saved review file.':err.message;}return;
+ }
+
  if(e.target.dataset.rbSource){const panel=e.target.dataset.rbSource,id=e.target.value;pendingArrow=id?{panel,id}:null;$('#rb-arrow-status-'+panel).textContent=id?'Source: '+endpointLabel(current(),panel,id)+'. Choose its destination.':'Choose the source.';}
  if(e.target.name==='rb-mechanism'||e.target.name==='rb-cation'){draft()[e.target.name.slice(3)]=e.target.value;delete draft().feedback;persist();}
+ if(e.target.id==='rb-manual-nohelp'){const c=C.ensure(s),d=c.manualDrafts[c.activeUnit]??={};d.noHelp=e.target.checked;persist();}
  if(e.target.id==='rb-nohelp'){draft().noHelp=e.target.checked;persist();}
  if(e.target.id==='rb-import'){try{const file=e.target.files[0];if(!file)return;const x=JSON.parse(await file.text());if(!validLegacy(x))throw Error('Choose a Chapter 7 work export.');s.importedLegacy={at:Date.now(),source:'learner-selected-export',snapshot:x};persist();$('#rb-import-status').textContent='Copy preserved: '+x.events.length+' events, '+Object.keys(x.drafts).length+' drafts. Original work was not overwritten or counted as new mastery.';}catch(err){$('#rb-import-status').textContent=err.message;}}
 });
-document.addEventListener('input',e=>{if(e.target.id==='rb-reason'){draft().reason=e.target.value;delete draft().feedback;persist();}});
+document.addEventListener('input',e=>{if(['rb-manual-source','rb-manual-reason'].includes(e.target.id)){const c=C.ensure(s),id=c.activeUnit,d=c.manualDrafts[id]??={};d.sourceRef=$('#rb-manual-source').value;d.reason=$('#rb-manual-reason').value;d.status='draft';c.manualResume={unitId:id,at:Date.now()};persist();}if(e.target.id==='rb-reason'){draft().reason=e.target.value;delete draft().feedback;persist();}});
 document.addEventListener('keydown',e=>{if(e.target.matches('[data-rb-site]')&&['Enter',' '].includes(e.key)){e.preventDefault();e.target.click();}});
+document.addEventListener('focusin',e=>{const spot=e.target.closest?.('[data-rb-component]');if(spot)workingAt(spot.dataset.rbComponent);});
 root.addEventListener('pagehide',sync);
 root.ChemRebuildPreview={...api,state:()=>clone(s),home,qa};
 home();
