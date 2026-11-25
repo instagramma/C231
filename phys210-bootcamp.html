@@ -7,7 +7,8 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.20  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.21  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  v2.21 (2026-11-25): Typed law statements from lecture and the practice papers in the Concepts quiz.
   v2.20 (2026-11-25): Three interactive quizzes on Today, separate restarts and a collapsible Canvas reminder.
   v2.19 (2026-11-25): Today concepts and print sheets; multi-equation retries keep correct picks.
   v2.18 (2026-11-25): Home-page practice exam equation quiz.
@@ -1057,6 +1058,8 @@ textarea.report{
 .canvas-heading .exam-text-button{margin-inline-start:auto}
 .today-print-links a{font-size:.9rem;min-height:36px}
 .concept-choices{display:grid;gap:.45rem;margin:.55rem 0}
+.law-blank label{font-weight:600}
+.law-blank input{box-sizing:border-box;width:min(100%,28rem);min-height:44px;font:inherit;padding:.5rem .7rem;color:var(--ink);background:var(--paper2);border:1px solid var(--line);border-radius:7px}
 .quiz-launch h2,.quiz-launch p,.quiz-tools .exam-meta{margin:0}
 .quiz-launch h2{font-size:1.25rem}
 .quiz-launch p{font-size:.92rem;color:var(--muted-tx);margin:.2rem 0}
@@ -5306,6 +5309,20 @@ const conceptCards = [
     "paper": "monday/springstick"
   },
   {
+    "id": "law-momentum",
+    "topic": "An isolated pair",
+    "source": "Lecture · Momentum and Energy Conservation",
+    "q": "During an impact with zero net external impulse, the system’s total ___ is conserved.",
+    "accept": [
+      "momentum",
+      "linear momentum",
+      "momentum vector",
+      "linear momentum vector"
+    ],
+    "why": "The objects can exchange momentum. Their momenta still add to the same vector after the impact.",
+    "paper": null
+  },
+  {
     "id": "elastic",
     "topic": "Elastic impact",
     "source": "Fall 2026 · p. 4, problem 6",
@@ -5319,6 +5336,19 @@ const conceptCards = [
     "why": "Zero net external impulse conserves the pair’s momentum. An elastic collision also conserves the pair’s kinetic energy.",
     "key": "Both totals",
     "paper": "fall/springelastic"
+  },
+  {
+    "id": "law-sticking",
+    "topic": "Collision types",
+    "source": "Monday · p. 4, problem 6",
+    "q": "If two carts lock together and move with one velocity after impact, the collision is called ___ inelastic.",
+    "accept": [
+      "perfectly",
+      "completely",
+      "totally"
+    ],
+    "why": "“Inelastic” alone allows the carts to separate. Sticking identifies the perfectly inelastic case.",
+    "paper": "monday/springstick"
   },
   {
     "id": "rebound",
@@ -5351,6 +5381,18 @@ const conceptCards = [
     "paper": null
   },
   {
+    "id": "law-elastic",
+    "topic": "Elastic collision",
+    "source": "Fall 2026 · p. 4, problem 6",
+    "q": "In an elastic collision, the system’s total ___ energy is the same before and after impact.",
+    "accept": [
+      "kinetic",
+      "translational kinetic"
+    ],
+    "why": "Compare the sum for both objects. An individual object can gain or lose kinetic energy.",
+    "paper": "fall/springelastic"
+  },
+  {
     "id": "ramp",
     "topic": "Reading “inelastic”",
     "source": "Monday & Fall 2026 · p. 3, problem 4",
@@ -5381,6 +5423,19 @@ const conceptCards = [
     "paper": "monday/springstick"
   },
   {
+    "id": "law-conservative",
+    "topic": "Conservative forces",
+    "source": "Monday · p. 1, Q1",
+    "q": "Between two fixed endpoints, the work done by a conservative force is independent of the ___ taken.",
+    "accept": [
+      "path",
+      "route",
+      "trajectory"
+    ],
+    "why": "Gravity does the same work between the same two heights along either route.",
+    "paper": "monday/conserve"
+  },
+  {
     "id": "conservative",
     "topic": "Conservative work",
     "source": "Monday · p. 1, Q1",
@@ -5394,6 +5449,20 @@ const conceptCards = [
     "why": "For a conservative force, any two paths with the same endpoints give the same work. A closed trip returns to its start, so the work is zero.",
     "key": "Same endpoints, same work",
     "paper": "monday/conserve"
+  },
+  {
+    "id": "law-second-general",
+    "topic": "Second law · general form",
+    "source": "Monday and Fall 2026 · p. 1, Q2",
+    "q": "In an inertial frame, the net external force on a system equals the time rate of change of its total ___.",
+    "accept": [
+      "linear momentum",
+      "momentum",
+      "momentum vector",
+      "linear momentum vector"
+    ],
+    "why": "In symbols, ΣFₑₓₜ = dP/dt. The direction of the force is the direction of the momentum change.",
+    "paper": "monday/n2"
   },
   {
     "id": "law",
@@ -5411,6 +5480,18 @@ const conceptCards = [
     "paper": "monday/n2"
   },
   {
+    "id": "law-frame",
+    "topic": "Reference frames",
+    "source": "Oct 12 lecture · Newton’s laws and inertial frames",
+    "q": "A nonrotating frame moving at constant velocity relative to an inertial frame is also an ___ frame.",
+    "accept": [
+      "inertial",
+      "inertial reference"
+    ],
+    "why": "Constant velocity includes rest. A turning frame changes direction even at constant speed.",
+    "paper": null
+  },
+  {
     "id": "impulse",
     "topic": "Impulse",
     "source": "Fall 2026 · p. 1, first question",
@@ -5423,6 +5504,18 @@ const conceptCards = [
     "answer": 2,
     "why": "Momentum is mass times velocity. Net impulse is the change in the system’s momentum, including direction.",
     "key": "Impulse equals Δp",
+    "paper": "fall/impulse"
+  },
+  {
+    "id": "law-impulse",
+    "topic": "Impulse and momentum",
+    "source": "Fall 2026 · p. 1, Q1",
+    "q": "The net external impulse on a system equals its final total momentum ___ its initial total momentum.",
+    "accept": [
+      "minus",
+      "less"
+    ],
+    "why": "Use final minus initial with signs: a reversal of direction changes the momentum even if speed stays the same.",
     "paper": "fall/impulse"
   },
   {
@@ -5439,6 +5532,18 @@ const conceptCards = [
     "why": "The inward force turns the velocity. The speed and kinetic energy stay constant, so the net work is zero.",
     "key": "Force perpendicular to motion",
     "paper": "fall/zerowork"
+  },
+  {
+    "id": "law-work",
+    "topic": "Work–energy theorem",
+    "source": "Lecture · Work and Energy",
+    "q": "The net work on a particle equals the change in its ___ energy.",
+    "accept": [
+      "kinetic",
+      "translational kinetic"
+    ],
+    "why": "Positive net work increases kinetic energy. Negative net work decreases it.",
+    "paper": null
   },
   {
     "id": "braking",
@@ -5471,6 +5576,22 @@ const conceptCards = [
     "paper": "test1a/balanced"
   },
   {
+    "id": "law-first-weak",
+    "topic": "First law · weak form",
+    "source": "Oct 14 lecture · Newton’s laws",
+    "q": "In an inertial frame, an object maintains its velocity ___ the net force on it is zero. Give the phrase that makes the statement work in both directions.",
+    "accept": [
+      "if and only if",
+      "iff",
+      "exactly when",
+      "precisely when",
+      "if and only when",
+      "when and only when"
+    ],
+    "why": "“If and only if” connects both directions. Balanced forces can act on the object.",
+    "paper": null
+  },
+  {
     "id": "netforce",
     "topic": "Nonzero net force",
     "source": "Monday · p. 1, Q3",
@@ -5484,6 +5605,20 @@ const conceptCards = [
     "why": "ΣF = ma. An object can be instantaneously at rest and still accelerate in the direction of a nonzero net force.",
     "key": "Net force gives acceleration",
     "paper": "monday/nonzero"
+  },
+  {
+    "id": "law-second-constant",
+    "topic": "Second law · constant mass",
+    "source": "Oct 14 lecture · Practice 1A, p. 1, Q3",
+    "q": "In an inertial frame, the net force on a constant-mass object equals its mass times its ___.",
+    "accept": [
+      "acceleration",
+      "acceleration vector",
+      "linear acceleration",
+      "rate of change of velocity"
+    ],
+    "why": "ΣF = ma. The acceleration points in the same direction as the net force.",
+    "paper": "test1a/n2example"
   },
   {
     "id": "translation",
@@ -5516,6 +5651,20 @@ const conceptCards = [
     "paper": "makeup/horizontal"
   },
   {
+    "id": "law-third",
+    "topic": "Third law · interaction pair",
+    "source": "Oct 14 lecture · Make-up practice, Q3",
+    "q": "If A pushes on B, B simultaneously pushes on A with a force equal in magnitude and ___ in direction.",
+    "accept": [
+      "opposite",
+      "opposite to it",
+      "opposite to the first force",
+      "opposite to that of the first force"
+    ],
+    "why": "The paired forces act on two different objects: one acts on A and the other on B.",
+    "paper": "makeup/pair"
+  },
+  {
     "id": "reaction",
     "topic": "Force pair",
     "source": "Make-up · p. 2, Q3",
@@ -5546,6 +5695,22 @@ const conceptCards = [
     "paper": "test1a/unequal"
   },
   {
+    "id": "law-cm",
+    "topic": "Center-of-mass frame",
+    "source": "Lecture · Collisions and Center of Mass",
+    "q": "In the center-of-mass frame, the total momentum of all objects in the system adds up to ___.",
+    "accept": [
+      "zero",
+      "0",
+      "the zero vector",
+      "the null vector",
+      "the zero momentum vector",
+      "zero momentum"
+    ],
+    "why": "In this frame, the center of mass is at rest. Since total momentum equals total mass times center-of-mass velocity, the vector sum is zero.",
+    "paper": null
+  },
+  {
     "id": "example",
     "topic": "Force-law example",
     "source": "Practice 1A · p. 1, Q3",
@@ -5573,6 +5738,19 @@ const conceptCards = [
     "answer": 2,
     "why": "An inertial frame moves at constant velocity relative to another inertial frame. Turning changes the velocity’s direction.",
     "key": "Constant velocity",
+    "paper": null
+  },
+  {
+    "id": "law-first-strong",
+    "topic": "First law · strong form",
+    "source": "Oct 14 lecture · Newton’s laws",
+    "q": "In an inertial frame, an object acted on by no forces keeps a constant ___. Give the vector quantity.",
+    "accept": [
+      "velocity",
+      "linear velocity",
+      "velocity vector"
+    ],
+    "why": "In Mohsen’s strong form, no force acts. The object stays at rest or keeps moving at the same speed in the same direction.",
     "paper": null
   },
   {
@@ -5616,7 +5794,8 @@ function restartConcepts(){
 }
 function addStudyLinks(section){
   const last=safeStore.get(conceptProgress+"last",null);
-  const row=todayQuizRow("concepts","Concepts and multiple choice",conceptCards.length+" questions · collisions, forces, momentum and energy",last,"Answer concepts in app","Resume concepts",restartConcepts);
+  const blankCount=conceptCards.filter(card=>card.accept).length;
+  const row=todayQuizRow("concepts","Concepts and multiple choice",(conceptCards.length-blankCount)+" multiple choice · "+blankCount+" fill in the blank",last,"Answer concepts in app","Resume concepts",restartConcepts);
   const files=el("details",{class:"today-print-links"});
   files.append(examNode("summary","Printable PDFs"));
   const downloads=el("div",{class:"print-downloads"});
@@ -5637,7 +5816,7 @@ function renderConceptQuiz(parent){
   const head=el("div",{class:"quiz-header"});
   head.append(examNode("h2","Concepts and multiple choice",{class:"exam-title",tabindex:"-1"}),examLink("Close quiz","home"));
   const picker=el("select",{"aria-label":"Choose a concept question",class:"quiz-picker"});
-  conceptCards.forEach((entry,i)=>picker.append(examNode("option",(i+1)+". "+entry.topic,{value:entry.id})));
+  conceptCards.forEach((entry,i)=>picker.append(examNode("option",(i+1)+". "+(entry.accept?"Fill in · ":"")+entry.topic,{value:entry.id})));
   picker.value=card.id;
   picker.onchange=()=>{location.hash="concepts/"+picker.value;};
   root.append(head,picker,examNode("p",card.source,{class:"exam-meta"}));
@@ -5645,19 +5824,33 @@ function renderConceptQuiz(parent){
   fieldset.append(examNode("legend",card.q),choices);root.append(fieldset);
   const storeKey=conceptProgress+"answer/"+card.id;
   const selected=safeStore.get(storeKey,null);
-  let picked=card.choices[selected?.picked]!==undefined?selected.picked:null;
-  let checked=picked!==null&&selected?.checked===true;
+  const isBlank=Array.isArray(card.accept);
+  let picked=Number.isInteger(selected?.picked)&&card.choices?.[selected.picked]!==undefined?selected.picked:null;
+  let typed=typeof selected?.typed==="string"?selected.typed:"";
+  const hasAnswer=()=>isBlank?typed.trim().length>0:picked!==null;
+  let checked=hasAnswer()&&selected?.checked===true;
   const action=examNode("button","Check answer",{type:"button",class:"btn"});
   const feedback=examNode("p","",{role:"status",class:"exam-feedback"});
   const retry=examNode("button","Try again",{type:"button",class:"exam-text-button"});
   const next=index+1<conceptCards.length?examLink("Next question","concepts/"+conceptCards[index+1].id,"btn"):examLink("Back to Today","home","btn");
-  const inputs=card.choices.map((word,i)=>{
+  const inputs=(card.choices||[]).map((word,i)=>{
     const label=el("label",{class:"quiz-choice"});
     const input=el("input",{type:"radio",name:"concept-answer",value:String(i)});
     label.append(input,examNode("span",word));choices.append(label);
     input.onchange=()=>{picked=i;update();};
     return input;
   });
+  let blankInput;
+  if(isBlank){
+    choices.classList.add("law-blank");
+    blankInput=el("input",{id:"concept-blank",type:"text",autocomplete:"off",spellcheck:"false"});
+    blankInput.value=typed;
+    choices.append(examNode("label","Type the missing word or phrase",{for:"concept-blank"}),blankInput);
+    blankInput.oninput=()=>{typed=blankInput.value;update();};
+    blankInput.onkeydown=event=>{
+      if(event.key==="Enter"&&!event.isComposing&&!action.disabled&&!checked){event.preventDefault();action.click();}
+    };
+  }
   const notesKey=conceptProgress+"note/"+card.id;
   const notes=el("details",{class:"exam-details exam-notes quiz-notes"});
   const field=el("textarea",{rows:"3","aria-label":"My concept reasoning"});
@@ -5687,16 +5880,26 @@ function renderConceptQuiz(parent){
       inputs[i].disabled=checked;
       inputs[i].parentElement.classList.toggle("quiz-selected",picked===i);
     }
-    const correct=checked&&picked===card.answer;
-    action.hidden=checked;action.disabled=picked===null;
+    const correct=checked&&(isBlank?card.accept.some(answer=>normalizeLawAnswer(answer)===normalizeLawAnswer(typed)):picked===card.answer);
+    if(isBlank)blankInput.readOnly=checked;
+    action.hidden=checked;action.disabled=!hasAnswer();
     next.hidden=!checked;retry.hidden=!checked;
     feedback.classList.toggle("correct",correct);
-    feedback.textContent=checked?(correct?"Correct. ":"Answer: "+card.choices[card.answer]+(/\p{P}$/u.test(card.choices[card.answer])?" ":". "))+card.why:"";
-    safeStore.set(storeKey,{picked,checked});
+    const answer=isBlank?card.accept[0]:card.choices[card.answer];
+    feedback.textContent=checked?(correct?"Correct. ":"Answer: "+answer+(/\p{P}$/u.test(answer)?" ":". "))+card.why:"";
+    safeStore.set(storeKey,isBlank?{typed,checked}:{picked,checked});
   }
   action.onclick=()=>{checked=true;update();next.focus();};
-  retry.onclick=()=>{picked=null;checked=false;update();inputs[0].focus();};
+  retry.onclick=()=>{
+    checked=false;picked=null;typed="";
+    if(isBlank)blankInput.value="";
+    update();(isBlank?blankInput:inputs[0]).focus();
+  };
   update();
+}
+
+function normalizeLawAnswer(text){
+  return text.normalize("NFKC").toLowerCase().trim().replace(/[.,!?]+$/u,"").replace(/([a-z])-(?=[a-z])/g,"$1 ").replace(/\s+/gu," ").trim();
 }
 
 VIEWS.equations = parent=>renderEquationQuiz(parent,"equations");
