@@ -7,7 +7,21 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.12  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-12
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.15  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  v2.15 (2026-11-24): Midterm practice in More, with source-labelled guided questions.
+  v2.14 (2026-10-19, Mon): FORCES + FRICTION — today's transcript adds the four
+        natural forces, contact-force components, static versus kinetic friction, and the
+        critical-angle idea. Ten lecture-grounded questions and a friction Cheat Sheet card
+        were added. Exam guidance now names friction as a current priority. Archived v2.13
+        before editing. Learning result is awaiting learner evidence.
+  v2.13 (2026-10-14, Wed): THREE LAWS + TWO-PART EXAM — today's transcript adds the
+        professor's exact strong/weak First Law distinction, inertial mass, the Second Law,
+        and why the Third Law relates two forces and does not require an inertial frame.
+        Eight exam-language questions were added. The exam card now records the Oct 31
+        Canvas practice release and that the Nov 4 exam is split across lab and lecture for
+        about two hours total. A temporary journal card records the Friday-night update
+        window and the newly shown standard: narrative first; photos only support it.
+        Archived v2.12 before editing. Learning result is awaiting learner evidence.
   v2.12 (2026-10-12, Mon): INERTIAL FRAMES + EXAM RUNWAY — today's transcript
         corrects the stale post-Thanksgiving exam assumption. Home and Course Map now show
         the Nov 2 practice test and Nov 4 test, Chapters 1–7, six problems + three conceptual
@@ -971,6 +985,48 @@ textarea.report{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+/* Midterm practice. Course-wide navigation stays available on every step. */
+.exam-section{max-width:780px;margin:0 auto;padding:clamp(16px,3vw,30px);overflow-wrap:anywhere}
+.exam-section h2{font-size:clamp(1.35rem,3vw,1.8rem);line-height:1.22;margin:.5rem 0}
+.exam-section h3{font-size:1.08rem;line-height:1.4;margin:1rem 0 .55rem}
+.exam-section .exam-desc,.exam-story{line-height:1.55;margin:.45rem 0 1rem}
+.exam-meta,.exam-menu-link small{color:var(--muted-tx);font-size:.83rem;line-height:1.45}
+.exam-meta{margin:.8rem 0 0}
+.exam-list{border-top:1px solid var(--line);margin:1rem 0}
+.exam-menu-link{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink);text-decoration:none;padding:.68rem .25rem;border-bottom:1px solid var(--line)}
+.exam-menu-link:hover,.exam-menu-link:focus-visible{background:var(--accent-bg);color:var(--teal-dk)}
+.exam-menu-link strong,.exam-menu-link small{display:block}
+.exam-chevron{font-size:1.4rem;color:var(--teal)}
+.exam-link,.exam-text-button{display:inline-flex;align-items:center;min-height:44px;padding:0 .25rem;color:var(--teal-dk);font-size:.91rem}
+.exam-text-button{background:transparent;border:0;cursor:pointer;text-decoration:underline}
+.exam-section .btn{display:inline-flex;align-items:center;text-decoration:none;margin:4px 10px 4px 0}
+.exam-details{border-top:1px solid var(--line);margin-top:1rem;padding:.4rem 0;color:var(--ink)}
+.exam-details summary,.exam-hint summary{cursor:pointer;color:var(--teal-dk);font-weight:600;min-height:44px;align-content:center;padding:.45rem 0}
+.exam-givens{display:grid;grid-template-columns:minmax(3rem,max-content) 1fr;gap:0 .85rem;background:var(--paper2);color:var(--ink);border-radius:8px;padding:.55rem .85rem;margin:.35rem 0 .9rem;font-size:.95rem}
+.exam-givens dt,.exam-givens dd{margin:0;padding:.26rem 0}
+.exam-givens dt{font-weight:700}
+.exam-task{display:grid;gap:8px}
+.exam-task .choice{width:100%;text-align:left;margin:0;line-height:1.45;white-space:normal}
+.exam-task .choice:disabled{opacity:.85}
+.exam-answer{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.exam-answer label{width:100%;font-weight:650}
+.exam-answer .answerbox{width:9rem;max-width:100%;margin:0}
+.exam-feedback:not(:empty){padding:.65rem .8rem;background:var(--warning-bg);color:var(--ink);border-radius:6px;margin:.7rem 0}
+.exam-feedback.correct:not(:empty){background:var(--success-bg);color:var(--ok)}
+.exam-feedback:empty{margin:0}
+.exam-review li{margin-bottom:.5rem}
+.exam-notes label{display:block;color:var(--muted-tx);font-size:.84rem}
+.exam-notes textarea{width:100%;max-width:100%;padding:.6rem;font:inherit;box-sizing:border-box;margin:.35rem 0}
+.exam-figure{margin:.25rem 0 .65rem}
+.exam-figure svg{width:min(100%,300px);height:auto;fill:var(--ink);font:12px sans-serif}
+.ex-axis,.ex-data,.ex-dash{fill:none;stroke:var(--ink);stroke-width:1.6}
+.ex-dash{stroke-dasharray:4 3}
+.ex-data{stroke:var(--teal);stroke-width:2.5}
+.ex-shape{fill:var(--paper2);stroke:var(--ink);stroke-width:1.4}
+@media(max-width:500px){.exam-givens{grid-template-columns:minmax(0,33%) minmax(0,1fr);gap:0 .55rem}.exam-section{padding:15px}.exam-section .choice{font-size:.96rem}}
+
+.exam-equation{border-left:3px solid var(--teal);padding:.45rem .7rem;margin:.5rem 0 .8rem;line-height:1.5;background:var(--surface2);color:var(--ink)}
+.exam-equation small{display:block;color:var(--muted-tx)}
 </style>
 </head>
 <body>
@@ -1023,7 +1079,7 @@ async function cloudPull(){
     if (!r.ok) throw 0;
     const rows = await r.json();
     mergeRemote(rows[0] && rows[0].data);
-    cloudState = "synced"; save(); if(typeof render==="function") render(); cloudPush(true);
+    cloudState = "synced"; save(); if(typeof render==="function" && S.view!=="midterm") render(); cloudPush(true);
   } catch(e){ cloudState = "offline"; renderSyncDot(); }
 }
 async function cloudPush(now){
@@ -1179,6 +1235,24 @@ const QUESTIONS = [
 {id:"n16",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"On an ideal horizontal surface with no friction and no net force, Galileo's inertia argument predicts that a moving marble will:",choices:["Continue at constant velocity","Slow down naturally","Speed up forever","Stop when its force runs out"],answer:0,why:"No net force means no acceleration. The marble keeps the <b>same velocity</b>; motion does not require a continuing force. Friction is what makes ordinary objects appear to stop on their own."},
 {id:"n17",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"Aristotle called motion caused by an external push or kick:",choices:["Violent motion","Natural motion","Inertial motion","Relative motion"],answer:0,why:"In Aristotle's model, <b>natural motion</b> carried elements toward their natural places; an outside push or kick produced <b>violent motion</b>. Galileo's experiments later challenged this account."},
 {id:"n18",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-12",prompt:"According to the relativity principle discussed in class, which statement is correct?",choices:["There is no absolute inertial frame of reference","Earth is the one absolute frame","The Sun is the one absolute frame","The center of the galaxy is perfectly stationary"],answer:0,why:"No experiment identifies one absolute state of rest. Choose a useful <b>inertial frame</b> for the problem—Earth for a car, the Sun for a planet—but do not call it absolute."},
+{id:"n19",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"Which statement matches the professor's STRONG form of Newton's First Law?",choices:["In an inertial frame, if no force acts on an object, it maintains its state of motion","In an inertial frame, an object maintains its motion if and only if its net force is zero","Every force has an equal and opposite partner","Net force equals inertial mass times acceleration"],answer:0,why:"The class wording for the <b>strong form</b> uses <b>if</b> and <b>no force</b>: in an inertial frame, if no force acts, the state of motion is maintained."},
+{id:"n20",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"Which statement matches the professor's WEAK form of Newton's First Law?",choices:["In an inertial frame, an object maintains its state of motion if and only if the net force is zero","If no force acts anywhere in the universe, an object maintains its motion","Mass measures weight","Action and reaction act on one object"],answer:0,why:"The class wording for the <b>weak form</b> changes 'if' to <b>if and only if</b> and 'no force' to <b>no net force</b>. It is the zero-net-force case of the Second Law."},
+{id:"n21",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"A student sits motionless on a chair. Which force statement is correct?",choices:["Gravity and the chair's upward normal force cancel, so the net force is zero","No forces act on the student","Only gravity acts on the student","The chair removes gravity"],answer:0,why:"The student is not force-free. Weight acts down and the chair's normal force acts up. Their vector sum is zero, so this is the lecture's example of <b>no net force</b>, not no force."},
+{id:"n22",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"What is the statement behind Newton's Second Law?",choices:["The net force on an object is proportional to its acceleration","Force is proportional to velocity","Mass is proportional to position","Acceleration exists only when an object moves"],answer:0,why:"Newton's Second Law connects <b>net force</b> to <b>acceleration</b>. In F_net = ma, inertial mass m is the constant of proportionality."},
+{id:"n23",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"Inertial mass measures an object's resistance to:",choices:["A change in its linear motion","Gravity only","A change in its color","Having any force on it"],answer:0,why:"A bowling ball resists a change in motion more than a soccer ball. That resistance is what <b>inertial mass</b> measures."},
+{id:"n24",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"Newton's Third Law always involves:",choices:["Two objects exerting forces on each other","One object with two cancelling forces","An inertial frame and no forces","Two objects with equal acceleration"],answer:0,why:"Third-law forces are an interaction pair: object C pushes D, and D pushes C. The two forces are equal in magnitude and opposite in direction, but they act on <b>different objects</b>."},
+{id:"n25",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"Why do Newton's Third Law force pairs not cancel each other on one free-body diagram?",choices:["They act on different objects","One force is always larger","They occur at different times","One of the forces is imaginary"],answer:0,why:"F_CD acts on D while F_DC acts on C. Equal and opposite does not mean they cancel, because cancellation requires forces acting on the <b>same object</b>."},
+{id:"n26",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-14",prompt:"According to the professor, why does Newton's Third Law not need the phrase 'in an inertial frame'?",choices:["It describes the relationship between two forces rather than an object's motion","It only works on Earth","It is really part of the First Law","It assumes both objects are at rest"],answer:0,why:"The Third Law relates two interaction forces. It is not a statement about an object's motion, so the class explicitly said <b>do not add</b> the inertial-frame phrase to its test definition."},
+{id:"n27",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"Which list contains the four natural forces discussed in class?",choices:["Gravitational, electromagnetic, weak nuclear, and strong nuclear","Gravitational, normal, friction, and tension","Static, kinetic, rolling, and air resistance","Weight, mass, acceleration, and momentum"],answer:0,why:"The four natural interactions are <b>gravitational, electromagnetic, weak nuclear, and strong nuclear</b>. Normal force and friction are macroscopic contact effects of electromagnetism, not additional fundamental forces."},
+{id:"n28",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"How did the lecture relate gravitational mass to inertial mass?",choices:["They describe different roles but are numerically equal","They are the same definition and always use the same equation","Gravitational mass is measured in newtons while inertial mass has no units","Only gravitational mass resists a change in motion"],answer:0,why:"<b>Inertial mass</b> measures resistance to a change in linear motion. <b>Gravitational mass</b> determines gravitational interaction. They play different roles but are observed to be numerically equal."},
+{id:"n29",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"Which natural forces are long-range according to the lecture?",choices:["Gravity and electromagnetism","Weak and strong nuclear forces","Normal force and friction","Only gravity"],answer:0,why:"Gravity and electromagnetism weaken with distance but remain <b>long-range</b>. The weak and strong nuclear interactions act only over extremely short distances."},
+{id:"n30",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"At the microscopic level, ordinary contact forces are mainly effects of which natural force?",choices:["Electromagnetic force","Gravitational force","Weak nuclear force","Strong nuclear force"],answer:0,why:"Atoms at contacting surfaces interact electromagnetically. Normal force, friction, tension, and compression are macroscopic ways those <b>electromagnetic interactions</b> appear."},
+{id:"n31",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"A contact force at a surface is separated into which two perpendicular components?",choices:["Normal force and friction","Weight and mass","Velocity and acceleration","Strong and weak force"],answer:0,why:"The <b>normal force</b> is perpendicular to the tangent line of the surface. <b>Friction</b> acts along that tangent line."},
+{id:"n32",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"Which equation correctly describes static friction before an object begins sliding?",choices:["F_s ≤ μ_sF_N","F_s = μ_sF_N at all times","F_s = ma","F_s = mg"],answer:0,why:"Static friction adjusts to match the needed opposing force up to a maximum: <b>F_s ≤ μ_sF_N</b>. Equality applies only at the threshold of slipping."},
+{id:"n33",topic:"newton",type:"num",origin:"Close transfer from Janatpour lecture · 2026-10-19",prompt:"A surface has μ_s = 0.40 and a normal force of 50 N. What is the maximum static friction? (N)",answer:20,tolerance:0.1,why:"At the threshold of motion, F_s,max = μ_sF_N = 0.40 × 50 = <b>20 N</b>. Below that threshold, static friction can be any smaller value needed."},
+{id:"n34",topic:"newton",type:"num",origin:"Close transfer from Janatpour lecture · 2026-10-19",prompt:"A sliding box has μ_k = 0.25 and a normal force of 40 N. What is the kinetic friction? (N)",answer:10,tolerance:0.1,why:"For sliding surfaces, F_k = μ_kF_N = 0.25 × 40 = <b>10 N</b>, directed opposite the relative sliding motion."},
+{id:"n35",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"For the same two surfaces, why is μ_k usually less than μ_s?",choices:["Sliding surface irregularities have less time to settle into one another","Kinetic friction has no normal-force dependence","Gravity stops acting once motion begins","Static friction acts only on perfectly smooth surfaces"],answer:0,why:"Microscopic surfaces are rough. While at rest, their irregularities can settle and interlock more fully. During sliding, they glide past with less time to settle, so typically <b>μ_k &lt; μ_s</b>."},
+{id:"n36",topic:"newton",type:"mc",origin:"Janatpour lecture · 2026-10-19",prompt:"On a slowly raised incline, what does the critical angle mark?",choices:["The angle where maximum static friction is reached and the object begins to slide","The angle where gravity becomes zero","The angle where normal force equals mass","The angle where kinetic friction changes into gravity"],answer:0,why:"As the incline rises, the needed static friction increases until it reaches F_s,max. The <b>critical angle</b> is the threshold where static friction can no longer prevent sliding."},
 /* --- Mastering Physics homework · 2026-09-16 — scaling/ratio reasoning --- */
 {id:"sc1",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"The radius of a circle of area A is doubled. The new area is ___ × A.",answer:4,why:"A = πr². Replace r with 2r: π(2r)² = π·4r² = <b>4A</b>. The exponent on r does the work — r is squared, so the factor gets squared too (2² = 4)."},
 {id:"sc2",topic:"scale",type:"num",origin:"Mastering Physics HW · 2026-09-16",prompt:"A circle has circumference C. Its radius is doubled. The new circumference is ___ × C.",answer:2,why:"C = 2πr → 2π(2r) = <b>2C</b>. Here r is to the FIRST power, so the factor passes straight through. Same circle, two different scaling laws — read the exponent, never assume."},
@@ -1474,8 +1548,12 @@ const NAV = [
   {id:"track", ico:"🗓️", label:"Plan",    purpose:"What's due"},
   {id:"more",  ico:"⋯",  label:"More",    purpose:"Map · formulas"},
 ];
-const NAV_SECONDARY = ["map","card","cheat","report"];
-function go(view){ S.view=view; render(); window.scrollTo(0,0); }
+const NAV_SECONDARY = ["map","card","cheat","report","midterm"];
+function go(view){
+  if(view==="midterm" || location.hash){
+    if(location.hash !== "#"+view){location.hash=view;return;}
+  }
+  S.view=view; render(); window.scrollTo(0,0); }
 function renderNav(){
   const n=$("#nav"); n.innerHTML="";
   const active = NAV_SECONDARY.indexOf(S.view)>=0 ? "more" : S.view;
@@ -1495,11 +1573,12 @@ VIEWS.more = (v) => {
   const head = el("div",{class:"card"});
   head.appendChild(el("div",{class:"tag"},"Reference"));
   head.appendChild(el("h2",{},"More"));
-  head.appendChild(el("p",{class:"muted"},"Everything that isn't a daily action lives here."));
+  head.appendChild(el("p",{class:"muted"},"Course resources and practice sets."));
   v.appendChild(head);
   const grid = el("div",{class:"more-grid"});
   [
     {id:"map",   ico:"🧭", t:"Course Map",  s:"How PHYS 210 is actually graded, and what the midterm covers"},
+    {id:"midterm",ico:"📝", t:"Midterm practice", s:"In-class paper, Canvas papers and related practice"},
     {id:"card",  ico:"🔑", t:"Bench Card",  s:"Which equation? — the 3-step rule, the table, words → symbols. Printable"},
     {id:"cheat", ico:"📌", t:"Cheat Sheet", s:"Formulas, constants, and the equations worth memorising"},
     {id:"report",ico:"📤", t:"Report",      s:"Export your progress to paste into a Claude session"}
@@ -1537,14 +1616,9 @@ VIEWS.home = (v) => {
     card0.appendChild(el("button",{class:"btn coral",style:"margin-top:8px",onclick:()=>{ startDrill("pick"); }},"🔑 &nbsp;Which equation? — 2-minute drill"));
     card0.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{ go("map"); }},"🧭 &nbsp;Confused about how this class works? Course Map"));
     v.appendChild(card0);
-    if(t <= "2026-11-04"){
-      const examDays = Math.max(0, Math.ceil((new Date("2026-11-04T12:00:00")-new Date(t+"T12:00:00"))/86400000));
-      const exam = el("div",{class:"card cream"});
-      exam.innerHTML = '<span class="tag coral">Exam runway · '+examDays+' days</span>'+
-        '<h2 style="font-size:1.35rem">Practice test Mon Nov 2 · test Wed Nov 4</h2>'+
-        '<p style="line-height:1.7;margin:6px 0 14px"><b>Scope:</b> Chapters 1–7, ending with energy. <b>Format:</b> six problems × 4 points plus three conceptual questions × 2 points = 30 points. A formula sheet will be provided. Today\'s highest-priority concept is identifying an <b>inertial frame of reference</b>.</p>';
-      exam.appendChild(el("button",{class:"bigbtn",onclick:()=>{ startDrill("newton"); }},"▶ &nbsp;Practice Newton + inertial frames"));
-      v.appendChild(exam);
+    if(t <= "2026-10-16"){
+      v.appendChild(el("div",{class:"card",style:"border-color:var(--coral)"},
+        '<span class="tag coral">Journal check · Friday night</span><h3>Narrative first; photos are supporting evidence</h3><p style="line-height:1.7">Mohsen showed the expected format on Oct 14: write what was discussed in connected paragraphs. Chalkboard photos may support the entry, but a photo-only entry does not meet the standard. He said updates may be made through Friday night before he checks journals Saturday.</p>'));
     }
     const a0 = accuracy();
     const st0 = el("div",{class:"statrow"});
@@ -1887,7 +1961,7 @@ VIEWS.map = (v) => {
   v.appendChild(el("div",{class:"card teal"},
     '<span class="tag gold">The map</span>'+
     '<h2>There IS a structure — it just isn\'t shaped like a reading list</h2>'+
-    '<p style="margin:6px 0 0;opacity:.92">The course runs on <b>four continuous streams + one midterm</b>. The current lecture announcement places the practice test on Nov 2 and the actual test on Nov 4. Once you see the streams and the dates, the confusion goes away.</p>'));
+    '<p style="margin:6px 0 0;opacity:.92">The course runs on <b>four continuous streams + one midterm</b>. Find the practice papers under More → Midterm practice.</p>'));
 
   // grade ruler
   const gr = el("div",{class:"card"});
@@ -1922,7 +1996,7 @@ VIEWS.map = (v) => {
   // midterm
   v.appendChild(el("div",{class:"card"},
     '<h3>The midterm — the only test</h3>'+
-    '<p style="line-height:1.7"><b>Practice test:</b> Monday, Nov 2. <b>Actual test:</b> Wednesday, Nov 4. <b>Scope announced Oct 12:</b> Chapters 1–7, ending with energy. <b>Format:</b> six problems worth 4 points each and three conceptual questions worth 2 points each, for 30 points total. Mohsen said a formula sheet will be provided.</p>'+
+    '<p style="line-height:1.7">Review Chapters 1–8, through momentum. The supplied practice papers have three concept questions and six calculation problems each. Use g = 10 m/s² in exam practice.</p>'+
     '<p class="muted"><b>Preparation starts now.</b> Use the Problem Lab for blank-page calculations and the Drill for conceptual distinctions such as inertial versus accelerating frames. A formula sheet removes memorization pressure; it does not replace knowing when and why an equation applies.</p>'));
 
   // failure mode
@@ -1979,6 +2053,11 @@ VIEWS.cheat = (v) => {
     '<p class="mono center" style="margin:6px 0">W = mg · N = kg·m/s² · g ≈ 9.8 m/s²</p>'+
     '<p class="muted">Mass (kg) is intrinsic; weight (N) is a force. Constant v ⇒ net 0 — engine force just cancels friction.</p>'));
   v.appendChild(el("div",{class:"card"},
+    '<h3>Contact forces + friction</h3>'+
+    '<p style="line-height:1.8"><b>Normal force F<sub>N</sub>:</b> perpendicular to the surface. <b>Friction:</b> tangent to the surface and opposite the relative motion or attempted motion.</p>'+
+    '<p class="mono center" style="margin:6px 0">F<sub>s</sub> ≤ μ<sub>s</sub>F<sub>N</sub> &nbsp;·&nbsp; F<sub>s,max</sub> = μ<sub>s</sub>F<sub>N</sub> &nbsp;·&nbsp; F<sub>k</sub> = μ<sub>k</sub>F<sub>N</sub></p>'+
+    '<p class="muted">Static friction adjusts from zero up to its maximum; do not automatically set it equal to μ<sub>s</sub>F<sub>N</sub>. Once surfaces slide, use kinetic friction. For the same surfaces, μ<sub>k</sub> is usually less than μ<sub>s</sub>.</p>'));
+  v.appendChild(el("div",{class:"card"},
     '<h3>Units you\'ll touch weekly</h3>'+
     '<p style="line-height:1.8" class="mono">x: m · v: m/s · a: m/s² · F: N = kg·m/s² · km/h → m/s: ÷3.6</p>'+
     '<p class="muted">Unit-check every rearranged formula before plugging numbers — it catches algebra errors for free.</p>'));
@@ -2018,7 +2097,2456 @@ VIEWS.report = (v) => {
   v.appendChild(el("div",{class:"card cream"},'<h3>When the syllabus lands</h3><p class="muted">Bring the course files to Claude — this app is built to grow: the TRACK swaps to real weeks with real due dates, per-chapter question banks append to the same schema, and the Problem Lab gains whatever problems your HW sets use. v1.0 → v2.0 in one session, same as the chem app.</p>'));
 };
 
+const midtermBank = {
+ "conserve": {
+  "ch": "6–7",
+  "title": "Conservative forces",
+  "story": "Work is measured along two paths between the same endpoints. What makes a force conservative?",
+  "givens": [
+   "Start and finish • Same on both paths",
+   "Quantity compared • Work done by this force"
+  ],
+  "steps": [
+   {
+    "ask": "Which rule tests the force?",
+    "options": [
+     "W = −ΔU for every path",
+     "W = 0 on every path",
+     "F must have constant magnitude"
+    ],
+    "why": "A potential-energy difference depends only on the endpoints."
+   },
+   {
+    "ask": "What would you observe on a closed trip?",
+    "options": [
+     "Total work by this force is zero.",
+     "The force is zero everywhere.",
+     "The trip takes zero energy at every instant."
+    ],
+    "why": "Returning to the starting position restores the initial potential energy."
+   }
+  ]
+ },
+ "n2": {
+  "ch": "4, 8",
+  "title": "Newton’s second law in general form",
+  "story": "State the general law for translation of a fixed collection of particles.",
+  "givens": [
+   "Frame • Inertial",
+   "System • The same particles throughout",
+   "p • Total linear momentum"
+  ],
+  "steps": [
+   {
+    "ask": "Which vector equation is the general law?",
+    "options": [
+     "ΣF_external = dp/dt",
+     "ΣF_external = p",
+     "ΣF_external = Δp"
+    ],
+    "why": "Force equals the time rate of change of momentum."
+   },
+   {
+    "ask": "How would you say it aloud?",
+    "options": [
+     "In an inertial frame, the net external force equals the rate of change of total momentum.",
+     "Total momentum always stays constant in an inertial frame.",
+     "An object moves in the direction of its net force at every instant."
+    ],
+    "why": "For constant mass, p = mv gives the familiar ΣF = ma."
+   }
+  ]
+ },
+ "nonzero": {
+  "ch": "4",
+  "title": "Net force and acceleration",
+  "story": "Can a nonzero net force act on an object while its acceleration is zero?",
+  "givens": [
+   "Frame • Inertial",
+   "m • Positive, constant mass"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation decides this?",
+    "options": [
+     "ΣF = ma",
+     "F = mv",
+     "W = Fd"
+    ],
+    "why": "Acceleration is set by the vector sum of forces."
+   },
+   {
+    "ask": "What follows for this object?",
+    "options": [
+     "A nonzero net force gives a nonzero acceleration.",
+     "The object can stay at rest under a nonzero net force indefinitely.",
+     "Its velocity must also be nonzero at that instant."
+    ],
+    "why": "Dividing the net force by a positive mass gives a nonzero acceleration, even at an instant of zero velocity."
+   }
+  ]
+ },
+ "impulse": {
+  "ch": "8",
+  "title": "Impulse and momentum",
+  "story": "Define momentum and impulse. Explain how an external force changes a system’s momentum over an interval.",
+  "givens": [
+   "m • Mass",
+   "v • Velocity",
+   "Δt • Duration of the interaction"
+  ],
+  "steps": [
+   {
+    "ask": "Which expression defines linear momentum?",
+    "options": [
+     "p = mv",
+     "p = ½mv²",
+     "p = ma"
+    ],
+    "why": "Momentum is a vector in the direction of velocity."
+   },
+   {
+    "ask": "How are net external impulse and momentum related?",
+    "options": [
+     "J = ∫ΣF_external dt = p_final − p_initial",
+     "J = p_final + p_initial",
+     "J = ∫ΣF_external dx"
+    ],
+    "why": "Impulse is the signed area under a force–time graph. Its unit N·s equals kg·m/s."
+   }
+  ]
+ },
+ "zerowork": {
+  "ch": "6",
+  "title": "Zero net force versus zero work",
+  "story": "Test both directions of the claim for a particle. Then consider the word “system” in the original question.",
+  "givens": [
+   "Motion model • Start with one particle",
+   "Interval • Net force is zero throughout the first case"
+  ],
+  "steps": [
+   {
+    "ask": "What links net force to net work along a path?",
+    "options": [
+     "W_net = ∫ΣF · dr",
+     "W_net = ∫ΣF dt",
+     "W_net = |ΣF| at the endpoint"
+    ],
+    "why": "Only force along each small displacement contributes. Zero net force throughout gives zero net work on the particle."
+   },
+   {
+    "ask": "Does zero net work require zero net force?",
+    "options": [
+     "No. A nonzero inward force can be perpendicular to motion throughout.",
+     "Yes. Zero net work requires every force to vanish.",
+     "Yes. Constant speed requires a straight path."
+    ],
+    "why": "Uniform circular motion is a counterexample. For a multi-object system, zero net external force fixes total momentum. Internal forces can still change total kinetic energy."
+   }
+  ]
+ },
+ "cord2": {
+  "ch": "5",
+  "title": "Cord tension and circular speed",
+  "story": "A ball moves in a horizontal circle on a smooth table. Find the largest speed the cord can withstand. Repeat for half the radius.",
+  "givens": [
+   "m • Ball mass = 0.40 kg",
+   "r • Circle radius = 1.3 m",
+   "T_max • Tension limit = 60 N"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation links tension to speed at the limit?",
+    "options": [
+     "T = mv²/r",
+     "T = mg",
+     "T = mr/v²"
+    ],
+    "why": "The cord supplies the inward force. The weight and normal force balance vertically."
+   },
+   {
+    "ask": "What is the greatest speed at the original radius?",
+    "value": 13.96424004376894,
+    "unit": "m/s",
+    "tol": 0.12,
+    "hint": "Solve for v before substituting the radius.",
+    "why": "v = √(Tr/m) = √(60 × 1.3 / 0.40) ≈ 14.0 m/s."
+   },
+   {
+    "ask": "At the same tension limit, how does speed depend on radius?",
+    "options": [
+     "v is proportional to √r",
+     "v is proportional to r",
+     "v is proportional to 1/r"
+    ],
+    "why": "The radius is inside the square root."
+   },
+   {
+    "ask": "What is the greatest speed when the radius is halved?",
+    "value": 9.874208829065749,
+    "unit": "m/s",
+    "tol": 0.13,
+    "hint": "Use r = 0.65 m and keep the same tension limit.",
+    "why": "v = √(60 × 0.65 / 0.40) ≈ 9.87 m/s."
+   }
+  ]
+ },
+ "cord1": {
+  "ch": "5",
+  "title": "Cord tension and circular speed",
+  "story": "A ball moves in a horizontal circle on a smooth table. Find the largest speed the cord can withstand.",
+  "givens": [
+   "m • Ball mass = 0.40 kg",
+   "r • Circle radius = 1.3 m",
+   "T_max • Tension limit = 60 N"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation links tension to speed at the limit?",
+    "options": [
+     "T = mv²/r",
+     "T = mg",
+     "T = mr/v²"
+    ],
+    "why": "The cord supplies the inward force. The weight and normal force balance vertically."
+   },
+   {
+    "ask": "What is the greatest speed at the original radius?",
+    "value": 13.96424004376894,
+    "unit": "m/s",
+    "tol": 0.12,
+    "hint": "Solve for v before substituting the radius.",
+    "why": "v = √(Tr/m) = √(60 × 1.3 / 0.40) ≈ 14.0 m/s."
+   }
+  ]
+ },
+ "twoballs": {
+  "ch": "2",
+  "title": "Two balls from the same roof",
+  "story": "Red is thrown straight up. One second later, blue is dropped from the same point. Which hits first, and by how much? Ignore drag. Use one clock starting at red’s release.",
+  "givens": [
+   "y₀ • Roof height = 30 m",
+   "y_f • Ground level = 0 m",
+   "v₀,red • Initial vertical velocity = +10 m/s",
+   "v₀,blue • Initial vertical velocity = 0 m/s",
+   "aᵧ • Acceleration = −10 m/s² (up is positive)",
+   "t_delay • Blue is released at 1.0 s"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives red’s flight time from these givens?",
+    "options": [
+     "Δy = v₀ᵧt + ½aᵧt²",
+     "vᵧ = v₀ᵧ + aᵧt",
+     "Δy = v₀ᵧt"
+    ],
+    "why": "The ground fixes displacement. Final velocity is unknown. The position equation uses just the givens and time."
+   },
+   {
+    "ask": "What is the signed vertical displacement from roof to ground?",
+    "value": -30,
+    "unit": "m",
+    "tol": 0.01,
+    "hint": "Subtract the roof coordinate from the ground coordinate.",
+    "why": "Δy = y_f − y₀ = 0 − 30 = −30 m."
+   },
+   {
+    "ask": "When does red reach the ground on the shared clock?",
+    "value": 3.6457513110645907,
+    "unit": "s",
+    "tol": 0.025,
+    "hint": "Solve −30 = 10t − 5t² and take the positive root.",
+    "why": "t² − 2t − 6 = 0, so t = 1 + √7 ≈ 3.65 s."
+   },
+   {
+    "ask": "Which equation describes blue using τ, its time since release?",
+    "options": [
+     "−30 = −5τ²",
+     "−30 = 10τ − 5τ²",
+     "+30 = −5τ²"
+    ],
+    "why": "Blue starts from rest. Its launch velocity term is zero. The displacement is still −30 m."
+   },
+   {
+    "ask": "How long is blue in the air after its own release?",
+    "value": 2.449489742783178,
+    "unit": "s",
+    "tol": 0.025,
+    "hint": "Blue starts from rest. Use −30 = −5τ², where τ is its time in the air.",
+    "why": "τ = √6 ≈ 2.45 s."
+   },
+   {
+    "ask": "When does blue hit, measured from red’s release?",
+    "value": 3.449489742783178,
+    "unit": "s",
+    "tol": 0.025,
+    "hint": "Add blue’s release delay to its flight time.",
+    "why": "t_blue = 1.00 + √6 ≈ 3.45 s."
+   },
+   {
+    "ask": "Which ball arrives first?",
+    "options": [
+     "Blue",
+     "Red",
+     "They arrive together"
+    ],
+    "why": "The shared clock reads about 3.45 s for blue and 3.65 s for red."
+   },
+   {
+    "ask": "How much earlier does it arrive?",
+    "value": 0.19626156828141283,
+    "unit": "s",
+    "tol": 0.012,
+    "hint": "Subtract the two arrival times on the same clock.",
+    "why": "Δt = (1 + √7) − (1 + √6) ≈ 0.20 s."
+   }
+  ]
+ },
+ "boxwork": {
+  "ch": "6",
+  "title": "Work done by a push",
+  "story": "A box starts at rest, slides on a level floor, and stops. Find the work done by the push over its trip. Model the push as horizontal.",
+  "givens": [
+   "d • Sliding distance = 20 m",
+   "μₖ • Kinetic friction coefficient = 0.25",
+   "v_i and v_f • Both 0 m/s",
+   "g • Gravity = 10 m/s²",
+   "m • Box mass is unspecified"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation counts the work of both horizontal forces?",
+    "options": [
+     "W_push + W_friction = ΔK",
+     "W_push = ΔK",
+     "W_friction = μₖmgd"
+    ],
+    "why": "Friction opposes sliding, and the two endpoint speeds give ΔK = 0."
+   },
+   {
+    "ask": "Which answer can you justify with the stated information?",
+    "options": [
+     "W_push = μₖmgd = (50 J/kg)m",
+     "W_push = 50 J for every box",
+     "W_push = 0 J"
+    ],
+    "why": "W_push = −W_friction. Mass is needed for a numerical answer in joules."
+   }
+  ]
+ },
+ "ramp500": {
+  "ch": "7–8",
+  "title": "Quarter-pipe, collision and spring",
+  "story": "A mass slides down a smooth quarter-pipe into a second mass attached to a relaxed spring. Find maximum compression. The paper calls the collision inelastic. For the numerical branch assume release from rest, a stationary second mass, and sticking.",
+  "givens": [
+   "m₁ • Sliding mass = 2.0 kg",
+   "m₂ • Attached mass = 2.0 kg",
+   "h • Vertical drop = 10 m",
+   "k • Spring constant = 500 N/m",
+   "g • Gravity = 10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which relation gives speed immediately before impact?",
+    "options": [
+     "m₁gh = ½m₁u²",
+     "m₁gh = m₁u",
+     "m₁g = ku²"
+    ],
+    "why": "On the descent gravity converts potential energy into kinetic energy."
+   },
+   {
+    "ask": "What speed does the sliding mass reach at the bottom?",
+    "value": 14.142135623730951,
+    "unit": "m/s",
+    "tol": 0.15,
+    "hint": "Isolate u = √(2gh).",
+    "why": "u = √(2 × 10 × 10) ≈ 14.14 m/s."
+   },
+   {
+    "ask": "Does the word “inelastic” alone fix the velocities just after impact?",
+    "options": [
+     "No. We need another condition, such as sticking.",
+     "Yes. Every inelastic collision ends with sticking.",
+     "Yes. Kinetic energy is conserved in every collision."
+    ],
+    "why": "Inelastic means kinetic energy decreases. Only a perfectly inelastic collision requires a shared final velocity."
+   },
+   {
+    "ask": "For a short sticking collision, which equation gives the common speed V?",
+    "options": [
+     "m₁u = (m₁ + m₂)V",
+     "½m₁u² = ½(m₁ + m₂)V²",
+     "m₁u = m₂V"
+    ],
+    "why": "During the short impact the external horizontal impulse is negligible. Both masses move together afterward."
+   },
+   {
+    "ask": "What is the common speed just after they stick?",
+    "value": 7.0710678118654755,
+    "unit": "m/s",
+    "tol": 0.08,
+    "hint": "Divide the incoming momentum by the combined mass.",
+    "why": "V = (2/4)√200 ≈ 7.07 m/s."
+   },
+   {
+    "ask": "Which equation now gives the compression x?",
+    "options": [
+     "½(m₁ + m₂)V² = ½kx²",
+     "m₁gh = ½kx²",
+     "(m₁ + m₂)V = kx"
+    ],
+    "why": "After impact, the moving pair slows to rest as the spring stores energy."
+   },
+   {
+    "ask": "Under the sticking assumption, how far does the spring compress?",
+    "value": 0.6324555320336759,
+    "unit": "m",
+    "tol": 0.01,
+    "hint": "Take the square root after solving for x².",
+    "why": "x = √(200/500) m ≈ 0.632 m."
+   }
+  ]
+ },
+ "ramp750": {
+  "ch": "7–8",
+  "title": "Quarter-pipe, collision and spring",
+  "story": "A mass slides down a smooth quarter-pipe into a second mass attached to a relaxed spring. Find maximum compression. The paper calls the collision inelastic. For the numerical branch assume release from rest, a stationary second mass, and sticking.",
+  "givens": [
+   "m₁ • Sliding mass = 2.0 kg",
+   "m₂ • Attached mass = 2.0 kg",
+   "h • Vertical drop = 10 m",
+   "k • Spring constant = 750 N/m",
+   "g • Gravity = 10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which relation gives speed immediately before impact?",
+    "options": [
+     "m₁gh = ½m₁u²",
+     "m₁gh = m₁u",
+     "m₁g = ku²"
+    ],
+    "why": "On the descent gravity converts potential energy into kinetic energy."
+   },
+   {
+    "ask": "What speed does the sliding mass reach at the bottom?",
+    "value": 14.142135623730951,
+    "unit": "m/s",
+    "tol": 0.15,
+    "hint": "Isolate u = √(2gh).",
+    "why": "u = √(2 × 10 × 10) ≈ 14.14 m/s."
+   },
+   {
+    "ask": "Does the word “inelastic” alone fix the velocities just after impact?",
+    "options": [
+     "No. We need another condition, such as sticking.",
+     "Yes. Every inelastic collision ends with sticking.",
+     "Yes. Kinetic energy is conserved in every collision."
+    ],
+    "why": "Inelastic means kinetic energy decreases. Only a perfectly inelastic collision requires a shared final velocity."
+   },
+   {
+    "ask": "For a short sticking collision, which equation gives the common speed V?",
+    "options": [
+     "m₁u = (m₁ + m₂)V",
+     "½m₁u² = ½(m₁ + m₂)V²",
+     "m₁u = m₂V"
+    ],
+    "why": "During the short impact the external horizontal impulse is negligible. Both masses move together afterward."
+   },
+   {
+    "ask": "What is the common speed just after they stick?",
+    "value": 7.0710678118654755,
+    "unit": "m/s",
+    "tol": 0.08,
+    "hint": "Divide the incoming momentum by the combined mass.",
+    "why": "V = (2/4)√200 ≈ 7.07 m/s."
+   },
+   {
+    "ask": "Which equation now gives the compression x?",
+    "options": [
+     "½(m₁ + m₂)V² = ½kx²",
+     "m₁gh = ½kx²",
+     "(m₁ + m₂)V = kx"
+    ],
+    "why": "After impact, the moving pair slows to rest as the spring stores energy."
+   },
+   {
+    "ask": "Under the sticking assumption, how far does the spring compress?",
+    "value": 0.5163977794943222,
+    "unit": "m",
+    "tol": 0.01,
+    "hint": "Take the square root after solving for x².",
+    "why": "x = √(200/750) m ≈ 0.516 m."
+   }
+  ]
+ },
+ "pulley": {
+  "ch": "4–5",
+  "title": "Movable pulley and hanging box",
+  "story": "A carries a movable pulley on a smooth table. A cord is anchored at the right, wraps around A’s pulley, returns to the right over a fixed pulley, and descends to B. Draw each free-body diagram and find A’s acceleration.",
+  "givens": [
+   "m_A • Block on table = 4.0 kg",
+   "m_B • Hanging box = 5.0 kg",
+   "g • Gravity = 10 m/s²",
+   "Cord • Inextensible, ideal pulleys",
+   "Positive directions • A to the right, B downward"
+  ],
+  "steps": [
+   {
+    "ask": "Which horizontal force equation belongs to A and its pulley?",
+    "options": [
+     "2T = m_A a_A",
+     "T = m_A a_A",
+     "m_Ag − T = m_A a_A"
+    ],
+    "why": "Both horizontal strands pull A to the right with tension T."
+   },
+   {
+    "ask": "Sketch the forces, then check your arrows. Which set matches?",
+    "options": [
+     "A: normal up, weight down, two tensions right. B: weight down, tension up.",
+     "A: one tension left and one right. B: only weight.",
+     "A: weight right, tension up. B: two tensions up."
+    ],
+    "why": "The cord wraps around A. B hangs from a single strand."
+   },
+   {
+    "ask": "Which acceleration constraint follows from the fixed cord length?",
+    "options": [
+     "a_B = 2a_A",
+     "a_B = a_A",
+     "a_A = 2a_B"
+    ],
+    "why": "If A moves right one centimeter, each horizontal segment shortens one centimeter. B must move down two."
+   },
+   {
+    "ask": "Which equation describes B along its chosen axis?",
+    "options": [
+     "m_Bg − T = m_B a_B",
+     "T − m_Bg = m_B a_B",
+     "2T = m_B a_B"
+    ],
+    "why": "Down is positive for B. Substitute T = m_A a_A/2 and a_B = 2a_A."
+   },
+   {
+    "ask": "What is A’s acceleration to the right?",
+    "value": 4.166666666666667,
+    "unit": "m/s²",
+    "tol": 0.06,
+    "hint": "50 − 2a_A = 10a_A.",
+    "why": "a_A = 50/12 ≈ 4.17 m/s² right."
+   }
+  ]
+ },
+ "springstick": {
+  "ch": "7–8",
+  "title": "Spring cart • sticking collision",
+  "story": "Cart adaptation. A small cart hits a stationary cart attached to a relaxed spring on a level frictionless track. The carts latch together. Find the incoming cart’s initial speed. Treat the impact as brief.",
+  "givens": [
+   "m • Incoming cart = 0.50 kg",
+   "M • Spring cart = 2.0 kg",
+   "k • Spring constant = 200 N/m",
+   "x • Maximum compression = 0.1 m"
+  ],
+  "steps": [
+   {
+    "ask": "Working backward from maximum compression, which equation gives the speed V just after impact?",
+    "options": [
+     "½(M + m)V² = ½kx²",
+     "½mu² = ½kx²",
+     "½MV² = ½kx²"
+    ],
+    "why": "Use the mass moving with the spring during compression: both latched carts."
+   },
+   {
+    "ask": "What speed does the spring carry into compression?",
+    "value": 0.894427190999916,
+    "unit": "m/s",
+    "tol": 0.012,
+    "hint": "Solve the selected energy equation for V.",
+    "why": "V = 0.894 m/s."
+   },
+   {
+    "ask": "Which collision relation connects incoming speed u to that speed V?",
+    "options": [
+     "mu = (m + M)V",
+     "V = [2m/(m + M)]u",
+     "u = V"
+    ],
+    "why": "For the short impact, conserve momentum and give the latched pair one velocity."
+   },
+   {
+    "ask": "What was the incoming cart’s speed?",
+    "value": 4.47213595499958,
+    "unit": "m/s",
+    "tol": 0.035,
+    "hint": "Rearrange the selected relation to isolate u.",
+    "why": "u ≈ 4.472 m/s."
+   }
+  ]
+ },
+ "springelastic": {
+  "ch": "7–8",
+  "title": "Spring cart • elastic rebound",
+  "story": "Cart adaptation. A small cart hits a stationary cart attached to a relaxed spring on a level frictionless track. The collision is head-on and elastic. Find the incoming cart’s initial speed. Treat the impact as brief.",
+  "givens": [
+   "m • Incoming cart = 0.50 kg",
+   "M • Spring cart = 2.0 kg",
+   "k • Spring constant = 200 N/m",
+   "x • Maximum compression = 0.15 m"
+  ],
+  "steps": [
+   {
+    "ask": "Working backward from maximum compression, which equation gives the speed V just after impact?",
+    "options": [
+     "½MV² = ½kx²",
+     "½mu² = ½kx²",
+     "½(M + m)V² = ½kx²"
+    ],
+    "why": "Use the mass moving with the spring during compression: only the spring cart."
+   },
+   {
+    "ask": "What speed does the spring carry into compression?",
+    "value": 1.5,
+    "unit": "m/s",
+    "tol": 0.012,
+    "hint": "Solve the selected energy equation for V.",
+    "why": "V = 1.500 m/s."
+   },
+   {
+    "ask": "Which collision relation connects incoming speed u to that speed V?",
+    "options": [
+     "V = [2m/(m + M)]u",
+     "mu = (m + M)V",
+     "u = V"
+    ],
+    "why": "For the short impact, use momentum and kinetic-energy conservation for a 1D elastic collision with a stationary target."
+   },
+   {
+    "ask": "What was the incoming cart’s speed?",
+    "value": 3.75,
+    "unit": "m/s",
+    "tol": 0.035,
+    "hint": "Rearrange the selected relation to isolate u.",
+    "why": "u ≈ 3.750 m/s."
+   }
+  ]
+ },
+ "drop": {
+  "ch": "7–8",
+  "title": "Kinetic energy and momentum at impact",
+  "story": "Drop a ball from a roof. Find its kinetic energy and signed vertical momentum just before impact. Ignore drag.",
+  "givens": [
+   "m • Ball mass = 2.0 kg",
+   "h • Drop = 30 m",
+   "v₀ • Initial speed = 0 m/s",
+   "g • Gravity = 10 m/s²",
+   "Axis • Up is positive"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives impact kinetic energy directly?",
+    "options": [
+     "K_f = mgh",
+     "K_f = mg/h",
+     "K_f = mgh²"
+    ],
+    "why": "All the lost gravitational potential energy becomes kinetic energy."
+   },
+   {
+    "ask": "What is its kinetic energy at impact?",
+    "value": 600,
+    "unit": "J",
+    "tol": 1,
+    "hint": "Multiply mass, gravity and drop height.",
+    "why": "K_f = 2 × 10 × 30 = 600 J."
+   },
+   {
+    "ask": "Which relation gives signed vertical momentum?",
+    "options": [
+     "pᵧ = mvᵧ",
+     "pᵧ = mvᵧ²",
+     "pᵧ = mgh"
+    ],
+    "why": "The ball is moving down, so vᵧ is negative on this axis."
+   },
+   {
+    "ask": "What is its vertical momentum?",
+    "value": -48.98979485566356,
+    "unit": "kg·m/s",
+    "tol": 0.4,
+    "hint": "Use vᵧ = −√(2gh).",
+    "why": "pᵧ = 2(−√600) ≈ −49.0 kg·m/s."
+   }
+  ]
+ },
+ "chase": {
+  "ch": "2",
+  "title": "Late start from a roof",
+  "story": "A ball drops from a roof. A second object starts from the roof 0.80 s later. Find the downward starting speed that lets it just catch the ball at ground level. Ignore drag.",
+  "givens": [
+   "h • Distance down = 30 m",
+   "v₀,ball • Initial speed = 0 m/s",
+   "t_delay • Later start = 0.80 s",
+   "a • Downward acceleration = +10 m/s²",
+   "Axis • Down is positive"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives the first ball’s time to the ground?",
+    "options": [
+     "h = ½gt²",
+     "h = gt",
+     "h = v₀t"
+    ],
+    "why": "The dropped ball starts from rest."
+   },
+   {
+    "ask": "How much flight time does the second object have?",
+    "value": 1.6494897427831778,
+    "unit": "s",
+    "tol": 0.025,
+    "hint": "Calculate √(2h/g) and subtract the delay.",
+    "why": "τ = √6 − 0.80 ≈ 1.6495 s."
+   },
+   {
+    "ask": "Which equation uses the second object’s own flight time τ?",
+    "options": [
+     "h = uτ + ½gτ²",
+     "h = ½gτ²",
+     "h = u(t + 0.80)"
+    ],
+    "why": "The later object travels the same distance with a nonzero initial speed."
+   },
+   {
+    "ask": "What downward starting speed is required?",
+    "value": 9.939993876,
+    "unit": "m/s",
+    "tol": 0.08,
+    "hint": "Isolate u = h/τ − gτ/2. Keep extra digits in τ.",
+    "why": "u = 30/1.6495 − 5(1.6495) ≈ 9.94 m/s downward."
+   }
+  ]
+ },
+ "horizontal": {
+  "ch": "3",
+  "title": "Horizontal projectile velocity",
+  "story": "A ball travels through the air with an initial horizontal component. What happens to that component?",
+  "givens": [
+   "Drag • Negligible",
+   "Gravity • Vertical",
+   "v₀ₓ • Nonzero horizontal velocity"
+  ],
+  "steps": [
+   {
+    "ask": "Which horizontal law applies?",
+    "options": [
+     "ΣFₓ = maₓ = 0",
+     "ΣFₓ = mg",
+     "vₓ = v₀ₓ − gt"
+    ],
+    "why": "Gravity has no horizontal component."
+   },
+   {
+    "ask": "What happens to vₓ during flight?",
+    "options": [
+     "It keeps its launch value.",
+     "It falls to zero at the peak.",
+     "It grows as the ball falls."
+    ],
+    "why": "With aₓ = 0, vₓ is constant. A purely vertical launch would keep vₓ = 0."
+   }
+  ]
+ },
+ "brakes": {
+  "ch": "2, 6",
+  "title": "Double the speed before braking",
+  "story": "A vehicle skids to rest on a level road. Predict the stopping distance if its initial speed doubles under the same conditions.",
+  "givens": [
+   "v_f • Final speed = 0",
+   "a • Same constant braking acceleration",
+   "u • Initial speed changes to 2u"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation eliminates stopping time?",
+    "options": [
+     "v_f² = u² + 2aΔx",
+     "v_f = u + at",
+     "Δx = ut"
+    ],
+    "why": "The problem compares distances at the same acceleration."
+   },
+   {
+    "ask": "How does doubling u change the distance?",
+    "options": [
+     "It becomes four times as long.",
+     "It doubles.",
+     "It stays the same."
+    ],
+    "why": "Stopping distance is u²/(2|a|). Squaring 2u gives 4u²."
+   }
+  ]
+ },
+ "pair": {
+  "ch": "4",
+  "title": "Reaction to a push",
+  "story": "Your hand pushes box G to the right. G touches another box H. Identify the reaction to your hand’s push on G.",
+  "givens": [
+   "Interaction • Hand on G",
+   "Other contact • G touches H"
+  ],
+  "steps": [
+   {
+    "ask": "Which rule identifies the partner force?",
+    "options": [
+     "F_hand on G = −F_G on hand",
+     "F_hand on G = −F_H on G",
+     "ΣF_on G = 0"
+    ],
+    "why": "For the third-law partner, swap the two bodies in the same interaction."
+   },
+   {
+    "ask": "Which force is the reaction?",
+    "options": [
+     "G pushes left on your hand.",
+     "H pushes left on G.",
+     "The floor pushes up on G."
+    ],
+    "why": "The paired forces act on different bodies."
+   }
+  ]
+ },
+ "graph": {
+  "ch": "6",
+  "title": "Work from a force graph",
+  "story": "A force points along a straight track. On the force–position graph, the line is horizontal from x = 0 to 10 m and then slopes straight down to zero at 15 m. Find the work over the trip.",
+  "givens": [
+   "Horizontal axis • Position x in m",
+   "Vertical axis • Force Fₓ in N",
+   "Graph vertices (x, Fₓ) • (0, 10), (10, 10), (15, 0)"
+  ],
+  "steps": [
+   {
+    "ask": "How do you read work from this graph?",
+    "options": [
+     "Add the signed areas under Fₓ versus x.",
+     "Take the slope of Fₓ versus x.",
+     "Multiply final force by total distance."
+    ],
+    "why": "Area has units N·m, which are joules."
+   },
+   {
+    "ask": "How much work is in the first interval?",
+    "value": 100,
+    "unit": "J",
+    "tol": 0.2,
+    "hint": "Its rectangle has width 10 m and height 10 N.",
+    "why": "W₁ = 10 × 10 = 100 J."
+   },
+   {
+    "ask": "How much work is in the sloped interval?",
+    "value": 25,
+    "unit": "J",
+    "tol": 0.2,
+    "hint": "Use a triangle with base 5 m and height 10 N.",
+    "why": "W₂ = ½ × 5 × 10 = 25 J."
+   },
+   {
+    "ask": "What is the total work?",
+    "value": 125,
+    "unit": "J",
+    "tol": 0.3,
+    "hint": "Both regions are above the axis.",
+    "why": "W = 100 + 25 = 125 J."
+   }
+  ]
+ },
+ "tow": {
+  "ch": "4",
+  "title": "Truck towing a bus",
+  "story": "A truck can now tow a bus using the same net driving force as when it accelerated alone. What maximum acceleration can the pair reach? Treat the level road and tow line as ideal.",
+  "givens": [
+   "m • Truck mass",
+   "m_bus • Bus mass = 2m",
+   "a_solo • Truck alone = 3.0 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation compares the solo truck with the pair?",
+    "options": [
+     "m a_solo = (m + 2m)a_pair",
+     "m a_solo = 2m a_pair",
+     "m a_solo = (m − 2m)a_pair"
+    ],
+    "why": "For the pair, the tow-line forces are internal. The same net driving force accelerates three times the mass."
+   },
+   {
+    "ask": "What is the pair’s acceleration?",
+    "value": 1,
+    "unit": "m/s²",
+    "tol": 0.02,
+    "hint": "Divide the original acceleration by 3.",
+    "why": "a_pair = 3m/(3m) = 1.0 m/s²."
+   }
+  ]
+ },
+ "car": {
+  "ch": "2",
+  "title": "Speed and time after 1.033 km",
+  "story": "A car accelerates steadily forward. Find its final speed and the time taken over the measured distance.",
+  "givens": [
+   "u • Initial speed = 7.0 m/s",
+   "a • Constant acceleration = +0.71 m/s²",
+   "Δx • Forward displacement = 1.033 km"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives final speed without time?",
+    "options": [
+     "v² = u² + 2aΔx",
+     "v = u + at",
+     "Δx = vt"
+    ],
+    "why": "Speed, acceleration and distance are linked without an unknown time."
+   },
+   {
+    "ask": "Convert 1.033 km to meters.",
+    "value": 1033,
+    "unit": "m",
+    "tol": 0.1,
+    "hint": "There are 1000 m in a kilometer.",
+    "why": "Δx = 1.033 × 1000 = 1033 m."
+   },
+   {
+    "ask": "What is the final speed?",
+    "value": 38.934,
+    "unit": "m/s",
+    "tol": 0.17,
+    "hint": "Use the positive square root of 7² + 2(0.71)(1033).",
+    "why": "v ≈ 38.93 m/s."
+   },
+   {
+    "ask": "Now that both speeds are known, which equation directly gives elapsed time?",
+    "options": [
+     "t = (v − u)/a",
+     "t = (v + u)/a",
+     "t = a/(v − u)"
+    ],
+    "why": "For constant acceleration the velocity change equals acceleration times elapsed time."
+   },
+   {
+    "ask": "How long did it take?",
+    "value": 44.978,
+    "unit": "s",
+    "tol": 0.2,
+    "hint": "Rearrange v = u + at to t = (v − u)/a.",
+    "why": "t = (38.934 − 7)/0.71 ≈ 45.0 s."
+   }
+  ]
+ },
+ "vectors": {
+  "ch": "1",
+  "title": "Three force vectors",
+  "story": "Find the size and direction of the resultant. Use angles measured counterclockwise from +x and report the final angle between 0° and 360°.",
+  "givens": [
+   "A • 5.0 lb along +x",
+   "B • 7.9 lb at 120° from +x",
+   "C • 8.0 lb along −y"
+  ],
+  "steps": [
+   {
+    "ask": "Which setup adds the vectors along x?",
+    "options": [
+     "Rₓ = 5.0 + 7.9 cos(120°)",
+     "Rₓ = 5.0 + 7.9 sin(120°) − 8.0",
+     "Rₓ = 5.0 + 7.9 + 8.0"
+    ],
+    "why": "The angle starts at +x, so cosine gives B’s signed x component. C points straight down."
+   },
+   {
+    "ask": "What is the x component of the sum?",
+    "value": 1.05,
+    "unit": "lb",
+    "tol": 0.055,
+    "hint": "cos(120°) = −0.5.",
+    "why": "Rₓ = 5.0 − 3.95 = +1.05 lb."
+   },
+   {
+    "ask": "What is the y component of the sum?",
+    "value": -1.1584,
+    "unit": "lb",
+    "tol": 0.055,
+    "hint": "Add B’s upward component and C’s downward component.",
+    "why": "Rᵧ = 7.9 sin(120°) − 8.0 ≈ −1.16 lb."
+   },
+   {
+    "ask": "Which equation turns the two components into a length?",
+    "options": [
+     "R = √(Rₓ² + Rᵧ²)",
+     "R = Rₓ + Rᵧ",
+     "R = Rₓ² + Rᵧ²"
+    ],
+    "why": "The components are perpendicular. The resultant is the hypotenuse of their right triangle."
+   },
+   {
+    "ask": "What is the magnitude?",
+    "value": 1.5635,
+    "unit": "lb",
+    "tol": 0.055,
+    "hint": "Use the Pythagorean theorem on Rₓ and Rᵧ.",
+    "why": "R = √(1.05² + (−1.1584)²) ≈ 1.56 lb."
+   },
+   {
+    "ask": "Which equation gives the acute reference angle before checking the quadrant?",
+    "options": [
+     "α = tan⁻¹(|Rᵧ|/|Rₓ|)",
+     "α = tan(|Rᵧ|/|Rₓ|)",
+     "α = tan⁻¹(|Rₓ|/|Rᵧ|)"
+    ],
+    "why": "For an angle from the horizontal, vertical is opposite and horizontal is adjacent. Use inverse tangent to recover an angle."
+   },
+   {
+    "ask": "What is the counterclockwise angle from +x?",
+    "value": 312.19,
+    "unit": "°",
+    "tol": 0.8,
+    "hint": "The resultant points right and down. Subtract its acute angle below +x from 360°.",
+    "why": "θ = 360° − tan⁻¹(1.1584/1.05) ≈ 312.2°."
+   }
+  ]
+ },
+ "sled": {
+  "ch": "5–6",
+  "title": "Sled slides to rest",
+  "story": "A sled skids to rest on a horizontal surface. Determine its starting speed.",
+  "givens": [
+   "d • Stopping distance = 10 m",
+   "μₖ • Kinetic friction coefficient = 0.20",
+   "v_f • Final speed = 0 m/s",
+   "g • Gravity = 10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which work–energy equation fits the sled?",
+    "options": [
+     "−μₖmgd = 0 − ½mu²",
+     "μₖmgd = 0 − ½mu²",
+     "−μₖmg = ½mu²"
+    ],
+    "why": "Friction does negative work, equal to the loss of kinetic energy."
+   },
+   {
+    "ask": "What was the starting speed?",
+    "value": 6.324555320336759,
+    "unit": "m/s",
+    "tol": 0.06,
+    "hint": "Cancel mass and take √(2μₖgd).",
+    "why": "u = √(2 × 0.20 × 10 × 10) ≈ 6.32 m/s."
+   }
+  ]
+ },
+ "sign": {
+  "ch": "4",
+  "title": "Sign supported by two ropes",
+  "story": "A stationary sign hangs from ropes A and B. Sketch a free-body diagram and find the tension in A. Use the angles above the horizontal.",
+  "givens": [
+   "m • Sign mass = 10 kg",
+   "g • Gravity = 10 m/s²",
+   "A • Up-left, 45° above horizontal",
+   "B • Up-right, 30° above horizontal"
+  ],
+  "steps": [
+   {
+    "ask": "Which horizontal force balance fits the sign?",
+    "options": [
+     "−T_A cos45° + T_B cos30° = 0",
+     "−T_A sin45° + T_B sin30° = mg",
+     "T_A + T_B = 0"
+    ],
+    "why": "The horizontal components cancel. Both angles are measured from horizontal."
+   },
+   {
+    "ask": "Draw the sign as one dot. Which arrows belong on it?",
+    "options": [
+     "Weight down, A up-left, B up-right.",
+     "Weight down, A and B straight up.",
+     "Weight up, A down-right, B down-left."
+    ],
+    "why": "Tensions point along each rope away from the sign."
+   },
+   {
+    "ask": "Which vertical equation goes with that sketch?",
+    "options": [
+     "T_A sin45° + T_B sin30° = mg",
+     "T_A cos45° − T_B cos30° = mg",
+     "T_A + T_B = mg"
+    ],
+    "why": "Both vertical components support the 100 N weight."
+   },
+   {
+    "ask": "What is the tension in A?",
+    "value": 89.6575,
+    "unit": "N",
+    "tol": 0.65,
+    "hint": "Substitute T_B = T_A cos45°/cos30° into the vertical equation.",
+    "why": "T_A = 100/(sin45° + cos45° tan30°) ≈ 89.7 N."
+   }
+  ]
+ },
+ "balanced": {
+  "ch": "4",
+  "title": "Zero acceleration and forces",
+  "story": "An object has zero acceleration. Explain what this tells you about the forces acting on it.",
+  "givens": [
+   "Frame • Inertial",
+   "a • Zero",
+   "m • Constant"
+  ],
+  "steps": [
+   {
+    "ask": "Which statement follows directly?",
+    "options": [
+     "The vector sum of external forces is zero.",
+     "Every individual force is zero.",
+     "Velocity is zero."
+    ],
+    "why": "ΣF = ma sets the resultant force."
+   },
+   {
+    "ask": "Which example illustrates your answer?",
+    "options": [
+     "A book stays on a level table while gravity and the normal force balance.",
+     "A falling book speeds up under gravity alone.",
+     "A turning car accelerates inward."
+    ],
+    "why": "Two nonzero forces on the book cancel."
+   }
+  ]
+ },
+ "unequal": {
+  "ch": "1",
+  "title": "Can unequal vectors cancel?",
+  "story": "Two nonzero vectors have unequal magnitudes. Can their sum be zero?",
+  "givens": [
+   "Number of vectors • Two",
+   "Sizes • Unequal"
+  ],
+  "steps": [
+   {
+    "ask": "What equation must hold for an exact cancellation?",
+    "options": [
+     "A = −B",
+     "A · B = 0",
+     "|A| + |B| = 0 for any opposite pair"
+    ],
+    "why": "If A + B = 0, moving one vector across gives A = −B."
+   },
+   {
+    "ask": "What does that imply here?",
+    "options": [
+     "Cancellation is impossible because the magnitudes differ.",
+     "Opposite directions alone are enough.",
+     "Any perpendicular pair cancels."
+    ],
+    "why": "Equal size and opposite direction are both necessary."
+   }
+  ]
+ },
+ "n2example": {
+  "ch": "4",
+  "title": "State the second law and give an example",
+  "story": "State Newton’s second law and use a constant-mass example to demonstrate it.",
+  "givens": [
+   "Frame • Inertial",
+   "Example cart • 2 kg",
+   "Example net force • 6 N right"
+  ],
+  "steps": [
+   {
+    "ask": "Which statement gives the law?",
+    "options": [
+     "ΣF_external = dp/dt, or ma for a constant mass.",
+     "Force is proportional to velocity.",
+     "One force always gives the speed of the body."
+    ],
+    "why": "Name the inertial frame, the net external force, and the rate of change of momentum."
+   },
+   {
+    "ask": "What does the cart example demonstrate?",
+    "options": [
+     "It accelerates at 3 m/s² right.",
+     "Its speed is a constant 3 m/s.",
+     "It accelerates at 12 m/s² right."
+    ],
+    "why": "a = ΣF/m = 6/2 = 3 m/s² in the direction of the net force."
+   }
+  ]
+ },
+ "platform": {
+  "ch": "3",
+  "title": "Ball thrown from a platform",
+  "story": "Find maximum height above ground, flight time and velocity just before the ball hits. Ignore drag.",
+  "givens": [
+   "y₀ • Platform height = 20 m",
+   "u • Launch speed = 10 m/s",
+   "θ • Launch angle = 30° above +x",
+   "aᵧ • Vertical acceleration = −10 m/s²",
+   "y_f • Ground = 0 m"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives the initial vertical component?",
+    "options": [
+     "uᵧ = u sin θ",
+     "uᵧ = u cos θ",
+     "uᵧ = u tan θ"
+    ],
+    "why": "The vertical leg is opposite the angle above horizontal."
+   },
+   {
+    "ask": "What is the starting vertical velocity?",
+    "value": 5,
+    "unit": "m/s",
+    "tol": 0.05,
+    "hint": "Use 10 sin30°.",
+    "why": "uᵧ = +5.0 m/s."
+   },
+   {
+    "ask": "Which equation finds the rise from the vertical launch speed?",
+    "options": [
+     "0 = uᵧ² − 2gΔy",
+     "0 = uₓ² − 2gΔy",
+     "y_max = uᵧ/g"
+    ],
+    "why": "At the peak vᵧ = 0. After solving for the rise, add the launch height."
+   },
+   {
+    "ask": "What is the maximum height above ground?",
+    "value": 21.25,
+    "unit": "m",
+    "tol": 0.08,
+    "hint": "At the top vᵧ = 0. Add uᵧ²/(2g) to the platform height.",
+    "why": "y_max = 20 + 25/20 = 21.25 m."
+   },
+   {
+    "ask": "Which position equation puts the ball at ground level?",
+    "options": [
+     "0 = 20 + 5t − 5t²",
+     "0 = 5t − 5t²",
+     "20 = 5t + 5t²"
+    ],
+    "why": "The ground is y = 0. The initial height is 20 m and the initial vertical velocity is +5 m/s."
+   },
+   {
+    "ask": "How long until the ball hits the ground?",
+    "value": 2.56155,
+    "unit": "s",
+    "tol": 0.03,
+    "hint": "Solve 0 = 20 + 5t − 5t² and take the positive root.",
+    "why": "t = (5 + √425)/10 ≈ 2.562 s."
+   },
+   {
+    "ask": "What is the horizontal impact velocity?",
+    "value": 8.6603,
+    "unit": "m/s",
+    "tol": 0.07,
+    "hint": "There is no horizontal acceleration. Use 10 cos30°.",
+    "why": "vₓ = 8.66 m/s right."
+   },
+   {
+    "ask": "What is the signed vertical impact velocity?",
+    "value": -20.6155,
+    "unit": "m/s",
+    "tol": 0.12,
+    "hint": "Use vᵧ = uᵧ − gt.",
+    "why": "vᵧ = 5 − 10(2.56155) ≈ −20.62 m/s."
+   },
+   {
+    "ask": "What is the impact speed?",
+    "value": 22.360679774997898,
+    "unit": "m/s",
+    "tol": 0.15,
+    "hint": "Combine the two perpendicular components using √(vₓ² + vᵧ²).",
+    "why": "|v| = √500 ≈ 22.36 m/s."
+   },
+   {
+    "ask": "How far below horizontal is the impact direction?",
+    "value": 67.21,
+    "unit": "°",
+    "tol": 0.4,
+    "hint": "Use tan⁻¹(|vᵧ|/vₓ) in degree mode.",
+    "why": "θ ≈ 67.2° below +x."
+   }
+  ]
+ },
+ "boxes": {
+  "ch": "4",
+  "title": "Three boxes in contact",
+  "story": "A horizontal push on the left box accelerates a row of three boxes. Draw a force diagram for each. Find the push of the middle box on the right box.",
+  "givens": [
+   "Left box • 4.0 kg",
+   "Middle box • 2.0 kg",
+   "Right box • 8.0 kg",
+   "F • External push = 28 N right",
+   "Floor • Level with negligible friction"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation finds the common acceleration?",
+    "options": [
+     "28 = (4 + 2 + 8)a",
+     "28 = 4a",
+     "28 = 8a"
+    ],
+    "why": "The applied force accelerates all three boxes together. Internal forces cancel in the combined system."
+   },
+   {
+    "ask": "What is the acceleration to the right?",
+    "value": 2,
+    "unit": "m/s²",
+    "tol": 0.02,
+    "hint": "Divide the external force by total mass.",
+    "why": "a = 28/14 = 2 m/s²."
+   },
+   {
+    "ask": "Sketch each box with weight down and normal up. Which horizontal arrows complete the diagrams?",
+    "options": [
+     "Left: applied →, middle on left ←. Middle: left on middle →, right on middle ←. Right: middle on right →.",
+     "Left: applied → only. Middle and right: no horizontal forces.",
+     "Each box has a separate applied 28 N force →."
+    ],
+    "why": "Put each contact on both bodies with opposite arrows. Only the left box receives the external push."
+   },
+   {
+    "ask": "What force does the middle box exert to the right on the 8 kg box?",
+    "value": 16,
+    "unit": "N",
+    "tol": 0.1,
+    "hint": "Isolate the right box. It has a single horizontal contact force.",
+    "why": "F_middle on right = 8 × 2 = 16 N right."
+   }
+  ]
+ },
+ "wingtip": {
+  "ch": "5",
+  "title": "Wingtip in a steady roll",
+  "story": "A wingtip turns in a circle about the aircraft’s axis at constant angular speed. Find the magnitude of its inward acceleration.",
+  "givens": [
+   "r • Wingtip radius = 4.6 m",
+   "T • Time per revolution = 35 s"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation uses radius and period directly?",
+    "options": [
+     "a_c = 4π²r/T²",
+     "a_c = r/T",
+     "a_c = 4π²T/r²"
+    ],
+    "why": "One revolution covers 2πr. Substitute v = 2πr/T into a_c = v²/r."
+   },
+   {
+    "ask": "What is the wingtip’s inward acceleration?",
+    "value": 0.14824548651432176,
+    "unit": "m/s²",
+    "tol": 0.005,
+    "hint": "Square the 35-second period in the denominator.",
+    "why": "a_c = 4π²(4.6)/35² ≈ 0.148 m/s²."
+   }
+  ]
+ },
+ "fixed": {
+  "ch": "5–7",
+  "title": "Two masses over a fixed pulley",
+  "story": "A block on a rough level table is tied over an ideal fixed pulley to a hanging mass. They start from rest. Draw both free-body diagrams and use work and energy to find their speed after the hanging mass drops.",
+  "givens": [
+   "m₁ • Mass on table = 8.0 kg",
+   "m₂ • Hanging mass = 4.0 kg",
+   "μₖ • Kinetic friction on table = 0.25",
+   "d • Drop = 2.0 m",
+   "g • Gravity = 10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which work–energy equation treats both masses as one system?",
+    "options": [
+     "m₂gd − μₖm₁gd = ½(m₁ + m₂)v²",
+     "m₂gd = ½m₂v²",
+     "μₖm₁gd − m₂gd = ½m₁v²"
+    ],
+    "why": "Gravity on the hanging mass does positive work. Friction on the table does negative work. Both masses gain kinetic energy."
+   },
+   {
+    "ask": "Sketch both masses, then check which set of forces belongs.",
+    "options": [
+     "Table block: normal up, weight down, tension toward pulley, friction away. Hanging mass: tension up, weight down.",
+     "Both masses: friction up, tension down.",
+     "Table block: tension only. Hanging mass: weight only."
+    ],
+    "why": "Friction opposes sliding on the table. Each block has its own weight and one cord tension."
+   },
+   {
+    "ask": "What net work is done on the two masses?",
+    "value": 40,
+    "unit": "J",
+    "tol": 0.3,
+    "hint": "Subtract friction work magnitude from 4 × 10 × 2.",
+    "why": "W_net = 80 − 0.25(8)(10)(2) = 40 J."
+   },
+   {
+    "ask": "What is the speed after the drop?",
+    "value": 2.581988897471611,
+    "unit": "m/s",
+    "tol": 0.04,
+    "hint": "Solve 40 = ½(12)v².",
+    "why": "v = √(80/12) ≈ 2.58 m/s."
+   }
+  ]
+ },
+ "gravityramp": {
+  "ch": "6–7",
+  "title": "Work by gravity on a ramp",
+  "story": "A box is pulled up a ramp. Find the signed work done by gravity alone.",
+  "givens": [
+   "F_g • Weight = 30 N",
+   "s • Travel along ramp = 6.0 m",
+   "θ • Ramp angle above horizontal = 37°"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation uses the vertical change in height?",
+    "options": [
+     "W_g = −F_g Δy",
+     "W_g = F_g s",
+     "W_g = F_g Δy"
+    ],
+    "why": "The box rises while gravity acts downward. The height gain is s sin θ."
+   },
+   {
+    "ask": "How much work does gravity do?",
+    "value": -108.32670416736869,
+    "unit": "J",
+    "tol": 1.1,
+    "hint": "The given 30 N is already a weight. Multiply by −6 sin37°.",
+    "why": "W_g = −30 × 6 sin37° ≈ −108 J."
+   }
+  ]
+ },
+ "meeting": {
+  "ch": "2",
+  "title": "Oct 5 • Two objects meet",
+  "story": "One object passes a stationary cart just as the cart begins accelerating. When and where do they meet again? This version uses the 20 m/s reading of the lecture example.",
+  "givens": [
+   "v • Constant-speed object = +20 m/s",
+   "a • Cart acceleration = +2 m/s²",
+   "u • Cart initial speed = 0 m/s",
+   "x₀ • Both start at 0 m at t = 0"
+  ],
+  "steps": [
+   {
+    "ask": "What equation captures “meet again”?",
+    "options": [
+     "vt = ½at²",
+     "v = at",
+     "vt + ½at² = 0"
+    ],
+    "why": "Meeting means equal positions on the same clock."
+   },
+   {
+    "ask": "At what positive time do they meet?",
+    "value": 20,
+    "unit": "s",
+    "tol": 0.1,
+    "hint": "Divide both sides by t to exclude their initial meeting.",
+    "why": "t = 2v/a = 20 s."
+   },
+   {
+    "ask": "Where do they meet?",
+    "value": 400,
+    "unit": "m",
+    "tol": 1,
+    "hint": "Substitute the meeting time into either position equation.",
+    "why": "x = 20 × 20 = 400 m."
+   },
+   {
+    "ask": "How fast is the accelerating cart then?",
+    "value": 40,
+    "unit": "m/s",
+    "tol": 0.1,
+    "hint": "Use v_cart = at.",
+    "why": "v_cart = 2 × 20 = 40 m/s."
+   }
+  ]
+ },
+ "ifr": {
+  "ch": "4",
+  "title": "Notebook • Inertial frames and the first law",
+  "story": "Give an operational definition of an inertial frame. Then distinguish the two first-law statements in the October 14 notes.",
+  "givens": [
+   "Test object • Free of interactions",
+   "Motion to observe • Speed and direction",
+   "Frame • Use nonrotating axes"
+  ],
+  "steps": [
+   {
+    "ask": "What would a free test object do in an inertial frame?",
+    "options": [
+     "Remain at rest or move in a straight line at constant speed.",
+     "Always remain at rest.",
+     "Follow any path at constant speed."
+    ],
+    "why": "A free object has constant velocity. Other nonrotating frames moving at constant velocity relative to this frame are also inertial."
+   },
+   {
+    "ask": "Which pairing matches the October 14 lecture notes?",
+    "options": [
+     "Strong: a force-free object keeps its motion. Weak: constant velocity if and only if net force is zero.",
+     "Strong: every object is at rest. Weak: speed is always constant.",
+     "Strong: velocity requires force. Weak: acceleration needs no force."
+    ],
+    "why": "State “in an inertial frame” for both. Balanced forces can give zero net force."
+   }
+  ]
+ },
+ "ruler": {
+  "ch": "4",
+  "title": "Oct 19 • A ruler between two hands",
+  "story": "Two hands push on opposite ends of a ruler. The ruler stays at rest. Explain balance and identify a third-law pair.",
+  "givens": [
+   "Ruler • Remains at rest",
+   "Left hand • Pushes right",
+   "Right hand • Pushes left"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation explains the ruler’s horizontal equilibrium?",
+    "options": [
+     "ΣFₓ,on ruler = 0",
+     "F_left hand on ruler = −F_ruler on left hand alone explains equilibrium",
+     "ΣFₓ,on ruler = mvₓ"
+    ],
+    "why": "Equilibrium adds the forces acting on the same ruler."
+   },
+   {
+    "ask": "What is the partner to the left hand’s push on the ruler?",
+    "options": [
+     "The ruler’s push on the left hand.",
+     "The right hand’s push on the ruler.",
+     "Gravity on the ruler."
+    ],
+    "why": "Newton’s third law swaps the two interacting bodies."
+   }
+  ]
+ },
+ "critical": {
+  "ch": "5",
+  "title": "Oct 19 • First slip on an incline",
+  "story": "Slowly tilt a board until a block just starts slipping. Relate that critical angle to static friction.",
+  "givens": [
+   "θ • Incline angle above horizontal",
+   "N • Normal force",
+   "μₛ • Coefficient of static friction"
+  ],
+  "steps": [
+   {
+    "ask": "Which relation holds at the threshold of sliding?",
+    "options": [
+     "mg sinθ = μₛN",
+     "mg = μₛN",
+     "mg cosθ = μₛmg sinθ"
+    ],
+    "why": "At the threshold, downhill gravity just matches the largest possible static friction."
+   },
+   {
+    "ask": "Using N = mg cosθ, what can you infer?",
+    "options": [
+     "μₛ = tanθ at the critical angle.",
+     "μₛ = cosθ at every angle.",
+     "μₛ = mg sinθ."
+    ],
+    "why": "Divide the parallel force balance by mg cosθ. Below threshold static friction adjusts to the value needed."
+   }
+  ]
+ },
+ "energy": {
+  "ch": "6–7",
+  "title": "Nov 4 notebook • Work and energy",
+  "story": "A ball rises while only gravity does work. Explain which energy changes are equal and opposite.",
+  "givens": [
+   "K • Kinetic energy",
+   "U_g • Gravitational potential energy",
+   "W_other • Work by other forces = 0"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation includes the energy of both motion and height?",
+    "options": [
+     "Δ(K + U_g) = W_other",
+     "K + U_g = W_other at every instant",
+     "ΔK = ΔU_g"
+    ],
+    "why": "Once gravity is included in U_g, the remaining work sets the change in mechanical energy."
+   },
+   {
+    "ask": "As the ball rises, which statement is correct?",
+    "options": [
+     "K decreases as U_g increases by the same amount.",
+     "Both energies are zero at the top.",
+     "Total mechanical energy must be zero."
+    ],
+    "why": "The change in the sum is zero. The sum itself can have a nonzero value."
+   }
+  ]
+ },
+ "light": {
+  "ch": "2",
+  "title": "Oct 5 • Yellow light",
+  "story": "A driver must decide whether the whole car can clear an intersection before the light changes. Set up the clearance and stopping tests symbolically.",
+  "givens": [
+   "d • Front bumper to near edge",
+   "w • Width of intersection",
+   "L • Car length",
+   "T • Time remaining",
+   "u • Initial speed",
+   "b • Positive braking-deceleration magnitude",
+   "Reaction time • Neglect in this setup"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation just clears the far edge with constant acceleration a?",
+    "options": [
+     "uT + ½aT² = d + w + L",
+     "uT + ½aT² = d",
+     "uT + ½aT² = d + w"
+    ],
+    "why": "The rear bumper must pass the far edge. The front bumper therefore travels one extra car length."
+   },
+   {
+    "ask": "Which inequality says the car can stop before entering?",
+    "options": [
+     "u²/(2b) ≤ d",
+     "u²/(2b) ≥ d + w + L",
+     "u/b ≤ d"
+    ],
+    "why": "Compare stopping distance to the space available before the near edge."
+   }
+  ]
+ },
+ "com": {
+  "ch": "8",
+  "title": "Chapter 8 • Center of mass",
+  "story": "Four point masses occupy the corners of a square. Find the x and y coordinates of the center of mass, measuring from the lower-left corner.",
+  "givens": [
+   "10 kg • (0, 0) m",
+   "20 kg • (0, 0.80) m",
+   "30 kg • (0.80, 0.80) m",
+   "40 kg • (0.80, 0) m"
+  ],
+  "steps": [
+   {
+    "ask": "Which rule gives each center-of-mass coordinate?",
+    "options": [
+     "x_cm = Σ(mᵢxᵢ)/Σmᵢ, and likewise for y",
+     "x_cm = Σxᵢ/4 for any masses",
+     "x_cm = Σ(mᵢxᵢ)/4"
+    ],
+    "why": "Weight each position by the mass located there. The total mass is 100 kg."
+   },
+   {
+    "ask": "What is x_cm?",
+    "value": 0.56,
+    "unit": "m",
+    "tol": 0.005,
+    "hint": "The 30 and 40 kg masses have x = 0.80 m.",
+    "why": "x_cm = (30 + 40)(0.80)/100 = 0.56 m."
+   },
+   {
+    "ask": "What is y_cm?",
+    "value": 0.4,
+    "unit": "m",
+    "tol": 0.005,
+    "hint": "Which two masses are in the top row?",
+    "why": "y_cm = (20 + 30)(0.80)/100 = 0.40 m."
+   }
+  ]
+ },
+ "spheres": {
+  "ch": "8",
+  "title": "Chapter 8 • Three spheres collide",
+  "story": "A moves right into stationary B in a head-on elastic collision. B then hits C and they stick. Find their velocities in the lab frame. Use +x to the right.",
+  "givens": [
+   "m_A • m",
+   "m_B • 2m",
+   "m_C • m/3",
+   "u_A • +v₀",
+   "u_B and u_C • 0",
+   "External impulse • Zero"
+  ],
+  "steps": [
+   {
+    "ask": "Which pair of relations applies during A’s collision with B?",
+    "options": [
+     "p_before = p_after and K_before = K_after",
+     "p_before = p_after and v_A = v_B afterward",
+     "Each sphere’s momentum is constant"
+    ],
+    "why": "The first collision is elastic. The lighter moving sphere rebounds."
+   },
+   {
+    "ask": "Which velocities solve that first collision?",
+    "options": [
+     "v_A = −v₀/3 and v_B = +2v₀/3",
+     "v_A = +v₀/3 and v_B = +2v₀/3",
+     "v_A = v_B = v₀/3"
+    ],
+    "why": "Momentum gives v_A + 2v_B = v₀. Elastic separation gives v_B − v_A = v₀."
+   },
+   {
+    "ask": "After B sticks to C, what is their shared velocity?",
+    "options": [
+     "+4v₀/7",
+     "+2v₀/3",
+     "−4v₀/7"
+    ],
+    "why": "2m(2v₀/3) = (2m + m/3)V. Sphere A continues left."
+   }
+  ]
+ },
+ "sphereenergy": {
+  "ch": "8",
+  "title": "Chapter 8 • What the collisions conserve",
+  "story": "Use the same three-sphere sequence. Find the center-of-mass speed and the change in kinetic energy through each collision.",
+  "givens": [
+   "m_A, m_B, m_C • m, 2m, m/3",
+   "Initial velocities • +v₀, 0, 0",
+   "First collision • Elastic",
+   "Second collision • B and C stick",
+   "Final velocities • −v₀/3, +4v₀/7, +4v₀/7",
+   "External impulse • Zero"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives the velocity of the whole system’s center of mass?",
+    "options": [
+     "v_cm = Σmᵢvᵢ/Σmᵢ",
+     "v_cm = Σvᵢ/3",
+     "v_cm = √(2K/m)"
+    ],
+    "why": "Use total momentum divided by total mass."
+   },
+   {
+    "ask": "Which result holds before and after the collisions?",
+    "options": [
+     "v_cm = +3v₀/10",
+     "v_cm = +v₀/3",
+     "v_cm = 0 in the lab"
+    ],
+    "why": "Initial momentum is mv₀, total mass is 10m/3, and external impulse is zero."
+   },
+   {
+    "ask": "What are the two kinetic-energy changes, final minus initial for each collision?",
+    "options": [
+     "ΔK₁ = 0 and ΔK₂ = −4mv₀²/63",
+     "ΔK₁ = 0 and ΔK₂ = 0",
+     "ΔK₁ = −4mv₀²/63 and ΔK₂ = 0"
+    ],
+    "why": "In collision two, B and C go from ½(2m)(2v₀/3)² to ½(7m/3)(4v₀/7)². Sphere A’s term cancels."
+   },
+   {
+    "ask": "Why is momentum conserved in both the lab and center-of-mass frames?",
+    "options": [
+     "The system receives zero net external impulse.",
+     "Both collisions are elastic.",
+     "All three masses have the same velocity."
+    ],
+    "why": "The internal forces exchange momentum among the spheres. The total is constant in either inertial frame."
+   }
+  ]
+ },
+ "vecdiag": {
+  "ch": "1",
+  "title": "Diagnostic • Two displacement vectors",
+  "story": "Add two displacement vectors. Report the components, magnitude and direction counterclockwise from +x.",
+  "givens": [
+   "A • 6.0 m at 30° above +x",
+   "B • 4.0 m directly left"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives the horizontal component of the resultant?",
+    "options": [
+     "Rₓ = 6 cos30° − 4",
+     "Rₓ = 6 sin30° − 4",
+     "Rₓ = 6 cos30° + 4"
+    ],
+    "why": "Cosine gives the adjacent leg. Leftward motion has a negative x component."
+   },
+   {
+    "ask": "What is Rₓ?",
+    "value": 1.196152422706632,
+    "unit": "m",
+    "tol": 0.025,
+    "hint": "Compute the rightward projection and subtract the leftward displacement.",
+    "why": "Rₓ ≈ +1.196 m."
+   },
+   {
+    "ask": "What is Rᵧ?",
+    "value": 3,
+    "unit": "m",
+    "tol": 0.025,
+    "hint": "Only A contributes vertically.",
+    "why": "Rᵧ = 6 sin30° = +3.0 m."
+   },
+   {
+    "ask": "Which equation turns the two components into a length?",
+    "options": [
+     "R = √(Rₓ² + Rᵧ²)",
+     "R = Rₓ + Rᵧ",
+     "R = Rₓ² + Rᵧ²"
+    ],
+    "why": "The components are perpendicular. The resultant is the hypotenuse of their right triangle."
+   },
+   {
+    "ask": "What is the resultant magnitude?",
+    "value": 3.22967,
+    "unit": "m",
+    "tol": 0.045,
+    "hint": "Use the square root of the sum of the squared components.",
+    "why": "R = √(1.196² + 3²) ≈ 3.23 m."
+   },
+   {
+    "ask": "Which equation gives the acute reference angle before checking the quadrant?",
+    "options": [
+     "α = tan⁻¹(|Rᵧ|/|Rₓ|)",
+     "α = tan(|Rᵧ|/|Rₓ|)",
+     "α = tan⁻¹(|Rₓ|/|Rᵧ|)"
+    ],
+    "why": "For an angle from the horizontal, vertical is opposite and horizontal is adjacent. Use inverse tangent to recover an angle."
+   },
+   {
+    "ask": "What is the counterclockwise direction from +x?",
+    "value": 68.27,
+    "unit": "°",
+    "tol": 0.4,
+    "hint": "Both components are positive. Use tan⁻¹(Rᵧ/Rₓ).",
+    "why": "θ ≈ 68.3°."
+   }
+  ]
+ },
+ "vectorangle": {
+  "ch": "1",
+  "title": "Homework • Recover a vector’s magnitude",
+  "story": "A vector points 60° below +x. Its horizontal component is +40 m. Find its magnitude.",
+  "givens": [
+   "Rₓ • Horizontal displacement = +40 m",
+   "θ • 60° below the positive x-axis",
+   "cos60° • 0.50"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation links the known component to the full length?",
+    "options": [
+     "Rₓ = R cos60°",
+     "Rₓ = R sin60°",
+     "R = Rₓ cos60°"
+    ],
+    "why": "The x component is adjacent to the marked angle. The full vector is the hypotenuse."
+   },
+   {
+    "ask": "What is the full magnitude?",
+    "value": 80,
+    "unit": "m",
+    "tol": 0.2,
+    "hint": "Divide the known horizontal component by its cosine factor.",
+    "why": "R = 40/0.50 = 80 m."
+   }
+  ]
+ },
+ "topeka": {
+  "ch": "2",
+  "title": "Earlier position",
+  "story": "A car heads east at constant speed. At 11 a.m. it is 500 km east of Topeka. Where was it at 9 a.m.?",
+  "givens": [
+   "v • Eastward velocity = 30 m/s",
+   "x_f • Position at 11 a.m. = +500 km",
+   "Δt • Elapsed time = 2.00 h"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation lets you work backward?",
+    "options": [
+     "x_i = x_f − vΔt",
+     "x_i = x_f + vΔt",
+     "x_i = v/Δt"
+    ],
+    "why": "The eastward car started west of its final position."
+   },
+   {
+    "ask": "How far did the car travel in those two hours?",
+    "value": 216,
+    "unit": "km",
+    "tol": 0.5,
+    "hint": "Convert hours to seconds and then meters to kilometers.",
+    "why": "30 × 7200 / 1000 = 216 km."
+   },
+   {
+    "ask": "How far east of Topeka was it at 9 a.m.?",
+    "value": 284,
+    "unit": "km",
+    "tol": 0.5,
+    "hint": "Subtract travel distance from the known final position.",
+    "why": "500 − 216 = 284 km east."
+   }
+  ]
+ },
+ "runway": {
+  "ch": "2",
+  "title": "Takeoff on a short runway",
+  "story": "A plane accelerates uniformly from rest. Find the minimum acceleration needed to reach takeoff speed before the runway ends.",
+  "givens": [
+   "u • Initial speed = 0 m/s",
+   "v • Takeoff speed = 50 m/s",
+   "d • Runway length = 200 m"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation leaves time out?",
+    "options": [
+     "v² = u² + 2ad",
+     "v = u + at",
+     "d = ½(u + v)t"
+    ],
+    "why": "Both speeds and distance are known."
+   },
+   {
+    "ask": "What is the minimum acceleration?",
+    "value": 6.25,
+    "unit": "m/s²",
+    "tol": 0.05,
+    "hint": "Solve for a using the full runway length.",
+    "why": "a = (50² − 0)/(2 × 200) = 6.25 m/s²."
+   }
+  ]
+ },
+ "reaction": {
+  "ch": "2",
+  "title": "Reaction distance and braking",
+  "story": "A driver sees an obstacle ahead. The car keeps its speed during reaction and then brakes steadily. Does it stop in time?",
+  "givens": [
+   "d • Space available = 40 m",
+   "u • Initial speed = 20 m/s",
+   "t_r • Reaction time = 0.50 s",
+   "a • Braking acceleration = −10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation fits the reaction interval?",
+    "options": [
+     "d_r = ut_r",
+     "d_r = ½at_r²",
+     "d_r = u²/(2|a|)"
+    ],
+    "why": "During reaction the car is still moving at its original speed."
+   },
+   {
+    "ask": "How far does the car travel during reaction?",
+    "value": 10,
+    "unit": "m",
+    "tol": 0.1,
+    "hint": "Multiply 20 by 0.50.",
+    "why": "d_r = 10 m."
+   },
+   {
+    "ask": "How far does braking take after reaction?",
+    "value": 20,
+    "unit": "m",
+    "tol": 0.1,
+    "hint": "Use 0 = u² + 2ad_b.",
+    "why": "d_b = 400/20 = 20 m."
+   },
+   {
+    "ask": "How much space is left when the car stops?",
+    "value": 10,
+    "unit": "m",
+    "tol": 0.1,
+    "hint": "Subtract both distances from the available 40 m.",
+    "why": "40 − 10 − 20 = 10 m of clearance."
+   }
+  ]
+ },
+ "lake": {
+  "ch": "2",
+  "title": "Two intervals at a lake",
+  "story": "A ball drops through air and then sinks through water at its entry speed. Find the water depth. This exam adaptation uses g = 10 m/s².",
+  "givens": [
+   "h • Air drop = 5.00 m",
+   "u • Initial speed = 0 m/s",
+   "t_total • Total time = 3.40 s",
+   "g • Gravity in air = 10 m/s²",
+   "Water • Constant speed"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation finds the time falling through air?",
+    "options": [
+     "h = ½gt_air²",
+     "h = v_water t_total",
+     "h = gt_total"
+    ],
+    "why": "The ball starts from rest and accelerates until it reaches the water."
+   },
+   {
+    "ask": "How long is the air interval?",
+    "value": 1,
+    "unit": "s",
+    "tol": 0.01,
+    "hint": "Use √(2h/g).",
+    "why": "t_air = 1.00 s. Its entry speed is gt_air = 10 m/s."
+   },
+   {
+    "ask": "What is the water depth?",
+    "value": 24,
+    "unit": "m",
+    "tol": 0.1,
+    "hint": "Use the remaining time at the constant entry speed.",
+    "why": "d = 10(3.40 − 1.00) = 24 m."
+   }
+  ]
+ },
+ "platformwall": {
+  "ch": "3",
+  "title": "Flight past a vertical marker",
+  "story": "Worksheet adaptation. A ball leaves a platform and passes a vertical marker on its way down. Find its peak height and height at the marker.",
+  "givens": [
+   "y₀ • Release height = 2.0 m",
+   "u • Launch speed = 10 m/s",
+   "θ • 30° above horizontal",
+   "x • Marker is 8.0 m away",
+   "g • Gravity = 10 m/s²",
+   "Air resistance • Negligible"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation finds the rise to the peak?",
+    "options": [
+     "0 = (u sinθ)² − 2gΔy",
+     "0 = (u cosθ)² − 2gΔy",
+     "Δy = x tanθ"
+    ],
+    "why": "At the peak only the vertical velocity is zero."
+   },
+   {
+    "ask": "What is the peak height measured from ground?",
+    "value": 3.25,
+    "unit": "m",
+    "tol": 0.03,
+    "hint": "Add the rise to the release height.",
+    "why": "2 + 5²/20 = 3.25 m."
+   },
+   {
+    "ask": "At what time does the ball pass the marker?",
+    "value": 0.9237604307034011,
+    "unit": "s",
+    "tol": 0.008,
+    "hint": "Horizontal velocity stays constant.",
+    "why": "t = 8/(10 cos30°) ≈ 0.924 s."
+   },
+   {
+    "ask": "How high is the ball at the marker?",
+    "value": 2.35213548685034,
+    "unit": "m",
+    "tol": 0.04,
+    "hint": "Use y = y₀ + uᵧt − ½gt².",
+    "why": "y ≈ 2.35 m above ground."
+   }
+  ]
+ },
+ "tennis": {
+  "ch": "3",
+  "title": "Tennis ball at a wall",
+  "story": "Find the height of a tennis ball as it reaches a vertical wall. Ignore drag. This exam adaptation uses g = 10 m/s².",
+  "givens": [
+   "y₀ • Release height = 1.00 m",
+   "u • Speed = 50.0 m/s",
+   "θ • 10° above horizontal",
+   "x • Wall distance = 10.0 m",
+   "g • Gravity = 10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which equation gives time at the wall first?",
+    "options": [
+     "t = x/(u cosθ)",
+     "t = x/(u sinθ)",
+     "t = √(2x/g)"
+    ],
+    "why": "Horizontal motion has constant speed."
+   },
+   {
+    "ask": "What is the time to the wall?",
+    "value": 0.20309,
+    "unit": "s",
+    "tol": 0.005,
+    "hint": "Use 10/(50 cos10°).",
+    "why": "t ≈ 0.203 s."
+   },
+   {
+    "ask": "How high is the ball at the wall?",
+    "value": 2.557,
+    "unit": "m",
+    "tol": 0.03,
+    "hint": "Use y = 1 + (50 sin10°)t − 5t².",
+    "why": "y ≈ 2.56 m."
+   }
+  ]
+ },
+ "hillside": {
+  "ch": "3",
+  "title": "Ball landing on a hillside",
+  "story": "Worksheet adaptation. A ball leaves a point above a downhill slope. Find the distance along the slope to its landing point. Put the origin at release and neglect drag.",
+  "givens": [
+   "y_ground at x=0 • −1.75 m",
+   "θ • Launch angle = 20° above horizontal",
+   "u • Launch speed = 10 m/s",
+   "β • Slope = 15° downhill",
+   "g • Gravity = 10 m/s²"
+  ],
+  "steps": [
+   {
+    "ask": "Which expression describes the ground?",
+    "options": [
+     "y_ground = −1.75 − x tan15°",
+     "y_ground = −1.75 + x tan15°",
+     "y_ground = −x tan20°"
+    ],
+    "why": "The ground starts below the origin and gets lower with x."
+   },
+   {
+    "ask": "Which condition gives landing?",
+    "options": [
+     "x tan20° − gx²/(2u²cos²20°) = −1.75 − x tan15°",
+     "y_ball = 0",
+     "vᵧ = 0"
+    ],
+    "why": "The ball and the slope have the same height at the landing point."
+   },
+   {
+    "ask": "What is the positive horizontal landing distance?",
+    "value": 13.456666847960852,
+    "unit": "m",
+    "tol": 0.07,
+    "hint": "Collect terms as (5/(10 cos20°)²)x² − (tan20° + tan15°)x − 1.75 = 0.",
+    "why": "The positive root is 13.46 m."
+   },
+   {
+    "ask": "How far is that along the slope?",
+    "value": 13.931366655407903,
+    "unit": "m",
+    "tol": 0.08,
+    "hint": "The horizontal run is adjacent to the 15° slope angle.",
+    "why": "d = x/cos15° ≈ 13.93 m."
+   }
+  ]
+ }
+};
+const midtermSources = [
+ {
+  "id": "monday",
+  "title": "Monday in-class practice",
+  "keys": [
+   "conserve",
+   "n2",
+   "nonzero",
+   "cord2",
+   "twoballs",
+   "boxwork",
+   "ramp500",
+   "pulley",
+   "springstick"
+  ]
+ },
+ {
+  "id": "fall",
+  "title": "Canvas · Fall 2026",
+  "keys": [
+   "impulse",
+   "n2",
+   "zerowork",
+   "cord2",
+   "drop",
+   "chase",
+   "ramp750",
+   "pulley",
+   "springelastic"
+  ]
+ },
+ {
+  "id": "makeup",
+  "title": "Canvas · Midterm make-up",
+  "keys": [
+   "horizontal",
+   "brakes",
+   "pair",
+   "graph",
+   "tow",
+   "car",
+   "vectors",
+   "sled",
+   "sign"
+  ]
+ },
+ {
+  "id": "test1a",
+  "title": "Canvas · Practice 1A",
+  "keys": [
+   "balanced",
+   "unequal",
+   "n2example",
+   "platform",
+   "boxes",
+   "wingtip",
+   "cord1",
+   "fixed",
+   "gravityramp"
+  ]
+ },
+ {
+  "id": "lecture",
+  "title": "Lecture and notebook",
+  "keys": [
+   "meeting",
+   "light",
+   "ifr",
+   "n2example",
+   "ruler",
+   "critical",
+   "energy"
+  ]
+ },
+ {
+  "id": "worksheets",
+  "title": "Lecture worksheets",
+  "keys": [
+   "topeka",
+   "runway",
+   "reaction",
+   "lake",
+   "platformwall",
+   "tennis",
+   "hillside"
+  ]
+ },
+ {
+  "id": "homework",
+  "title": "Homework and diagnostic",
+  "keys": [
+   "com",
+   "spheres",
+   "sphereenergy",
+   "vecdiag",
+   "vectorangle"
+  ]
+ }
+];
+
+/* The exam is a secondary destination. Only explicit exam URLs enter it. */
+function examNode(tag,text,attrs={}){
+  const node=el(tag,attrs);
+  node.textContent=text;
+  return node;
+}
+function examLink(label,path,cls="exam-link"){
+  return examNode("a",label,{href:"#"+path,class:cls});
+}
+function examLabel(source,index){
+  if(["monday","fall","makeup","test1a"].includes(source.id)){
+    if(source.id==="fall" && index===2) return "Concept Q2 (second)";
+    const label=index<3?"Concept Q"+(index+1):"Problem "+(index-2);
+    return source.id==="monday"?label+" · p. "+(index<3?1:2+Math.floor((index-3)/2)):label;
+  }
+  if(source.id==="worksheets") return index<4?"1D motion "+(index+1):"Projectiles "+(index-3);
+  return source.id==="lecture"?"Class example "+(index+1):"Practice "+(index+1);
+}
+function examStoreKey(source,key){return "midtermNov26/"+source.id+"/"+key;}
+function examProgress(source,key){
+  const stored=safeStore.get(examStoreKey(source,key),{})||{};
+  const total=midtermBank[key].steps.length;
+  const step=Number.isInteger(stored.step)?Math.max(-1,Math.min(total,stored.step)):-1;
+  return {step,entered:typeof stored.entered==="string"?stored.entered:"",checked:step>=0 && step<total && stored.checked===true,notes:typeof stored.notes==="string"?stored.notes:""};
+}
+function examMenuLink(parent,path,title,sub){
+  const a=examLink("",path,"exam-menu-link");
+  const words=el("span"); words.append(examNode("strong",title),examNode("small",sub));
+  a.append(words,examNode("span","›",{"aria-hidden":"true",class:"exam-chevron"}));parent.append(a);
+}
+function examPageTitle(parent,title){
+  const h=examNode("h2",title,{tabindex:"-1",class:"exam-title"}); parent.append(h);return h;
+}
+function examIndex(root){
+  examPageTitle(root,"Midterm practice");
+  root.append(examNode("p","Choose a practice paper. Each problem starts with its givens. Use g = 10 m/s² for this exam.",{class:"exam-desc"}));
+  const last=safeStore.get("midtermNov26/last",null);
+  const lastSource=last && midtermSources.find(s=>s.id===last.source && s.keys.includes(last.key));
+  if(lastSource){
+    const p=examProgress(lastSource,last.key);
+    if(p.step>=0 && p.step<midtermBank[last.key].steps.length){
+      root.append(examLink("Continue · "+midtermBank[last.key].title,"midterm/"+lastSource.id+"/"+last.key,"btn"));
+    }
+  }
+  const list=el("div",{class:"exam-list"});
+  function addSource(s,parent){
+    const count=s.keys.filter(key=>examProgress(s,key).step===midtermBank[key].steps.length).length;
+    examMenuLink(parent,"midterm/"+s.id,s.title,s.keys.length+" entries"+(count?" · "+count+" completed":""));
+  }
+  midtermSources.slice(0,4).forEach(s=>addSource(s,list));
+  root.append(list);
+  const extras=el("details",{class:"exam-details"});
+  extras.append(examNode("summary","Lecture, homework and diagnostic practice"));
+  const more=el("div",{class:"exam-list"});midtermSources.slice(4).forEach(s=>addSource(s,more));extras.append(more);root.append(extras);
+}
+function examSourcePage(root,s){
+  root.append(examLink("‹ All practice sources","midterm"));
+  examPageTitle(root,s.title);
+  const list=el("div",{class:"exam-list"});
+  s.keys.forEach((key,i)=>{
+    const item=midtermBank[key], progress=examProgress(s,key);
+    const status=progress.step===item.steps.length?" · completed":progress.step>=0?" · in progress":"";
+    examMenuLink(list,"midterm/"+s.id+"/"+key,item.title,examLabel(s,i)+" · Ch. "+item.ch+status);
+  });
+  root.append(list);
+}
+const examFigures={
+  graph:'<path d="M40 13v88h211 M36 43h8 M160 97v8 M220 97v8" class="ex-axis"/><path d="M40 43h120l60 58" class="ex-data"/><text x="4" y="17">Fₓ (N)</text><text x="18" y="47">10</text><text x="35" y="120">0</text><text x="152" y="120">10</text><text x="213" y="120">15</text><text x="248" y="106">x (m)</text>',
+  sign:'<rect x="86" y="72" width="105" height="31" class="ex-shape"/><path d="M86 72L41 27 M191 72l69 -40" class="ex-data"/><path d="M24 72h62 M191 72h78" class="ex-dash"/><text x="35" y="24">A</text><text x="261" y="30">B</text><text x="45" y="66">45°</text><text x="220" y="67">30°</text><text x="121" y="93">sign</text>',
+  vectors:'<path d="M24 70h231 M118 10v106" class="ex-axis"/><path d="M118 70h67m-6 -4l6 4 -6 4 M118 70L87 16m0 8v-8l7 4 M118 70v40m-4 -7l4 7 4 -7" class="ex-data"/><text x="190" y="67">A</text><text x="68" y="18">B</text><text x="128" y="114">C</text><text x="126" y="51">120°</text><text x="255" y="75">+x</text>',
+  pulley:'<path d="M14 82h182v37 M200 11h32" class="ex-axis"/><rect x="29" y="49" width="51" height="31" class="ex-shape"/><path d="M80 59h15" class="ex-axis"/><circle cx="105" cy="59" r="13" class="ex-shape"/><circle cx="207" cy="58" r="12" class="ex-shape"/><path d="M193 72H105a13 13 0 0 1 0 -26h102a12 12 0 0 1 12 12v37" class="ex-data"/><path d="M193 68v8 M207 48V12" class="ex-axis"/><rect x="205" y="95" width="29" height="24" class="ex-shape"/><text x="44" y="70">A</text><text x="214" y="113">B</text><text x="147" y="88">anchor</text>'
+};
+function examGivens(parent,item,key){
+  const table=el("dl",{class:"exam-givens"});
+  item.givens.forEach(row=>{
+    const [symbol, meaning]=row.split(" • ");
+    table.append(examNode("dt",symbol),examNode("dd",meaning));
+  });parent.append(table);
+  if(examFigures[key]){
+    const fig=el("figure",{class:"exam-figure"});
+    fig.innerHTML='<svg aria-hidden="true" viewBox="0 0 292 128" xmlns="http://www.w3.org/2000/svg">'+examFigures[key]+'</svg>';
+    parent.append(fig);
+  }
+}
+function examProblem(root,s,key){
+  const item=midtermBank[key],i=s.keys.indexOf(key),state=examProgress(s,key),total=item.steps.length;
+  const store=()=>safeStore.set(examStoreKey(s,key),state);
+  const revisit=()=>{render();const target=document.querySelector(".exam-step-title")||document.querySelector(".exam-title");if(target)target.focus();};
+  root.append(examLink("‹ "+s.title,"midterm/"+s.id),examNode("p",examLabel(s,i)+" · Ch. "+item.ch,{class:"exam-meta"}));
+  examPageTitle(root,item.title);
+  root.append(examNode("p",item.story,{class:"exam-story"}));
+  if(state.step===-1){
+    root.append(examNode("h3","Givens"));
+    examGivens(root,item,key);
+    const concept=(["monday","fall","makeup","test1a"].includes(s.id) && i<3) || ["ifr","energy","ruler"].includes(key);
+    root.append(examNode("button",concept?"Choose the principle":"Choose the equation",{class:"btn",onclick:()=>{
+      state.step=0;store();safeStore.set("midtermNov26/last",{source:s.id,key});revisit();
+    }}));
+    return;
+  }
+  const facts=el("details",{class:"exam-details"});
+  facts.append(examNode("summary","View givens"));examGivens(facts,item,key);root.append(facts);
+  if(state.step===total){
+    root.append(examNode("h3","Guided practice complete",{class:"exam-step-title",tabindex:"-1"}));
+    const review=el("details",{class:"exam-details"});review.append(examNode("summary","Review the worked steps"));
+    const list=el("ol",{class:"exam-review"});item.steps.forEach(step=>list.append(examNode("li",step.why)));review.append(list);root.append(review);
+    if(i+1<s.keys.length)root.append(examLink("Next question","midterm/"+s.id+"/"+s.keys[i+1],"btn"));
+    root.append(examLink("Question list","midterm/"+s.id,"exam-link"));
+    root.append(examNode("button","Practice again",{class:"exam-text-button",onclick:()=>{state.step=-1;state.checked=false;state.entered="";store();revisit();}}));
+  }else{
+    const step=item.steps[state.step];
+    if(state.step>0){
+      const prior=item.steps.slice(0,state.step);
+      const equations=prior.filter(prev=>prev.options && prev.options[0].includes("="));
+      if(!step.options && equations.length){
+        const selected=el("div",{class:"exam-equation"});
+        selected.append(examNode("small","Selected equation"),examNode("span",equations[equations.length-1].options[0]));root.append(selected);
+      }
+      const history=el("details",{class:"exam-hint"});
+      history.append(examNode("summary","Earlier steps ("+prior.length+")"));
+      const ol=el("ol",{class:"exam-review"});prior.forEach(prev=>ol.append(examNode("li",prev.why)));history.append(ol);root.append(history);
+    }
+    root.append(examNode("p","Step "+(state.step+1)+" of "+total,{class:"exam-meta"}));
+    root.append(examNode("h3",step.ask,{class:"exam-step-title",tabindex:"-1"}));
+    const task=el("div",{class:"exam-task"}),feedback=el("p",{role:"status",class:"exam-feedback"}),next=el("div");
+    root.append(task,feedback,next);
+    let answered=state.checked;
+    function showNext(){
+      feedback.className="exam-feedback correct";feedback.textContent=step.why;
+      const button=examNode("button",state.step+1===total?"Finish question":"Next step",{class:"btn",onclick:()=>{
+        state.step++;state.checked=false;state.entered="";store();revisit();
+      }});
+      next.append(button);
+    }
+    function correct(){
+      answered=true;state.checked=true;store();safeStore.set("midtermNov26/last",{source:s.id,key});
+      Array.from(task.querySelectorAll("button,input")).forEach(e=>e.disabled=true);
+      showNext();
+    }
+    if(step.options){
+      shuffle(step.options).forEach(option=>{
+        const b=examNode("button",option,{class:"choice",type:"button"});
+        b.disabled=answered;
+        if(answered && option===step.options[0])b.classList.add("picked-right");
+        b.addEventListener("click",()=>{
+          if(answered)return;
+          if(option===step.options[0]){b.classList.add("picked-right");correct();}
+          else{b.classList.add("picked-wrong");b.disabled=true;feedback.textContent="Try again. "+step.why;}
+        });task.append(b);
+      });
+    }else{
+      const form=el("form",{class:"exam-answer"}),label=examNode("label","Answer ("+step.unit+")",{for:"exam-number"});
+      const input=el("input",{id:"exam-number",class:"answerbox",type:"text",inputmode:"decimal",autocomplete:"off"});
+      const submit=examNode("button","Check answer",{type:"submit",class:"btn ghost"});
+      form.append(label,input,submit);task.append(form);
+      if(answered){input.value=state.entered || String(Number(step.value.toPrecision(4)));input.disabled=true;submit.disabled=true;}
+      form.onsubmit=e=>{
+        e.preventDefault();if(answered)return;
+        const text=input.value.trim().replace(/−/g,"-").replace(",",".");
+        const v=/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(text)?Number(text):NaN;
+        if(!Number.isFinite(v)){feedback.textContent="Enter a number. The unit is already shown.";return;}
+        if(Math.abs(v-step.value)<=step.tol+1e-10){state.entered=input.value.trim();correct();}
+        else feedback.textContent="Try again. "+step.hint;
+      };
+      if(!answered){
+        const hint=el("details",{class:"exam-hint"});hint.append(examNode("summary","Show a hint"),examNode("p",step.hint));task.append(hint);
+      }
+    }
+    if(answered)showNext();
+  }
+  const work=el("details",{class:"exam-details exam-notes"});
+  work.append(examNode("summary","My written work"+(state.notes?" · saved":"")));
+  const label=examNode("label",safeStore.persistent?"Equation, substitution and answer · saved in this browser":"Equation, substitution and answer · available for this session",{for:"exam-work"});
+  const field=el("textarea",{id:"exam-work",rows:"4",placeholder:"Show your work here or use paper."});
+  field.value=state.notes;field.oninput=()=>{state.notes=field.value;store();};work.append(label,field);root.append(work);
+}
+VIEWS.midterm=v=>{
+  const [,source,key]=location.hash.slice(1).split("/");
+  const s=midtermSources.find(p=>p.id===source);
+  const root=el("section",{class:"card exam-section","aria-label":"Midterm practice"});v.append(root);
+  if(s && s.keys.includes(key))examProblem(root,s,key);
+  else if(s)examSourcePage(root,s);
+  else examIndex(root);
+};
+function readCourseHash(){
+  const name=location.hash.slice(1).split("/")[0];
+  S.view=Object.prototype.hasOwnProperty.call(VIEWS,name)?name:"home";
+}
+window.addEventListener("hashchange",()=>{
+  readCourseHash();render();window.scrollTo(0,0);
+  const heading=document.querySelector(".exam-title");if(heading)heading.focus({preventScroll:true});
+});
+
 /* ================= BOOT ================= */
+readCourseHash();
 render();
 cloudPull();  // v2.2: create/merge the gabe-p210 cloud row on every load
 </script>
