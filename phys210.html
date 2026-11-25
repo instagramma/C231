@@ -7,7 +7,8 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.17  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.18  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  v2.18 (2026-11-25): Home-page practice exam equation quiz.
   v2.17 (2026-11-24): Choose the free-fall equation from the known values.
   v2.16 (2026-11-24): Original practice papers, figures and independent setup.
   v2.15 (2026-11-24): Midterm practice in More, with source-labelled guided questions.
@@ -1043,6 +1044,30 @@ textarea.report{
 @media(max-width:500px){.exam-givens{grid-template-columns:minmax(0,33%) minmax(0,1fr);gap:0 .55rem}.exam-section{padding:15px}.exam-section .choice{font-size:.96rem}}
 
 .exam-equation{border-left:3px solid var(--teal);padding:.45rem .7rem;margin:.5rem 0 .8rem;line-height:1.5;background:var(--surface2);color:var(--ink)}
+.quiz-launch,.quiz-header,.quiz-tools,.quiz-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem}
+.quiz-launch h2,.quiz-launch p,.quiz-tools .exam-meta{margin:0}
+.quiz-launch h2{font-size:1.25rem}
+.quiz-launch p{font-size:.92rem;color:var(--muted-tx);margin:.2rem 0}
+.quiz-launch .btn{text-decoration:none;display:inline-flex;align-items:center}
+.quiz-header .exam-link{font-size:.86rem}
+.quiz-tools{border-bottom:1px solid var(--line);padding:.4rem 0 .8rem;margin-bottom:.9rem}
+.quiz-picker{font:inherit;max-width:100%;background:var(--paper2);color:var(--ink);border:1px solid var(--line);border-radius:7px;min-height:42px;padding:.35rem .55rem}
+.quiz-method{margin:.65rem 0;line-height:1.5}
+.quiz-fieldset{border:0;padding:0;margin:.85rem 0;min-width:0}
+.quiz-fieldset legend{font-weight:700;padding:0;margin:0 0 .5rem}
+.quiz-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.quiz-choice{display:flex;align-items:center;gap:.65rem;background:var(--paper2);border:1px solid var(--line);border-radius:9px;padding:.65rem .8rem;cursor:pointer;line-height:1.4;min-height:54px;min-width:0}
+.quiz-choice input{width:17px;height:17px;flex:none;margin:0;accent-color:var(--teal)}
+.quiz-choice:focus-within,.quiz-choice.quiz-selected{border-color:var(--teal);outline:1px solid var(--teal)}
+.quiz-label,.quiz-formula{display:block}
+.quiz-label{font-size:.83rem;color:var(--muted-tx)}
+.quiz-formula{font-size:1.05rem;font-weight:600}
+.quiz-notes{margin:.2rem 0 .45rem}
+.quiz-actions{justify-content:flex-start}
+.quiz-actions .exam-meta{margin:0}
+.quiz-card [hidden]{display:none}
+@media(max-width:560px){.quiz-choices{grid-template-columns:minmax(0,1fr)}.quiz-choice{padding:.45rem .65rem}.quiz-header h2{font-size:1.25rem}}
+
 .exam-equation small{display:block;color:var(--muted-tx)}
 </style>
 </head>
@@ -1096,7 +1121,7 @@ async function cloudPull(){
     if (!r.ok) throw 0;
     const rows = await r.json();
     mergeRemote(rows[0] && rows[0].data);
-    cloudState = "synced"; save(); if(typeof render==="function" && S.view!=="midterm") render(); cloudPush(true);
+    cloudState = "synced"; save(); if(typeof render==="function" && S.view!=="midterm" && S.view!=="equations") render(); cloudPush(true);
   } catch(e){ cloudState = "offline"; renderSyncDot(); }
 }
 async function cloudPush(now){
@@ -1573,7 +1598,7 @@ function go(view){
   S.view=view; render(); window.scrollTo(0,0); }
 function renderNav(){
   const n=$("#nav"); n.innerHTML="";
-  const active = NAV_SECONDARY.indexOf(S.view)>=0 ? "more" : S.view;
+  const active = S.view==="equations" ? "home" : NAV_SECONDARY.includes(S.view) ? "more" : S.view;
   NAV.forEach(t=>{
     const b=el("button",{class:active===t.id?"active":"",onclick:()=>go(t.id),"aria-label":t.label+" — "+t.purpose});
     b.innerHTML='<span class="ico">'+t.ico+'</span><span class="nav-label">'+t.label+'</span><span class="nav-purpose">'+t.purpose+'</span>';
@@ -1610,6 +1635,8 @@ VIEWS.more = (v) => {
 
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
+  if(S.view==="equations")renderEquationQuiz(v);
+  else quizLauncher(v);
   const t = todayStr();
   // re-entry ritual: gap of 2+ days since previous visit
   const prev = S.visits.filter(d=>d<t).sort().pop();
@@ -4901,6 +4928,313 @@ VIEWS.midterm=v=>{
   else if(s)examSourcePage(root,s);
   else examIndex(root);
 };
+// Equations are keyed independently of their position in the choice list.
+const quizEquations = {
+  inward: ["Inward net force", "ΣFᵢₙ = mv²/r"],
+  circularSpeed: ["Uniform circular speed", "v = 2πr/T"],
+  inwardAcceleration: ["Inward acceleration", "aᵣ = v²/r"],
+  axisForce: ["Net force along an axis", "ΣFⱼ = maⱼ"],
+  movingPulley: ["Movable pulley constraint", "|a{B}| = 2|a{A}|"],
+  height: ["Vertical position (+y up)", "y = y₀ + v₀ᵧt − ½gt²"],
+  delay: ["Delayed flight time", "t{flight} = t{clock} − t{release}"],
+  finalV: ["Final velocity", "v = v₀ + at"],
+  noTime: ["Velocity and displacement", "v² = v₀² + 2aΔx"],
+  fallEnergy: ["Mechanical energy balance · descent from rest", "mgh = ½mv²"],
+  momentum: ["Linear momentum", "p⃗ = mv⃗"],
+  stick: ["Shared velocity after sticking", "m₁u₁ + m₂u₂ = (m₁ + m₂)V"],
+  compression: ["Mechanical energy balance · spring compression", "½mv² = ½kx²"],
+  collision: ["Isolated-system momentum", "m₁u₁ + m₂u₂ = m₁v₁ + m₂v₂"],
+  elasticSpeed: ["Relative velocity (elastic, 1D)", "v₂ − v₁ = u₁ − u₂"],
+  netWork: ["Net work", "W{net} = K{f} − K{i}"],
+  friction: ["Kinetic friction", "fₖ = μₖN"],
+  slideWork: ["Work by sliding friction", "W{fr} = −fₖd"],
+  area: ["Work from force vs. position", "W = ∫ Fₓ dx"],
+  forceX: ["Horizontal component", "Aₓ = A cos θ"],
+  forceY: ["Vertical component", "Aᵧ = A sin θ"],
+  sum: ["Resultant component", "Rⱼ = ΣAⱼ"],
+  length: ["Resultant magnitude", "R = √(Rₓ² + Rᵧ²)"],
+  angle: ["Resultant direction", "θ = atan2(Rᵧ, Rₓ)"],
+  balanceX: ["Horizontal equilibrium", "ΣFₓ = 0"],
+  balanceY: ["Vertical equilibrium", "ΣFᵧ = 0"],
+  apex: ["Vertical speed squared", "vᵧ² = v₀ᵧ² − 2g(y − y₀)"],
+  verticalV: ["Vertical velocity (+y up)", "vᵧ = v₀ᵧ − gt"],
+  gravWork: ["Conservative-force work · gravity", "W{g} = −mgΔy"],
+  rise: ["Vertical component of ramp displacement", "Δy = d sin θ"],
+  impulse: ["Net impulse", "J⃗ = Δp⃗"],
+  hooke: ["Spring force", "Fₛ = −kx"],
+  power: ["Average power", "P = W/Δt"],
+  torque: ["Torque magnitude", "τ = rF sin θ"],
+  static: ["Maximum static friction", "f{s,max} = μₛN"]
+};
+
+// Each pool omits equivalent formulas and viable alternative methods for that card.
+const quizKeys = {
+  cord2: {
+    answers:["inward"], others:["verticalV","hooke","power","static","slideWork","elasticSpeed"],
+    why:"The cord supplies the inward force. Set Tₘₐₓ = mv²/r, solve for v, then use half the radius for B."
+  },
+  twoballs: {
+    answers:["height","delay"], others:["inward","movingPulley","hooke","slideWork","static","elasticSpeed"],
+    why:"Use one height equation for each ball. Blue starts at rest and red starts at +10 m/s. Add 1.0 s to blue’s flight time before you compare the landing times."
+  },
+  boxwork: {
+    answers:["netWork","friction","slideWork"], others:["static","inward","elasticSpeed","hooke","height","torque"],
+    given:"Assume the push is horizontal. The mass can stay symbolic.",
+    why:"Both endpoint speeds are zero, so the push must replace the work lost to friction. On level ground N = mg, giving the push does μₖmgd of work."
+  },
+  ramp500: {
+    answers:["fallEnergy","stick","compression"], others:["static","movingPulley","elasticSpeed","torque","power","delay"],
+    given:"For this setup, assume release from rest and that the masses stick on impact.",
+    why:"Use the drop to get the first speed, then momentum to get the joined speed. Both masses compress the spring. The word “inelastic” alone does not specify that they stick."
+  },
+  pulley: {
+    answers:["axisForce","movingPulley"], others:["static","elasticSpeed","compression","power","delay","inward"],
+    why:"Draw both free-body diagrams. On the table, two tensions pull A. For B, subtract one tension from its weight. Two strands shorten at A, so B accelerates twice as fast."
+  },
+  springstick: {
+    answers:["compression","stick"], others:["elasticSpeed","slideWork","static","inward","movingPulley","fallEnergy"],
+    why:"Work backward. At maximum compression the joined masses have stopped. Spring energy gives their shared speed just after contact. Use sticking momentum for the incoming speed."
+  },
+  drop: {
+    answers:["fallEnergy","momentum"], others:["movingPulley","hooke","static","delay","elasticSpeed","slideWork"],
+    why:"The lost gravitational energy mgh equals the final kinetic energy. Use that same balance for speed, then p = mv for momentum. Its direction is downward."
+  },
+  chase: {
+    answers:["height","delay"], others:["slideWork","movingPulley","elasticSpeed","static","hooke","torque"],
+    why:"Find the dropped ball’s time from roof to ground. Subtract the 0.80 s delay. Use the remaining time in the height equation again, now solving for the pursuer’s starting velocity."
+  },
+  springelastic: {
+    answers:["compression","collision","elasticSpeed"], others:["stick","slideWork","static","fallEnergy","movingPulley","delay"],
+    why:"Only the block compresses the spring. Find its speed after impact. During contact, momentum is conserved and the relative speed of separation equals the relative speed of approach."
+  },
+  graph: {
+    answers:["area"], others:["impulse","power","torque","finalV","inward","static"],
+    why:"The horizontal axis is position. Count the area of the rectangle from 0–10 m, then the triangle from 10–15 m. Both contribute positive work."
+  },
+  tow: {
+    answers:["axisForce"], others:["inward","movingPulley","static","hooke","elasticSpeed","torque"],
+    given:"Assume the same maximum driving force and negligible resistance.",
+    why:"Use the force equation twice. The truck alone gives F = m(3.0 m/s²). With the bus, that same force accelerates a total mass of 3m."
+  },
+  car: {
+    answers:["noTime","finalV"], others:["inward","movingPulley","static","compression","elasticSpeed","delay"],
+    why:"Convert 1.033 km to metres. Part (a) gives acceleration and distance, so get the final speed without time. Use that speed in v = v₀ + at for part (b)."
+  },
+  vectors: {
+    answers:["forceX","forceY","sum","length","angle"], others:["static","torque","height","inward","power","elasticSpeed"],
+    why:"Resolve each arrow horizontally and vertically. Add the signed components, then use the two sums for magnitude and angle. Express the final angle counterclockwise from +x."
+  },
+  sled: {
+    answers:["friction","slideWork","netWork"], others:["static","inward","delay","stick","elasticSpeed","movingPulley"],
+    method:"Use the work–energy method.",
+    why:"On level ground N = mg. Sliding friction does negative work, which equals the change from the starting kinetic energy to zero. Solve for the initial speed."
+  },
+  sign: {
+    answers:["balanceX","balanceY"], others:["inward","movingPulley","compression","static","impulse","power"],
+    why:"Draw both tensions along the ropes and the weight down. The horizontal balance links the two tensions. The vertical balance uses both upward components and the weight."
+  },
+  platform: {
+    answers:["forceX","forceY","apex","height","verticalV"], others:["elasticSpeed","power","movingPulley","stick","inward","static"],
+    method:"Use components. Find peak height directly from vertical speeds, then use landing time to find the impact velocity.",
+    why:"Split the launch velocity. At the peak vᵧ = 0. At the ground y = 0. Use the positive landing time to find vᵧ, and keep vₓ at its launch value. Give the impact velocity as (vₓ, vᵧ)."
+  },
+  boxes: {
+    answers:["axisForce"], others:["inward","movingPulley","compression","static","delay","torque"],
+    why:"Draw the three free-body diagrams. Apply ΣFₓ = ma first to all three boxes for their acceleration, then to the 8 kg box alone for the contact force."
+  },
+  wingtip: {
+    answers:["circularSpeed","inwardAcceleration"], others:["movingPulley","hooke","verticalV","static","elasticSpeed","slideWork"],
+    why:"The period is the time for one circle. Divide the circumference by that time for speed, then use v²/r for the wingtip’s inward acceleration."
+  },
+  cord1: {
+    answers:["inward"], others:["hooke","power","static","elasticSpeed","slideWork","verticalV"],
+    why:"Tension provides the inward force. Put the breaking tension into T = mv²/r and solve for the maximum speed."
+  },
+  fixed: {
+    answers:["friction","slideWork","netWork"], others:["movingPulley","static","inward","elasticSpeed","delay","compression"],
+    why:"Draw both force diagrams. Gravity on the hanging mass adds m₂gd in work. Friction on the table mass removes μₖm₁gd. Their sum is the kinetic-energy gain of both masses at the same speed."
+  },
+  gravityramp: {
+    answers:["rise","gravWork"], others:["elasticSpeed","inward","movingPulley","static","compression","delay"],
+    method:"Use the change in height.",
+    why:"The rise is the distance along the ramp times sin 37°. The given 30 N is already the weight mg. Multiply that weight by the rise and give gravity’s work a negative sign."
+  }
+};
+quizKeys.ramp750 = quizKeys.ramp500;
+const quizCards = midtermSources.filter(source=>examPapers[source.id]).flatMap(source=>
+  source.keys.slice(3).map((key,index)=>({id:source.id+"/"+key,source,key,number:index+1}))
+);
+
+const quizStorage = "practiceEquations/";
+const quizAttemptKey = card => quizStorage + "attempt/" + card.id;
+
+function dealQuizChoices(card,previous=[]){
+  const {answers,others}=quizKeys[card.key];
+  // Refill distractor slots with previously unseen alternatives first.
+  const fresh=shuffle(others.filter(id=>!previous.includes(id)));
+  const choices=fresh.concat(shuffle(others.filter(id=>previous.includes(id)))).slice(0,3);
+  if(previous.length===answers.length+3){
+    return previous.map(id=>answers.includes(id)?id:choices.shift());
+  }
+  return shuffle([...answers,...choices]);
+}
+
+function readQuizAttempt(card){
+  const attempt=safeStore.get(quizAttemptKey(card),null);
+  const {answers,others}=quizKeys[card.key];
+  if(attempt && Array.isArray(attempt.choices) && attempt.choices.length===answers.length+3 &&
+     new Set(attempt.choices).size===attempt.choices.length && answers.every(id=>attempt.choices.includes(id)) &&
+     attempt.choices.every(id=>answers.includes(id)||others.includes(id)) && Array.isArray(attempt.picked)){
+    return attempt;
+  }
+  const initial={choices:dealQuizChoices(card),picked:[],result:""};
+  safeStore.set(quizAttemptKey(card),initial);
+  return initial;
+}
+
+function quizFormula(text){
+  const node=el("span",{class:"quiz-formula"});
+  // Curly braces denote subscripts in the authored formulas.
+  text.split(/(\{[^}]+\})/).forEach(part=>{
+    if(part.startsWith("{"))node.append(examNode("sub",part.slice(1,-1)));
+    else node.append(document.createTextNode(part));
+  });
+  return node;
+}
+
+function quizLastCard(){
+  const id=safeStore.get(quizStorage+"last",null);
+  return quizCards.find(card=>card.id===id)||quizCards[0];
+}
+
+function quizLauncher(parent){
+  const section=el("section",{class:"card quiz-launch","aria-labelledby":"quiz-home-title"});
+  const words=el("div");
+  words.append(examNode("h2","Practice exam equations",{id:"quiz-home-title"}),
+    examNode("p",quizCards.length+" problems · 4 practice exams"));
+  const started=!!safeStore.get(quizStorage+"last",null);
+  section.append(words,examLink(started?"Resume quiz":"Start quiz","equations","btn"));
+  parent.append(section);
+}
+
+function renderEquationQuiz(parent){
+  const requested=location.hash.slice(1).split("/").slice(1).join("/");
+  const card=quizCards.find(c=>c.id===requested)||quizLastCard();
+  const {answers,why,given,method}=quizKeys[card.key];
+  const paper=examPapers[card.source.id][card.key];
+  const attempt=readQuizAttempt(card);
+  const saveAttempt=()=>safeStore.set(quizAttemptKey(card),attempt);
+  safeStore.set(quizStorage+"last",card.id);
+  const root=el("section",{class:"card exam-section quiz-card","aria-label":"Practice exam equations"});
+  parent.append(root);
+  const header=el("div",{class:"quiz-header"});
+  header.append(examNode("h2","Practice exam equations",{class:"exam-title",tabindex:"-1"}),examLink("Close quiz","home"));
+  root.append(header);
+  const picker=el("select",{"aria-label":"Choose a practice exam problem",class:"quiz-picker"});
+  for(const source of midtermSources.filter(s=>examPapers[s.id])){
+    const group=el("optgroup",{label:source.title});
+    for(const entry of quizCards.filter(c=>c.source===source)){
+      group.append(examNode("option",source.title+" · Problem "+entry.number,{value:entry.id}));
+    }
+    picker.append(group);
+  }
+  picker.value=card.id;
+  picker.onchange=()=>{location.hash="equations/"+picker.value;};
+  const tools=el("div",{class:"quiz-tools"});
+  tools.append(picker,examNode("span","Paper p. "+paper.page+" · g = 10 m/s²",{class:"exam-meta"}));
+  root.append(tools);
+  examPaperPrompt(root,paper,card.key);
+  if(given || method)root.append(examNode("p",given || method,{class:"quiz-method"}));
+
+  const needed=answers.length;
+  const fieldset=el("fieldset",{class:"quiz-fieldset"});
+  const legend=examNode("legend",needed===1?"Choose 1 equation":"Select "+needed+" equations");
+  const grid=el("div",{class:"quiz-choices"});
+  fieldset.append(legend,grid);
+  root.append(fieldset);
+  const notes=el("details",{class:"exam-details exam-notes quiz-notes"});
+  const notesKey=quizStorage+"notes/"+card.id;
+  const field=el("textarea",{id:"eq-reason",rows:"3"});
+  field.value=safeStore.get(notesKey,"")||"";
+  field.oninput=()=>safeStore.set(notesKey,field.value);
+  notes.append(examNode("summary","My reasoning (optional)"),examNode("label",safeStore.persistent?
+    "Your notes · saved in this browser":"Your notes for this session",{for:"eq-reason"}),field);
+  const feedback=examNode("p","",{class:"exam-feedback",role:"status"});
+  const explanation=el("details",{class:"exam-hint"});
+  explanation.append(examNode("summary","Why these equations?"),examNode("p",why));
+  const footer=el("div",{class:"quiz-actions"});
+  root.append(notes,feedback,explanation,footer);
+  const count=examNode("span","",{class:"exam-meta","aria-live":"polite"});
+
+  function retry(){
+    attempt.choices=dealQuizChoices(card,attempt.choices);
+    attempt.picked=[];attempt.result="";explanation.open=false;saveAttempt();paint();
+    grid.querySelector("input").focus();
+  }
+  function nextCard(){
+    const i=quizCards.indexOf(card);
+    const next=[...quizCards.slice(i+1),...quizCards.slice(0,i)].find(c=>safeStore.get(quizAttemptKey(c),{})?.result!=="correct");
+    if(next){location.hash="equations/"+next.id;return;}
+    // A new pass keeps the notes and all correct options in their existing slots.
+    for(const entry of quizCards){
+      const old=readQuizAttempt(entry);
+      safeStore.set(quizAttemptKey(entry),{choices:dealQuizChoices(entry,old.choices),picked:[],result:""});
+    }
+    const path="#equations/"+quizCards[0].id;
+    if(location.hash===path){render();window.scrollTo(0,0);}else location.hash=path;
+  }
+  function paint(){
+    const checked=!!attempt.result;
+    grid.replaceChildren();footer.replaceChildren();
+    const submit=examNode("button","Check answer",{type:"button",class:"btn"});
+    function updateSelection(){
+      const full=attempt.picked.length===needed;
+      for(const input of grid.querySelectorAll("input")){
+        input.checked=attempt.picked.includes(input.value);
+        input.disabled=checked || (needed>1 && full && !input.checked);
+        input.parentElement.classList.toggle("quiz-selected",input.checked);
+      }
+      submit.disabled=checked || !full;
+      count.textContent=needed>1?attempt.picked.length+" of "+needed+" selected":"";
+    }
+    for(const id of attempt.choices){
+      const [name,formula]=quizEquations[id];
+      const label=el("label",{class:"quiz-choice"});
+      const input=el("input",{name:"equation-choice",type:needed===1?"radio":"checkbox",value:id});
+      const words=el("span");
+      words.append(examNode("span",name,{class:"quiz-label"}),quizFormula(formula));
+      label.append(input,words);grid.append(label);
+      input.onchange=()=>{
+        attempt.picked=needed===1?[id]:Array.from(grid.querySelectorAll("input:checked"),e=>e.value);
+        saveAttempt();updateSelection();
+      };
+    }
+    updateSelection();
+    feedback.className="exam-feedback"+(attempt.result==="correct"?" correct":"");
+    explanation.hidden=!checked;
+    if(!checked){
+      feedback.textContent="";
+      submit.onclick=()=>{
+        attempt.result=answers.every(id=>attempt.picked.includes(id))?"correct":"wrong";
+        saveAttempt();paint();
+        footer.querySelector("button").focus();
+      };
+      footer.append(submit,count);
+    }else if(attempt.result==="wrong"){
+      const hits=attempt.picked.filter(id=>answers.includes(id)).length;
+      feedback.textContent=needed===1?"Try another equation.":hits+" of your "+needed+" choices fit this setup.";
+      footer.append(examNode("button","Try again",{type:"button",class:"btn",onclick:retry}));
+    }else{
+      const complete=quizCards.every(c=>safeStore.get(quizAttemptKey(c),{})?.result==="correct");
+      feedback.textContent=complete?"Correct. You’ve checked all "+quizCards.length+" problems.":"Correct.";
+      footer.append(examNode("button",complete?"New round":"Next problem",{type:"button",class:"btn",onclick:nextCard}),
+        examNode("button","Practice again",{type:"button",class:"exam-text-button",onclick:retry}));
+    }
+  }
+  paint();
+}
+VIEWS.equations = VIEWS.home;
+
 function readCourseHash(){
   const name=location.hash.slice(1).split("/")[0];
   S.view=Object.prototype.hasOwnProperty.call(VIEWS,name)?name:"home";
