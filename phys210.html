@@ -7,7 +7,8 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.16  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.17  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  v2.17 (2026-11-24): Choose the free-fall equation from the known values.
   v2.16 (2026-11-24): Original practice papers, figures and independent setup.
   v2.15 (2026-11-24): Midterm practice in More, with source-labelled guided questions.
   v2.14 (2026-10-19, Mon): FORCES + FRICTION — today's transcript adds the four
@@ -2350,73 +2351,179 @@ const midtermBank = {
   ],
   "steps": [
    {
-    "ask": "Which equation gives red’s flight time from these givens?",
-    "options": [
-     "Δy = v₀ᵧt + ½aᵧt²",
-     "vᵧ = v₀ᵧ + aᵧt",
-     "Δy = v₀ᵧt"
+    "ask": "Which equation can you solve for blue’s time in the air?",
+    "rows": [
+     [
+      "Start height",
+      "y₀ = 30 m"
+     ],
+     [
+      "End height",
+      "y = 0 m"
+     ],
+     [
+      "Starting velocity",
+      "v₀ᵧ = 0 m/s (dropped)"
+     ],
+     [
+      "Gravity",
+      "g = 10 m/s², downward"
+     ]
     ],
-    "why": "The ground fixes displacement. Final velocity is unknown. The position equation uses just the givens and time."
-   },
-   {
-    "ask": "Take up as positive. What is the signed vertical displacement from roof to ground?",
-    "value": -30,
-    "unit": "m",
-    "tol": 0.01,
-    "hint": "Subtract the roof coordinate from the ground coordinate.",
-    "why": "Δy = y_f − y₀ = 0 − 30 = −30 m."
-   },
-   {
-    "ask": "On a clock starting at red’s release, when does red reach the ground?",
-    "value": 3.6457513110645907,
-    "unit": "s",
-    "tol": 0.025,
-    "hint": "Solve −30 = 10t − 5t² and take the positive root.",
-    "why": "t² − 2t − 6 = 0, so t = 1 + √7 ≈ 3.65 s."
-   },
-   {
-    "ask": "Which equation describes blue using τ, its time since release?",
+    "cue": "Look for t. For every other symbol, point to its value above. Up is positive.",
     "options": [
-     "−30 = −5τ²",
-     "−30 = 10τ − 5τ²",
-     "+30 = −5τ²"
+     "y = y₀ + v₀ᵧt − ½gt²",
+     "vᵧ = v₀ᵧ − gt",
+     "vᵧ² = v₀ᵧ² − 2g(y − y₀)"
     ],
-    "why": "Blue starts from rest. Its launch velocity term is zero. The displacement is still −30 m."
+    "misses": {
+     "vᵧ = v₀ᵧ − gt": "This has t. It also needs vᵧ, blue’s velocity when it hits. You only know its starting velocity. Try a formula using the two heights.",
+     "vᵧ² = v₀ᵧ² − 2g(y − y₀)": "This connects height to impact speed. Look for the unknown you were asked for, t."
+    },
+    "why": "The height equation has t. You can fill in y, y₀, v₀ᵧ and g, so t is the only unknown."
    },
    {
-    "ask": "How long is blue in the air after its own release?",
+    "ask": "How long does blue fall?",
+    "rows": [
+     [
+      "Equation",
+      "y = y₀ + v₀ᵧt − ½gt²"
+     ],
+     [
+      "Fill it in",
+      "0 = 30 + (0)t − ½(10)t²"
+     ],
+     [
+      "Simplify",
+      "5t² = 30, so t² = 6"
+     ]
+    ],
+    "cue": "Start blue’s timer when you let go. Take the positive square root to get seconds.",
     "value": 2.449489742783178,
     "unit": "s",
     "tol": 0.025,
-    "hint": "Blue starts from rest. Use −30 = −5τ², where τ is its time in the air.",
-    "why": "τ = √6 ≈ 2.45 s."
+    "hint": "Use √6. The 1.0 s wait happens before blue starts falling.",
+    "why": "Blue spends √6 ≈ 2.45 s in the air after its release."
    },
    {
-    "ask": "When does blue hit, measured from red’s release?",
+    "ask": "Your turn. Which setup gives red’s time in the air?",
+    "rows": [
+     [
+      "Heights",
+      "Roof 30 m → ground 0 m"
+     ],
+     [
+      "Starting velocity",
+      "+10 m/s (thrown up)"
+     ],
+     [
+      "Gravity",
+      "10 m/s², downward"
+     ]
+    ],
+    "cue": "Start red’s timer at its throw. Use red’s starting velocity and look for a single unknown, t.",
+    "options": [
+     "0 = 30 + 10t − 5t²",
+     "0 = 30 − 5t²",
+     "vᵧ = 10 − 10t"
+    ],
+    "misses": {
+     "0 = 30 − 5t²": "This uses a starting velocity of zero. Red is thrown upward at +10 m/s. Which term accounts for that?",
+     "vᵧ = 10 − 10t": "Both impact velocity vᵧ and time t are unknown here. Which setup uses the known ground height?"
+    },
+    "why": "0 = 30 + 10t − 5t². The +10t comes from the upward throw. The −5t² comes from downward gravity."
+   },
+   {
+    "ask": "How long is red in the air?",
+    "rows": [
+     [
+      "Start with",
+      "0 = 30 + 10t − 5t²"
+     ],
+     [
+      "Divide by −5",
+      "t² − 2t − 6 = 0"
+     ]
+    ],
+    "cue": "Keep the positive solution. It gives the time after the throw.",
+    "more": [
+     "Show the quadratic steps",
+     "In at² + bt + c = 0, a = 1, b = −2 and c = −6.",
+     "t = (−b ± √(b² − 4ac)) / (2a)",
+     "t = (2 ± √(4 + 24)) / 2 = 1 ± √7"
+    ],
+    "value": 3.6457513110645907,
+    "unit": "s",
+    "tol": 0.025,
+    "hint": "Evaluate 1 + √7. The negative root gives a time before the throw.",
+    "why": "Red spends 1 + √7 ≈ 3.65 s in the air. Since red was thrown at 0 s, the shared clock also reads 3.65 s when it lands."
+   },
+   {
+    "ask": "What does the shared clock read when blue lands?",
+    "rows": [
+     [
+      "Clock starts",
+      "0.00 s when red is thrown"
+     ],
+     [
+      "Blue is released",
+      "1.00 s on that clock"
+     ],
+     [
+      "Blue falls for",
+      "2.45 s after its release"
+     ]
+    ],
+    "cue": "Picture a stopwatch running through both the wait and the fall.",
     "value": 3.449489742783178,
     "unit": "s",
     "tol": 0.025,
-    "hint": "Add blue’s release delay to its flight time.",
-    "why": "t_blue = 1.00 + √6 ≈ 3.45 s."
+    "hint": "Add the 1.00 s wait to the 2.45 s fall.",
+    "why": "Blue lands at 1.00 + 2.45 = 3.45 s on the shared clock."
    },
    {
-    "ask": "Which ball arrives first?",
+    "ask": "Which ball lands first?",
+    "rows": [
+     [
+      "Red lands",
+      "3.65 s on the shared clock"
+     ],
+     [
+      "Blue lands",
+      "3.45 s on the shared clock"
+     ]
+    ],
     "options": [
      "Blue",
      "Red",
      "They arrive together"
     ],
-    "why": "The shared clock reads about 3.45 s for blue and 3.65 s for red."
+    "misses": {
+     "Red": "Red was released first. Compare the two landing times and pick the smaller number.",
+     "They arrive together": "Read the landing times on the same clock. Which number is smaller?"
+    },
+    "why": "Blue lands first. The clock reaches 3.45 s before 3.65 s."
    },
    {
-    "ask": "How much earlier does it arrive?",
+    "ask": "How much time passes between the two impacts?",
+    "rows": [
+     [
+      "First impact",
+      "Blue at 3.45 s"
+     ],
+     [
+      "Second impact",
+      "Red at 3.65 s"
+     ]
+    ],
     "value": 0.19626156828141283,
     "unit": "s",
     "tol": 0.012,
-    "hint": "Subtract the two arrival times on the same clock.",
-    "why": "Δt = (1 + √7) − (1 + √6) ≈ 0.20 s."
+    "hint": "Subtract the earlier clock reading from the later one.",
+    "why": "The gap is about 3.65 − 3.45 = 0.20 s."
    }
-  ]
+  ],
+  "revision": "givens-first"
  },
  "boxwork": {
   "ch": "6",
@@ -4385,9 +4492,19 @@ function examLabel(source,index){
   if(source.id==="worksheets") return index<4?"1D motion "+(index+1):"Projectiles "+(index-3);
   return source.id==="lecture"?"Class example "+(index+1):"Practice "+(index+1);
 }
-function examStoreKey(source,key){return "midtermNov26/"+source.id+"/"+key;}
+function examStoreKey(source,key,revision=midtermBank[key].revision){
+  const base="midtermNov26/"+source.id+"/"+key;
+  return revision?base+"/"+revision:base;
+}
 function examProgress(source,key){
-  const stored=safeStore.get(examStoreKey(source,key),{})||{};
+  let stored=safeStore.get(examStoreKey(source,key),null);
+  if(!stored && midtermBank[key].revision){
+    const previous=safeStore.get(examStoreKey(source,key,""),{})||{};
+    // The lesson order changed. Carry the learner's writing into the new first step.
+    stored={step:previous.setupDone?0:-1,setupDone:previous.setupDone,
+      givensDraft:previous.givensDraft,onPaper:previous.onPaper,notes:previous.notes};
+  }
+  stored=stored||{};
   const total=midtermBank[key].steps.length;
   const step=Number.isInteger(stored.step)?Math.max(-1,Math.min(total,stored.step)):-1;
   const revisedValues=(key==="springstick" || key==="springelastic") && stored.originalPaper!==true;
@@ -4702,7 +4819,7 @@ function examProblem(root,s,key){
     if(state.step>0){
       const prior=item.steps.slice(0,state.step);
       const equations=prior.filter(prev=>prev.options && prev.options[0].includes("="));
-      if(!step.options && equations.length){
+      if(!step.options && !step.rows && equations.length){
         const selected=el("div",{class:"exam-equation"});
         selected.append(examNode("small","Selected equation"),examNode("span",equations[equations.length-1].options[0]));root.append(selected);
       }
@@ -4712,6 +4829,18 @@ function examProblem(root,s,key){
     }
     root.append(examNode("p","Step "+(state.step+1)+" of "+total,{class:"exam-meta"}));
     root.append(examNode("h3",step.ask,{class:"exam-step-title",tabindex:"-1"}));
+    if(step.rows){
+      const givens=el("dl",{class:"exam-givens"});
+      step.rows.forEach(([label,value])=>givens.append(examNode("dt",label),examNode("dd",value)));
+      root.append(givens);
+    }
+    if(step.cue)root.append(examNode("p",step.cue,{class:"exam-desc"}));
+    if(step.more){
+      const [label,...lines]=step.more;
+      const detail=el("details",{class:"exam-hint"});
+      detail.append(examNode("summary",label),...lines.map(line=>examNode("p",line)));
+      root.append(detail);
+    }
     const task=el("div",{class:"exam-task"}),feedback=el("p",{role:"status",class:"exam-feedback"}),next=el("div");
     root.append(task,feedback,next);
     let answered=state.checked;
@@ -4735,7 +4864,7 @@ function examProblem(root,s,key){
         b.addEventListener("click",()=>{
           if(answered)return;
           if(option===step.options[0]){b.classList.add("picked-right");correct();}
-          else{b.classList.add("picked-wrong");b.disabled=true;feedback.textContent="Try again. "+step.why;}
+          else{b.classList.add("picked-wrong");b.disabled=true;feedback.textContent=step.misses?.[option] || "Try again. "+step.why;}
         });task.append(b);
       });
     }else{
