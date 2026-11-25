@@ -7,7 +7,8 @@
 <title>PHYS 210 · Physics Bootcamp</title>
 <!--
   ============================================================
-  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.19  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  PHYS 210 — PHYSICS BOOTCAMP  ·  v2.20  ·  built 2026-09-09, reskinned 2026-09-13, lecture intake 2026-10-19
+  v2.20 (2026-11-25): Three interactive quizzes on Today, separate restarts and a collapsible Canvas reminder.
   v2.19 (2026-11-25): Today concepts and print sheets; multi-equation retries keep correct picks.
   v2.18 (2026-11-25): Home-page practice exam equation quiz.
   v2.17 (2026-11-24): Choose the free-fall equation from the known values.
@@ -1047,9 +1048,13 @@ textarea.report{
 .exam-equation{border-left:3px solid var(--teal);padding:.45rem .7rem;margin:.5rem 0 .8rem;line-height:1.5;background:var(--surface2);color:var(--ink)}
 .quiz-launch,.quiz-header,.quiz-tools,.quiz-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem}
 
-.today-concept-row,.today-print-links{flex:1 0 100%;box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:.45rem;border-top:1px solid var(--line);padding-top:.65rem}
-.today-print-links{justify-content:flex-start;column-gap:1rem}
-.today-print-links strong{font-size:.9rem}
+.today-quiz-row,.today-print-links{flex:1 0 100%;box-sizing:border-box;border-top:1px solid var(--line);padding-top:.65rem}
+.today-quiz-row:first-child{border:0;padding-top:0}
+.today-quiz-row,.today-quiz-actions,.canvas-heading,.print-downloads{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem}
+.today-quiz-row,.canvas-heading{justify-content:space-between}
+.today-print-links summary{cursor:pointer;line-height:44px;color:var(--teal-dk)}
+.canvas-heading h2{margin:0;font-size:1.25rem}
+.canvas-heading .exam-text-button{margin-inline-start:auto}
 .today-print-links a{font-size:.9rem;min-height:36px}
 .concept-choices{display:grid;gap:.45rem;margin:.55rem 0}
 .quiz-launch h2,.quiz-launch p,.quiz-tools .exam-meta{margin:0}
@@ -1128,7 +1133,7 @@ async function cloudPull(){
     if (!r.ok) throw 0;
     const rows = await r.json();
     mergeRemote(rows[0] && rows[0].data);
-    cloudState = "synced"; save(); if(typeof render==="function" && S.view!=="midterm" && S.view!=="equations" && S.view!=="concepts") render(); cloudPush(true);
+    cloudState = "synced"; save(); if(typeof render==="function" && !["midterm","equations","equations-only","concepts"].includes(S.view)) render(); cloudPush(true);
   } catch(e){ cloudState = "offline"; renderSyncDot(); }
 }
 async function cloudPush(now){
@@ -1605,7 +1610,7 @@ function go(view){
   S.view=view; render(); window.scrollTo(0,0); }
 function renderNav(){
   const n=$("#nav"); n.innerHTML="";
-  const active = ["equations","concepts"].includes(S.view) ? "home" : NAV_SECONDARY.includes(S.view) ? "more" : S.view;
+  const active = ["equations","equations-only","concepts"].includes(S.view) ? "home" : NAV_SECONDARY.includes(S.view) ? "more" : S.view;
   NAV.forEach(t=>{
     const b=el("button",{class:active===t.id?"active":"",onclick:()=>go(t.id),"aria-label":t.label+" — "+t.purpose});
     b.innerHTML='<span class="ico">'+t.ico+'</span><span class="nav-label">'+t.label+'</span><span class="nav-purpose">'+t.purpose+'</span>';
@@ -1642,9 +1647,7 @@ VIEWS.more = (v) => {
 
 /* ---- HOME ---- */
 VIEWS.home = (v) => {
-  if(S.view==="equations")renderEquationQuiz(v);
-  else if(S.view==="concepts")renderConceptQuiz(v);
-  else quizLauncher(v);
+  quizLauncher(v);
   const t = todayStr();
   // re-entry ritual: gap of 2+ days since previous visit
   const prev = S.visits.filter(d=>d<t).sort().pop();
@@ -1659,14 +1662,27 @@ VIEWS.home = (v) => {
   if (t >= CLASS_START){
     const card0 = el("div",{class:"card teal"});
     const isClassNight = [1,3].includes(new Date(t+"T12:00:00").getDay()); // Mon/Wed
-    card0.innerHTML = '<span class="tag gold">Semester mode</span>'+
-      '<h2 style="font-size:1.4rem">Deadlines live on Canvas — check there first</h2>'+
-      '<p style="margin:6px 0 14px;opacity:.92">This app is practice, not your planner. '+
+    const head = el("div",{class:"canvas-heading"});
+    const toggle = examNode("button","",{type:"button",class:"exam-text-button","aria-controls":"canvas-deadlines-body"});
+    head.append(examNode("h2","Canvas deadlines"),toggle);
+    const body = el("div",{id:"canvas-deadlines-body"});
+    body.innerHTML = '<p style="margin:6px 0 14px;opacity:.92">Check Canvas for due dates. '+
       (isClassNight?'<b>Tonight is a class night: journal in your own words, cold, before sleep.</b> (Claude checks recall only AFTER you write.) ':'')+
       'Highest-yield practice here: the Problem Lab, blank-page first.</p>';
-    card0.appendChild(el("button",{class:"bigbtn",onclick:()=>{ go("lab"); }},"▶ &nbsp;Open the Problem Lab"));
-    card0.appendChild(el("button",{class:"btn coral",style:"margin-top:8px",onclick:()=>{ startDrill("pick"); }},"🔑 &nbsp;Which equation? — 2-minute drill"));
-    card0.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{ go("map"); }},"🧭 &nbsp;Confused about how this class works? Course Map"));
+    body.appendChild(el("button",{class:"bigbtn",onclick:()=>{ go("lab"); }},"▶ &nbsp;Open the Problem Lab"));
+    body.appendChild(el("button",{class:"btn coral",style:"margin-top:8px",onclick:()=>{ startDrill("pick"); }},"🔑 &nbsp;Which equation? — 2-minute drill"));
+    body.appendChild(el("button",{class:"btn gold",style:"margin-top:8px",onclick:()=>{ go("map"); }},"🧭 &nbsp;Confused about how this class works? Course Map"));
+    function showDeadlines(expanded){
+      body.hidden=!expanded;
+      toggle.setAttribute("aria-expanded",String(expanded));
+      toggle.textContent=expanded?"Minimize":"Expand";
+    }
+    showDeadlines(safeStore.get("today/deadlinesExpanded",true));
+    toggle.onclick=()=>{
+      showDeadlines(body.hidden);
+      safeStore.set("today/deadlinesExpanded",!body.hidden);
+    };
+    card0.append(head,body);
     v.appendChild(card0);
     if(t <= "2026-10-16"){
       v.appendChild(el("div",{class:"card",style:"border-color:var(--coral)"},
@@ -5073,8 +5089,11 @@ const quizCards = midtermSources.filter(source=>examPapers[source.id]).flatMap(s
   source.keys.slice(3).map((key,index)=>({id:source.id+"/"+key,source,key,number:index+1}))
 );
 
-const quizStorage = "practiceEquations/";
-const quizAttemptKey = card => quizStorage + "attempt/" + card.id;
+const equationModes = {
+  equations:{title:"Labeled equations",storage:"practiceEquations/",showNames:true},
+  "equations-only":{title:"Equations only",storage:"practiceEquationsOnly/",showNames:false}
+};
+const quizAttemptKey = (card,mode) => mode.storage + "attempt/" + card.id;
 
 function dealQuizChoices(card,previous=[]){
   const {answers,others}=quizKeys[card.key];
@@ -5087,8 +5106,8 @@ function dealQuizChoices(card,previous=[]){
   return shuffle([...answers,...choices]);
 }
 
-function readQuizAttempt(card){
-  const attempt=safeStore.get(quizAttemptKey(card),null);
+function readQuizAttempt(card,mode){
+  const attempt=safeStore.get(quizAttemptKey(card,mode),null);
   const {answers,others}=quizKeys[card.key];
   if(attempt && Array.isArray(attempt.choices) && attempt.choices.length===answers.length+3 &&
      new Set(attempt.choices).size===attempt.choices.length && answers.every(id=>attempt.choices.includes(id)) &&
@@ -5096,7 +5115,7 @@ function readQuizAttempt(card){
     return attempt;
   }
   const initial={choices:dealQuizChoices(card),picked:[],result:""};
-  safeStore.set(quizAttemptKey(card),initial);
+  safeStore.set(quizAttemptKey(card,mode),initial);
   return initial;
 }
 
@@ -5111,34 +5130,59 @@ function quizFormula(text){
   return node;
 }
 
-function quizLastCard(){
-  const id=safeStore.get(quizStorage+"last",null);
+function quizLastCard(mode){
+  const id=safeStore.get(mode.storage+"last",null);
   return quizCards.find(card=>card.id===id)||quizCards[0];
 }
 
-function quizLauncher(parent){
-  const section=el("section",{class:"card quiz-launch","aria-labelledby":"quiz-home-title"});
+function restartEquations(route){
+  const mode=equationModes[route];
+  for(const card of quizCards){
+    const previous=safeStore.get(quizAttemptKey(card,mode),null);
+    if(previous){
+      safeStore.set(quizAttemptKey(card,mode),{choices:dealQuizChoices(card,readQuizAttempt(card,mode).choices),picked:[],result:""});
+    }
+  }
+  const path="#"+route+"/"+quizCards[0].id;
+  if(location.hash===path){render();window.scrollTo(0,0);}else location.hash=path;
+}
+
+function todayQuizRow(route,title,description,started,label,resume,restart){
+  const row=el("section",{class:"today-quiz-row","aria-label":title});
   const words=el("div");
-  words.append(examNode("h2","Practice exam equations",{id:"quiz-home-title"}),
-    examNode("p",quizCards.length+" problems · 4 practice exams"));
-  const started=!!safeStore.get(quizStorage+"last",null);
-  section.append(words,examLink(started?"Resume quiz":"Start quiz","equations","btn"));
+  words.append(examNode("h2",title),examNode("p",description));
+  const actions=el("div",{class:"today-quiz-actions"});
+  actions.append(examLink(started?resume:label,route,"btn"));
+  if(started)actions.append(examNode("button","Start over",{type:"button",class:"exam-text-button",onclick:restart,
+    "aria-label":"Start over — "+title,title:"Restart this quiz at question 1. Your reasoning notes stay saved."}));
+  row.append(words,actions);
+  return row;
+}
+
+function quizLauncher(parent){
+  const section=el("section",{class:"card quiz-launch","aria-label":"Practice quizzes"});
+  for(const [route,mode] of Object.entries(equationModes)){
+    const started=!!safeStore.get(mode.storage+"last",null);
+    const description=quizCards.length+" exam problems · "+(mode.showNames?"formulas with names":"formulas without names");
+    section.append(todayQuizRow(route,mode.title,description,started,"Start quiz","Resume quiz",()=>restartEquations(route)));
+  }
   addStudyLinks(section);
   parent.append(section);
 }
 
-function renderEquationQuiz(parent){
+function renderEquationQuiz(parent,route){
+  const mode=equationModes[route];
   const requested=location.hash.slice(1).split("/").slice(1).join("/");
-  const card=quizCards.find(c=>c.id===requested)||quizLastCard();
+  const card=quizCards.find(c=>c.id===requested)||quizLastCard(mode);
   const {answers,why,given,method}=quizKeys[card.key];
   const paper=examPapers[card.source.id][card.key];
-  const attempt=readQuizAttempt(card);
-  const saveAttempt=()=>safeStore.set(quizAttemptKey(card),attempt);
-  safeStore.set(quizStorage+"last",card.id);
-  const root=el("section",{class:"card exam-section quiz-card","aria-label":"Practice exam equations"});
+  const attempt=readQuizAttempt(card,mode);
+  const saveAttempt=()=>safeStore.set(quizAttemptKey(card,mode),attempt);
+  safeStore.set(mode.storage+"last",card.id);
+  const root=el("section",{class:"card exam-section quiz-card","aria-label":mode.title});
   parent.append(root);
   const header=el("div",{class:"quiz-header"});
-  header.append(examNode("h2","Practice exam equations",{class:"exam-title",tabindex:"-1"}),examLink("Close quiz","home"));
+  header.append(examNode("h2",mode.title,{class:"exam-title",tabindex:"-1"}),examLink("Close quiz","home"));
   root.append(header);
   const picker=el("select",{"aria-label":"Choose a practice exam problem",class:"quiz-picker"});
   for(const source of midtermSources.filter(s=>examPapers[s.id])){
@@ -5149,7 +5193,7 @@ function renderEquationQuiz(parent){
     picker.append(group);
   }
   picker.value=card.id;
-  picker.onchange=()=>{location.hash="equations/"+picker.value;};
+  picker.onchange=()=>{location.hash=route+"/"+picker.value;};
   const tools=el("div",{class:"quiz-tools"});
   tools.append(picker,examNode("span","Paper p. "+paper.page+" · g = 10 m/s²",{class:"exam-meta"}));
   root.append(tools);
@@ -5163,7 +5207,7 @@ function renderEquationQuiz(parent){
   fieldset.append(legend,grid);
   root.append(fieldset);
   const notes=el("details",{class:"exam-details exam-notes quiz-notes"});
-  const notesKey=quizStorage+"notes/"+card.id;
+  const notesKey=mode.storage+"notes/"+card.id;
   const field=el("textarea",{id:"eq-reason",rows:"3"});
   field.value=safeStore.get(notesKey,"")||"";
   field.oninput=()=>safeStore.set(notesKey,field.value);
@@ -5185,15 +5229,9 @@ function renderEquationQuiz(parent){
   }
   function nextCard(){
     const i=quizCards.indexOf(card);
-    const next=[...quizCards.slice(i+1),...quizCards.slice(0,i)].find(c=>safeStore.get(quizAttemptKey(c),{})?.result!=="correct");
-    if(next){location.hash="equations/"+next.id;return;}
-    // A new pass keeps the notes and all correct options in their existing slots.
-    for(const entry of quizCards){
-      const old=readQuizAttempt(entry);
-      safeStore.set(quizAttemptKey(entry),{choices:dealQuizChoices(entry,old.choices),picked:[],result:""});
-    }
-    const path="#equations/"+quizCards[0].id;
-    if(location.hash===path){render();window.scrollTo(0,0);}else location.hash=path;
+    const next=[...quizCards.slice(i+1),...quizCards.slice(0,i)].find(c=>safeStore.get(quizAttemptKey(c,mode),{})?.result!=="correct");
+    if(next){location.hash=route+"/"+next.id;return;}
+    restartEquations(route);
   }
   function paint(){
     const checked=!!attempt.result;
@@ -5215,7 +5253,8 @@ function renderEquationQuiz(parent){
       const label=el("label",{class:"quiz-choice"});
       const input=el("input",{name:"equation-choice",type:needed===1?"radio":"checkbox",value:id});
       const words=el("span");
-      words.append(examNode("span",name,{class:"quiz-label"}),quizFormula(formula));
+      if(mode.showNames)words.append(examNode("span",name,{class:"quiz-label"}));
+      words.append(quizFormula(formula));
       label.append(input,words);grid.append(label);
       input.onchange=()=>{
         const picks=new Set(attempt.picked);
@@ -5241,7 +5280,7 @@ function renderEquationQuiz(parent){
       feedback.textContent=needed===1?"Try another equation.":hits+" of "+needed+" correct."+(hits?" Try again to keep your correct "+(hits===1?"choice.":"choices."):"");
       footer.append(examNode("button","Try again",{type:"button",class:"btn",onclick:retry}));
     }else{
-      const complete=quizCards.every(c=>safeStore.get(quizAttemptKey(c),{})?.result==="correct");
+      const complete=quizCards.every(c=>safeStore.get(quizAttemptKey(c,mode),{})?.result==="correct");
       feedback.textContent=complete?"Correct. You’ve checked all "+quizCards.length+" problems.":"Correct.";
       footer.append(examNode("button",complete?"New round":"Next problem",{type:"button",class:"btn",onclick:nextCard}),
         examNode("button","Practice again",{type:"button",class:"exam-text-button",onclick:retry}));
@@ -5571,17 +5610,20 @@ const collisionRules = [
   ]
 ];
 const conceptProgress = "practiceConcepts/";
+function restartConcepts(){
+  for(const card of conceptCards)safeStore.set(conceptProgress+"answer/"+card.id,null);
+  location.hash="concepts/"+conceptCards[0].id;
+}
 function addStudyLinks(section){
-  const row=el("div",{class:"today-concept-row"});
-  const words=el("div");
-  words.append(examNode("h2","Concepts and multiple choice"),examNode("p","Collisions, forces, momentum and energy"));
   const last=safeStore.get(conceptProgress+"last",null);
-  row.append(words,examLink(last?"Resume concepts":"Practice concepts","concepts","btn"));
-  const files=el("div",{class:"today-print-links","aria-label":"Printable study sheets"});
-  files.append(examNode("strong","Printable PDFs"));
+  const row=todayQuizRow("concepts","Concepts and multiple choice",conceptCards.length+" questions · collisions, forces, momentum and energy",last,"Answer concepts in app","Resume concepts",restartConcepts);
+  const files=el("details",{class:"today-print-links"});
+  files.append(examNode("summary","Printable PDFs"));
+  const downloads=el("div",{class:"print-downloads"});
   for(const sheet of studySheets){
-    files.append(examNode("a",sheet.label,{class:"exam-link",download:sheet.name,href:"data:application/pdf;base64,"+sheet.data}));
+    downloads.append(examNode("a",sheet.label,{class:"exam-link",download:sheet.name,href:"data:application/pdf;base64,"+sheet.data}));
   }
+  files.append(downloads);
   section.append(row,files);
 }
 function renderConceptQuiz(parent){
@@ -5657,8 +5699,9 @@ function renderConceptQuiz(parent){
   update();
 }
 
-VIEWS.equations = VIEWS.home;
-VIEWS.concepts = VIEWS.home;
+VIEWS.equations = parent=>renderEquationQuiz(parent,"equations");
+VIEWS["equations-only"] = parent=>renderEquationQuiz(parent,"equations-only");
+VIEWS.concepts = renderConceptQuiz;
 
 function readCourseHash(){
   const name=location.hash.slice(1).split("/")[0];
